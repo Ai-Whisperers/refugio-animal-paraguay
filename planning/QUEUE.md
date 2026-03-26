@@ -74,7 +74,7 @@ Week 3-4:
 | # | Story | Epic | Points | Status |
 |---|-------|------|--------|--------|
 | 1 | Event Bus Infrastructure | EPIC-9 S05 | 8 | DONE (PR #8) |
-| 2 | Audit Trail System | EPIC-13 S01 | 7 | READY (can start late V1) |
+| 2 | Audit Trail System | EPIC-13 S01 | 7 | DONE (PR #9) |
 | 3 | Stripe Webhook Processing | EPIC-3 S01 (remaining) | 8 | BLOCKED on V1 |
 | 4 | SEPA Direct Debit | EPIC-3 S02 | 8 | BLOCKED on #3 |
 | 5 | GDPR Consent Tracking | EPIC-13 S07 | 5 | BLOCKED on #2 |
