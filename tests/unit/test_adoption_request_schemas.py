@@ -1,11 +1,10 @@
 """Unit tests for src/schemas/adoption_request.py."""
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from uuid import uuid4
 
 import pytest
 from pydantic import ValidationError
-
 from src.db.models.adoption_request import AdoptionRequestStatus
 from src.schemas.adoption_request import (
     AdoptionRequestCreate,
@@ -71,7 +70,7 @@ class TestAdoptionRequestStatusUpdate:
 
 class TestAdoptionRequestResponse:
     def test_from_orm_attributes(self) -> None:
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         uid = uuid4()
         _animal_id = uuid4()
         _adopter_id = uuid4()
@@ -93,7 +92,7 @@ class TestAdoptionRequestResponse:
         assert resp.decided_at is None
 
     def test_approved_status_from_orm(self) -> None:
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
 
         class _FakeRequest:
             id = uuid4()

@@ -6,7 +6,7 @@ Provides initial test data for development and staging environments:
 """
 
 import uuid
-from datetime import date, datetime, timedelta, timezone
+from datetime import UTC, date, datetime, timedelta
 
 import sqlalchemy as sa
 from alembic import op
@@ -98,7 +98,7 @@ def upgrade() -> None:
             "email": "juan.lopez@example.com",
             "phone": "+595 21 123456",
             "address": "Barrio San Lorenzo, Asunción, Paraguay",
-            "gdpr_consent_at": datetime.now(timezone.utc),
+            "gdpr_consent_at": datetime.now(UTC),
         },
         {
             "id": uuid.UUID("550e8400-e29b-41d4-a716-446655441002"),
@@ -106,7 +106,7 @@ def upgrade() -> None:
             "email": "maria.garcia@example.com",
             "phone": "+595 21 654321",
             "address": "Barrio Ñemby, Encarnación, Paraguay",
-            "gdpr_consent_at": datetime.now(timezone.utc),
+            "gdpr_consent_at": datetime.now(UTC),
         },
     ]
 
@@ -147,6 +147,4 @@ def downgrade() -> None:
     op.execute(
         "DELETE FROM adopters WHERE email IN ('juan.lopez@example.com', 'maria.garcia@example.com')"
     )
-    op.execute(
-        "DELETE FROM animals WHERE name IN ('Buddy', 'Luna', 'Max', 'Whiskers', 'Rex')"
-    )
+    op.execute("DELETE FROM animals WHERE name IN ('Buddy', 'Luna', 'Max', 'Whiskers', 'Rex')")

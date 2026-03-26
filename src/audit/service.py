@@ -92,9 +92,7 @@ class AuditService:
             count_query = count_query.where(AuditLog.action == action)
         if resource_type is not None:
             query = query.where(AuditLog.resource_type == resource_type)
-            count_query = count_query.where(
-                AuditLog.resource_type == resource_type
-            )
+            count_query = count_query.where(AuditLog.resource_type == resource_type)
         if resource_id is not None:
             query = query.where(AuditLog.resource_id == resource_id)
             count_query = count_query.where(AuditLog.resource_id == resource_id)

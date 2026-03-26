@@ -14,7 +14,6 @@ import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
-
 from src.app import app
 from src.auth.utils import create_access_token, hash_password
 from src.config import Settings
@@ -37,9 +36,7 @@ async def client() -> AsyncGenerator[AsyncClient, None]:
     engine = init_engine(settings)
 
     # Upsert test staff user (ON CONFLICT keeps idempotent across runs)
-    session_factory = async_sessionmaker(
-        bind=engine, class_=AsyncSession, expire_on_commit=False
-    )
+    session_factory = async_sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
     async with session_factory() as session:
         await session.execute(
             text("""

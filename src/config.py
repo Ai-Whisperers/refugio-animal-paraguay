@@ -31,9 +31,7 @@ class Settings(BaseSettings):
     def validate_database_url(cls, value: str) -> str:
         # asyncpg driver required for async SQLAlchemy; psycopg2 is sync-only.
         if not value.startswith("postgresql+asyncpg://"):
-            raise ValueError(
-                "database_url must use the asyncpg driver: postgresql+asyncpg://..."
-            )
+            raise ValueError("database_url must use the asyncpg driver: postgresql+asyncpg://...")
         return value
 
     # Application
@@ -120,6 +118,16 @@ class Settings(BaseSettings):
     email_from_name: str = Field(
         default="Refugio Animal Paraguay",
         description="Default sender display name.",
+    )
+
+    # Stripe
+    stripe_secret_key: str = Field(
+        default="",
+        description="Stripe API secret key. Required for payment processing.",
+    )
+    stripe_webhook_secret: str = Field(
+        default="",
+        description="Stripe webhook signing secret (whsec_...). Required to verify webhook signatures.",
     )
 
     # Rate limiting

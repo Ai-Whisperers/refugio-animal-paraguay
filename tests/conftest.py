@@ -20,6 +20,7 @@ def _disable_rate_limiting() -> None:
     """Disable rate limiting globally for tests."""
     configure_limiter(enabled=False)
 
+
 # ---------------------------------------------------------------------------
 # Deterministic IDs for reproducible tests
 # ---------------------------------------------------------------------------

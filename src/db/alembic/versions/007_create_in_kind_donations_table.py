@@ -97,7 +97,5 @@ def upgrade() -> None:
 def downgrade() -> None:
     op.drop_index("ix_in_kind_donations_item_type", table_name="in_kind_donations")
     op.drop_index("ix_in_kind_donations_donor_date", table_name="in_kind_donations")
-    op.drop_constraint(
-        "chk_in_kind_donations_item_type", "in_kind_donations", type_="check"
-    )
+    op.drop_constraint("chk_in_kind_donations_item_type", "in_kind_donations", type_="check")
     op.drop_table("in_kind_donations")

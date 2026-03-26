@@ -1,7 +1,6 @@
 """Unit tests for src/config.py — Settings class."""
 
 import pytest
-
 from src.config import Settings
 
 
@@ -30,9 +29,7 @@ class TestSettingsDefaults:
 
 
 class TestSettingsEnvOverride:
-    def test_database_url_overridden_via_env(
-        self, monkeypatch: pytest.MonkeyPatch
-    ) -> None:
+    def test_database_url_overridden_via_env(self, monkeypatch: pytest.MonkeyPatch) -> None:
         url = "postgresql+asyncpg://user:pass@db:5432/mydb"
         monkeypatch.setenv("DATABASE_URL", url)
         s = Settings()

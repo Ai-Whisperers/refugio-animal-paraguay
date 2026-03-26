@@ -35,12 +35,8 @@ router = APIRouter(prefix="/admin", tags=["admin"])
 async def list_audit_logs(
     user_id: UUID | None = Query(default=None, description="Filter by user ID"),
     action: str | None = Query(default=None, description="Filter by action type"),
-    resource_type: str | None = Query(
-        default=None, description="Filter by resource type"
-    ),
-    resource_id: str | None = Query(
-        default=None, description="Filter by resource ID"
-    ),
+    resource_type: str | None = Query(default=None, description="Filter by resource type"),
+    resource_id: str | None = Query(default=None, description="Filter by resource ID"),
     start_date: datetime | None = Query(
         default=None, description="Filter entries from this date (inclusive)"
     ),
@@ -111,45 +107,44 @@ async def export_audit_logs(
     if format == "json":
         import json
 
-        data = [
-            AuditLogResponse.model_validate(e).model_dump(mode="json")
-            for e in entries
-        ]
+        data = [AuditLogResponse.model_validate(e).model_dump(mode="json") for e in entries]
         content = json.dumps(data, indent=2, default=str)
         return StreamingResponse(
             iter([content]),
             media_type="application/json",
-            headers={
-                "Content-Disposition": "attachment; filename=audit-logs.json"
-            },
+            headers={"Content-Disposition": "attachment; filename=audit-logs.json"},
         )
 
     # CSV export (default)
     output = io.StringIO()
     writer = csv.writer(output)
-    writer.writerow([
-        "id",
-        "user_id",
-        "action",
-        "resource_type",
-        "resource_id",
-        "timestamp",
-        "ip_address",
-        "user_agent",
-        "request_id",
-    ])
+    writer.writerow(
+        [
+            "id",
+            "user_id",
+            "action",
+            "resource_type",
+            "resource_id",
+            "timestamp",
+            "ip_address",
+            "user_agent",
+            "request_id",
+        ]
+    )
     for entry in entries:
-        writer.writerow([
-            str(entry.id),
-            str(entry.user_id),
-            entry.action,
-            entry.resource_type,
-            entry.resource_id or "",
-            entry.timestamp.isoformat() if entry.timestamp else "",
-            entry.ip_address or "",
-            entry.user_agent or "",
-            entry.request_id or "",
-        ])
+        writer.writerow(
+            [
+                str(entry.id),
+                str(entry.user_id),
+                entry.action,
+                entry.resource_type,
+                entry.resource_id or "",
+                entry.timestamp.isoformat() if entry.timestamp else "",
+                entry.ip_address or "",
+                entry.user_agent or "",
+                entry.request_id or "",
+            ]
+        )
 
     output.seek(0)
     return StreamingResponse(

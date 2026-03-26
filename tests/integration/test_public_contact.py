@@ -134,18 +134,14 @@ async def test_submit_contact_no_auth_required(public_client: AsyncClient):
 
 
 @pytest.mark.asyncio
-async def test_submit_animal_inquiry_success(
-    public_client: AsyncClient, seed_animal: uuid.UUID
-):
+async def test_submit_animal_inquiry_success(public_client: AsyncClient, seed_animal: uuid.UUID):
     """Successful animal inquiry returns 201."""
     payload = {
         "visitor_name": "Juan Lopez",
         "visitor_email": f"inquiry-{uuid.uuid4().hex[:8]}@example.com",
         "message": "I am very interested in adopting this animal. Can you tell me more?",
     }
-    response = await public_client.post(
-        f"/public/animals/{seed_animal}/inquiries", json=payload
-    )
+    response = await public_client.post(f"/public/animals/{seed_animal}/inquiries", json=payload)
     assert response.status_code == 201
     data = response.json()
     assert data["form_type"] == "animal_inquiry"
@@ -162,9 +158,7 @@ async def test_submit_animal_inquiry_nonexistent_animal(
         "visitor_email": "test@example.com",
         "message": "I am interested in adopting this animal please.",
     }
-    response = await public_client.post(
-        f"/public/animals/{uuid.uuid4()}/inquiries", json=payload
-    )
+    response = await public_client.post(f"/public/animals/{uuid.uuid4()}/inquiries", json=payload)
     assert response.status_code == 404
 
 
@@ -178,9 +172,7 @@ async def test_submit_animal_inquiry_invalid_message(
         "visitor_email": "test@example.com",
         "message": "Too short",
     }
-    response = await public_client.post(
-        f"/public/animals/{seed_animal}/inquiries", json=payload
-    )
+    response = await public_client.post(f"/public/animals/{seed_animal}/inquiries", json=payload)
     assert response.status_code == 422
 
 
@@ -194,7 +186,5 @@ async def test_submit_animal_inquiry_no_auth_required(
         "visitor_email": f"noauth-{uuid.uuid4().hex[:8]}@example.com",
         "message": "I would like to learn more about this animal please.",
     }
-    response = await public_client.post(
-        f"/public/animals/{seed_animal}/inquiries", json=payload
-    )
+    response = await public_client.post(f"/public/animals/{seed_animal}/inquiries", json=payload)
     assert response.status_code in (201, 429)

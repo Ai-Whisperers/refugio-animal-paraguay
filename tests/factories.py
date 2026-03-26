@@ -157,10 +157,10 @@ class VerificationTokenFactory(_BaseFactory):
             data["user_id"] = str(uuid.uuid4())
         if "token" not in overrides:
             import secrets
+
             data["token"] = secrets.token_urlsafe(32)
         if "expires_at" not in overrides:
             from datetime import timedelta
-            data["expires_at"] = (
-                datetime.now(UTC) + timedelta(hours=24)
-            ).isoformat()
+
+            data["expires_at"] = (datetime.now(UTC) + timedelta(hours=24)).isoformat()
         return data

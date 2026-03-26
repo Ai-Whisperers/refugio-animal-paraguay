@@ -58,9 +58,7 @@ async def test_create_adopter_with_all_fields(client: AsyncClient) -> None:
 async def test_create_adopter_duplicate_email_returns_409(client: AsyncClient) -> None:
     email = _unique_email()
     await client.post("/adopters", json={"full_name": "First", "email": email})
-    response = await client.post(
-        "/adopters", json={"full_name": "Second", "email": email}
-    )
+    response = await client.post("/adopters", json={"full_name": "Second", "email": email})
     assert response.status_code == 409
     assert "already exists" in response.json()["message"]
 
@@ -68,9 +66,7 @@ async def test_create_adopter_duplicate_email_returns_409(client: AsyncClient) -
 @pytest.mark.asyncio
 @pytest.mark.integration
 async def test_create_adopter_invalid_email_returns_422(client: AsyncClient) -> None:
-    response = await client.post(
-        "/adopters", json={"full_name": "Juan", "email": "not-an-email"}
-    )
+    response = await client.post("/adopters", json={"full_name": "Juan", "email": "not-an-email"})
     assert response.status_code == 422
 
 
@@ -100,9 +96,7 @@ async def test_list_adopters_returns_200(client: AsyncClient) -> None:
 @pytest.mark.integration
 async def test_list_adopters_excludes_soft_deleted(client: AsyncClient) -> None:
     email = _unique_email()
-    create = await client.post(
-        "/adopters", json={"full_name": "ToDelete", "email": email}
-    )
+    create = await client.post("/adopters", json={"full_name": "ToDelete", "email": email})
     adopter_id = create.json()["id"]
 
     await client.delete(f"/adopters/{adopter_id}")

@@ -1,11 +1,10 @@
 """Unit tests for src/schemas/animal.py."""
 
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
 from uuid import uuid4
 
 import pytest
 from pydantic import ValidationError
-
 from src.db.models.animal import AnimalSpecies, AnimalStatus
 from src.schemas.animal import AnimalCreate, AnimalResponse, AnimalUpdate
 
@@ -73,7 +72,7 @@ class TestAnimalUpdate:
 
 class TestAnimalResponse:
     def test_from_orm_attributes(self) -> None:
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         uid = uuid4()
 
         class _FakeAnimal:

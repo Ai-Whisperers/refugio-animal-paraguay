@@ -17,7 +17,6 @@ from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 
 from src.api.admin import router as admin_router
-from src.api.public_adoption import router as public_adoption_router
 from src.api.adopters import router as adopters_router
 from src.api.adoption_requests import router as adoption_requests_router
 from src.api.animals import router as animals_router
@@ -27,7 +26,9 @@ from src.api.donors import router as donors_router
 from src.api.health import router as health_router
 from src.api.in_kind_donations import router as in_kind_donations_router
 from src.api.public import router as public_router
+from src.api.public_adoption import router as public_adoption_router
 from src.api.public_contact import router as public_contact_router
+from src.api.webhooks import router as webhooks_router
 from src.audit.middleware import AuditMiddleware
 from src.config import Settings, get_settings
 from src.db.session import dispose_engine, init_engine
@@ -110,6 +111,7 @@ def create_app() -> FastAPI:
     application.include_router(public_router)
     application.include_router(public_adoption_router)
     application.include_router(public_contact_router)
+    application.include_router(webhooks_router)
 
     return application
 

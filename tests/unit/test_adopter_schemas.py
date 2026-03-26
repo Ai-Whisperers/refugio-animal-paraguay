@@ -1,11 +1,10 @@
 """Unit tests for src/schemas/adopter.py."""
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from uuid import uuid4
 
 import pytest
 from pydantic import ValidationError
-
 from src.schemas.adopter import AdopterCreate, AdopterResponse, AdopterUpdate
 
 
@@ -19,7 +18,7 @@ class TestAdopterCreate:
         assert a.gdpr_consent_at is None
 
     def test_all_fields(self) -> None:
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         a = AdopterCreate(
             full_name="Ana García",
             email="ana@example.com",
@@ -82,7 +81,7 @@ class TestAdopterUpdate:
             AdopterUpdate(full_name="")
 
     def test_gdpr_consent_at_can_be_set(self) -> None:
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         u = AdopterUpdate(gdpr_consent_at=now)
         data = u.model_dump(exclude_unset=True)
         assert data == {"gdpr_consent_at": now}
@@ -90,7 +89,7 @@ class TestAdopterUpdate:
 
 class TestAdopterResponse:
     def test_from_orm_attributes(self) -> None:
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         uid = uuid4()
 
         class _FakeAdopter:
