@@ -5,9 +5,7 @@ from unittest.mock import AsyncMock, MagicMock
 from uuid import uuid4
 
 import pytest
-
 from src.services import impact_report_service
-
 
 # --- Helpers ---
 START = datetime(2026, 1, 1, tzinfo=timezone.utc)

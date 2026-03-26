@@ -333,7 +333,7 @@ async def test_list_sponsorships_filter_by_donor(client: AsyncClient) -> None:
 
 @pytest.mark.asyncio
 @pytest.mark.integration
-async def test_list_sponsorships_unauthenticated_returns_403(_client: AsyncClient) -> None:
+async def test_list_sponsorships_unauthenticated_returns_403() -> None:
     # Use a client without auth header
     from httpx import ASGITransport
     from httpx import AsyncClient as RawClient

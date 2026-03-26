@@ -225,11 +225,15 @@ async def create_sponsorship(
     )
     db.add(sponsorship)
     await db.commit()
-    await db.refresh(sponsorship)
 
-    # Load tier relationship for response
-    await db.refresh(sponsorship, ["tier"])
-    return sponsorship
+    # Re-query after commit — ORM objects are expired after commit,
+    # so we need a fresh query with eager-loaded tier relationship.
+    result = await db.execute(
+        select(Sponsorship)
+        .options(selectinload(Sponsorship.tier))
+        .where(Sponsorship.id == sponsorship.id)
+    )
+    return result.scalar_one()
 
 
 # ---------------------------------------------------------------------------
@@ -352,8 +356,13 @@ async def cancel_sponsorship(
         sponsorship.notes = payload.notes
 
     await db.commit()
-    await db.refresh(sponsorship, ["tier"])
-    return sponsorship
+    # Re-query with eager-loaded tier so all attributes are in-memory for serialization
+    refreshed = await db.execute(
+        select(Sponsorship)
+        .options(selectinload(Sponsorship.tier))
+        .where(Sponsorship.id == sponsorship_id)
+    )
+    return refreshed.scalar_one()
 
 
 # ---------------------------------------------------------------------------
@@ -405,8 +414,13 @@ async def pause_sponsorship(
         sponsorship.notes = payload.notes
 
     await db.commit()
-    await db.refresh(sponsorship, ["tier"])
-    return sponsorship
+    # Re-query with eager-loaded tier so all attributes are in-memory for serialization
+    refreshed = await db.execute(
+        select(Sponsorship)
+        .options(selectinload(Sponsorship.tier))
+        .where(Sponsorship.id == sponsorship_id)
+    )
+    return refreshed.scalar_one()
 
 
 # ---------------------------------------------------------------------------
@@ -457,8 +471,13 @@ async def resume_sponsorship(
 
     sponsorship.status = SponsorshipStatus.ACTIVE.value
     await db.commit()
-    await db.refresh(sponsorship, ["tier"])
-    return sponsorship
+    # Re-query with eager-loaded tier so all attributes are in-memory for serialization
+    refreshed = await db.execute(
+        select(Sponsorship)
+        .options(selectinload(Sponsorship.tier))
+        .where(Sponsorship.id == sponsorship_id)
+    )
+    return refreshed.scalar_one()
 
 
 # ---------------------------------------------------------------------------

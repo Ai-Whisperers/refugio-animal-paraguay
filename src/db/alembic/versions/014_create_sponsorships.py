@@ -5,6 +5,8 @@
 - Adds indexes for efficient sponsor dashboard queries
 """
 
+import json
+
 import sqlalchemy as sa
 from alembic import op
 
@@ -213,7 +215,11 @@ def upgrade() -> None:
         sa.column("benefits"),
         sa.column("display_order"),
     )
-    op.bulk_insert(tiers_table, _TIER_SEEDS)
+    # psycopg2 cannot adapt dict to JSON directly — serialize benefits to JSON string
+    serialized_seeds = [
+        {**seed, "benefits": json.dumps(seed["benefits"])} for seed in _TIER_SEEDS
+    ]
+    op.bulk_insert(tiers_table, serialized_seeds)
 
 
 def downgrade() -> None:
