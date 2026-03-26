@@ -58,6 +58,26 @@ class Settings(BaseSettings):
             raise ValueError(f"app_env must be one of {allowed}, got: {value!r}")
         return value
 
+    # CORS
+    allowed_origins: str = Field(
+        default="http://localhost:3000,http://localhost:5173",
+        description="Comma-separated list of allowed CORS origins.",
+    )
+
+    # Rate Limiting
+    rate_limit_enabled: bool = Field(
+        default=True,
+        description="Enable/disable rate limiting. Disable for testing.",
+    )
+    rate_limit_general: str = Field(
+        default="60/minute",
+        description="General API rate limit (slowapi format).",
+    )
+    rate_limit_auth: str = Field(
+        default="5/minute",
+        description="Auth endpoints rate limit (slowapi format).",
+    )
+
     # Auth
     secret_key: str = Field(
         default="dev-secret-key-change-in-production-must-be-32-chars-min",
@@ -83,6 +103,11 @@ class Settings(BaseSettings):
     def is_production(self) -> bool:
         """True when running in the production environment."""
         return self.app_env == "production"
+
+    @property
+    def cors_origins(self) -> list[str]:
+        """Parse comma-separated ALLOWED_ORIGINS into a list."""
+        return [o.strip() for o in self.allowed_origins.split(",") if o.strip()]
 
 
 def get_settings() -> Settings:

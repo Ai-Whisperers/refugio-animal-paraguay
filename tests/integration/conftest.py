@@ -10,15 +10,16 @@ import uuid
 from collections.abc import AsyncGenerator
 from datetime import timedelta
 
+import pytest
 import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
-
 from src.app import app
 from src.auth.utils import create_access_token, hash_password
 from src.config import Settings
 from src.db.session import init_engine
+from src.middleware.rate_limiter import limiter
 
 # Deterministic test user — created once, reused across all test runs.
 _TEST_STAFF_ID = uuid.UUID("00000000-0000-0000-0000-000000000001")
@@ -62,9 +63,25 @@ async def client() -> AsyncGenerator[AsyncClient, None]:
         expires_delta=timedelta(minutes=30),
     )
 
+    # Disable rate limiting for integration tests by default
+    # Individual tests can re-enable via limiter.enabled = True
+    limiter.enabled = False
+
     async with AsyncClient(
         transport=ASGITransport(app=app),
         base_url="http://test",
         headers={"Authorization": f"Bearer {token}"},
     ) as ac:
         yield ac
+
+    # Re-enable after tests (in case test left it enabled)
+    limiter.enabled = False
+
+
+@pytest.fixture
+def enable_rate_limiting():
+    """Fixture to temporarily enable rate limiting for a specific test."""
+    limiter.enabled = True
+    limiter.reset()
+    yield
+    limiter.enabled = False

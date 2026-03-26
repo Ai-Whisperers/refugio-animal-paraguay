@@ -8,7 +8,7 @@ Endpoints:
 
 from datetime import timedelta
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -18,13 +18,16 @@ from src.auth.utils import create_access_token, hash_password, verify_password
 from src.config import Settings, get_settings
 from src.db.models.user import User
 from src.db.session import get_db
+from src.middleware.rate_limiter import limiter
 from src.schemas.user import TokenResponse, UserCreate, UserResponse
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
 @router.post("/token", response_model=TokenResponse)
+@limiter.limit("5/minute")
 async def login(
+    request: Request,
     form: OAuth2PasswordRequestForm = Depends(),
     db: AsyncSession = Depends(get_db),
     settings: Settings = Depends(get_settings),

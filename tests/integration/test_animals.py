@@ -124,7 +124,7 @@ async def test_get_animal_returns_200(client: AsyncClient) -> None:
 async def test_get_animal_unknown_id_returns_404(client: AsyncClient) -> None:
     response = await client.get(f"/animals/{uuid4()}")
     assert response.status_code == 404
-    assert response.json()["detail"] == "Animal not found"
+    assert response.json()["message"] == "Animal not found"
 
 
 # ---------------------------------------------------------------------------
