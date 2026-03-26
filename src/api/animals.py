@@ -1,11 +1,13 @@
 """Animals CRUD router.
 
 Endpoints:
-  GET    /animals          — paginated list, filterable by species/status
-  GET    /animals/{id}     — single animal or 404
-  POST   /animals          — create, returns 201
-  PATCH  /animals/{id}     — partial update, returns 200 or 404
-  DELETE /animals/{id}     — hard delete, returns 204 or 404
+  GET    /animals                          — paginated list, filterable by species/status
+  GET    /animals/{id}                     — single animal or 404
+  POST   /animals                          — create, returns 201
+  PATCH  /animals/{id}                     — partial update, returns 200 or 404
+  DELETE /animals/{id}                     — hard delete, returns 204 or 404
+  POST   /animals/{id}/photos              — add gallery photo, returns 201 (staff only)
+  DELETE /animals/{id}/photos/{photo_id}   — remove gallery photo, returns 204 (staff only)
 """
 
 from datetime import UTC, datetime
@@ -16,10 +18,16 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.dependencies import require_staff
-from src.db.models.animal import Animal, AnimalSpecies, AnimalStatus
+from src.db.models.animal import Animal, AnimalPhoto, AnimalSpecies, AnimalStatus
 from src.db.models.user import User
 from src.db.session import get_db
-from src.schemas.animal import AnimalCreate, AnimalResponse, AnimalUpdate
+from src.schemas.animal import (
+    AnimalCreate,
+    AnimalResponse,
+    AnimalUpdate,
+    PhotoCreate,
+    PhotoResponse,
+)
 
 router = APIRouter(prefix="/animals", tags=["animals"])
 
@@ -70,6 +78,7 @@ async def create_animal(
         status=payload.status.value,
         birth_date=payload.birth_date,
         description=payload.description,
+        primary_photo_url=payload.primary_photo_url,
     )
     db.add(animal)
     await db.flush()
@@ -117,4 +126,56 @@ async def delete_animal(
             status_code=status.HTTP_404_NOT_FOUND, detail="Animal not found"
         )
     await db.delete(animal)
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.post(
+    "/{animal_id}/photos",
+    response_model=PhotoResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+async def add_animal_photo(
+    animal_id: UUID,
+    payload: PhotoCreate,
+    db: AsyncSession = Depends(get_db),
+    _: User = Depends(require_staff),
+) -> AnimalPhoto:
+    animal = await db.get(Animal, animal_id)
+    if animal is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Animal not found"
+        )
+    photo = AnimalPhoto(
+        animal_id=animal_id,
+        url=payload.url,
+        caption=payload.caption,
+        display_order=payload.display_order,
+    )
+    db.add(photo)
+    await db.flush()
+    await db.refresh(photo)
+    return photo
+
+
+@router.delete(
+    "/{animal_id}/photos/{photo_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+async def delete_animal_photo(
+    animal_id: UUID,
+    photo_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    _: User = Depends(require_staff),
+) -> Response:
+    stmt = select(AnimalPhoto).where(
+        AnimalPhoto.id == photo_id,
+        AnimalPhoto.animal_id == animal_id,
+    )
+    result = await db.execute(stmt)
+    photo = result.scalar_one_or_none()
+    if photo is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Photo not found"
+        )
+    await db.delete(photo)
     return Response(status_code=status.HTTP_204_NO_CONTENT)

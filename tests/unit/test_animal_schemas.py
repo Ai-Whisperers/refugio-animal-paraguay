@@ -83,6 +83,8 @@ class TestAnimalResponse:
             status = "available"
             birth_date = None
             description = None
+            primary_photo_url = None
+            photos: list = []
             created_at = now
             updated_at = now
 

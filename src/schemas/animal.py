@@ -8,6 +8,27 @@ from pydantic import BaseModel, ConfigDict, Field
 from src.db.models.animal import AnimalSpecies, AnimalStatus
 
 
+class PhotoCreate(BaseModel):
+    """Fields for adding a photo to an animal gallery."""
+
+    url: str = Field(..., min_length=1)
+    caption: str | None = None
+    display_order: int = Field(default=0, ge=0)
+
+
+class PhotoResponse(BaseModel):
+    """Shape returned for each animal photo."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: UUID
+    animal_id: UUID
+    url: str
+    caption: str | None
+    display_order: int
+    created_at: datetime
+
+
 class AnimalCreate(BaseModel):
     """Fields required (or optional) when creating a new animal."""
 
@@ -16,6 +37,7 @@ class AnimalCreate(BaseModel):
     status: AnimalStatus = AnimalStatus.INTAKE
     birth_date: date | None = None
     description: str | None = None
+    primary_photo_url: str | None = None
 
 
 class AnimalUpdate(BaseModel):
@@ -26,6 +48,7 @@ class AnimalUpdate(BaseModel):
     status: AnimalStatus | None = None
     birth_date: date | None = None
     description: str | None = None
+    primary_photo_url: str | None = None
 
 
 class AnimalResponse(BaseModel):
@@ -39,5 +62,7 @@ class AnimalResponse(BaseModel):
     status: AnimalStatus
     birth_date: date | None
     description: str | None
+    primary_photo_url: str | None
+    photos: list[PhotoResponse]
     created_at: datetime
     updated_at: datetime
