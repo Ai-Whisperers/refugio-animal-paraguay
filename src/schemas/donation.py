@@ -44,6 +44,18 @@ class DonationCreate(BaseModel):
     notes: str | None = None
 
 
+class CashDonationCreate(BaseModel):
+    """Fields for recording a cash donation received at the shelter."""
+
+    donor_id: UUID | None = None
+    # Amount in smallest currency unit (cents for EUR/USD, guaranies for PYG)
+    amount_cents: int = Field(..., gt=0)
+    currency: CurrencyCode = CurrencyCode.PYG
+    # Paper receipt reference from physical receipt book
+    receipt_number: str | None = Field(default=None, max_length=50)
+    notes: str | None = None
+
+
 class DonationResponse(BaseModel):
     """Shape returned for a donation record."""
 
@@ -56,6 +68,7 @@ class DonationResponse(BaseModel):
     payment_method: PaymentMethod
     stripe_payment_intent_id: str | None
     status: DonationStatus
+    receipt_number: str | None
     notes: str | None
     created_at: datetime
     updated_at: datetime

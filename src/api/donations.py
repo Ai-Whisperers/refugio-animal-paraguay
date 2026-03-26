@@ -2,6 +2,7 @@
 
 Endpoints:
   POST /donations                    — create donation record (public; anonymous if no donor_id)
+  POST /donations/cash               — record cash donation (staff only, immediate completion)
   POST /donations/{id}/stripe-intent — create Stripe PaymentIntent, return client_secret (public)
   GET  /donations                    — paginated list with filters (staff only)
   GET  /donations/{id}               — single donation (staff only)
@@ -19,7 +20,12 @@ from src.auth.dependencies import require_staff
 from src.db.models.donation import Donation, DonationStatus, Donor
 from src.db.models.user import User
 from src.db.session import get_db
-from src.schemas.donation import DonationCreate, DonationResponse, StripeIntentResponse
+from src.schemas.donation import (
+    CashDonationCreate,
+    DonationCreate,
+    DonationResponse,
+    StripeIntentResponse,
+)
 
 router = APIRouter(prefix="/donations", tags=["donations"])
 
@@ -59,6 +65,40 @@ async def create_donation(
         amount_cents=payload.amount_cents,
         currency=payload.currency.value,
         payment_method=payload.payment_method.value,
+        notes=payload.notes,
+    )
+    db.add(donation)
+    await db.flush()
+    await db.refresh(donation)
+    return donation
+
+
+@router.post("/cash", response_model=DonationResponse, status_code=status.HTTP_201_CREATED)
+async def record_cash_donation(
+    payload: CashDonationCreate,
+    db: AsyncSession = Depends(get_db),
+    _current_user: User = Depends(require_staff),
+) -> Donation:
+    """Record a cash donation received at the shelter. Staff only.
+
+    Cash donations are created with status=completed immediately
+    since the money has already been received.
+    """
+    if payload.donor_id is not None:
+        donor = await db.get(Donor, payload.donor_id)
+        if donor is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Donor not found",
+            )
+
+    donation = Donation(
+        donor_id=payload.donor_id,
+        amount_cents=payload.amount_cents,
+        currency=payload.currency.value,
+        payment_method="cash",
+        status="completed",
+        receipt_number=payload.receipt_number,
         notes=payload.notes,
     )
     db.add(donation)
