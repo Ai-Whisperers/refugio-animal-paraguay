@@ -3,7 +3,7 @@
 from datetime import UTC, datetime, timedelta
 from uuid import UUID
 
-from sqlalchemy import func, select
+from sqlalchemy import case, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.db.models.adoption_request import AdoptionRequest
@@ -142,12 +142,17 @@ async def get_adoption_outcome_stats(
     )
 
     # Return rate by species
+    # Use CASE to conditionally count returned adoptions (avoids FILTER clause issues)
     species_q = await db.execute(
         select(
             Animal.species,
             func.count(func.distinct(FollowUp.adoption_request_id)).label("total"),
             func.count(
-                func.distinct(FollowUp.adoption_request_id).filter(FollowUp.return_date.isnot(None))
+                func.distinct(
+                    case(
+                        (FollowUp.return_date.isnot(None), FollowUp.adoption_request_id),
+                    )
+                )
             ).label("returned"),
         )
         .join(

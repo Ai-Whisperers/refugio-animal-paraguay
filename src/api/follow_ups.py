@@ -106,7 +106,7 @@ async def schedule_follow_ups_endpoint(
 
     if req.status != AdoptionRequestStatus.APPROVED.value:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail="Follow-ups can only be scheduled for approved requests",
         )
 
