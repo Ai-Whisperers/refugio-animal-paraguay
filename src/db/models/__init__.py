@@ -22,6 +22,9 @@ __all__ = [
     "AnimalStatus",
     "AuditAction",
     "AuditLog",
+    "ConsentMethod",
+    "ConsentStatus",
+    "ConsentType",
     "ContactFormType",
     "ContactSubmission",
     "CurrencyCode",
@@ -33,8 +36,5 @@ __all__ = [
     "MandateStatus",
     "PaymentMethod",
     "SepaMandate",
-    "ConsentMethod",
-    "ConsentStatus",
-    "ConsentType",
     "UserConsent",
 ]

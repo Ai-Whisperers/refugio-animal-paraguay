@@ -75,7 +75,7 @@ async def create_sepa_setup(
             "customer_acceptance": {
                 "type": "online",
                 "online": {
-                    "ip_address": "0.0.0.0",  # placeholder, overridden by caller
+                    "ip_address": "0.0.0.0",  # noqa: S104  # nosec B104 — Stripe placeholder, not a bind address
                     "user_agent": "refugio-api",
                 },
             },

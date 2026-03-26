@@ -4,14 +4,20 @@ Tracks SEPA mandate lifecycle for recurring EU donations.
 Mandates authorize the shelter to debit a donor's bank account.
 """
 
+from __future__ import annotations
+
 import enum
 from datetime import datetime
+from typing import TYPE_CHECKING
 from uuid import UUID
 
 import sqlalchemy as sa
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ..base import Base
+
+if TYPE_CHECKING:
+    from .donation import Donor
 
 
 class MandateStatus(enum.StrEnum):
