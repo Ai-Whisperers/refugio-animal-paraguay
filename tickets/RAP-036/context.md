@@ -1,25 +1,19 @@
 # RAP-036 Context
 
-## STATUS: ACTIVE
+## STATUS: COMPLETED
 **Last updated**: 2026-03-26
 
 ## Current Focus
-Implementing SEPA Direct Debit support for EU recurring donations.
+SEPA Direct Debit support delivered. PR #27 created.
 
 ## Technical State
-- Stripe SDK v15 integrated, webhook handler exists (RAP-034)
-- Donation model has amount_cents, currency, payment_method, stripe_payment_intent_id
-- PaymentMethod enum: stripe, cash, transfer (needs sepa_debit)
-- Webhook handler processes payment_intent.succeeded/failed, charge.refunded
-
-## Next Steps
-1. Extend PaymentMethod enum with sepa_debit
-2. Create SepaMandate model + migration
-3. Add IBAN validation utility
-4. Create SEPA service
-5. Add API endpoints and schemas
-6. Extend webhook handler for SEPA events
-7. Write tests
+- SepaMandate model with full lifecycle (pending -> active -> revoked/failed)
+- IBAN validation (ISO 13616, MOD-97-10) with GDPR-safe masking
+- Stripe integration: Customer, PaymentMethod, SetupIntent creation
+- Webhook handlers for setup_intent.succeeded and setup_intent.setup_failed
+- 3 API endpoints: POST /donations/sepa-setup, GET /donors/{id}/mandates, DELETE revoke
+- Alembic migration 010_add_sepa_support
+- 36 new tests (19 IBAN + 11 service + 6 integration)
 
 ## Blockers
 - None
