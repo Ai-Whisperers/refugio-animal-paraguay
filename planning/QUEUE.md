@@ -41,7 +41,7 @@ Stories are ordered by dependency and priority. Work top-to-bottom. Each story b
 | 2 | Animal Intake Workflow | EPIC-1 S06 | 8 | DONE (PR #3) | Backend |
 | 3 | CORS + Rate Limiting + Error Standardization | Cross-cutting | 5 | DONE (PR #13) | Backend |
 | 4 | Next.js 14 Project Scaffold | EPIC-11 | 5 | DONE (PR #19) | Frontend |
-| 5 | Animal Browsing Page (public) | EPIC-11 S01 | 8 | DONE (PR #20) | Frontend |
+| 5 | Animal Browsing Page (public) | EPIC-11 S01 | 8 | READY | Frontend |
 
 ### Sprint 2 (Weeks 3-4): Admin Panel + Polish
 
@@ -49,7 +49,7 @@ Stories are ordered by dependency and priority. Work top-to-bottom. Each story b
 |---|-------|------|--------|--------|-------|
 | 6 | Staff Admin Panel — Animals + Adoptions | EPIC-7 S01 (partial) | 8 | DONE (PR #21) | Frontend |
 | 7 | Adoption Application Form (public) | EPIC-11 S01 | 5 | DONE (PR #22) | Frontend |
-| 8 | Mobile-First Responsive Design | EPIC-11 S05 | 5 | READY | Frontend |
+| 8 | Mobile-First Responsive Design | EPIC-11 S05 | 5 | DONE (PR #23) | Frontend |
 | 9 | Password Reset Flow | EPIC-10 S02 (partial) | 5 | DONE (PR #12) | Backend |
 | 10 | Contact & Inquiry Form | EPIC-11 S02 | 8 | READY | Frontend |
 
@@ -157,8 +157,8 @@ Week 3-4:
 | Range | Version | Purpose |
 |-------|---------|---------|
 | RAP-001 to RAP-010 | Pre-V1 | Backend foundation (done) |
-| RAP-011 to RAP-035 | V1 | MVP frontend + CI/CD |
-| RAP-036 to RAP-050 | V2 | Donations + EU compliance |
+| RAP-011 to RAP-030 | V1 | MVP frontend + CI/CD |
+| RAP-031 to RAP-050 | V2 | Donations + EU compliance |
 | RAP-051 to RAP-070 | V3 | Communications + workflow |
 | RAP-071 to RAP-095 | V4 | Operations |
 | RAP-096 to RAP-120 | V5 | Analytics + scale |
