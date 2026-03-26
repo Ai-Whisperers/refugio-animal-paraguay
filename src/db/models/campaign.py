@@ -70,12 +70,8 @@ class Campaign(Base):
         nullable=True,
     )
     # Minimum and maximum donation amounts in cents (optional)
-    min_donation_cents: Mapped[int | None] = mapped_column(
-        sa.Integer, nullable=True
-    )
-    max_donation_cents: Mapped[int | None] = mapped_column(
-        sa.Integer, nullable=True
-    )
+    min_donation_cents: Mapped[int | None] = mapped_column(sa.Integer, nullable=True)
+    max_donation_cents: Mapped[int | None] = mapped_column(sa.Integer, nullable=True)
     # Whether to allow donations after target is reached
     allow_overfunding: Mapped[bool] = mapped_column(
         sa.Boolean,
