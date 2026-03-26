@@ -167,6 +167,90 @@ export const SPECIES_LABELS: Record<string, string> = {
   other: "Otro",
 } as const;
 
+// --- About Page ---
+export const ABOUT = {
+  title: "Sobre Nosotros",
+  metaDescription:
+    "Conoce la historia, mision y equipo de Refugio Animal Paraguay.",
+  heroTitle: "Nuestra Mision",
+  heroSubtitle:
+    "Refugio Animal Paraguay nacio con un sueno simple: que ningun animal en Paraguay sufra abandono o maltrato. Rescatamos, rehabilitamos y encontramos hogares amorosos para cada animal que llega a nuestras puertas.",
+  historyTitle: "Nuestra Historia",
+  historyP1:
+    "Fundado por un grupo de amantes de los animales con raices en los Paises Bajos y Paraguay, Refugio Animal Paraguay combina la pasion latinoamericana con estandares europeos de bienestar animal.",
+  historyP2:
+    "Lo que empezo como un esfuerzo voluntario para rescatar animales callejeros en Asuncion se convirtio en un refugio completo, con instalaciones de cuarentena, atencion veterinaria y un programa de adopcion estructurado.",
+  historyP3:
+    "Hoy contamos con una red de donantes internacionales, voluntarios locales y familias de acogida que hacen posible nuestra labor diaria.",
+  teamTitle: "Nuestro Equipo",
+  teamMembers: [
+    { name: "Ana Rodriguez", role: "Directora del Refugio" },
+    { name: "Dr. Carlos Benitez", role: "Veterinario Principal" },
+    { name: "Laura Gomez", role: "Coordinadora de Adopciones" },
+    { name: "Miguel Torres", role: "Coordinador de Voluntarios" },
+  ],
+  locationTitle: "Donde Estamos",
+  locationAddress: "Asuncion, Paraguay",
+  locationHours: "Lunes a Sabado: 8:00 - 17:00",
+  locationVisit:
+    "Coordina tu visita con anticipacion por WhatsApp para conocer a nuestros animales.",
+  impactTitle: "Nuestro Impacto",
+  impactStats: [
+    { value: "150+", label: "Animales rescatados" },
+    { value: "80+", label: "Adopciones exitosas" },
+    { value: "50+", label: "Voluntarios activos" },
+    { value: "200+", label: "Atenciones veterinarias" },
+  ],
+  ctaTitle: "Sumate a nuestra causa",
+  ctaSubtitle:
+    "Cada adopcion, donacion o hora de voluntariado hace una diferencia enorme en la vida de un animal.",
+  ctaAdopt: "Adoptar un animal",
+  ctaDonate: "Hacer una donacion",
+} as const;
+
+// --- Donate Page ---
+export const DONATE = {
+  title: "Donar",
+  metaDescription:
+    "Dona a Refugio Animal Paraguay. Tu aporte nos ayuda a rescatar, alimentar y dar atencion veterinaria a animales.",
+  heroTitle: "Tu donacion transforma vidas",
+  heroSubtitle:
+    "Cada guarani y cada euro que donas se convierte en alimento, medicina y refugio para animales que no tienen a nadie mas.",
+  howHelpsTitle: "Como ayuda tu donacion",
+  howHelps: [
+    { icon: "\u{1F35B}", title: "Alimento", description: "Alimentamos a mas de 50 animales diariamente con alimento balanceado y suplementos.", amount: "Gs. 50.000/mes" },
+    { icon: "\u{1F3E5}", title: "Atencion Veterinaria", description: "Vacunas, esterilizaciones, cirugias de emergencia y tratamientos continuos.", amount: "Gs. 150.000/mes" },
+    { icon: "\u{1F3E0}", title: "Mantenimiento", description: "Reparaciones, limpieza y servicios basicos para las instalaciones del refugio.", amount: "Gs. 100.000/mes" },
+    { icon: "\u{1F698}", title: "Operaciones de Rescate", description: "Transporte y recursos para rescatar animales en situacion de calle o maltrato.", amount: "Gs. 75.000/mes" },
+  ],
+  donateOptionsTitle: "Opciones de Donacion",
+  bankTransferTitle: "Transferencia Bancaria (Paraguay)",
+  bankDetails: [
+    { label: "Banco", value: "Banco Itau Paraguay" },
+    { label: "Tipo", value: "Cuenta Corriente" },
+    { label: "Titular", value: "Refugio Animal Paraguay" },
+    { label: "RUC", value: "80000000-0" },
+  ],
+  bankNote:
+    "Envia tu comprobante por WhatsApp para que podamos agradecerte y emitir tu recibo.",
+  euTitle: "Donantes de la Union Europea",
+  euDescription:
+    "Aceptamos donaciones en EUR via transferencia SEPA. Tu aporte esta sujeto a beneficios fiscales segun la legislacion de tu pais.",
+  euComingSoon:
+    "Estamos configurando pagos online con Stripe para donaciones con tarjeta en EUR. Mientras tanto, contactanos por WhatsApp.",
+  otherWaysTitle: "Otras Formas de Ayudar",
+  otherWays: [
+    { icon: "\u{1F4E6}", title: "Donacion de Insumos", description: "Alimento, mantas, medicamentos, productos de limpieza. Coordinamos el retiro." },
+    { icon: "\u{2764}\u{FE0F}", title: "Apadrina un Animal", description: "Cubri los gastos mensuales de un animal. Recibis actualizaciones y fotos." },
+    { icon: "\u{1F91D}", title: "Dona tu Tiempo", description: "Unite como voluntario. Necesitamos ayuda en cuidado diario, transporte y eventos." },
+  ],
+  transparencyTitle: "Transparencia",
+  transparencyText:
+    "Nos comprometemos a la transparencia total. Publicamos informes periodicos sobre el uso de fondos. Cada donante merece saber como se usa su contribucion.",
+  whatsappCta: "Consultas sobre donaciones",
+  whatsappNumber: "+595 981 000 000",
+} as const;
+
 // --- Common ---
 export const COMMON = {
   loading: "Cargando...",
