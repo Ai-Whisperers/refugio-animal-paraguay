@@ -46,12 +46,13 @@ def create_app() -> FastAPI:
 
     app.include_router(health_router)
     app.include_router(auth_router)
+    # Intake must be registered before animals to avoid /animals/{id} matching "intake"
+    app.include_router(intake_router)
     app.include_router(animals_router)
     app.include_router(adopters_router)
     app.include_router(adoption_requests_router)
     app.include_router(donors_router)
     app.include_router(donations_router)
-    app.include_router(intake_router)
 
     return app
 

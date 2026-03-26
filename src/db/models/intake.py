@@ -13,7 +13,7 @@ from ..base import Base
 logger = logging.getLogger(__name__)
 
 
-class IntakeSource(str, enum.Enum):
+class IntakeSource(enum.StrEnum):
     """How the animal arrived at the shelter."""
 
     STRAY = "stray"

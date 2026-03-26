@@ -43,9 +43,7 @@ async def create_intake(
     """
     # Determine initial animal status based on quarantine flag
     animal_status = (
-        AnimalStatus.QUARANTINE.value
-        if payload.requires_quarantine
-        else AnimalStatus.INTAKE.value
+        AnimalStatus.QUARANTINE.value if payload.requires_quarantine else AnimalStatus.INTAKE.value
     )
 
     # Parse birth_date if provided
@@ -53,11 +51,11 @@ async def create_intake(
     if payload.birth_date is not None:
         try:
             parsed_birth_date = date.fromisoformat(payload.birth_date)
-        except ValueError:
+        except ValueError as err:
             raise HTTPException(
                 status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
                 detail="Invalid birth_date format. Expected YYYY-MM-DD.",
-            )
+            ) from err
 
     # Create Animal record
     animal = Animal(

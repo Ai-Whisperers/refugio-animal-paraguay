@@ -17,24 +17,16 @@ class IntakeCreate(BaseModel):
 
     # Animal fields
     name: str = Field(..., min_length=1, max_length=255, description="Animal name")
-    species: AnimalSpecies = Field(
-        default=AnimalSpecies.DOG, description="Animal species"
-    )
-    birth_date: str | None = Field(
-        default=None, description="Animal birth date (YYYY-MM-DD)"
-    )
-    description: str | None = Field(
-        default=None, description="Animal description"
-    )
+    species: AnimalSpecies = Field(default=AnimalSpecies.DOG, description="Animal species")
+    birth_date: str | None = Field(default=None, description="Animal birth date (YYYY-MM-DD)")
+    description: str | None = Field(default=None, description="Animal description")
 
     # Intake fields
     source: IntakeSource = Field(..., description="How the animal arrived")
     finder_name: str | None = Field(
         default=None, max_length=255, description="Name of the person who found/brought the animal"
     )
-    finder_email: EmailStr | None = Field(
-        default=None, description="Finder's email address"
-    )
+    finder_email: EmailStr | None = Field(default=None, description="Finder's email address")
     finder_phone: str | None = Field(
         default=None, max_length=50, description="Finder's phone number"
     )
@@ -47,9 +39,7 @@ class IntakeCreate(BaseModel):
     requires_quarantine: bool = Field(
         default=False, description="Whether the animal requires quarantine"
     )
-    notes: str | None = Field(
-        default=None, description="Additional intake notes"
-    )
+    notes: str | None = Field(default=None, description="Additional intake notes")
     photo_urls: list[str] = Field(
         default_factory=list,
         description="URLs of intake photos to link to the animal",
