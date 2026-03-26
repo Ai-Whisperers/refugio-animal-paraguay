@@ -30,6 +30,23 @@ class AnimalStatus(str, enum.Enum):
     DECEASED = "deceased"
 
 
+class AnimalSize(str, enum.Enum):
+    """Size category — must match chk_animals_size CHECK constraint."""
+
+    SMALL = "small"
+    MEDIUM = "medium"
+    LARGE = "large"
+    EXTRA_LARGE = "extra_large"
+
+
+class AnimalGender(str, enum.Enum):
+    """Gender — must match chk_animals_gender CHECK constraint."""
+
+    MALE = "male"
+    FEMALE = "female"
+    UNKNOWN = "unknown"
+
+
 class AnimalPhoto(Base):
     """Gallery photo for an animal.
 
@@ -85,6 +102,9 @@ class Animal(Base):
         nullable=False,
         server_default="intake",
     )
+    breed: Mapped[str | None] = mapped_column(sa.String(100), nullable=True)
+    size: Mapped[str | None] = mapped_column(sa.String(20), nullable=True)
+    gender: Mapped[str | None] = mapped_column(sa.String(20), nullable=True)
     birth_date: Mapped[date | None] = mapped_column(sa.Date, nullable=True)
     description: Mapped[str | None] = mapped_column(sa.Text, nullable=True)
     primary_photo_url: Mapped[str | None] = mapped_column(sa.Text, nullable=True)
