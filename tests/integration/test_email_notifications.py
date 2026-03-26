@@ -63,7 +63,7 @@ async def test_notification_handlers_can_register_on_bus() -> None:
     bus = EventBus()
     handlers.register(bus)
 
-    assert bus.subscriber_count == 2  # adoption + donation handlers
+    assert bus.subscriber_count == 3  # adoption created + status changed + donation handlers
 
 
 @pytest.mark.asyncio

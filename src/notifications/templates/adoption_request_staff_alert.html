@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>New Adoption Application</h2>
+
+<p>A new adoption application has been submitted:</p>
+
+<table style="border-collapse: collapse; width: 100%; margin: 16px 0;">
+  <tr>
+    <td style="padding: 8px; border-bottom: 1px solid #dee2e6; font-weight: bold; width: 30%;">Applicant</td>
+    <td style="padding: 8px; border-bottom: 1px solid #dee2e6;">{{ adopter_name }}</td>
+  </tr>
+  <tr>
+    <td style="padding: 8px; border-bottom: 1px solid #dee2e6; font-weight: bold;">Animal</td>
+    <td style="padding: 8px; border-bottom: 1px solid #dee2e6;">{{ animal_name }}</td>
+  </tr>
+  <tr>
+    <td style="padding: 8px; border-bottom: 1px solid #dee2e6; font-weight: bold;">Status</td>
+    <td style="padding: 8px; border-bottom: 1px solid #dee2e6;">Pending Review</td>
+  </tr>
+</table>
+
+<p>Please log in to the admin panel to review this application.</p>
+{% endblock %}

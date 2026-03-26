@@ -17,6 +17,9 @@ from src.db.models.adopter import Adopter
 from src.db.models.adoption_request import AdoptionRequest, AdoptionRequestStatus
 from src.db.models.animal import Animal
 from src.db.session import get_db
+from src.events.bus import EventBus
+from src.events.dependencies import get_event_bus
+from src.events.domain_events import create_adoption_request_created
 from src.middleware.rate_limiter import limiter
 from src.schemas.public_adoption import (
     PublicAdoptionApplicationCreate,
@@ -39,6 +42,7 @@ async def submit_adoption_application(
     request: Request,
     payload: PublicAdoptionApplicationCreate,
     db: AsyncSession = Depends(get_db),
+    event_bus: EventBus = Depends(get_event_bus),
 ) -> PublicAdoptionApplicationResponse:
     """Accept an adoption application from a public visitor.
 
@@ -114,6 +118,16 @@ async def submit_adoption_application(
     db.add(adoption_request)
     await db.flush()
     await db.refresh(adoption_request)
+
+    # Publish domain event for notification handlers
+    if event_bus.is_running:
+        event = create_adoption_request_created(
+            aggregate_id=adoption_request.id,
+            adopter_name=adopter.full_name,
+            animal_name=animal.name,
+            adopter_email=adopter.email,
+        )
+        await event_bus.publish(event)
 
     return PublicAdoptionApplicationResponse(
         id=adoption_request.id,

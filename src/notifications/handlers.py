@@ -16,6 +16,7 @@ from src.db.models.adopter import Adopter
 from src.db.models.adoption_request import AdoptionRequest
 from src.db.models.animal import Animal
 from src.db.models.donation import Donation, Donor
+from src.db.models.user import User, UserRole
 from src.db.session import get_async_session
 from src.events.bus import EventBus
 from src.events.types import DomainEvent, EventType
@@ -40,9 +41,59 @@ class NotificationHandlers:
 
     def register(self, bus: EventBus) -> None:
         """Subscribe all notification handlers to the event bus."""
+        bus.subscribe(EventType.ADOPTION_REQUEST_CREATED, self.on_adoption_request_created)
         bus.subscribe(EventType.ADOPTION_STATUS_CHANGED, self.on_adoption_status_changed)
         bus.subscribe(EventType.DONATION_RECEIVED, self.on_donation_received)
         logger.info("Notification handlers registered on event bus")
+
+    async def on_adoption_request_created(self, event: DomainEvent) -> None:
+        """Send confirmation to adopter and alert to staff on new application."""
+        try:
+            payload = event.payload
+            adopter_email = payload.get("adopter_email")
+            adopter_name = payload.get("adopter_name", "Valued Adopter")
+            animal_name = payload.get("animal_name", "an animal")
+
+            # Send confirmation to adopter
+            if adopter_email:
+                html = self._renderer.render(
+                    "adoption_request_received",
+                    {
+                        "adopter_name": adopter_name,
+                        "animal_name": animal_name,
+                    },
+                )
+                await self._email.send_email(
+                    EmailMessage(
+                        to=adopter_email,
+                        subject="Adoption Application Received",
+                        html_body=html,
+                    )
+                )
+
+            # Send staff alert
+            staff_emails = await self._get_staff_emails()
+            if staff_emails:
+                staff_html = self._renderer.render(
+                    "adoption_request_staff_alert",
+                    {
+                        "adopter_name": adopter_name,
+                        "animal_name": animal_name,
+                    },
+                )
+                for email in staff_emails:
+                    await self._email.send_email(
+                        EmailMessage(
+                            to=email,
+                            subject=f"New Adoption Application: {animal_name}",
+                            html_body=staff_html,
+                        )
+                    )
+        except Exception:
+            logger.exception(
+                "Failed to send adoption request notification for event_id=%s",
+                event.id,
+            )
 
     async def on_adoption_status_changed(self, event: DomainEvent) -> None:
         """Send email when an adoption request status changes."""
@@ -208,3 +259,19 @@ class NotificationHandlers:
                 donation_id,
             )
             return None, None, None, None, None
+
+    @staticmethod
+    async def _get_staff_emails() -> list[str]:
+        """Get email addresses of all active staff and admin users."""
+        try:
+            async with get_async_session() as session:
+                result = await session.execute(
+                    select(User.email).where(
+                        User.is_active == True,  # noqa: E712
+                        User.role.in_([UserRole.STAFF.value, UserRole.ADMIN.value]),
+                    )
+                )
+                return [email for email in result.scalars().all() if email]
+        except Exception:
+            logger.exception("Failed to look up staff emails")
+            return []

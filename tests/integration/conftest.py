@@ -18,10 +18,26 @@ from src.app import app
 from src.auth.utils import create_access_token, hash_password
 from src.config import Settings
 from src.db.session import init_engine
+from src.events.bus import EventBus
 
 # Deterministic test user — created once, reused across all test runs.
 _TEST_STAFF_ID = uuid.UUID("00000000-0000-0000-0000-000000000001")
 _TEST_STAFF_EMAIL = "test-staff@refugio.test"
+
+
+@pytest_asyncio.fixture(autouse=True)
+async def _attach_event_bus() -> AsyncGenerator[None, None]:
+    """Attach a running EventBus to app.state for every integration test.
+
+    The ASGITransport-based client skips the app lifespan, so endpoints
+    that depend on get_event_bus would fail without this fixture.
+    """
+    bus = EventBus()
+    await bus.start()
+    app.state.event_bus = bus
+    yield
+    await bus.stop()
+    app.state.event_bus = None
 
 
 @pytest_asyncio.fixture
