@@ -24,6 +24,7 @@ from src.api.auth import router as auth_router
 from src.api.consents import router as consents_router
 from src.api.donations import router as donations_router
 from src.api.donors import router as donors_router
+from src.api.fund_allocations import router as fund_allocations_router  # noqa: F401, E501
 from src.api.gdpr_export import router as gdpr_export_router
 from src.api.health import router as health_router
 from src.api.in_kind_donations import router as in_kind_donations_router
@@ -115,6 +116,7 @@ def create_app() -> FastAPI:
     application.include_router(donors_router)
     application.include_router(donations_router)
     application.include_router(in_kind_donations_router)
+    application.include_router(fund_allocations_router)
     application.include_router(admin_router)
     application.include_router(public_router)
     application.include_router(public_adoption_router)
