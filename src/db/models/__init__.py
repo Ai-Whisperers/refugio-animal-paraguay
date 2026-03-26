@@ -4,6 +4,7 @@ from .adopter import Adopter
 from .adoption_request import AdoptionRequest, AdoptionRequestStatus
 from .animal import Animal, AnimalPhoto, AnimalSpecies, AnimalStatus
 from .donation import CurrencyCode, Donation, DonationStatus, Donor, PaymentMethod
+from .verification_token import TokenType, VerificationToken
 
 __all__ = [
     "Animal",
@@ -18,4 +19,6 @@ __all__ = [
     "CurrencyCode",
     "PaymentMethod",
     "DonationStatus",
+    "TokenType",
+    "VerificationToken",
 ]

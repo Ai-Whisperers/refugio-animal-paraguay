@@ -34,9 +34,8 @@ class User(Base):
         nullable=False,
         server_default="staff",
     )
-    is_active: Mapped[bool] = mapped_column(
-        sa.Boolean, nullable=False, server_default=sa.true()
-    )
+    is_active: Mapped[bool] = mapped_column(sa.Boolean, nullable=False, server_default=sa.true())
+    is_verified: Mapped[bool] = mapped_column(sa.Boolean, nullable=False, server_default=sa.false())
     created_at: Mapped[datetime] = mapped_column(
         sa.TIMESTAMP(timezone=True),
         nullable=False,

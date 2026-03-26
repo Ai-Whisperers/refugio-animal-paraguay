@@ -43,9 +43,9 @@ async def client() -> AsyncGenerator[AsyncClient, None]:
     async with session_factory() as session:
         await session.execute(
             text("""
-                INSERT INTO users (id, email, hashed_password, role, is_active)
-                VALUES (:id, :email, :pwd, 'staff', true)
-                ON CONFLICT (email) DO NOTHING
+                INSERT INTO users (id, email, hashed_password, role, is_active, is_verified)
+                VALUES (:id, :email, :pwd, 'staff', true, true)
+                ON CONFLICT (email) DO UPDATE SET is_verified = true
                 """),
             {
                 "id": str(_TEST_STAFF_ID),
