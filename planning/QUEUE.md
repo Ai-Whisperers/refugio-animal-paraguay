@@ -102,7 +102,7 @@ Week 3-4:
 | 7 | Tigo Money Integration (PYG) | EPIC-3 S03 | 8 | |
 | 8 | Sponsor Update Notifications | EPIC-14 S02 | 6 | |
 | 9 | Campaign Progress & Social Proof | EPIC-14 S04 | 5 | |
-| 10 | Impact Report Generator | EPIC-13 S03 | 7 | |
+| 10 | Impact Report Generator | EPIC-13 S03 | 7 | DONE (PR #46) |
 | 11 | Fund Allocation Tracking | EPIC-13 S04 | 6 | |
 | 12 | GDPR Data Deletion | EPIC-13 S06 | 5 | PR #31 (conflicts) |
 | 13 | Success Stories Page | EPIC-11 S06 | 5 | |
