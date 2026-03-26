@@ -1,27 +1,22 @@
 # RAP-041 Context
 
-## STATUS: ACTIVE
+## STATUS: COMPLETED
 **Last updated**: 2026-03-26
 
 ## Current Focus
-Building Campaign model, migration, API endpoints, and frontend pages for the Donation Landing Page.
+Completed. PR #51 submitted targeting develop.
 
 ## Technical State
 - Branch: feature/RAP-041-donation-landing-page
-- New model: Campaign (SQLAlchemy)
-- New migration: 013_create_campaigns_table
-- New endpoints: /public/campaigns, /admin/campaigns
-- Frontend: /donate page revamp + /donate/campaigns/[id] detail
-
-## Next Steps
-1. Create Campaign ORM model
-2. Create Alembic migration
-3. Create schemas and endpoints
-4. Build frontend pages
-
-## Blockers
-- None
+- 3 commits on branch
+- Migration 013 applied to dev database
+- 38 new tests (18 unit + 20 integration), all passing
+- PR: https://github.com/Ai-Whisperers/refugio-animal-paraguay/pull/51
 
 ## Key Decisions Made
-- Campaign model stores raised_amount_cents as computed from donations (not cached) for accuracy
-- Using existing Stripe PaymentIntent flow, just linking to campaign_id
+- Campaign progress computed at query time from CampaignDonation junction + Donation joins (not cached)
+- Only completed donations count towards progress (pending donations excluded)
+- Admin campaign list returns raw list (not paginated), public list is paginated
+- Multi-currency support: EUR/USD use cents (÷100), PYG uses whole units
+- DynamicIcon component maps string icon names to lucide-react components
+- Replaced emoji unicode escapes with lucide-react icons across all pages
