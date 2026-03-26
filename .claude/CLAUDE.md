@@ -6,10 +6,11 @@
 
 **Owner context**: Dutch owner relocating to Paraguay. European donor network is critical — donation flows and reporting must reflect EU standards and currency handling (EUR + PYG).
 
+---
+
 ## Current Phase
 
-**Phase 0 — Foundation (active)**: Documentation, planning, and framework setup only.
-No application code exists. Tech stack decided (see above). First ticket pending.
+**Phase 0 — Foundation (active)**: Documentation, planning, and framework setup only. No application code exists. Tech stack decided (see Project Tech Stack section below). First ticket pending.
 
 **Phase 1 — Data Layer (next)**: PostgreSQL schema, Alembic migrations, seed data.
 **Phase 2 — API Scaffold (future)**: FastAPI routes, auth, basic CRUD.
@@ -207,7 +208,7 @@ Activates deeper reasoning. Use for architecture, data model design, and complex
 | Payments | Stripe (EUR/SEPA) | EU/NL donors; PYG cash handling TBD |
 | Frontend | TBD | Not yet started |
 | Hosting | TBD | EU-West region preferred (donor latency); Paraguay secondary |
-| CI/CD | GitHub Actions | |
+| CI/CD | GitHub Actions | Pipeline definition TBD in Phase 2 |
 | Email | TBD | Transactional email for notifications |
 
 ---
