@@ -9,6 +9,7 @@ from .donation import CurrencyCode, Donation, DonationStatus, Donor, PaymentMeth
 from .fund_allocation import FundAllocation, FundCategory  # noqa: F401
 from .in_kind_donation import InKindDonation, ItemType
 from .notification import Notification, NotificationType
+from .notification_preference import NotificationChannel, NotificationPreference
 from .user_consent import ConsentMethod, ConsentStatus, ConsentType, UserConsent
 
 __all__ = [
@@ -38,6 +39,8 @@ __all__ = [
     "ItemType",
     "Notification",
     "NotificationType",
+    "NotificationChannel",
+    "NotificationPreference",
     "PaymentMethod",
     "UserConsent",
 ]

@@ -29,6 +29,7 @@ from src.api.gdpr_export import router as gdpr_export_router
 from src.api.health import router as health_router
 from src.api.in_kind_donations import router as in_kind_donations_router
 from src.api.notifications import router as notifications_router
+from src.api.notification_preferences import router as notification_preferences_router
 from src.api.public import router as public_router
 from src.api.public_adoption import router as public_adoption_router
 from src.api.public_contact import router as public_contact_router
@@ -125,6 +126,7 @@ def create_app() -> FastAPI:
     application.include_router(consents_router)
     application.include_router(notifications_router)
     application.include_router(gdpr_export_router)
+    application.include_router(notification_preferences_router)
 
     return application
 
