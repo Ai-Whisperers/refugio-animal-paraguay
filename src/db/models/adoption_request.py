@@ -53,6 +53,11 @@ class AdoptionRequest(Base):
         nullable=True,
     )
     notes: Mapped[str | None] = mapped_column(sa.Text, nullable=True)
+    contract_pdf_path: Mapped[str | None] = mapped_column(sa.Text, nullable=True)
+    contract_generated_at: Mapped[datetime | None] = mapped_column(
+        sa.TIMESTAMP(timezone=True),
+        nullable=True,
+    )
     created_at: Mapped[datetime] = mapped_column(
         sa.TIMESTAMP(timezone=True),
         nullable=False,

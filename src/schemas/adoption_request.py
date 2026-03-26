@@ -34,5 +34,17 @@ class AdoptionRequestResponse(BaseModel):
     submitted_at: datetime
     decided_at: datetime | None
     notes: str | None
+    contract_pdf_path: str | None = None
+    contract_generated_at: datetime | None = None
     created_at: datetime
     updated_at: datetime
+
+
+class ContractGeneratedResponse(BaseModel):
+    """Response returned when a contract PDF is generated."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    request_id: UUID
+    contract_pdf_path: str
+    contract_generated_at: datetime
