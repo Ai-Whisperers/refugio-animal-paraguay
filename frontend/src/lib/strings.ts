@@ -145,6 +145,13 @@ export const ANIMAL_DETAIL = {
   applyToAdopt: (name: string) => `Solicitar adopcion de ${name}`,
   notAvailable: "Este animal no esta disponible para adopcion actualmente",
   breadcrumbAnimals: "Animales",
+  wantToAdopt: (name: string) => `Quiero adoptar a ${name}`,
+  askAbout: (name: string) => `Preguntar por ${name}`,
+  openGallery: "Abrir galeria de fotos",
+  closeGallery: "Cerrar galeria",
+  photoGallery: "Galeria de fotos",
+  previousPhoto: "Foto anterior",
+  nextPhoto: "Siguiente foto",
 } as const;
 
 // --- Adoption Form ---
@@ -186,9 +193,23 @@ export const ADOPTION_FORM = {
     `¡Gracias por tu interes en adoptar a ${name}! Recibimos tu solicitud y la revisaremos pronto. Recibiras una confirmacion en ${email}.`,
   backTo: (name: string) => `Volver a ${name}`,
   browseMore: "Ver mas animales",
+  whatsappConfirm: "Confirmar por WhatsApp",
+  // Steps
+  stepOf: (current: number, total: number) => `Paso ${current} de ${total}`,
+  stepPersonal: "Datos personales",
+  stepHome: "Sobre tu hogar",
+  stepConsent: "Consentimiento",
+  prevStep: "Anterior",
+  nextStep: "Siguiente",
+  breadcrumbApply: "Solicitar",
+  // Step 2 fields
+  livingSituation: "Situacion de vivienda",
+  livingSituationPlaceholder: "Contanos sobre tu hogar: tipo de vivienda, patio, otras mascotas...",
+  // Review
+  reviewTitle: "Resumen de tu solicitud",
   // Errors
   animalNotAvailable: "Este animal no esta disponible para adopcion actualmente.",
-  submitError: "Algo salio mal al enviar. ¿Podes intentar de nuevo?",
+  submitError: "Algo salio mal al enviar. \u00bfPodes intentar de nuevo?",
 } as const;
 
 // --- Contact ---
