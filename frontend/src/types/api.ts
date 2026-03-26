@@ -23,24 +23,20 @@ export interface TokenPayload {
 
 export type UserRole = "admin" | "staff" | "adopter";
 
+export interface UserInfo {
+  id: string;
+  email: string;
+  role: UserRole;
+  is_active: boolean;
+}
+
 // --- Animals ---
 
-export interface Animal {
-  id: number;
-  name: string;
-  species: string;
-  breed: string | null;
-  age_years: number | null;
-  age_months: number | null;
-  gender: string;
-  size: string;
-  status: AnimalStatus;
-  description: string | null;
-  intake_date: string;
-  photo_url: string | null;
-  created_at: string;
-  updated_at: string;
-}
+export type AnimalSpecies = "dog" | "cat" | "bird" | "rabbit" | "other";
+
+export type AnimalSize = "small" | "medium" | "large" | "extra_large";
+
+export type AnimalGender = "male" | "female" | "unknown";
 
 export type AnimalStatus =
   | "available"
@@ -49,6 +45,69 @@ export type AnimalStatus =
   | "medical_hold"
   | "intake"
   | "reserved";
+
+export interface AnimalPhoto {
+  id: string;
+  animal_id: string;
+  url: string;
+  caption: string | null;
+  display_order: number;
+  created_at: string;
+}
+
+export interface Animal {
+  id: string;
+  name: string;
+  species: AnimalSpecies;
+  status: AnimalStatus;
+  birth_date: string | null;
+  description: string | null;
+  primary_photo_url: string | null;
+  breed: string | null;
+  size: AnimalSize | null;
+  gender: AnimalGender | null;
+  photos: AnimalPhoto[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AnimalCreate {
+  name: string;
+  species: AnimalSpecies;
+  status: AnimalStatus;
+  birth_date?: string | null;
+  description?: string | null;
+  primary_photo_url?: string | null;
+}
+
+export interface AnimalUpdate {
+  name?: string;
+  species?: AnimalSpecies;
+  status?: AnimalStatus;
+  birth_date?: string | null;
+  description?: string | null;
+  primary_photo_url?: string | null;
+}
+
+// --- Adoption Requests ---
+
+export type AdoptionRequestStatus =
+  | "pending"
+  | "approved"
+  | "rejected"
+  | "cancelled";
+
+export interface AdoptionRequest {
+  id: string;
+  animal_id: string;
+  adopter_id: string;
+  status: AdoptionRequestStatus;
+  submitted_at: string;
+  decided_at: string | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
 
 // --- Pagination ---
 
