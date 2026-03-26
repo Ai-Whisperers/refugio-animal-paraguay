@@ -251,6 +251,74 @@ export const DONATE = {
   whatsappNumber: "+595 981 000 000",
 } as const;
 
+// --- Volunteer Page ---
+export const VOLUNTEER = {
+  title: "Ser Voluntario",
+  metaDescription: "Unite como voluntario a Refugio Animal Paraguay. Ayuda con el cuidado diario, eventos y mas.",
+  heroTitle: "Tu tiempo hace la diferencia",
+  heroSubtitle: "Nuestros voluntarios son el corazon del refugio. Sin su dedicacion, nada de lo que hacemos seria posible. Unite y cambia vidas.",
+  activitiesTitle: "Que hacen nuestros voluntarios",
+  activities: [
+    { icon: "\u{1F436}", title: "Cuidado Diario", description: "Alimentacion, paseos, socializacion y carino para los animales del refugio." },
+    { icon: "\u{1F3C3}", title: "Transporte", description: "Llevar animales a consultas veterinarias, eventos de adopcion y hogares de acogida." },
+    { icon: "\u{1F389}", title: "Eventos", description: "Organizar y participar en ferias de adopcion, campanas de concientizacion y recaudacion." },
+    { icon: "\u{1F4F8}", title: "Difusion", description: "Fotos, videos y publicaciones en redes sociales para dar visibilidad a los animales." },
+  ],
+  requirementsTitle: "Requisitos",
+  requirements: [
+    "Ser mayor de 16 anos (menores con autorizacion de un tutor)",
+    "Disponibilidad minima de 4 horas por semana",
+    "Amor por los animales y ganas de aprender",
+    "No se requiere experiencia previa \u2014 te capacitamos",
+  ],
+  howToJoinTitle: "Como unirte",
+  howToJoinSteps: [
+    { step: "1", title: "Contactanos", description: "Escribinos por WhatsApp para expresar tu interes." },
+    { step: "2", title: "Orientacion", description: "Te damos una charla sobre el refugio, nuestros procesos y los animales." },
+    { step: "3", title: "Empeza", description: "Eleji tus horarios y empeza a hacer la diferencia desde el primer dia." },
+  ],
+  testimonialTitle: "Lo que dicen nuestros voluntarios",
+  testimonials: [
+    { quote: "Ser voluntario aca me cambio la vida. Cada dia es una oportunidad de hacer algo significativo.", name: "Sofia M.", role: "Voluntaria desde 2024" },
+    { quote: "El equipo es increible y los animales te llenan el corazon. No hay mejor forma de pasar un sabado.", name: "Marcos L.", role: "Voluntario de fin de semana" },
+  ],
+  ctaTitle: "Queres ser voluntario?",
+  whatsappNumber: "+595 981 000 000",
+} as const;
+
+// --- Foster Page ---
+export const FOSTER = {
+  title: "Acogida Temporal",
+  metaDescription: "Ofrece tu hogar temporalmente a un animal del refugio. Programa de acogida de Refugio Animal Paraguay.",
+  heroTitle: "Un hogar temporal, un impacto permanente",
+  heroSubtitle: "La acogida temporal salva vidas. Al abrir tu hogar a un animal, le das el tiempo y el espacio que necesita para recuperarse y encontrar su familia definitiva.",
+  howItWorksTitle: "Como funciona",
+  howItWorksSteps: [
+    { step: "1", title: "Aplica", description: "Contactanos por WhatsApp y contanos sobre tu hogar y disponibilidad." },
+    { step: "2", title: "Evaluacion", description: "Conversamos sobre el tipo de animal que mejor se adapta a tu situacion." },
+    { step: "3", title: "Recibis al animal", description: "Te entregamos al animal con todo lo necesario: alimento, medicamentos e indicaciones." },
+    { step: "4", title: "Acompanamiento", description: "Nuestro equipo te acompana durante todo el proceso con visitas y consultas veterinarias." },
+  ],
+  requirementsTitle: "Que necesitas",
+  requirements: [
+    { icon: "\u{1F3E0}", title: "Espacio adecuado", description: "Un ambiente seguro y tranquilo donde el animal se sienta comodo." },
+    { icon: "\u{23F0}", title: "Tiempo y dedicacion", description: "Compromiso de al menos 2 semanas. La duracion varia segun las necesidades del animal." },
+    { icon: "\u{2764}\u{FE0F}", title: "Paciencia y amor", description: "Algunos animales vienen de situaciones dificiles y necesitan tiempo para confiar." },
+  ],
+  shelterProvides: "El refugio cubre alimento, medicamentos, vacunas y atencion veterinaria. Vos pones el carino.",
+  faqTitle: "Preguntas frecuentes",
+  faqs: [
+    { question: "Cuanto tiempo dura la acogida?", answer: "Generalmente entre 2 semanas y 2 meses, dependiendo de las necesidades del animal y la velocidad de adopcion." },
+    { question: "Que pasa si el animal se enferma?", answer: "Nuestro veterinario se encarga. Solo tenes que avisarnos y coordinamos la atencion." },
+    { question: "Puedo elegir que animal acoger?", answer: "Si. Te presentamos opciones que se adapten a tu hogar y estilo de vida." },
+    { question: "Que pasa si me enamoro y quiero adoptarlo?", answer: "Pasa seguido y nos encanta. Tenes prioridad de adopcion como familia de acogida." },
+  ],
+  ctaTitle: "Queres ser familia de acogida?",
+  ctaSubtitle: "Contactanos por WhatsApp y te contamos todo lo que necesitas saber.",
+  whatsappNumber: "+595 981 000 000",
+} as const;
+
+
 // --- Common ---
 export const COMMON = {
   loading: "Cargando...",
