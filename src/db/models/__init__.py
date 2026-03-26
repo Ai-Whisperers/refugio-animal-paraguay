@@ -3,6 +3,7 @@
 from .adopter import Adopter
 from .adoption_request import AdoptionRequest, AdoptionRequestStatus
 from .animal import Animal, AnimalPhoto, AnimalSpecies, AnimalStatus
+from .donation import CurrencyCode, Donation, DonationStatus, Donor, PaymentMethod
 
 __all__ = [
     "Animal",
@@ -12,4 +13,9 @@ __all__ = [
     "Adopter",
     "AdoptionRequest",
     "AdoptionRequestStatus",
+    "Donor",
+    "Donation",
+    "CurrencyCode",
+    "PaymentMethod",
+    "DonationStatus",
 ]
