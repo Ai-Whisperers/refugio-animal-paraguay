@@ -17,6 +17,13 @@ from uuid import UUID
 from src.events.types import DomainEvent, EventType
 
 
+class AdoptionRequestCreated(DomainEvent):
+    """Published when a new adoption request is submitted."""
+
+    event_type: EventType = EventType.ADOPTION_REQUEST_CREATED
+    aggregate_type: str = "adoption_request"
+
+
 class AdoptionStatusChanged(DomainEvent):
     """Published when an adoption request transitions to a new status."""
 
@@ -57,6 +64,25 @@ class AnimalIntakeCompleted(DomainEvent):
 
     event_type: EventType = EventType.ANIMAL_INTAKE_COMPLETED
     aggregate_type: str = "animal"
+
+
+def create_adoption_request_created(
+    aggregate_id: UUID,
+    adopter_name: str,
+    animal_name: str,
+    adopter_email: str | None = None,
+    actor_id: UUID | None = None,
+) -> AdoptionRequestCreated:
+    """Factory for AdoptionRequestCreated events with typed payload."""
+    return AdoptionRequestCreated(
+        payload={
+            "adopter_name": adopter_name,
+            "animal_name": animal_name,
+            "adopter_email": adopter_email,
+        },
+        aggregate_id=aggregate_id,
+        actor_id=actor_id,
+    )
 
 
 def create_adoption_status_changed(

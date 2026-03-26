@@ -20,6 +20,12 @@ from src.db.models.adoption_request import AdoptionRequest, AdoptionRequestStatu
 from src.db.models.animal import Animal
 from src.db.models.user import User
 from src.db.session import get_db
+from src.events.bus import EventBus
+from src.events.dependencies import get_event_bus
+from src.events.domain_events import (
+    create_adoption_request_created,
+    create_adoption_status_changed,
+)
 from src.schemas.adoption_request import (
     AdoptionRequestCreate,
     AdoptionRequestResponse,
@@ -90,7 +96,8 @@ async def get_adoption_request(
 async def create_adoption_request(
     payload: AdoptionRequestCreate,
     db: AsyncSession = Depends(get_db),
-    _: User = Depends(require_staff),
+    current_user: User = Depends(require_staff),
+    event_bus: EventBus = Depends(get_event_bus),
 ) -> AdoptionRequest:
     # Validate animal exists
     animal = await db.get(Animal, payload.animal_id)
@@ -118,6 +125,18 @@ async def create_adoption_request(
     db.add(req)
     await db.flush()
     await db.refresh(req)
+
+    # Publish domain event for notification handlers
+    if event_bus.is_running:
+        event = create_adoption_request_created(
+            aggregate_id=req.id,
+            adopter_name=adopter.full_name,
+            animal_name=animal.name,
+            adopter_email=adopter.email,
+            actor_id=current_user.id,
+        )
+        await event_bus.publish(event)
+
     return req
 
 
@@ -126,7 +145,8 @@ async def update_adoption_request_status(
     request_id: UUID,
     payload: AdoptionRequestStatusUpdate,
     db: AsyncSession = Depends(get_db),
-    _: User = Depends(require_staff),
+    current_user: User = Depends(require_staff),
+    event_bus: EventBus = Depends(get_event_bus),
 ) -> AdoptionRequest:
     req = await db.get(AdoptionRequest, request_id)
     if req is None:
@@ -147,6 +167,7 @@ async def update_adoption_request_status(
             ),
         )
 
+    old_status_value = current.value
     req.status = new_status.value
     req.decided_at = datetime.now(UTC)
     req.updated_at = datetime.now(UTC)
@@ -160,4 +181,15 @@ async def update_adoption_request_status(
 
     await db.flush()
     await db.refresh(req)
+
+    # Publish domain event for notification handlers
+    if event_bus.is_running:
+        event = create_adoption_status_changed(
+            aggregate_id=req.id,
+            old_status=old_status_value,
+            new_status=new_status.value,
+            actor_id=current_user.id,
+        )
+        await event_bus.publish(event)
+
     return req

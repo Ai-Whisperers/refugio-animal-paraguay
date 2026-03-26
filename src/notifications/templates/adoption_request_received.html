@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Application Received</h2>
+<p>Dear {{ adopter_name }},</p>
+
+<p>Thank you for submitting an adoption application for <strong>{{ animal_name }}</strong>!</p>
+
+<p>Your application has been received and is now under review by our team. We will carefully evaluate your request and get back to you as soon as possible.</p>
+
+<p><strong>What happens next?</strong></p>
+<ul>
+  <li>Our staff will review your application</li>
+  <li>We may contact you for additional information</li>
+  <li>You will receive an email notification when a decision is made</li>
+</ul>
+
+<p>If you have any questions in the meantime, please don't hesitate to contact us.</p>
+
+<p>Thank you for choosing to give an animal a loving home!</p>
+{% endblock %}
