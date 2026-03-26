@@ -197,6 +197,33 @@ Week 3-4:
 | RAP-096 to RAP-120 | V5 | Analytics + scale |
 | RAP-121 to RAP-140 | V6 | Reporting + multi-shelter |
 | RAP-141 to RAP-170 | V7 | Community + mobile + API platform |
+| RAP-171 to RAP-178 | UX | UX/UI overhaul (EPIC-20) |
+
+---
+
+## UX Sprint — EPIC-20: UX/UI Overhaul (38 points, 2 sprints)
+
+**Audit:** `planning/epics/EPIC-20-ux-ui-overhaul/UX-AUDIT.md`
+**Why now:** Site is live at sunstein.cloud/petShelter but speaks English to Paraguayan users, uses wrong brand colors, has 4 dead nav links, no WhatsApp. Must fix before driving traffic.
+
+### Sprint UX-1: Foundation + Critical Fixes (23 pts)
+
+| # | Story | Ticket | Pts | Status | Depends On |
+|---|-------|--------|-----|--------|------------|
+| 1 | Design System Realignment | RAP-171 | 5 | READY | — |
+| 2 | Spanish Translation & Warm Tone | RAP-172 | 5 | READY | RAP-171 (color classes) |
+| 3 | Missing Pages: About & Donate | RAP-173 | 5 | READY | RAP-171, RAP-172 (strings) |
+| 4 | Homepage Redesign with Trust Signals | RAP-175 | 5 | READY | RAP-171, RAP-172 |
+| 5 | WhatsApp + Accessibility (partial) | RAP-178 | 3 | READY | RAP-172 (Spanish strings) |
+
+### Sprint UX-2: Polish + Flow Optimization (15 pts)
+
+| # | Story | Ticket | Pts | Status | Depends On |
+|---|-------|--------|-----|--------|------------|
+| 1 | Missing Pages: Volunteer & Foster | RAP-174 | 3 | READY | RAP-171, RAP-172 |
+| 2 | Animal Catalog UX Improvements | RAP-176 | 5 | READY | RAP-171, RAP-172 |
+| 3 | Animal Detail & Adoption Flow Overhaul | RAP-177 | 5 | READY | RAP-171, RAP-172, RAP-176 |
+| 4 | Accessibility Remainder (images, 404) | RAP-178 | 2 | READY | RAP-171 |
 
 ---
 
