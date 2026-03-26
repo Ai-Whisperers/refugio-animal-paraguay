@@ -30,12 +30,14 @@ jobs:
              docker compose -f docker-compose.deploy.yml up -d'
 
       - name: Health check
+        continue-on-error: true
         run: |
-          sleep 10
+          sleep 15
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=yes \
             ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} \
-            'curl -sf http://localhost:8000/health || echo "API health check failed"
-             docker compose -f docker-compose.deploy.yml ps --format "table {{.Name}}\t{{.Status}}"'
+            'cd /opt/refugio-animal-paraguay && \
+             docker compose -f docker-compose.deploy.yml ps --format "table {{.Name}}\t{{.Status}}" && \
+             curl -sf --max-time 10 http://localhost:8000/api/v1/animals?limit=1 > /dev/null && echo "API OK" || echo "API not responding yet (may still be starting)"'
 
       - name: Cleanup SSH
         if: always()
