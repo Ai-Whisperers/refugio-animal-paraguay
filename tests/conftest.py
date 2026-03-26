@@ -8,6 +8,17 @@ import uuid
 from datetime import UTC, datetime
 
 import pytest
+from src.middleware.rate_limiter import configure_limiter
+
+
+# ---------------------------------------------------------------------------
+# Rate limiting — disabled for all tests by default to avoid interference.
+# Tests that specifically test rate limiting should re-enable it.
+# ---------------------------------------------------------------------------
+@pytest.fixture(autouse=True)
+def _disable_rate_limiting() -> None:
+    """Disable rate limiting globally for tests."""
+    configure_limiter(enabled=False)
 
 # ---------------------------------------------------------------------------
 # Deterministic IDs for reproducible tests

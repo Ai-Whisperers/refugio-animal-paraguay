@@ -1,7 +1,8 @@
 """FastAPI application factory and lifespan.
 
 Entry point for the Refugio Animal Paraguay API. Creates the FastAPI app,
-registers routers, and manages the database engine lifecycle via lifespan.
+registers routers, configures CORS/rate limiting/error handling, and manages
+the database engine lifecycle via lifespan.
 
 Run locally:
     uvicorn src.app:app --reload
@@ -11,6 +12,9 @@ from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
 
 from src.api.adopters import router as adopters_router
 from src.api.adoption_requests import router as adoption_requests_router
@@ -21,6 +25,9 @@ from src.api.donors import router as donors_router
 from src.api.health import router as health_router
 from src.config import Settings, get_settings
 from src.db.session import dispose_engine, init_engine
+from src.middleware.error_handler import register_exception_handlers
+from src.middleware.rate_limiter import configure_limiter, limiter
+from src.middleware.request_id import RequestIDMiddleware
 
 
 @asynccontextmanager
@@ -36,22 +43,43 @@ def create_app() -> FastAPI:
     """Create and configure the FastAPI application."""
     settings = get_settings()
 
-    app = FastAPI(
+    application = FastAPI(
         title=settings.app_name,
         version="0.1.0",
         debug=settings.debug,
         lifespan=lifespan,
     )
 
-    app.include_router(health_router)
-    app.include_router(auth_router)
-    app.include_router(animals_router)
-    app.include_router(adopters_router)
-    app.include_router(adoption_requests_router)
-    app.include_router(donors_router)
-    app.include_router(donations_router)
+    # --- Request ID middleware (must be outermost to cover all responses) ---
+    application.add_middleware(RequestIDMiddleware)
 
-    return app
+    # --- CORS middleware ---
+    application.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.allowed_origins_list,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
+    # --- Rate limiting ---
+    configure_limiter(enabled=settings.rate_limit_enabled)
+    application.state.limiter = limiter
+    application.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+    # --- Exception handlers (overrides default FastAPI handlers) ---
+    register_exception_handlers(application)
+
+    # --- Routers ---
+    application.include_router(health_router)
+    application.include_router(auth_router)
+    application.include_router(animals_router)
+    application.include_router(adopters_router)
+    application.include_router(adoption_requests_router)
+    application.include_router(donors_router)
+    application.include_router(donations_router)
+
+    return application
 
 
 # Module-level app instance — used by uvicorn and test client

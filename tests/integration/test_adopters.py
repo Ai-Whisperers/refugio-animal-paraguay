@@ -62,7 +62,7 @@ async def test_create_adopter_duplicate_email_returns_409(client: AsyncClient) -
         "/adopters", json={"full_name": "Second", "email": email}
     )
     assert response.status_code == 409
-    assert "already exists" in response.json()["detail"]
+    assert "already exists" in response.json()["message"]
 
 
 @pytest.mark.asyncio
@@ -143,7 +143,7 @@ async def test_get_adopter_returns_200(client: AsyncClient) -> None:
 async def test_get_adopter_unknown_id_returns_404(client: AsyncClient) -> None:
     response = await client.get(f"/adopters/{uuid4()}")
     assert response.status_code == 404
-    assert response.json()["detail"] == "Adopter not found"
+    assert response.json()["message"] == "Adopter not found"
 
 
 @pytest.mark.asyncio

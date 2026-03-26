@@ -14,6 +14,8 @@ import pytest
 from httpx import ASGITransport, AsyncClient
 
 from src.app import app
+from src.config import Settings
+from src.db.session import init_engine
 
 # ---------------------------------------------------------------------------
 # POST /auth/token
@@ -140,6 +142,7 @@ async def test_post_adopter_without_token_returns_401() -> None:
 @pytest.mark.asyncio
 @pytest.mark.integration
 async def test_post_adoption_request_without_token_returns_401() -> None:
+    init_engine(Settings())  # Ensure engine on current event loop
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://test"
     ) as unauthenticated:
@@ -153,6 +156,7 @@ async def test_post_adoption_request_without_token_returns_401() -> None:
 @pytest.mark.asyncio
 @pytest.mark.integration
 async def test_patch_adoption_request_status_without_token_returns_401() -> None:
+    init_engine(Settings())  # Ensure engine on current event loop
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://test"
     ) as unauthenticated:
