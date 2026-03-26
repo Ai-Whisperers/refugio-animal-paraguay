@@ -102,9 +102,35 @@ export const ANIMALS_LIST = {
   other: "Otros",
   loading: "Cargando animales...",
   errorRetry: "Intentar de nuevo",
-  emptyState: "¡No hay animales disponibles ahora. Volve pronto!",
+  emptyTitle: "No encontramos animales con esos filtros",
+  emptySubtitle:
+    "Proba quitando algun filtro o busca con otras palabras. Siempre hay nuevos amiguitos llegando.",
+  emptyClearFilters: "Limpiar filtros",
+  emptyNoAnimals: "No hay animales disponibles ahora. Volve pronto!",
+  errorTitle: "Algo salio mal al cargar los animales",
+  errorSubtitle: "Por favor intenta de nuevo. Si el problema persiste, contactanos por WhatsApp.",
   previous: "Anterior",
   next: "Siguiente",
+  meetAnimal: (name: string) => `Conocer a ${name}`,
+  // Filter labels
+  filterSpecies: "Especie",
+  filterSize: "Tamano",
+  filterAge: "Edad",
+  filterSearch: "Buscar por nombre...",
+  filterActiveCount: (count: number) =>
+    count === 1 ? "1 filtro activo" : `${count} filtros activos`,
+  filterClear: "Limpiar",
+  // Size options
+  sizeAll: "Todos",
+  sizeSmall: "Pequeno",
+  sizeMedium: "Mediano",
+  sizeLarge: "Grande",
+  // Age options
+  ageAll: "Todas",
+  agePuppy: "Cachorro (<1 ano)",
+  ageYoung: "Joven (1-3)",
+  ageAdult: "Adulto (3-8)",
+  ageSenior: "Senior (8+)",
 } as const;
 
 // --- Animal Detail ---
