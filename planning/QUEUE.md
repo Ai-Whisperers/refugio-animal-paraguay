@@ -1,7 +1,8 @@
 # Development Queue — Refugio Animal Paraguay
 
 **Last updated**: 2026-03-26
-**Active version**: V1 (MVP)
+**Active version**: V2/V3 (completing remaining stories)
+**Full roadmap**: [ROADMAP.md](ROADMAP.md) — 10 sprints, 50 epics, 250 stories
 **Tech stack**: Python 3.12, FastAPI, SQLAlchemy 2.x, PostgreSQL 16, Next.js 14
 
 ---
@@ -111,80 +112,6 @@ Week 3-4:
 
 ---
 
-## V4 — Operations (Weeks 13-18)
-
-| # | Story | Epic | Points |
-|---|-------|------|--------|
-| 1 | Medical Record Schema & API | EPIC-4 S01 | 8 |
-| 2 | Veterinary Notes & Documents | EPIC-4 S02 | 6 |
-| 3 | Medical Timeline & History | EPIC-4 S03 | 5 |
-| 4 | Vaccination & Medication Tracking | EPIC-4 S04 | 8 |
-| 5 | Volunteer Registration & Profiles | EPIC-5 S01 | 5 |
-| 6 | Volunteer Onboarding Checklist | EPIC-5 S05 | 5 |
-| 7 | Shift Scheduling System | EPIC-5 S02 | 8 |
-| 8 | Task Assignment & Tracking | EPIC-5 S03 | 6 |
-| 9 | Volunteer Recognition & Analytics | EPIC-5 S04 | 5 |
-| 10 | Foster Family Registration | EPIC-12 S01 | 5 |
-| 11 | Foster Placement & Matching | EPIC-12 S02 | 8 |
-| 12 | Foster Check-in & Monitoring | EPIC-12 S03 | 6 |
-| 13 | Foster-to-Adopt Pathway | EPIC-12 S04 | 6 |
-| 14 | Foster Supply & Cost Tracking | EPIC-12 S05 | 5 |
-| 15 | Outcome Metrics & Analytics | EPIC-13 S05 | 7 |
-
----
-
-## V5 — Analytics & Scale (Weeks 19-24)
-
-| # | Story | Epic | Points |
-|---|-------|------|--------|
-| 1 | Admin Dashboard & Analytics | EPIC-7 S01 | 8 |
-| 2 | User & Role Management UI | EPIC-7 S02 | 6 |
-| 3 | Content & Settings Management | EPIC-7 S03 | 5 |
-| 4 | Reporting & Export | EPIC-7 S04 | 6 |
-| 5 | Admin Panel Localization | EPIC-7 S05 | 5 |
-| 6 | Advanced Search & Filters (tsvector) | EPIC-1 S05 | 8 |
-| 7 | Password Reset + Email Verification | EPIC-10 S02 (complete) | 5 |
-| 8 | Profile Management | EPIC-10 S03 | 5 |
-| 9 | E2E Testing (Playwright) | EPIC-8 S03 | 8 |
-| 10 | Performance & Security Testing | EPIC-8 S04 | 6 |
-| 11 | Production Deployment & TLS | EPIC-9 S03 | 8 |
-| 12 | Monitoring & Logging | EPIC-9 S04 | 6 |
-
----
-
-## V6 — Reporting & Multi-Shelter (Weeks 25-32)
-
-| # | Story | Epic | Points |
-|---|-------|------|--------|
-| 1 | Financial Reporting Dashboard | EPIC-15 S01 | 8 |
-| 2 | EU Tax Compliance Exports | EPIC-15 S02 | 7 |
-| 3 | Donor Retention & Impact Reports | EPIC-15 S03 | 6 |
-| 4 | Operational KPI Dashboard | EPIC-15 S04 | 7 |
-| 5 | Multi-Shelter Location Management | EPIC-16 S01 | 8 |
-| 6 | Inter-Shelter Animal Transfers | EPIC-16 S02 | 8 |
-| 7 | Location-Specific Staff & Permissions | EPIC-16 S03 | 6 |
-| 8 | Consolidated Cross-Shelter Reporting | EPIC-16 S04 | 7 |
-
----
-
-## V7 — Community, Mobile & API Platform (Weeks 33-42)
-
-| # | Story | Epic | Points |
-|---|-------|------|--------|
-| 1 | Success Stories Publishing | EPIC-17 S01 | 5 |
-| 2 | Social Media Integration | EPIC-17 S02 | 6 |
-| 3 | Adopter Community Forum | EPIC-17 S03 | 8 |
-| 4 | Community Events Management | EPIC-17 S04 | 5 |
-| 5 | Mobile App — Staff Field Operations | EPIC-18 S01 | 13 |
-| 6 | Mobile App — Volunteer Shift & Tasks | EPIC-18 S02 | 8 |
-| 7 | Mobile App — Push Notifications | EPIC-18 S03 | 5 |
-| 8 | Public REST API & Developer Docs | EPIC-19 S01 | 8 |
-| 9 | Government Animal Registration Integration | EPIC-19 S02 | 8 |
-| 10 | Webhook System for Partners | EPIC-19 S03 | 6 |
-| 11 | Tigo Money Payment Integration | EPIC-19 S04 | 8 |
-
----
-
 ## Ticket ID Allocation
 
 | Range | Version | Purpose |
@@ -193,11 +120,17 @@ Week 3-4:
 | RAP-011 to RAP-033 | V1 | MVP frontend + CI/CD (done) |
 | RAP-034 to RAP-050 | V2 | Donations + EU compliance |
 | RAP-051 to RAP-070 | V3 | Communications + workflow |
-| RAP-071 to RAP-095 | V4 | Operations |
-| RAP-096 to RAP-120 | V5 | Analytics + scale |
-| RAP-121 to RAP-140 | V6 | Reporting + multi-shelter |
-| RAP-141 to RAP-170 | V7 | Community + mobile + API platform |
-| RAP-171 to RAP-178 | UX | UX/UI overhaul (EPIC-20) |
+| RAP-071 to RAP-099 | V2/V3 | Remaining stories |
+| RAP-100 to RAP-124 | V4 | Sprint 1: Staff Operations Launch |
+| RAP-125 to RAP-149 | V5 | Sprint 2: Veterinary & Medical Records |
+| RAP-150 to RAP-174 | V6 | Sprint 3: EU Payment Integration |
+| RAP-175 to RAP-199 | V7 | Sprint 4: Volunteer & Foster Programs |
+| RAP-200 to RAP-224 | V8 | Sprint 5: Notifications & Communications |
+| RAP-225 to RAP-249 | V9 | Sprint 6: GDPR, Security & Compliance |
+| RAP-250 to RAP-274 | V10 | Sprint 7: Analytics & Reporting |
+| RAP-275 to RAP-299 | V11 | Sprint 8: Public Experience & Content |
+| RAP-300 to RAP-324 | V12 | Sprint 9: Infrastructure & DevOps |
+| RAP-325 to RAP-349 | V13 | Sprint 10: Mobile, Scale & Future |
 
 ---
 
@@ -235,3 +168,23 @@ Week 3-4:
 4. **Update this file** when completing stories (move to Done)
 5. **Never start a BLOCKED item** — check dependencies first
 6. **Commit often** — small, focused commits with ticket IDs
+
+---
+
+## Future Sprints (V4-V13)
+
+Full details in [ROADMAP.md](ROADMAP.md). Each sprint has epic and story docs in `planning/epics/EPIC-NN-*/` and sprint docs in `planning/sprints/sprint-NN/`.
+
+| Sprint | Version | Theme | Points | Epics |
+|--------|---------|-------|--------|-------|
+| 1 | V4 | Staff Operations Launch | 105 | EPIC 21-25 |
+| 2 | V5 | Veterinary & Medical Records | 105 | EPIC 26-30 |
+| 3 | V6 | EU Payment Integration | 112 | EPIC 31-35 |
+| 4 | V7 | Volunteer & Foster Programs | 99 | EPIC 36-40 |
+| 5 | V8 | Notifications & Communications | 102 | EPIC 41-45 |
+| 6 | V9 | GDPR, Security & Compliance | 87 | EPIC 46-50 |
+| 7 | V10 | Analytics & Reporting | 101 | EPIC 51-55 |
+| 8 | V11 | Public Experience & Content | 101 | EPIC 56-60 |
+| 9 | V12 | Infrastructure & DevOps | 104 | EPIC 61-65 |
+| 10 | V13 | Mobile, Scale & Future | 109 | EPIC 66-70 |
+

@@ -1,496 +1,180 @@
 # Agent Work Guide — Refugio Animal Paraguay
 
-This guide explains how agents claim and work on tasks to prevent work collisions and maintain smooth parallel development.
+This guide explains how autonomous agents find, claim, and implement stories from the roadmap.
 
 ## Quick Start
 
-1. Read `QUEUE.md` to see available tasks
-2. Find a task with status 🟢 (ready)
-3. Create a claim PR by running:
-   ```bash
-   git checkout -b claiming/TASK-123-agent-name
-   # Add your claim to CLAIMING.md
-   git add planning/CLAIMING.md
-   git commit -m "chore: claim TASK-123"
-   git push origin claiming/TASK-123-agent-name
-   # Create PR
-   ```
-4. Once PR merges, the task is yours — begin implementation
-5. When complete, update status to ✅ (done) in QUEUE.md
+1. Read `QUEUE.md` — check for READY stories in V2/V3 (highest priority)
+2. If no V2/V3 READY stories, read `ROADMAP.md` — find next planned story by sprint order
+3. Read the story's `STORY.md` for acceptance criteria
+4. Create branch from develop: `feature/RAP-NNN-brief-description`
+5. Implement, test, commit often with ticket ID
+6. Create PR targeting develop
+7. Update story status on develop (not in feature branch)
 
 ---
 
-## Complete Workflow
+## Project Structure
 
-### Phase 1: Read the Queue
-
-Open `QUEUE.md` and understand the current state:
-
-- 🟢 **ready** — No dependencies blocking. You can claim this.
-- 🔒 **claimed** — Another agent claimed it. Wait or pick a different task.
-- 🔨 **in_progress** — Agent is actively working. Do not touch.
-- 👀 **review** — Waiting for code review. Do not touch.
-- ✅ **done** — Completed. Move on.
-- 🚧 **blocked** — Cannot start yet (dependencies). Do not claim.
-
-### Phase 2: Understand the Task
-
-Open the task file, e.g., `EPIC-0-testing-foundation/STORY-0.1-vitest-setup/TASK-0.1.1.md`:
-
-Read the frontmatter:
-```yaml
----
-id: TASK-0.1.1
-title: Set Up Vitest Configuration
-epic: EPIC-0
-story: STORY-0.1
-priority: P0
-status: ready
-agent_type: fullstack
-dependencies: []
-branch: features/vitest-setup
-claimed_by: null
-claimed_at: null
-pr_url: null
----
+```
+planning/
+├── QUEUE.md                  ← Active queue (V1-V3 stories with live status)
+├── ROADMAP.md                ← 10-sprint roadmap index (V4-V13, 50 epics)
+├── AGENT-GUIDE.md            ← This file
+├── CLAIMING.md               ← Legacy claiming log
+├── orchestrator-log.md       ← Automated checker run history
+├── sprints/
+│   ├── sprint-01/SPRINT.md   ← Sprint 1 goal, epics, deliverables
+│   ├── sprint-02/SPRINT.md
+│   └── ...sprint-10/
+├── epics/
+│   ├── EPIC-1-animal-catalog-and-management/    ← V1 epics (1-20)
+│   │   ├── EPIC.md
+│   │   └── stories/S01-*/STORY.md
+│   ├── EPIC-21-staff-login-auth-hardening/      ← V4+ epics (21-70)
+│   │   ├── EPIC.md
+│   │   └── stories/S1-*/STORY.md
+│   └── ...
 ```
 
-Read sections:
-- **Description** — What needs to be built
-- **Acceptance Criteria** — Specific requirements (checkboxes)
-- **Technical Notes** — Architecture, patterns, libraries
-- **Dependencies** — Tasks that must complete first
+## Story Discovery (Priority Order)
 
-### Phase 3: Claim the Task
+### Priority 1: V2/V3 READY stories in QUEUE.md
+These are partially completed versions. Finish them first.
 
-Create a feature branch with the claim:
+```
+Read planning/QUEUE.md
+Find first READY story in V2 or V3
+```
 
+### Priority 2: V4+ stories from ROADMAP.md (Sprint Order)
+After V2/V3 are complete, work the 10-sprint roadmap in order.
+
+```
+Sprint 1 (V4): EPIC-21 through EPIC-25 — Staff Operations Launch
+Sprint 2 (V5): EPIC-26 through EPIC-30 — Veterinary & Medical Records
+Sprint 3 (V6): EPIC-31 through EPIC-35 — EU Payment Integration
+Sprint 4 (V7): EPIC-36 through EPIC-40 — Volunteer & Foster Programs
+Sprint 5 (V8): EPIC-41 through EPIC-45 — Notifications & Communications
+Sprint 6 (V9): EPIC-46 through EPIC-50 — GDPR, Security & Compliance
+Sprint 7 (V10): EPIC-51 through EPIC-55 — Analytics & Reporting
+Sprint 8 (V11): EPIC-56 through EPIC-60 — Public Experience & Content
+Sprint 9 (V12): EPIC-61 through EPIC-65 — Infrastructure & DevOps
+Sprint 10 (V13): EPIC-66 through EPIC-70 — Mobile, Scale & Future
+```
+
+Within each sprint: work epics in order (EPIC-21 before EPIC-22). Within each epic: work S1 before S2. P0 stories before P1.
+
+### Reading a Story
+```
+planning/epics/EPIC-NN-slug/stories/SN-slug/STORY.md
+```
+The STORY.md frontmatter contains: ticket ID, points, priority, track, sprint, status.
+The body contains: acceptance criteria (Given/When/Then), definition of done, technical notes.
+
+---
+
+## Implementation Workflow
+
+### 1. Create Ticket and Branch
+- Use the ticket ID from STORY.md frontmatter (e.g., RAP-100)
+- Create ticket directory: `tickets/RAP-NNN/` with plan.md, context.md, progress.md, timeline.md
+- Branch from develop: `feature/RAP-NNN-brief-description`
+
+### 2. Implement
+- Read relevant source files before modifying
+- Backend: Python 3.12, FastAPI, SQLAlchemy 2.x, Pydantic v2 (in `src/`)
+- Frontend: Next.js 14, Tailwind CSS, TypeScript (in `frontend/`)
+- Write tests: `tests/unit/test_*.py` and `tests/integration/test_*.py`
+- Commit often: `RAP-NNN: Add X` (imperative mood)
+
+### 3. Quality Gates
 ```bash
-# Navigate to project root
-cd /home/ai-whisperers/Projects/refugio-animal-paraguay
-
-# Create claiming branch
-git checkout -b claiming/TASK-0.1.1-your-agent-name
-
-# Edit CLAIMING.md and add your claim
-cat >> planning/CLAIMING.md << 'EOF'
-| TASK-0.1.1 | Set Up Vitest Configuration | your-agent-name | features/vitest-setup | $(date -u +%Y-%m-%dT%H:%M:%SZ) |
-EOF
-
-# Stage and commit
-git add planning/CLAIMING.md
-git commit -m "chore: claim TASK-0.1.1 - Vitest setup"
-
-# Push
-git push origin claiming/TASK-0.1.1-your-agent-name
-
-# Create PR on GitHub
-gh pr create \
-  --title "CLAIM: TASK-0.1.1 - Vitest setup" \
-  --body "Claiming task for implementation" \
-  --base main \
-  --draft
+PYTHONPATH=. python3 -m ruff check .
+PYTHONPATH=. python3 -m black --check .
+PYTHONPATH=. python3 -m pytest tests/ --tb=short -q
 ```
 
-### Phase 4: Wait for Merge
-
-The queue manager reviews and merges your claiming PR. Once merged:
-- You have exclusive rights to the task
-- Update the task's frontmatter to set `status: in_progress`
-- Push your implementation branch
-
-### Phase 5: Implement
-
-Work on the implementation branch (e.g., `features/vitest-setup`):
-
+### 4. Create PR
 ```bash
-# Switch to your feature branch
-git checkout features/vitest-setup
-
-# Make changes, commit as normal
-git add src/
-git commit -m "feat: configure vitest with defaults
-
-- Add vitest.config.ts
-- Configure paths alias
-- Set coverage thresholds
-- Add reporter options"
-
-# When ready, update task status
-# Edit TASK-0.1.1.md: status: review
-git add planning/
-git commit -m "chore: TASK-0.1.1 ready for review"
-
-# Push
-git push origin features/vitest-setup
-
-# Create implementation PR
-gh pr create \
-  --title "TASK-0.1.1: Set Up Vitest Configuration" \
-  --body "Implements vitest setup from acceptance criteria" \
-  --base main \
-  --reviewers "@lead-reviewer"
+unset GITHUB_TOKEN && gh auth switch --user IvanWeissVanDerPol
+git push -u origin feature/RAP-NNN-brief-description
+gh pr create --base develop --title "RAP-NNN: Brief description" --body "..."
 ```
 
-### Phase 6: Code Review & Merge
-
-- Reviewer checks acceptance criteria against implementation
-- Address feedback in follow-up commits
-- Once approved, merge to main
-- Update task status to ✅ (done) in QUEUE.md
-- Delete feature branch
-
----
-
-## Task File Format
-
-Each task is a markdown file with YAML frontmatter. Example:
-
-```yaml
----
-id: TASK-0.1.1
-title: Set Up Vitest Configuration
-epic: EPIC-0
-story: STORY-0.1
-priority: P0
-status: ready
-agent_type: fullstack
-dependencies: []
-branch: features/vitest-setup
-claimed_by: null
-claimed_at: null
-pr_url: null
----
-
-## Description
-
-Set up Vitest as the primary test framework with sensible defaults, including path alias resolution, coverage thresholds, and reporter configuration.
-
-## Acceptance Criteria
-
-- [ ] `vitest.config.ts` created with defaults
-- [ ] Path alias `@/` resolves correctly in tests
-- [ ] Coverage thresholds configured (80/75/95/90)
-- [ ] HTML reporter configured
-- [ ] `package.json` test scripts added
-- [ ] `vitest` runs without error
-- [ ] All checks pass
-
-## Technical Notes
-
-- Use Vitest v2.1.x (latest)
-- Configure for ESM + TypeScript
-- Include jsdom environment
-- Set up @vitest/ui for debugging
-
-## Dependencies
-
-None — this is EPIC-0 start task.
+### 5. Update Status (on develop, NOT in feature branch)
+```bash
+git checkout develop
+# For V2/V3: edit QUEUE.md status to DONE (PR #XX)
+# For V4+: edit STORY.md frontmatter status to "done"
+git commit -m "Housekeeping: Mark RAP-NNN as DONE (PR #XX)"
+git push origin develop
 ```
 
 ---
 
-## Priority Levels
-
-Tasks are prioritized by phase. Work these in order:
-
-### Phase 0: Foundation (EPIC-0)
-**13 tasks** — All other work blocked until complete.
-- Testing infrastructure
-- Type checking setup
-- Mock API setup
-- Test coverage baseline
-
-### Phase 1: Core Infrastructure (EPIC-8, EPIC-9)
-**8 tasks** — Can start immediately after Phase 0.
-- Database migrations
-- Redis/BullMQ setup
-- Design system
-- Visual assets
-
-### Phase 2: Features (EPIC-1, EPIC-3, EPIC-7)
-**17 tasks** — Start after Phase 1 foundation.
-- Animal catalog
-- Lost & found
-- PWA/offline
-- i18n
-
-### Phase 3: Advanced (EPIC-2, EPIC-5, EPIC-4, EPIC-6)
-**28 tasks** — Last phase.
-- Adoption workflow
-- Admin panel
-- Payments (multi-currency)
-- User portal
-
----
+## GitHub Auth Fix
+Before ANY git push or gh command:
+```bash
+unset GITHUB_TOKEN && gh auth switch --user IvanWeissVanDerPol
+```
 
 ## Conflict Prevention
 
-### Rule 1: One Agent Per Task
-A task can only be claimed by one agent. The claiming PR ensures atomicity.
+### Rule 1: Never update QUEUE.md in a feature branch
+Update it on develop directly after creating the PR. This prevents merge conflict cascades.
 
-### Rule 2: Claiming is Idempotent
-Once a claiming PR merges, that agent has exclusive rights. Do not create duplicate claims.
+### Rule 2: One story per agent per run
+Don't try to do multiple stories in a single session.
 
-### Rule 3: Block on Dependencies
-If a task shows 🚧 (blocked), check `dependencies:` in the frontmatter. A prior task must complete first.
+### Rule 3: Lock file coordination
+Worker creates `/tmp/refugio-worker.lock` while running. Checker skips PR merges when lock exists.
 
-### Rule 4: Update Status Atomically
-Each agent updates their task's `status:` field in the same commit where they update QUEUE.md. This prevents drift.
-
-### Rule 5: PR Links Are Canonical
-The `pr_url:` field in the task frontmatter is the single source of truth. If missing, work is not tracked.
+### Rule 4: PRs always target develop
+Never target another feature branch. Never target main directly.
 
 ---
 
-## State Machine
+## Ticket ID Allocation
 
-```
-┌─────────────────────────────────────────────────────────┐
-│                                                         │
-│  🟢 ready ──(claim PR)──> 🔒 claimed                   │
-│     ▲                         │                         │
-│     │                         │                         │
-│     │                    (start working)               │
-│     │                         │                         │
-│     │                         ▼                         │
-│     │                    🔨 in_progress                │
-│     │                         │                         │
-│     │                         │                         │
-│     │                    (finish & test)               │
-│     │                         │                         │
-│     │                         ▼                         │
-│     │                    👀 review                      │
-│     │                         │                         │
-│     │    (approved)      (needs work)                   │
-│     │        │                │                         │
-│     │        ▼                ▼                         │
-│     │       ✅ done         🟢 ready (back)            │
-│     │                         │                         │
-│     └─────────────────────────┘                         │
-│                                                         │
-│  Any state ──(blocker found)──> 🚧 blocked            │
-│                                                         │
-└─────────────────────────────────────────────────────────┘
-```
-
-### Transitions
-
-| From | To | Trigger | Who |
-|------|----|---------|----|
-| ready | claimed | Claiming PR merges | Agent |
-| claimed | in_progress | Agent creates feature branch | Agent |
-| in_progress | review | Agent creates implementation PR | Agent |
-| review | done | PR approved & merged | Reviewer |
-| review | ready | Changes requested | Reviewer |
-| (any) | blocked | Dependency fails | Lead |
-
----
-
-## Agent Types & Skills Mapping
-
-### fullstack
-- Next.js / React components
-- Database schemas / migrations
-- API endpoints
-- Type definitions
-- Tests (unit + integration)
-
-**Recommended for**: Feature work, EPIC-1-4, EPIC-6
-
-### devops
-- Docker, Kubernetes, Terraform
-- CI/CD pipeline
-- Environment setup
-- Infrastructure monitoring
-- Secrets management
-
-**Recommended for**: EPIC-8 infrastructure
-
-### design
-- Visual assets
-- Design tokens
-- UI/UX mockups
-- Accessibility review
-- Brand compliance
-
-**Recommended for**: EPIC-9
-
-### qa
-- Test strategy
-- Coverage analysis
-- Performance testing
-- Security scanning
-- Release validation
-
-**Recommended for**: EPIC-0 (all testing work)
-
----
-
-## Troubleshooting
-
-### "Task shows 🚧 blocked — what do I do?"
-
-Check the `dependencies:` field in the task file. Example:
-
-```yaml
-dependencies:
-  - TASK-0.1.1  # Vitest setup must complete first
-  - TASK-0.1.2  # Type checking must be ready
-```
-
-Wait for those tasks to show ✅ (done), then the queue manager will unblock this task.
-
-### "I claimed a task but can't find my branch"
-
-The claiming PR only adds you to `CLAIMING.md`. You still need to:
-
-1. Create your feature branch:
-   ```bash
-   git checkout -b features/your-task-name
-   ```
-
-2. Update the task's `branch:` field with the actual branch name
-
-3. Push and create implementation PR
-
-### "Two agents claimed the same task — conflict!"
-
-The claiming PR system prevents this. If it happens anyway:
-
-1. First PR merged wins — that agent owns the task
-2. Second agent should abandon their claim
-3. Queue manager resolves and picks next available task
-
-### "Dependency task is taking too long"
-
-Contact the lead or queue manager. They can:
-- Reassign the blocking task to a faster agent
-- Break it into smaller pieces
-- Provide architectural guidance to unblock you
-
-### "I found a bug in someone else's completed task"
-
-Create an issue:
-
-```bash
-gh issue create \
-  --title "BUG: TASK-X.X.X — [description]" \
-  --label bug,dependencies \
-  --body "This task has a regression that blocks downstream work"
-```
-
-The original agent or a new agent claims the fix.
-
----
-
-## Conventions
-
-### Commit Messages
-
-Follow [Conventional Commits](https://www.conventionalcommits.org):
-
-```
-<type>(<scope>): <subject>
-
-<body>
-
-Closes #<issue-number>
-TASK-X.X.X
-```
-
-Example:
-```
-feat(testing): add vitest configuration
-
-- Add vitest.config.ts with path aliases
-- Configure coverage thresholds
-- Add HTML reporter
-
-Closes #42
-TASK-0.1.1
-```
-
-### Branch Names
-
-Format: `<type>/<short-description>`
-
-- `features/vitest-setup` — Feature work
-- `claiming/TASK-0.1.1-agent-name` — Claiming branch
-- `bugfix/animal-filter-crash` — Bug fix
-- `docs/readme-update` — Documentation
-
-### PR Titles
-
-Include task ID and title:
-
-```
-TASK-0.1.1: Set Up Vitest Configuration
-
-or
-
-CLAIM: TASK-0.1.1 - Vitest setup
-```
+| Range | Version | Sprint |
+|-------|---------|--------|
+| RAP-001 to RAP-010 | Pre-V1 | Foundation (done) |
+| RAP-011 to RAP-033 | V1 | MVP (done) |
+| RAP-034 to RAP-070 | V2/V3 | Donations + Communications |
+| RAP-100 to RAP-124 | V4 | Sprint 1: Staff Operations |
+| RAP-125 to RAP-149 | V5 | Sprint 2: Veterinary |
+| RAP-150 to RAP-174 | V6 | Sprint 3: EU Payments |
+| RAP-175 to RAP-199 | V7 | Sprint 4: Volunteer/Foster |
+| RAP-200 to RAP-224 | V8 | Sprint 5: Notifications |
+| RAP-225 to RAP-249 | V9 | Sprint 6: GDPR/Security |
+| RAP-250 to RAP-274 | V10 | Sprint 7: Analytics |
+| RAP-275 to RAP-299 | V11 | Sprint 8: Public Experience |
+| RAP-300 to RAP-324 | V12 | Sprint 9: Infrastructure |
+| RAP-325 to RAP-349 | V13 | Sprint 10: Mobile/Scale |
 
 ---
 
 ## Rollback Procedures
 
 ### Broken Feature Branch
-If a scheduled task creates a branch with failing tests or broken code:
 ```bash
-# Option 1: Delete the branch entirely
 git branch -D feature/RAP-NNN-description
 git push origin --delete feature/RAP-NNN-description
-
-# Option 2: Reset to last good commit
-git checkout feature/RAP-NNN-description
-git log --oneline -10  # find last good commit
-git reset --hard <good-commit-sha>
-git push --force-with-lease origin feature/RAP-NNN-description
 ```
 
 ### Broken PR
 ```bash
-# Close the PR without merging
 gh pr close <PR-NUMBER>
-# Then clean up the branch as above
 ```
 
-### Ticket Cleanup
-If a ticket was partially completed:
-1. Update `tickets/RAP-NNN/context.md` — set STATUS: PAUSED, add RESUME_POINT
-2. Log the issue in `tickets/RAP-NNN/progress.md`
-3. In `planning/QUEUE.md`, change the story status back to READY
-
 ### Database Migration Rollback
-If a migration was applied but the code is broken:
 ```bash
-# Find the previous migration
 PYTHONPATH=. python3 -m alembic history
-# Downgrade to previous
 PYTHONPATH=. python3 -m alembic downgrade -1
 ```
 
 ---
 
-## Queue Status Check
-
-Run `./scripts/queue-status.sh` to cross-reference QUEUE.md with actual ticket directories, branches, and PRs. Use this to detect drift between documented and actual state.
-
----
-
-## Resources
-
-- **QUEUE.md** — Current task status and availability
-- **CLAIMING.md** — Who claimed what and when
-- **Epic folders** — `EPIC-X-title/` directories with story & task files
-- **Tech stack** — Python 3.12, FastAPI, SQLAlchemy 2.x, PostgreSQL 16, Next.js 14
-- **Git repo** — `/home/ai-whisperers/Projects/refugio-animal-paraguay`
-- **Scripts** — `scripts/queue-status.sh` (queue/branch reconciliation)
-- **Orchestrator log** — `planning/orchestrator-log.md` (automated run history)
-
----
-
 **Last updated**: 2026-03-26
-**Maintained by**: Refugio Animal Paraguay Team
+**Roadmap**: 10 sprints, 50 epics, 250 stories, ~1,010 story points
