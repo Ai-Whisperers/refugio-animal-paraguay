@@ -26,7 +26,7 @@ from src.api.consents import router as consents_router
 from src.api.donations import router as donations_router
 from src.api.donors import router as donors_router
 from src.api.follow_ups import router as follow_ups_router
-from src.api.fund_allocations import router as fund_allocations_router
+from src.api.fund_allocations import router as fund_allocations_router  # noqa: F401, E501
 from src.api.gdpr import router as gdpr_router
 from src.api.gdpr_export import router as gdpr_export_router
 from src.api.health import router as health_router
@@ -39,6 +39,7 @@ from src.api.public_adoption import router as public_adoption_router
 from src.api.public_campaigns import router as public_campaigns_router
 from src.api.public_contact import router as public_contact_router
 from src.api.sepa import router as sepa_router
+from src.api.sponsorships import router as sponsorships_router
 from src.api.webhooks import router as webhooks_router
 from src.audit.middleware import AuditMiddleware
 from src.config import Settings, get_settings
@@ -139,6 +140,7 @@ def create_app() -> FastAPI:
     application.include_router(follow_ups_router)
     application.include_router(gdpr_router)
     application.include_router(impact_reports_router)
+    application.include_router(sponsorships_router)
 
     return application
 
