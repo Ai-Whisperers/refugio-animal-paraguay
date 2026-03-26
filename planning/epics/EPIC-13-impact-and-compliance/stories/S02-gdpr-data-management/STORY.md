@@ -1,77 +1,85 @@
 ---
 story: S02
 epic: EPIC-13
-title: GDPR Data Management
+title: GDPR Data Export
 status: ready
 created: 2026-03-26T00:00:00.000000
-effort: 8
+effort: 6
+version: V3
 ---
 
-# S02: GDPR Data Management
+# S02: GDPR Data Export
 
 ## User Story
 
-As a **data subject (donor, adopter, or staff member)**, I want to **request my personal data (Article 15), request corrections (Article 16), request deletion (Article 17), or receive my data in portable format (Article 20)** so that **I can exercise my GDPR rights and the organization respects my privacy**.
+As a **data subject (donor, adopter, or staff member)**, I want to **request and download my personal data in a portable format (GDPR Articles 15 & 20)** so that **I can exercise my right to access and data portability, and migrate my data to another organization**.
 
 ## Acceptance Criteria
 
-**Given** I am a registered user
+**Given** I am a registered donor/adopter/staff member
 **When** I access my account settings
-**Then** I can request a download of all my personal data
+**Then** I see a "Request My Data Export" button in the Data & Privacy section
 
-**Given** a data subject requests their data export
-**When** the request is processed
-**Then** I receive a JSON or CSV file with all my personal information and activity
+**Given** I request a data export
+**When** the request is submitted
+**Then** the system logs the request with timestamp, request ID, and data subject identity for audit trail compliance
 
-**Given** I request my data to be deleted
-**When** I submit a GDPR deletion request
-**Then** the system flags my account for safe deletion and requires staff verification
+**Given** my data export is processed by the system
+**When** the export is ready
+**Then** I receive an email with a secure download link (valid for 7 days) containing a JSON file with all my personal data
 
-**Given** a deletion request is approved by staff
-**When** the deletion is executed
-**Then** my data is removed from the system while preserving referential integrity (anonymization where needed)
+**Given** I download my exported data
+**When** the file is received
+**Then** the JSON includes: profile (name, email, address, phone), donation history (amount, date, currency, tax receipt status), adoption records (animal name, date, status), communication preferences, and activity audit trail
 
-**Given** I need to correct my personal information
-**When** I update my profile
-**Then** changes are tracked in the audit trail (as required by GDPR Article 32 on accountability)
+**Given** I request an export as a staff member
+**When** the export is generated
+**Then** the file also includes my volunteer/shift history, task assignments, and role/permission records
 
-**Given** the organization needs to manage data retention
-**When** a donor hasn't engaged in 5 years
-**Then** staff receives a notification to archive or delete per retention policy
+**Given** my data export contains sensitive information
+**When** the download link is accessed
+**Then** the download is tracked in the audit log and the link becomes inactive after one download
+
+**Given** I did not download my exported data within 7 days
+**When** the expiration deadline passes
+**Then** the temporary export file is securely deleted and I must request a new export
 
 ## Tasks
 
-- T01: Implement data export API (Articles 15, 20) - CSV/JSON format
-- T02: Build user-facing data request interface (view, download, delete)
-- T03: Implement data deletion workflow with staff verification step
-- T04: Create retention policy enforcement (automated archival/deletion notifications)
-- T05: Add GDPR consent tracking and revocation for communications
+- T01: Implement POST /api/gdpr/data-export request endpoint (validation, audit logging)
+- T02: Build background job for data aggregation and JSON serialization
+- T03: Implement secure download link generation and expiration tracking
+- T04: Add "Request My Data Export" UI in user account settings
+- T05: Email notification service for export ready/link expiration
+- T06: Unit tests for data filtering and JSON serialization (90%+ coverage)
+- T07: Integration tests for full export request → download lifecycle
+- T08: Security tests for download link validation and replay attack prevention
 
 ## Definition of Done
 
-- [ ] Data export API includes all personal data fields (name, email, address, donation history, etc.)
-- [ ] Export format is structured (JSON or CSV) and machine-readable
-- [ ] Deletion request workflow captures reason and staff approval
-- [ ] Anonymization logic preserves data integrity (replace names with hashes)
-- [ ] Retention policy notifications sent to staff on schedule
-- [ ] Consent records show what communications user has opted into/out of
-- [ ] Unit tests cover data export filtering and anonymization (85%+ coverage)
-- [ ] Integration tests cover full data subject request lifecycle
+- [ ] Data export endpoint returns all personal data fields per spec
+- [ ] Export format is valid JSON, schema-documented
+- [ ] Download links expire correctly and are not reusable
+- [ ] Audit trail records all data export requests
 - [ ] No unencrypted personal data in logs or error messages
+- [ ] Email notifications sent reliably with link and expiration info
+- [ ] Unit test coverage ≥90% for export logic
+- [ ] Integration tests cover happy path and error scenarios
+- [ ] Deployed to staging and verified
 
 ## Technical Notes
 
-- Data export includes: user profile, donations, adoptions, communications, audit trail entries
-- Deletion strategy: hard delete where possible, anonymize where referential integrity requires it (donations → anonymous donor)
-- Retention policy config: donor_inactivity_days=1825 (5 years), staff_inactivity_days=365 (1 year)
-- Consent model: user_id, consent_type (enum: marketing_email, newsletter, sms), opt_in_date, opt_out_date, ip_address
-- Implement request tracking: gdpr_request_id, request_type (export, delete, correct), status, created_date, resolved_date, staff_notes
-- Consider: 30-day grace period before actual deletion to allow user to cancel
+- Export schema: user_id, export_date, export_uuid (unique request ID), data_subjects array with profile, donations, adoptions, communications, audit_entries
+- Donation data: amount (EUR/PYG), date, frequency (one-time/recurring), payment method, tax receipt status, fund allocation
+- Secure download: generate JWT token with exp claim (7 days), single-use tracking in download_tokens table
+- Background job: triggered immediately on request, runs async, sends email on completion or failure
+- Encryption: exports at rest in temp storage (encrypted with data key from KMS), deleted after 7 days
+- Consider: support for batch export requests (export all data across multiple accounts user owns)
 
 ## Dependencies
 
-- Depends on: S01-audit-trail-system (GDPR compliance requires audit trail)
+- Depends on: S01-audit-trail-system (export requests must be logged)
 - Depends on: EPIC-10 (User authentication and account management)
-- Blocks: S03-impact-report-generator (reports must exclude deleted user data)
+- Blocks: S06-gdpr-data-deletion (deletion should reference export requests)
 
-## Story Points: 8
+## Story Points: 6
