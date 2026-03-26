@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import DynamicIcon from "@/components/DynamicIcon";
+import { Building2, MessageCircle, Phone, ArrowLeft } from "lucide-react";
 import { DONATE, SITE_TITLE } from "@/lib/strings";
+import CampaignListSection from "./CampaignListSection";
 
 export const metadata: Metadata = {
   title: `${DONATE.title} | ${SITE_TITLE}`,
@@ -22,6 +25,19 @@ export default function DonatePage() {
         </div>
       </section>
 
+      {/* Active Campaigns */}
+      <section className="py-10 sm:py-16 px-4 bg-white">
+        <div className="max-w-6xl mx-auto">
+          <h2 className="text-2xl sm:text-3xl font-heading font-bold text-gray-900 mb-2 text-center">
+            {DONATE.campaignsTitle}
+          </h2>
+          <p className="text-gray-500 text-center mb-8">
+            {DONATE.campaignsSubtitle}
+          </p>
+          <CampaignListSection />
+        </div>
+      </section>
+
       {/* How Donations Help */}
       <section className="py-10 sm:py-16 px-4 bg-white">
         <div className="max-w-5xl mx-auto">
@@ -34,7 +50,7 @@ export default function DonatePage() {
                 key={item.title}
                 className="bg-white rounded-xl p-6 shadow-sm border border-gray-100"
               >
-                <div className="text-3xl mb-3">{item.icon}</div>
+                <div className="mb-3 text-primary-600"><DynamicIcon name={item.icon} className="h-8 w-8" /></div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">
                   {item.title}
                 </h3>
@@ -60,7 +76,7 @@ export default function DonatePage() {
           {/* Bank Transfer (Paraguay) */}
           <div className="bg-white rounded-xl p-6 sm:p-8 shadow-sm border border-gray-100 mb-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <span>{"\u{1F3E6}"}</span> {DONATE.bankTransferTitle}
+              <Building2 className="h-5 w-5 text-primary-600" /> {DONATE.bankTransferTitle}
             </h3>
             <div className="space-y-2">
               {DONATE.bankDetails.map((detail) => (
@@ -80,7 +96,7 @@ export default function DonatePage() {
           {/* EU Donors */}
           <div className="bg-white rounded-xl p-6 sm:p-8 shadow-sm border border-gray-100">
             <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
-              <span>{"\u{1F1EA}\u{1F1FA}"}</span> {DONATE.euTitle}
+              <span className="inline-flex items-center justify-center w-6 h-6 bg-blue-100 text-blue-700 font-bold text-sm rounded">EU</span> {DONATE.euTitle}
             </h3>
             <p className="text-sm text-gray-600 mb-3">
               {DONATE.euDescription}
@@ -104,7 +120,7 @@ export default function DonatePage() {
                 key={item.title}
                 className="bg-white rounded-xl p-6 shadow-sm border border-gray-100"
               >
-                <div className="text-3xl mb-3">{item.icon}</div>
+                <div className="mb-3 text-primary-600"><DynamicIcon name={item.icon} className="h-8 w-8" /></div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">
                   {item.title}
                 </h3>
@@ -130,7 +146,7 @@ export default function DonatePage() {
       {/* WhatsApp CTA */}
       <section className="py-10 sm:py-16 px-4 bg-white">
         <div className="max-w-3xl mx-auto text-center">
-          <p className="text-2xl mb-3">{"\u{1F4AC}"}</p>
+          <div className="inline-flex items-center justify-center mb-3"><MessageCircle className="h-8 w-8 text-gray-900" /></div>
           <h2 className="text-xl font-heading font-bold text-gray-900 mb-2">
             {DONATE.whatsappCta}
           </h2>
@@ -140,14 +156,14 @@ export default function DonatePage() {
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors mt-3"
           >
-            {"\u{1F4F1}"} WhatsApp: {DONATE.whatsappNumber}
+            <Phone className="h-5 w-5" /> WhatsApp: {DONATE.whatsappNumber}
           </a>
           <div className="mt-6">
             <Link
               href="/animals"
-              className="text-primary-600 hover:text-primary-700 font-medium"
+              className="text-primary-600 hover:text-primary-700 font-medium inline-flex items-center gap-1"
             >
-              {"\u{2190}"} Ver animales disponibles
+              <ArrowLeft className="h-4 w-4" /> Ver animales disponibles
             </Link>
           </div>
         </div>

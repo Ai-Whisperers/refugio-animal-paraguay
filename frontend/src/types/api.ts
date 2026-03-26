@@ -105,6 +105,90 @@ export interface PaginatedResponse<T> {
   pages: number;
 }
 
+// --- Campaigns ---
+
+export type CampaignStatus = "draft" | "active" | "completed" | "cancelled";
+
+export type FundCategory =
+  | "medical"
+  | "food"
+  | "operations"
+  | "rescue"
+  | "infrastructure"
+  | "general";
+
+export type CurrencyCode = "EUR" | "PYG" | "USD";
+
+export interface CampaignPublic {
+  id: string;
+  title: string;
+  description: string;
+  impact_story: string | null;
+  target_amount_cents: number;
+  raised_amount_cents: number;
+  currency: CurrencyCode;
+  fund_category: FundCategory;
+  status: CampaignStatus;
+  image_url: string | null;
+  deadline: string | null;
+  min_donation_cents: number | null;
+  max_donation_cents: number | null;
+  allow_overfunding: boolean;
+  donation_count: number;
+  progress_percentage: number;
+  created_at: string;
+}
+
+export interface CampaignListResponse {
+  items: CampaignPublic[];
+  total: number;
+  page: number;
+  page_size: number;
+}
+
+export interface DonationCreateRequest {
+  donor_id?: string | null;
+  campaign_id?: string | null;
+  amount_cents: number;
+  currency: CurrencyCode;
+  payment_method: "stripe" | "cash" | "transfer";
+  notes?: string | null;
+}
+
+export interface DonationResponse {
+  id: string;
+  donor_id: string | null;
+  amount_cents: number;
+  currency: CurrencyCode;
+  payment_method: string;
+  stripe_payment_intent_id: string | null;
+  status: string;
+  fund_category: string | null;
+  receipt_number: string | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DonorCreateRequest {
+  full_name: string;
+  email: string;
+  country?: string;
+  currency_preference?: CurrencyCode;
+  gdpr_consent_at?: string;
+}
+
+export interface DonorResponse {
+  id: string;
+  full_name: string;
+  email: string;
+  country: string | null;
+  currency_preference: CurrencyCode;
+  gdpr_consent_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 // --- API Error ---
 
 export interface ApiError {

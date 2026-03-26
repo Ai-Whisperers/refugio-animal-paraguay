@@ -309,10 +309,10 @@ export const DONATE = {
     "Cada guarani y cada euro que donas se convierte en alimento, medicina y refugio para animales que no tienen a nadie mas.",
   howHelpsTitle: "Como ayuda tu donacion",
   howHelps: [
-    { icon: "\u{1F35B}", title: "Alimento", description: "Alimentamos a mas de 50 animales diariamente con alimento balanceado y suplementos.", amount: "Gs. 50.000/mes" },
-    { icon: "\u{1F3E5}", title: "Atencion Veterinaria", description: "Vacunas, esterilizaciones, cirugias de emergencia y tratamientos continuos.", amount: "Gs. 150.000/mes" },
-    { icon: "\u{1F3E0}", title: "Mantenimiento", description: "Reparaciones, limpieza y servicios basicos para las instalaciones del refugio.", amount: "Gs. 100.000/mes" },
-    { icon: "\u{1F698}", title: "Operaciones de Rescate", description: "Transporte y recursos para rescatar animales en situacion de calle o maltrato.", amount: "Gs. 75.000/mes" },
+    { icon: "utensils", title: "Alimento", description: "Alimentamos a mas de 50 animales diariamente con alimento balanceado y suplementos.", amount: "Gs. 50.000/mes" },
+    { icon: "stethoscope", title: "Atencion Veterinaria", description: "Vacunas, esterilizaciones, cirugias de emergencia y tratamientos continuos.", amount: "Gs. 150.000/mes" },
+    { icon: "wrench", title: "Mantenimiento", description: "Reparaciones, limpieza y servicios basicos para las instalaciones del refugio.", amount: "Gs. 100.000/mes" },
+    { icon: "truck", title: "Operaciones de Rescate", description: "Transporte y recursos para rescatar animales en situacion de calle o maltrato.", amount: "Gs. 75.000/mes" },
   ],
   donateOptionsTitle: "Opciones de Donacion",
   bankTransferTitle: "Transferencia Bancaria (Paraguay)",
@@ -331,15 +331,23 @@ export const DONATE = {
     "Estamos configurando pagos online con Stripe para donaciones con tarjeta en EUR. Mientras tanto, contactanos por WhatsApp.",
   otherWaysTitle: "Otras Formas de Ayudar",
   otherWays: [
-    { icon: "\u{1F4E6}", title: "Donacion de Insumos", description: "Alimento, mantas, medicamentos, productos de limpieza. Coordinamos el retiro." },
-    { icon: "\u{2764}\u{FE0F}", title: "Apadrina un Animal", description: "Cubri los gastos mensuales de un animal. Recibis actualizaciones y fotos." },
-    { icon: "\u{1F91D}", title: "Dona tu Tiempo", description: "Unite como voluntario. Necesitamos ayuda en cuidado diario, transporte y eventos." },
+    { icon: "package", title: "Donacion de Insumos", description: "Alimento, mantas, medicamentos, productos de limpieza. Coordinamos el retiro." },
+    { icon: "heart", title: "Apadrina un Animal", description: "Cubri los gastos mensuales de un animal. Recibis actualizaciones y fotos." },
+    { icon: "handshake", title: "Dona tu Tiempo", description: "Unite como voluntario. Necesitamos ayuda en cuidado diario, transporte y eventos." },
   ],
   transparencyTitle: "Transparencia",
   transparencyText:
     "Nos comprometemos a la transparencia total. Publicamos informes periodicos sobre el uso de fondos. Cada donante merece saber como se usa su contribucion.",
   whatsappCta: "Consultas sobre donaciones",
   whatsappNumber: "+595 981 000 000",
+  campaignsTitle: "Campanas Activas",
+  campaignsSubtitle: "Elegi una campana y hace tu aporte. Cada donacion cuenta.",
+  noCampaigns: "No hay campanas activas en este momento. Podes donar directamente por transferencia bancaria.",
+  campaignDetailBack: "Volver a campanas",
+  donateNow: "Donar ahora",
+  donationSuccess: "Gracias por tu donacion",
+  donationSuccessMessage: "Tu aporte va a marcar una diferencia real en la vida de los animales del refugio.",
+  donationSuccessTransfer: "Para completar tu donacion por transferencia, envia el monto a la cuenta bancaria indicada y comparti tu comprobante por WhatsApp.",
 } as const;
 
 // --- Volunteer Page ---
@@ -350,10 +358,10 @@ export const VOLUNTEER = {
   heroSubtitle: "Nuestros voluntarios son el corazon del refugio. Sin su dedicacion, nada de lo que hacemos seria posible. Unite y cambia vidas.",
   activitiesTitle: "Que hacen nuestros voluntarios",
   activities: [
-    { icon: "\u{1F436}", title: "Cuidado Diario", description: "Alimentacion, paseos, socializacion y carino para los animales del refugio." },
-    { icon: "\u{1F3C3}", title: "Transporte", description: "Llevar animales a consultas veterinarias, eventos de adopcion y hogares de acogida." },
-    { icon: "\u{1F389}", title: "Eventos", description: "Organizar y participar en ferias de adopcion, campanas de concientizacion y recaudacion." },
-    { icon: "\u{1F4F8}", title: "Difusion", description: "Fotos, videos y publicaciones en redes sociales para dar visibilidad a los animales." },
+    { icon: "dog", title: "Cuidado Diario", description: "Alimentacion, paseos, socializacion y carino para los animales del refugio." },
+    { icon: "car", title: "Transporte", description: "Llevar animales a consultas veterinarias, eventos de adopcion y hogares de acogida." },
+    { icon: "party-popper", title: "Eventos", description: "Organizar y participar en ferias de adopcion, campanas de concientizacion y recaudacion." },
+    { icon: "camera", title: "Difusion", description: "Fotos, videos y publicaciones en redes sociales para dar visibilidad a los animales." },
   ],
   requirementsTitle: "Requisitos",
   requirements: [
@@ -392,9 +400,9 @@ export const FOSTER = {
   ],
   requirementsTitle: "Que necesitas",
   requirements: [
-    { icon: "\u{1F3E0}", title: "Espacio adecuado", description: "Un ambiente seguro y tranquilo donde el animal se sienta comodo." },
-    { icon: "\u{23F0}", title: "Tiempo y dedicacion", description: "Compromiso de al menos 2 semanas. La duracion varia segun las necesidades del animal." },
-    { icon: "\u{2764}\u{FE0F}", title: "Paciencia y amor", description: "Algunos animales vienen de situaciones dificiles y necesitan tiempo para confiar." },
+    { icon: "home", title: "Espacio adecuado", description: "Un ambiente seguro y tranquilo donde el animal se sienta comodo." },
+    { icon: "clock", title: "Tiempo y dedicacion", description: "Compromiso de al menos 2 semanas. La duracion varia segun las necesidades del animal." },
+    { icon: "heart", title: "Paciencia y amor", description: "Algunos animales vienen de situaciones dificiles y necesitan tiempo para confiar." },
   ],
   shelterProvides: "El refugio cubre alimento, medicamentos, vacunas y atencion veterinaria. Vos pones el carino.",
   faqTitle: "Preguntas frecuentes",
@@ -502,7 +510,7 @@ export const SUCCESS_STORIES = {
 export const COMMON = {
   loading: "Cargando...",
   error: "Algo salio mal. ¿Podes intentar de nuevo?",
-  paw: "\u{1F43E}",
+  paw: "paw-print",
 } as const;
 
 // --- Date Formatting ---

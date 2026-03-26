@@ -1,4 +1,4 @@
-import type { AnimalSpecies, AnimalStatus } from "@/types/api";
+import type { AnimalStatus } from "@/types/api";
 
 /** Human-readable status labels for display. */
 export const STATUS_LABELS: Record<AnimalStatus, string> = {
@@ -48,14 +48,3 @@ export function calculateAge(birthDate: string): string {
   return `${years}y ${remainingMonths}m`;
 }
 
-/** Emoji placeholder for animals without photos. */
-export function speciesEmoji(species: AnimalSpecies): string {
-  switch (species) {
-    case "dog":
-      return "\u{1F415}";
-    case "cat":
-      return "\u{1F408}";
-    default:
-      return "\u{1F43E}";
-  }
-}

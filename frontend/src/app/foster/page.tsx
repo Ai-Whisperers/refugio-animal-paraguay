@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import DynamicIcon from "@/components/DynamicIcon";
+import { Phone } from "lucide-react";
 import { FOSTER, SITE_TITLE } from "@/lib/strings";
 
 export const metadata: Metadata = {
@@ -57,7 +59,7 @@ export default function FosterPage() {
                 key={req.title}
                 className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 text-center"
               >
-                <div className="text-3xl mb-3">{req.icon}</div>
+                <div className="mb-3 text-primary-600"><DynamicIcon name={req.icon} className="h-8 w-8" /></div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">
                   {req.title}
                 </h3>
@@ -108,7 +110,7 @@ export default function FosterPage() {
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors"
           >
-            {"\u{1F4F1}"} WhatsApp: {FOSTER.whatsappNumber}
+            <Phone className="h-5 w-5" /> WhatsApp: {FOSTER.whatsappNumber}
           </a>
         </div>
       </section>

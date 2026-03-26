@@ -10,6 +10,13 @@ import type {
   Animal,
   AnimalSpecies,
   AnimalStatus,
+  CampaignListResponse,
+  CampaignPublic,
+  DonationCreateRequest,
+  DonationResponse,
+  DonorCreateRequest,
+  DonorResponse,
+  FundCategory,
   PublicAdoptionApplicationCreate,
   PublicAdoptionApplicationResponse,
 } from "@/types/api";
@@ -73,4 +80,60 @@ export async function submitAdoptionApplication(
     data,
     NO_AUTH
   );
+}
+
+// --- Campaigns ---
+
+/** Query parameters for filtering campaign listings. */
+export interface CampaignListParams {
+  category?: FundCategory;
+  page?: number;
+  page_size?: number;
+}
+
+/**
+ * Fetch a list of active campaigns with progress stats (no auth required).
+ */
+export async function listCampaignsPublic(
+  params: CampaignListParams = {}
+): Promise<CampaignListResponse> {
+  const searchParams = new URLSearchParams();
+  if (params.category) searchParams.set("category", params.category);
+  if (params.page !== undefined)
+    searchParams.set("page", String(params.page));
+  if (params.page_size !== undefined)
+    searchParams.set("page_size", String(params.page_size));
+
+  const query = searchParams.toString();
+  const endpoint = `/public/campaigns${query ? `?${query}` : ""}`;
+  return api.get<CampaignListResponse>(endpoint, NO_AUTH);
+}
+
+/**
+ * Fetch a single campaign by ID (no auth required).
+ */
+export async function getCampaignPublic(
+  campaignId: string
+): Promise<CampaignPublic> {
+  return api.get<CampaignPublic>(`/public/campaigns/${campaignId}`, NO_AUTH);
+}
+
+// --- Donations (public) ---
+
+/**
+ * Create a donation record (no auth required, anonymous donations allowed).
+ */
+export async function createDonation(
+  data: DonationCreateRequest
+): Promise<DonationResponse> {
+  return api.post<DonationResponse>("/donations", data, NO_AUTH);
+}
+
+/**
+ * Create a donor profile (no auth required).
+ */
+export async function createDonor(
+  data: DonorCreateRequest
+): Promise<DonorResponse> {
+  return api.post<DonorResponse>("/donors", data, NO_AUTH);
 }
