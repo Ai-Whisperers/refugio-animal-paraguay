@@ -1,0 +1,28 @@
+# HTTP-only config — use this BEFORE SSL certificates are obtained.
+# After running ./deploy.sh ssl, switch to the full default.conf.
+server {
+    listen 80;
+    server_name sunstein.cloud www.sunstein.cloud;
+
+    # Let's Encrypt challenge path
+    location /.well-known/acme-challenge/ {
+        root /var/www/certbot;
+    }
+
+    # API routes (HTTP, temporary)
+    location /api/ {
+        rewrite ^/api(/.*)$ $1 break;
+        proxy_pass http://api:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+
+    # Frontend (HTTP, temporary)
+    location / {
+        proxy_pass http://frontend:3000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    }
+}

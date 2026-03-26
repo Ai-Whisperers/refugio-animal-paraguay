@@ -21,6 +21,7 @@ from src.db.models.donation import Donation, DonationStatus
 from src.db.session import get_db
 from src.events.bus import EventBus
 from src.events.domain_events import create_donation_received
+from src.services.sepa_service import activate_mandate, fail_mandate
 
 logger = logging.getLogger(__name__)
 
@@ -30,12 +31,16 @@ router = APIRouter(prefix="/webhooks", tags=["webhooks"])
 EVENT_PAYMENT_INTENT_SUCCEEDED = "payment_intent.succeeded"
 EVENT_PAYMENT_INTENT_FAILED = "payment_intent.payment_failed"
 EVENT_CHARGE_REFUNDED = "charge.refunded"
+EVENT_SETUP_INTENT_SUCCEEDED = "setup_intent.succeeded"
+EVENT_SETUP_INTENT_FAILED = "setup_intent.setup_failed"
 
 HANDLED_EVENT_TYPES = frozenset(
     {
         EVENT_PAYMENT_INTENT_SUCCEEDED,
         EVENT_PAYMENT_INTENT_FAILED,
         EVENT_CHARGE_REFUNDED,
+        EVENT_SETUP_INTENT_SUCCEEDED,
+        EVENT_SETUP_INTENT_FAILED,
     }
 )
 
@@ -156,6 +161,50 @@ async def _handle_charge_refunded(
     return "refunded"
 
 
+async def _handle_setup_intent_succeeded(
+    db: AsyncSession,
+    setup_intent_id: str,
+    mandate_id: str | None,
+) -> str:
+    """Handle setup_intent.succeeded: activate SEPA mandate."""
+    mandate = await activate_mandate(db, setup_intent_id, mandate_id)
+    if mandate is None:
+        logger.warning(
+            "Webhook setup_intent.succeeded: no mandate found for setup_intent %s",
+            setup_intent_id,
+        )
+        return "mandate_not_found"
+
+    logger.info(
+        "SEPA mandate %s activated via webhook (setup_intent: %s)",
+        mandate.id,
+        setup_intent_id,
+    )
+    return "mandate_activated"
+
+
+async def _handle_setup_intent_failed(
+    db: AsyncSession,
+    setup_intent_id: str,
+    failure_reason: str | None,
+) -> str:
+    """Handle setup_intent.setup_failed: mark SEPA mandate as failed."""
+    mandate = await fail_mandate(db, setup_intent_id, failure_reason)
+    if mandate is None:
+        logger.warning(
+            "Webhook setup_intent.setup_failed: no mandate found for setup_intent %s",
+            setup_intent_id,
+        )
+        return "mandate_not_found"
+
+    logger.info(
+        "SEPA mandate %s failed via webhook (setup_intent: %s)",
+        mandate.id,
+        setup_intent_id,
+    )
+    return "mandate_failed"
+
+
 def _extract_payment_intent_id_from_object(data_object: Any, event_type: str) -> str | None:
     """Extract the payment intent ID from a Stripe event's data.object.
 
@@ -225,6 +274,28 @@ async def stripe_webhook(
     # Extract the data object from the event using dict-style access
     # Stripe StripeObject supports [] but not .get() in v15
     data_obj: Any = event["data"]["object"]
+
+    # SEPA SetupIntent events use a different ID extraction path
+    if event_type in (EVENT_SETUP_INTENT_SUCCEEDED, EVENT_SETUP_INTENT_FAILED):
+        setup_intent_id = data_obj.get("id")
+        if not setup_intent_id:
+            logger.warning(
+                "Stripe webhook: could not extract setup_intent_id from %s event",
+                event_type,
+            )
+            return {"status": "skipped", "reason": "no_setup_intent_id"}
+
+        if event_type == EVENT_SETUP_INTENT_SUCCEEDED:
+            mandate_id = data_obj.get("mandate")
+            result = await _handle_setup_intent_succeeded(db, setup_intent_id, mandate_id)
+        else:
+            last_error = data_obj.get("last_setup_error")
+            failure_reason = last_error.get("message") if last_error else None
+            result = await _handle_setup_intent_failed(db, setup_intent_id, failure_reason)
+
+        return {"status": "processed", "event_type": event_type, "result": result}
+
+    # Payment intent / charge events
     payment_intent_id = _extract_payment_intent_id_from_object(data_obj, event_type)
     if not payment_intent_id:
         logger.warning(

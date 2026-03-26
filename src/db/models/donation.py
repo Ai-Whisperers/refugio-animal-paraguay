@@ -24,6 +24,7 @@ class PaymentMethod(enum.StrEnum):
     STRIPE = "stripe"
     CASH = "cash"
     TRANSFER = "transfer"
+    SEPA_DEBIT = "sepa_debit"
 
 
 class DonationStatus(enum.StrEnum):
