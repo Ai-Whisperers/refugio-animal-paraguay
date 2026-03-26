@@ -40,14 +40,14 @@ Stories are ordered by dependency and priority. Work top-to-bottom. Each story b
 | 1 | CI/CD Pipeline (GitHub Actions) | EPIC-9 S02 | 8 | DONE (PR #2) | Backend |
 | 2 | Animal Intake Workflow | EPIC-1 S06 | 8 | DONE (PR #3) | Backend |
 | 3 | CORS + Rate Limiting + Error Standardization | Cross-cutting | 5 | DONE (PR #13) | Backend |
-| 4 | Next.js 14 Project Scaffold | EPIC-11 | 5 | READY | Frontend |
+| 4 | Next.js 14 Project Scaffold | EPIC-11 | 5 | DONE (PR #19) | Frontend |
 | 5 | Animal Browsing Page (public) | EPIC-11 S01 | 8 | READY | Frontend |
 
 ### Sprint 2 (Weeks 3-4): Admin Panel + Polish
 
 | # | Story | Epic | Points | Status | Track |
 |---|-------|------|--------|--------|-------|
-| 6 | Staff Admin Panel — Animals + Adoptions | EPIC-7 S01 (partial) | 8 | BLOCKED #4 | Frontend |
+| 6 | Staff Admin Panel — Animals + Adoptions | EPIC-7 S01 (partial) | 8 | READY | Frontend |
 | 7 | Adoption Application Form (public) | EPIC-11 S01 | 5 | BLOCKED #5 | Frontend |
 | 8 | Mobile-First Responsive Design | EPIC-11 S05 | 5 | BLOCKED #5 | Frontend |
 | 9 | Password Reset Flow | EPIC-10 S02 (partial) | 5 | DONE (PR #12) | Backend |
