@@ -1,4 +1,4 @@
-"""SQLAlchemy ORM models for donors and donations."""
+"""SQLAlchemy ORM models for donors, donations, and in-kind donations."""
 
 import enum
 from datetime import datetime
@@ -33,6 +33,20 @@ class DonationStatus(str, enum.Enum):
     COMPLETED = "completed"
     FAILED = "failed"
     REFUNDED = "refunded"
+
+
+class ItemType(enum.StrEnum):
+    """Categories for in-kind donations — must match chk_inkind_item_type CHECK constraint."""
+
+    FOOD = "food"
+    MEDICATION = "medication"
+    EQUIPMENT = "equipment"
+    TOYS = "toys"
+    BEDDING = "bedding"
+    SUPPLIES = "supplies"
+    VETERINARY_SERVICES = "veterinary_services"
+    TRANSPORTATION = "transportation"
+    OTHER = "other"
 
 
 class Donor(Base):
@@ -78,6 +92,11 @@ class Donor(Base):
 
     donations: Mapped[list["Donation"]] = relationship(
         "Donation",
+        back_populates="donor",
+        lazy="select",
+    )
+    in_kind_donations: Mapped[list["InKindDonation"]] = relationship(
+        "InKindDonation",
         back_populates="donor",
         lazy="select",
     )
@@ -139,5 +158,65 @@ class Donation(Base):
     donor: Mapped["Donor | None"] = relationship(
         "Donor",
         back_populates="donations",
+        lazy="select",
+    )
+
+
+class InKindDonation(Base):
+    """Non-cash donation record — estimated value stored as integer cents."""
+
+    __tablename__ = "in_kind_donations"
+
+    id: Mapped[UUID] = mapped_column(
+        sa.UUID(as_uuid=True),
+        primary_key=True,
+        server_default=sa.func.gen_random_uuid(),
+    )
+    donor_id: Mapped[UUID | None] = mapped_column(
+        sa.UUID(as_uuid=True),
+        sa.ForeignKey("donors.id", ondelete="SET NULL"),
+        nullable=True,
+        index=True,
+    )
+    item_type: Mapped[str] = mapped_column(
+        sa.String(30),
+        nullable=False,
+    )
+    description: Mapped[str | None] = mapped_column(sa.String(500), nullable=True)
+    quantity: Mapped[int] = mapped_column(sa.Integer, nullable=False, server_default="1")
+    # Estimated value in smallest currency unit (cents for EUR/USD, guaranies for PYG)
+    estimated_value_cents: Mapped[int] = mapped_column(sa.Integer, nullable=False)
+    currency: Mapped[str] = mapped_column(
+        sa.String(3),
+        nullable=False,
+        server_default="EUR",
+    )
+    date_received: Mapped[datetime] = mapped_column(
+        sa.TIMESTAMP(timezone=True),
+        nullable=False,
+        server_default=sa.func.now(),
+    )
+    # Staff member who received/recorded the donation
+    received_by_staff_id: Mapped[UUID | None] = mapped_column(
+        sa.UUID(as_uuid=True),
+        sa.ForeignKey("users.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    notes: Mapped[str | None] = mapped_column(sa.Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(
+        sa.TIMESTAMP(timezone=True),
+        nullable=False,
+        server_default=sa.func.now(),
+    )
+    updated_at: Mapped[datetime] = mapped_column(
+        sa.TIMESTAMP(timezone=True),
+        nullable=False,
+        server_default=sa.func.now(),
+        onupdate=sa.func.now(),
+    )
+
+    donor: Mapped["Donor | None"] = relationship(
+        "Donor",
+        back_populates="in_kind_donations",
         lazy="select",
     )
