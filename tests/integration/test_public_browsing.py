@@ -17,7 +17,6 @@ import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
-
 from src.app import app
 from src.auth.utils import create_access_token, hash_password
 from src.config import Settings
@@ -53,9 +52,7 @@ async def staff_client() -> AsyncGenerator[AsyncClient, None]:
     settings = Settings()
     engine = init_engine(settings)
 
-    session_factory = async_sessionmaker(
-        bind=engine, class_=AsyncSession, expire_on_commit=False
-    )
+    session_factory = async_sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
     async with session_factory() as session:
         await session.execute(
             text(
@@ -132,7 +129,9 @@ class TestPublicAnimalListing:
         """Animals with non-available status are excluded."""
         await _create_animal(staff_client, name="Available Dog", status="available")
         await _create_animal(staff_client, name="Intake Dog", status="intake")
-        await _create_animal(staff_client, name="Quarantine Cat", species="cat", status="quarantine")
+        await _create_animal(
+            staff_client, name="Quarantine Cat", species="cat", status="quarantine"
+        )
 
         resp = await public_client.get("/public/animals")
         assert resp.status_code == 200
@@ -149,9 +148,7 @@ class TestPublicAnimalListing:
         """Response includes correct pagination metadata."""
         # Create enough animals to test pagination
         for i in range(5):
-            await _create_animal(
-                staff_client, name=f"PaginationDog{i}", status="available"
-            )
+            await _create_animal(staff_client, name=f"PaginationDog{i}", status="available")
 
         resp = await public_client.get("/public/animals?page=1&page_size=2")
         assert resp.status_code == 200
@@ -194,12 +191,8 @@ class TestPublicAnimalListing:
     async def test_filter_by_gender(
         self, public_client: AsyncClient, staff_client: AsyncClient
     ) -> None:
-        await _create_animal(
-            staff_client, name="MaleDog", gender="male", status="available"
-        )
-        await _create_animal(
-            staff_client, name="FemaleDog", gender="female", status="available"
-        )
+        await _create_animal(staff_client, name="MaleDog", gender="male", status="available")
+        await _create_animal(staff_client, name="FemaleDog", gender="female", status="available")
 
         resp = await public_client.get("/public/animals?gender=female")
         assert resp.status_code == 200
@@ -214,9 +207,7 @@ class TestPublicAnimalListing:
         await _create_animal(
             staff_client, name="SmallCat", species="cat", size="small", status="available"
         )
-        await _create_animal(
-            staff_client, name="LargeDog", size="large", status="available"
-        )
+        await _create_animal(staff_client, name="LargeDog", size="large", status="available")
 
         resp = await public_client.get("/public/animals?size=small")
         assert resp.status_code == 200
@@ -228,12 +219,8 @@ class TestPublicAnimalListing:
     async def test_filter_by_breed_case_insensitive(
         self, public_client: AsyncClient, staff_client: AsyncClient
     ) -> None:
-        await _create_animal(
-            staff_client, name="BreedDog", breed="Labrador", status="available"
-        )
-        await _create_animal(
-            staff_client, name="OtherDog", breed="Poodle", status="available"
-        )
+        await _create_animal(staff_client, name="BreedDog", breed="Labrador", status="available")
+        await _create_animal(staff_client, name="OtherDog", breed="Poodle", status="available")
 
         resp = await public_client.get("/public/animals?breed=labrador")
         assert resp.status_code == 200
@@ -277,9 +264,7 @@ class TestPublicAnimalListing:
             status="available",
         )
 
-        resp = await public_client.get(
-            "/public/animals?species=dog&gender=male&size=large"
-        )
+        resp = await public_client.get("/public/animals?species=dog&gender=male&size=large")
         assert resp.status_code == 200
         data = resp.json()
         names = [item["name"] for item in data["items"]]
@@ -287,9 +272,7 @@ class TestPublicAnimalListing:
         assert "ComboMismatch" not in names
 
     @pytest.mark.asyncio
-    async def test_empty_search_returns_all(
-        self, public_client: AsyncClient
-    ) -> None:
+    async def test_empty_search_returns_all(self, public_client: AsyncClient) -> None:
         """Empty search string is ignored (returns all available)."""
         resp = await public_client.get("/public/animals?search=")
         assert resp.status_code == 200
@@ -301,16 +284,12 @@ class TestPublicAnimalListing:
         assert resp.status_code == 200
 
     @pytest.mark.asyncio
-    async def test_invalid_species_filter_returns_422(
-        self, public_client: AsyncClient
-    ) -> None:
+    async def test_invalid_species_filter_returns_422(self, public_client: AsyncClient) -> None:
         resp = await public_client.get("/public/animals?species=fish")
         assert resp.status_code == 422
 
     @pytest.mark.asyncio
-    async def test_zero_results_returns_empty_list(
-        self, public_client: AsyncClient
-    ) -> None:
+    async def test_zero_results_returns_empty_list(self, public_client: AsyncClient) -> None:
         resp = await public_client.get("/public/animals?search=nonexistent_xyz_animal_name")
         assert resp.status_code == 200
         data = resp.json()
@@ -341,8 +320,16 @@ class TestPublicAnimalListing:
         item = next(i for i in data["items"] if i["name"] == "FieldCheckDog")
 
         expected_fields = {
-            "id", "name", "species", "breed", "size", "gender",
-            "birth_date", "description", "primary_photo_url", "created_at",
+            "id",
+            "name",
+            "species",
+            "breed",
+            "size",
+            "gender",
+            "birth_date",
+            "description",
+            "primary_photo_url",
+            "created_at",
         }
         assert expected_fields.issubset(set(item.keys()))
 
@@ -387,26 +374,20 @@ class TestPublicAnimalDetail:
         self, public_client: AsyncClient, staff_client: AsyncClient
     ) -> None:
         """Animals not in 'available' status return 404 on the public endpoint."""
-        animal = await _create_animal(
-            staff_client, name="IntakeDog", status="intake"
-        )
+        animal = await _create_animal(staff_client, name="IntakeDog", status="intake")
         animal_id = animal["id"]
 
         resp = await public_client.get(f"/public/animals/{animal_id}")
         assert resp.status_code == 404
 
     @pytest.mark.asyncio
-    async def test_nonexistent_animal_returns_404(
-        self, public_client: AsyncClient
-    ) -> None:
+    async def test_nonexistent_animal_returns_404(self, public_client: AsyncClient) -> None:
         fake_id = uuid.uuid4()
         resp = await public_client.get(f"/public/animals/{fake_id}")
         assert resp.status_code == 404
 
     @pytest.mark.asyncio
-    async def test_invalid_uuid_returns_422(
-        self, public_client: AsyncClient
-    ) -> None:
+    async def test_invalid_uuid_returns_422(self, public_client: AsyncClient) -> None:
         resp = await public_client.get("/public/animals/not-a-uuid")
         assert resp.status_code == 422
 
@@ -414,9 +395,7 @@ class TestPublicAnimalDetail:
     async def test_detail_includes_photos_array(
         self, public_client: AsyncClient, staff_client: AsyncClient
     ) -> None:
-        animal = await _create_animal(
-            staff_client, name="PhotoDog", status="available"
-        )
+        animal = await _create_animal(staff_client, name="PhotoDog", status="available")
         animal_id = animal["id"]
 
         # Add a photo via staff endpoint
@@ -436,9 +415,7 @@ class TestPublicAnimalDetail:
         self, public_client: AsyncClient, staff_client: AsyncClient
     ) -> None:
         """Nullable fields appear as null in JSON, not omitted."""
-        animal = await _create_animal(
-            staff_client, name="NullFieldsDog", status="available"
-        )
+        animal = await _create_animal(staff_client, name="NullFieldsDog", status="available")
         animal_id = animal["id"]
 
         resp = await public_client.get(f"/public/animals/{animal_id}")
@@ -455,8 +432,6 @@ class TestPublicAnimalDetail:
     async def test_no_auth_required(
         self, public_client: AsyncClient, staff_client: AsyncClient
     ) -> None:
-        animal = await _create_animal(
-            staff_client, name="NoAuthDog", status="available"
-        )
+        animal = await _create_animal(staff_client, name="NoAuthDog", status="available")
         resp = await public_client.get(f"/public/animals/{animal['id']}")
         assert resp.status_code == 200

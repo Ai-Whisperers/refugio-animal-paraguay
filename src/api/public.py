@@ -45,14 +45,22 @@ _PUBLIC_STATUS = AnimalStatus.AVAILABLE.value
 @router.get("", response_model=PaginatedAnimalResponse)
 async def list_available_animals(
     species: AnimalSpecies | None = Query(default=None, description="Filter by species"),
-    breed: str | None = Query(default=None, max_length=100, description="Filter by breed (case-insensitive)"),
+    breed: str | None = Query(
+        default=None, max_length=100, description="Filter by breed (case-insensitive)"
+    ),
     size: AnimalSize | None = Query(default=None, description="Filter by size category"),
     gender: AnimalGender | None = Query(default=None, description="Filter by gender"),
     min_age_months: int | None = Query(default=None, ge=0, description="Minimum age in months"),
     max_age_months: int | None = Query(default=None, ge=0, description="Maximum age in months"),
-    search: str | None = Query(default=None, max_length=255, description="Search by animal name (partial, case-insensitive)"),
+    search: str | None = Query(
+        default=None,
+        max_length=255,
+        description="Search by animal name (partial, case-insensitive)",
+    ),
     page: int = Query(default=1, ge=1, description="Page number (1-based)"),
-    page_size: int = Query(default=DEFAULT_PAGE_SIZE, ge=1, le=MAX_PAGE_SIZE, description="Items per page"),
+    page_size: int = Query(
+        default=DEFAULT_PAGE_SIZE, ge=1, le=MAX_PAGE_SIZE, description="Items per page"
+    ),
     db: AsyncSession = Depends(get_db),
 ) -> PaginatedAnimalResponse:
     """List available animals with filtering, search, and pagination.
@@ -75,12 +83,16 @@ async def list_available_animals(
     if min_age_months is not None:
         # Animal must be at least min_age_months old (born before cutoff date)
         base_query = base_query.where(
-            Animal.birth_date <= func.current_date() - text("make_interval(months => :months)").bindparams(months=min_age_months)
+            Animal.birth_date
+            <= func.current_date()
+            - text("make_interval(months => :months)").bindparams(months=min_age_months)
         )
     if max_age_months is not None:
         # Animal must be at most max_age_months old (born after cutoff date)
         base_query = base_query.where(
-            Animal.birth_date >= func.current_date() - text("make_interval(months => :months)").bindparams(months=max_age_months)
+            Animal.birth_date
+            >= func.current_date()
+            - text("make_interval(months => :months)").bindparams(months=max_age_months)
         )
     if search is not None and search.strip():
         base_query = base_query.where(Animal.name.ilike(f"%{search.strip()}%"))

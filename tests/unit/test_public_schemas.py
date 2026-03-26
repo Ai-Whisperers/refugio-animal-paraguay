@@ -1,11 +1,10 @@
 """Unit tests for src/schemas/public.py — public browsing response schemas."""
 
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
 from uuid import uuid4
 
 import pytest
 from pydantic import ValidationError
-
 from src.db.models.animal import AnimalGender, AnimalSize, AnimalSpecies
 from src.schemas.public import (
     PaginatedAnimalResponse,
@@ -49,7 +48,7 @@ class TestPublicAnimalListItem:
             birth_date=date(2023, 1, 15),
             description="Friendly dog",
             primary_photo_url="https://example.com/photo.jpg",
-            created_at=datetime(2026, 1, 1, tzinfo=timezone.utc),
+            created_at=datetime(2026, 1, 1, tzinfo=UTC),
         )
         assert item.name == "Firulais"
         assert item.species == AnimalSpecies.DOG
@@ -69,7 +68,7 @@ class TestPublicAnimalListItem:
             birth_date=None,
             description=None,
             primary_photo_url=None,
-            created_at=datetime(2026, 1, 1, tzinfo=timezone.utc),
+            created_at=datetime(2026, 1, 1, tzinfo=UTC),
         )
         data = item.model_dump()
         assert data["breed"] is None
@@ -99,8 +98,8 @@ class TestPublicAnimalDetail:
             description="Playful cat",
             primary_photo_url="https://example.com/photo.jpg",
             photos=[photo],
-            created_at=datetime(2026, 1, 1, tzinfo=timezone.utc),
-            updated_at=datetime(2026, 1, 2, tzinfo=timezone.utc),
+            created_at=datetime(2026, 1, 1, tzinfo=UTC),
+            updated_at=datetime(2026, 1, 2, tzinfo=UTC),
         )
         assert len(detail.photos) == 1
         assert detail.photos[0].url == "https://example.com/photo.jpg"
@@ -117,8 +116,8 @@ class TestPublicAnimalDetail:
             description=None,
             primary_photo_url=None,
             photos=[],
-            created_at=datetime(2026, 1, 1, tzinfo=timezone.utc),
-            updated_at=datetime(2026, 1, 1, tzinfo=timezone.utc),
+            created_at=datetime(2026, 1, 1, tzinfo=UTC),
+            updated_at=datetime(2026, 1, 1, tzinfo=UTC),
         )
         assert detail.photos == []
         # Ensure it serializes as empty array, not null
@@ -156,9 +155,7 @@ class TestPaginatedAnimalResponse:
     def test_empty_response(self) -> None:
         response = PaginatedAnimalResponse(
             items=[],
-            pagination=PaginationMeta(
-                page=1, page_size=20, total_items=0, total_pages=0
-            ),
+            pagination=PaginationMeta(page=1, page_size=20, total_items=0, total_pages=0),
         )
         assert response.items == []
         assert response.pagination.total_items == 0
@@ -174,13 +171,11 @@ class TestPaginatedAnimalResponse:
             birth_date=date(2022, 3, 1),
             description="Good boy",
             primary_photo_url=None,
-            created_at=datetime(2026, 1, 1, tzinfo=timezone.utc),
+            created_at=datetime(2026, 1, 1, tzinfo=UTC),
         )
         response = PaginatedAnimalResponse(
             items=[item],
-            pagination=PaginationMeta(
-                page=1, page_size=20, total_items=1, total_pages=1
-            ),
+            pagination=PaginationMeta(page=1, page_size=20, total_items=1, total_pages=1),
         )
         assert len(response.items) == 1
         assert response.items[0].name == "Buddy"

@@ -69,9 +69,7 @@ class AnimalPhoto(Base):
     )
     url: Mapped[str] = mapped_column(sa.Text, nullable=False)
     caption: Mapped[str | None] = mapped_column(sa.Text, nullable=True)
-    display_order: Mapped[int] = mapped_column(
-        sa.Integer, nullable=False, server_default="0"
-    )
+    display_order: Mapped[int] = mapped_column(sa.Integer, nullable=False, server_default="0")
     created_at: Mapped[datetime] = mapped_column(
         sa.TIMESTAMP(timezone=True),
         nullable=False,

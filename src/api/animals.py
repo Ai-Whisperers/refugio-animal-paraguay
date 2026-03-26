@@ -67,9 +67,7 @@ async def get_animal(
 ) -> Animal:
     animal = await db.get(Animal, animal_id)
     if animal is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Animal not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Animal not found")
     return animal
 
 
@@ -105,9 +103,7 @@ async def update_animal(
 ) -> Animal:
     animal = await db.get(Animal, animal_id)
     if animal is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Animal not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Animal not found")
 
     updates = payload.model_dump(exclude_unset=True)
     for field, value in updates.items():
@@ -132,9 +128,7 @@ async def delete_animal(
 ) -> Response:
     animal = await db.get(Animal, animal_id)
     if animal is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Animal not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Animal not found")
     await db.delete(animal)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
@@ -152,9 +146,7 @@ async def add_animal_photo(
 ) -> AnimalPhoto:
     animal = await db.get(Animal, animal_id)
     if animal is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Animal not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Animal not found")
     photo = AnimalPhoto(
         animal_id=animal_id,
         url=payload.url,
@@ -184,8 +176,6 @@ async def delete_animal_photo(
     result = await db.execute(stmt)
     photo = result.scalar_one_or_none()
     if photo is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Photo not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Photo not found")
     await db.delete(photo)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
