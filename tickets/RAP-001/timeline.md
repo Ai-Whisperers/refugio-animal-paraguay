@@ -6,7 +6,9 @@
 | 2026-03-25 21:16 | timeline.md, references.md created; current.md updated | ~1min |
 | 2026-03-25 21:16 | Git commit: RAP-001 initialization | — |
 
+| 2026-03-25 22:45 | Schema migration + seed data committed; ticket closed | ~1.5h |
+
 ## Session Summary
-- Total sessions: 1
-- Estimated hours: 0.25h (ticket scaffolding only — schema design work to follow)
-- Status: Scaffolding complete, ready for schema-designer agent invocation
+- Total sessions: 2
+- Estimated hours: ~1.75h (scaffolding + schema design + migration + seed data)
+- Status: COMPLETED
