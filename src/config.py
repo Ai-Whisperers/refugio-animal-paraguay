@@ -122,6 +122,16 @@ class Settings(BaseSettings):
         description="Default sender display name.",
     )
 
+    # Stripe
+    stripe_secret_key: str = Field(
+        default="",
+        description="Stripe API secret key. Required for payment processing.",
+    )
+    stripe_webhook_secret: str = Field(
+        default="",
+        description="Stripe webhook signing secret (whsec_...). Required to verify webhook signatures.",
+    )
+
     # Rate limiting
     rate_limit_enabled: bool = Field(
         default=True,
