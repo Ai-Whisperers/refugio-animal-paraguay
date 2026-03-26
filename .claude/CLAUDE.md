@@ -247,6 +247,7 @@ Activates deeper reasoning. Use for architecture, data model design, and complex
 | Catch up on changes | `/catchup` | — |
 | Execute a plan | `/execute-plan [plan-file]` | ticket-management.md |
 | Record architecture decision | `/adr "Decision title"` | — |
+| Pick up next story from queue | `/next-story` | ticket-management.md, git-workflow.md, quality-standards.md |
 
 ---
 
