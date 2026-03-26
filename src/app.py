@@ -25,17 +25,26 @@ from src.api.donors import router as donors_router
 from src.api.health import router as health_router
 from src.config import Settings, get_settings
 from src.db.session import dispose_engine, init_engine
+from src.events.bus import EventBus
 from src.middleware.error_handler import register_exception_handlers
 from src.middleware.rate_limiter import configure_limiter, limiter
 from src.middleware.request_id import RequestIDMiddleware
 
 
 @asynccontextmanager
-async def lifespan(_app: FastAPI) -> AsyncGenerator[None, None]:
-    """Manage application lifecycle: open DB engine on startup, close on shutdown."""
+async def lifespan(application: FastAPI) -> AsyncGenerator[None, None]:
+    """Manage application lifecycle: DB engine + event bus on startup/shutdown."""
     settings: Settings = get_settings()
     init_engine(settings)
+
+    # Start the event bus and attach to app state for handler access
+    event_bus = EventBus()
+    application.state.event_bus = event_bus
+    await event_bus.start()
+
     yield
+
+    await event_bus.stop()
     await dispose_engine()
 
 
