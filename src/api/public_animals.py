@@ -45,12 +45,8 @@ _AVAILABLE_STATUS = AnimalStatus.AVAILABLE.value
     "status 'available' are included.",
 )
 async def list_public_animals(
-    species: AnimalSpecies | None = Query(
-        default=None, description="Filter by species"
-    ),
-    gender: AnimalGender | None = Query(
-        default=None, description="Filter by gender"
-    ),
+    species: AnimalSpecies | None = Query(default=None, description="Filter by species"),
+    gender: AnimalGender | None = Query(default=None, description="Filter by gender"),
     size: AnimalSize | None = Query(default=None, description="Filter by size"),
     search: str | None = Query(
         default=None,
@@ -90,9 +86,7 @@ async def list_public_animals(
     offset = (page - 1) * page_size
 
     # Fetch page of results
-    items_stmt = (
-        base.order_by(Animal.created_at.desc()).offset(offset).limit(page_size)
-    )
+    items_stmt = base.order_by(Animal.created_at.desc()).offset(offset).limit(page_size)
     result = await db.execute(items_stmt)
     animals = list(result.scalars().all())
 
