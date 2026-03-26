@@ -17,6 +17,9 @@ service-account*.json
 # Firecrawl research cache (local research data, not project source)
 .firecrawl/
 
+# Local archives
+*.zip
+
 # Legacy CI/CD from another project (Eneve.Domain / .NET) — not applicable
 cicd/
 
