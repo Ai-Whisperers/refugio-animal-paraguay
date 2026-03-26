@@ -9,6 +9,7 @@ the lifetime of the process. Call dispose_engine() during app shutdown.
 """
 
 from collections.abc import AsyncGenerator
+from contextlib import asynccontextmanager
 
 from sqlalchemy.ext.asyncio import (
     AsyncEngine,
@@ -30,7 +31,7 @@ def init_engine(settings: Settings) -> AsyncEngine:
     Must be called once during application startup (inside FastAPI lifespan).
     Subsequent calls to get_db() will reuse the cached engine.
     """
-    global _engine, _session_factory  # noqa: PLW0603
+    global _engine, _session_factory
 
     _engine = create_async_engine(
         str(settings.database_url),
@@ -51,7 +52,7 @@ async def dispose_engine() -> None:
 
     Must be called during application shutdown (inside FastAPI lifespan).
     """
-    global _engine  # noqa: PLW0603
+    global _engine
     if _engine is not None:
         await _engine.dispose()
         _engine = None
@@ -61,6 +62,25 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
     """FastAPI dependency: yield an AsyncSession per request.
 
     Commits on success; rolls back on any exception.
+    """
+    if _session_factory is None:
+        raise RuntimeError("Database engine not initialised. Call init_engine() first.")
+
+    async with _session_factory() as session:
+        try:
+            yield session
+            await session.commit()
+        except Exception:
+            await session.rollback()
+            raise
+
+
+@asynccontextmanager
+async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
+    """Standalone async session context manager for use outside FastAPI dependencies.
+
+    Use this when you need a session outside the request lifecycle
+    (e.g., in middleware, background tasks).
     """
     if _session_factory is None:
         raise RuntimeError("Database engine not initialised. Call init_engine() first.")

@@ -16,6 +16,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 
+from src.api.admin import router as admin_router
 from src.api.adopters import router as adopters_router
 from src.api.adoption_requests import router as adoption_requests_router
 from src.api.animals import router as animals_router
@@ -23,6 +24,7 @@ from src.api.auth import router as auth_router
 from src.api.donations import router as donations_router
 from src.api.donors import router as donors_router
 from src.api.health import router as health_router
+from src.audit.middleware import AuditMiddleware
 from src.config import Settings, get_settings
 from src.db.session import dispose_engine, init_engine
 from src.events.bus import EventBus
@@ -62,6 +64,9 @@ def create_app() -> FastAPI:
     # --- Request ID middleware (must be outermost to cover all responses) ---
     application.add_middleware(RequestIDMiddleware)
 
+    # --- Audit trail middleware (after auth, records successful write ops) ---
+    application.add_middleware(AuditMiddleware)
+
     # --- CORS middleware ---
     application.add_middleware(
         CORSMiddleware,
@@ -87,6 +92,7 @@ def create_app() -> FastAPI:
     application.include_router(adoption_requests_router)
     application.include_router(donors_router)
     application.include_router(donations_router)
+    application.include_router(admin_router)
 
     return application
 

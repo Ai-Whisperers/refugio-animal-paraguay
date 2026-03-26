@@ -64,6 +64,9 @@ src = ["src", "tests"]
 select = ["E", "F", "W", "I", "N", "UP", "B", "SIM", "T20", "RUF"]
 ignore = ["E501"]
 
+[tool.ruff.lint.per-file-ignores]
+"src/api/*.py" = ["B008"]  # FastAPI uses Query()/Depends() in function defaults by design
+
 [tool.black]
 target-version = ["py312"]
 line-length = 100
