@@ -206,22 +206,16 @@ async def _delete_donor(db: AsyncSession, donor_id: UUID) -> None:
     donor_email = donor.email
 
     # Anonymize monetary donations (preserve financial records)
-    await db.execute(
-        update(Donation).where(Donation.donor_id == donor_id).values(donor_id=None)
-    )
+    await db.execute(update(Donation).where(Donation.donor_id == donor_id).values(donor_id=None))
 
     # Anonymize in-kind donations
     await db.execute(
-        update(InKindDonation)
-        .where(InKindDonation.donor_id == donor_id)
-        .values(donor_id=None)
+        update(InKindDonation).where(InKindDonation.donor_id == donor_id).values(donor_id=None)
     )
 
     # Delete contact submissions by this donor's email
     contacts_result = await db.execute(
-        select(ContactSubmission).where(
-            ContactSubmission.visitor_email == donor_email
-        )
+        select(ContactSubmission).where(ContactSubmission.visitor_email == donor_email)
     )
     for contact in contacts_result.scalars().all():
         await db.delete(contact)
@@ -255,9 +249,7 @@ async def _delete_adopter(db: AsyncSession, adopter_id: UUID) -> None:
 
     # Delete contact submissions
     contacts_result = await db.execute(
-        select(ContactSubmission).where(
-            ContactSubmission.visitor_email == adopter_email
-        )
+        select(ContactSubmission).where(ContactSubmission.visitor_email == adopter_email)
     )
     for contact in contacts_result.scalars().all():
         await db.delete(contact)
@@ -281,7 +273,9 @@ async def _delete_staff(db: AsyncSession, user_id: UUID) -> None:
 
     # Anonymize profile (cannot hard-delete due to audit_log FK)
     user.email = f"deleted-{user_id}@anonymized.local"
-    user.hashed_password = "DELETED"
+    user.hashed_password = (
+        "DELETED"  # noqa: S105  # nosec B105 — GDPR erasure placeholder, not a real password
+    )
     user.is_active = False
     await db.flush()
 
