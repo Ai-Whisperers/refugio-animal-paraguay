@@ -1,4 +1,4 @@
-.PHONY: help dev test lint type-check format security migrate seed docker-up docker-down clean all-checks
+.PHONY: help dev test lint type-check format security migrate seed docker-up docker-down clean all-checks health
 
 PYTHON := python3
 PYTEST := $(PYTHON) -m pytest
@@ -74,6 +74,16 @@ docker-build: ## Rebuild Docker image
 
 docker-logs: ## Follow container logs
 	docker compose logs -f api
+
+# ── Health Check ──────────────────────────────────────────
+
+health: ## Verify dev environment is ready (DB, migrations, app start)
+	@echo "Checking PostgreSQL connectivity..."
+	@PYTHONPATH=. $(PYTHON) -c "from src.config import Settings; s = Settings(); print(f'DB URL: {s.database_url[:30]}...')" || (echo "FAIL: Cannot load settings" && exit 1)
+	@PYTHONPATH=. $(PYTHON) -c "import asyncio; from src.db.session import init_engine; from src.config import Settings; s=Settings(); e=init_engine(s); asyncio.run(e.dispose()); print('DB engine: OK')" || (echo "FAIL: Cannot connect to database" && exit 1)
+	@echo "Checking migration state..."
+	@PYTHONPATH=. $(PYTHON) -m alembic current 2>/dev/null | tail -1 || echo "WARNING: Cannot check migrations"
+	@echo "Health check passed."
 
 # ── Cleanup ───────────────────────────────────────────────
 

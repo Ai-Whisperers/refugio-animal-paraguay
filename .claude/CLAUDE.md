@@ -16,7 +16,7 @@
 
 **Phase 3 — Feature Expansion (next)**: Medical records, volunteer management, notifications, frontend.
 
-**Current state**: 30 source files, 18 test files (95 tests passing), full CRUD APIs (animals, adopters, adoption requests, donors, donations), JWT auth with roles, animal photo gallery, Stripe donations, Docker containerization with auto-migrations. 4 Alembic migrations applied.
+**Current state**: 30 source files, 204 tests (96 unit + 108 integration, 80.42% coverage), full CRUD APIs (animals, adopters, adoption requests, donors, donations), JWT auth with roles, animal photo gallery, Stripe donations, Docker containerization with auto-migrations, CI/CD workflows (GitHub Actions). 4 Alembic migrations applied.
 
 ---
 
@@ -179,6 +179,7 @@ Domain knowledge loaded on demand via skills:
 | REST API patterns | `.claude/skills/rest-api-patterns.md` | API design, endpoints, validation, pagination |
 | PostgreSQL patterns | `.claude/skills/postgresql-patterns.md` | Schema design, indexing, migrations, query optimization |
 | Python patterns | `.claude/skills/python-patterns.md` | Async, retry, logging, type hints, dataclasses |
+| CI/CD patterns | `.claude/skills/cicd-patterns.md` | GitHub Actions, pipelines, deployment, quality gates |
 
 ## Specialist Agents
 
