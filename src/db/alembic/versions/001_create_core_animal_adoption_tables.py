@@ -25,6 +25,9 @@ depends_on = None
 def upgrade() -> None:
     """Create animals, adopters, adoption_requests tables."""
 
+    # btree_gist is required for GIST exclusion constraints on non-geometric types (e.g. UUID, int)
+    op.execute("CREATE EXTENSION IF NOT EXISTS btree_gist")
+
     # ============================================================
     # TABLE: animals
     # Purpose: Animal records with species, status, and medical info
