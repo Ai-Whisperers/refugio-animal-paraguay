@@ -7,6 +7,7 @@ import Link from "next/link";
 import type { Animal } from "@/types/api";
 import { getAnimalPublic } from "@/lib/public-api";
 import { STATUS_LABELS, statusBadgeClass, calculateAge, speciesEmoji } from "@/lib/animal-utils";
+import { ANIMAL_DETAIL, COMMON, formatDate } from "@/lib/strings";
 
 export default function AnimalDetailPage() {
   const params = useParams<{ id: string }>();
@@ -25,7 +26,7 @@ export default function AnimalDetailPage() {
         setAnimal(data);
       } catch (err) {
         setError(
-          err instanceof Error ? err.message : "Failed to load animal details"
+          err instanceof Error ? err.message : COMMON.error
         );
       } finally {
         setIsLoading(false);
@@ -39,7 +40,7 @@ export default function AnimalDetailPage() {
     return (
       <div className="max-w-4xl mx-auto px-4 py-16 text-center">
         <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-primary-600 border-r-transparent" />
-        <p className="mt-3 text-gray-500">Loading animal details...</p>
+        <p className="mt-3 text-gray-500">{ANIMAL_DETAIL.loading}</p>
       </div>
     );
   }
@@ -47,13 +48,13 @@ export default function AnimalDetailPage() {
   if (error || !animal) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-16 text-center">
-        <p className="text-5xl mb-4">🐾</p>
-        <p className="text-red-600 mb-4">{error ?? "Animal not found"}</p>
+        <p className="text-5xl mb-4">{COMMON.paw}</p>
+        <p className="text-red-600 mb-4">{error ?? ANIMAL_DETAIL.notFound}</p>
         <Link
           href="/animals"
           className="text-primary-600 hover:text-primary-700 font-medium"
         >
-          Back to Animals
+          {ANIMAL_DETAIL.backToAnimals}
         </Link>
       </div>
     );
@@ -66,7 +67,7 @@ export default function AnimalDetailPage() {
       {/* Breadcrumb */}
       <nav className="mb-6 text-sm text-gray-500">
         <Link href="/animals" className="hover:text-primary-600">
-          Animals
+          {ANIMAL_DETAIL.breadcrumbAnimals}
         </Link>
         <span className="mx-2">/</span>
         <span className="text-gray-900">{animal.name}</span>
@@ -123,17 +124,13 @@ export default function AnimalDetailPage() {
 
           {/* Details Grid */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            <DetailItem label="Species" value={animal.species} capitalize />
+            <DetailItem label={ANIMAL_DETAIL.species} value={animal.species} capitalize />
             {animal.birth_date && (
-              <DetailItem label="Age" value={calculateAge(animal.birth_date)} />
+              <DetailItem label={ANIMAL_DETAIL.age} value={calculateAge(animal.birth_date)} />
             )}
             <DetailItem
-              label="Arrived"
-              value={new Date(animal.created_at).toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
+              label={ANIMAL_DETAIL.arrived}
+              value={formatDate(animal.created_at)}
             />
           </div>
 
@@ -141,7 +138,7 @@ export default function AnimalDetailPage() {
           {animal.description && (
             <div className="mb-8">
               <h2 className="text-lg font-semibold text-gray-900 mb-2">
-                About {animal.name}
+                {ANIMAL_DETAIL.about(animal.name)}
               </h2>
               <p className="text-gray-600 leading-relaxed whitespace-pre-line">
                 {animal.description}
@@ -156,18 +153,18 @@ export default function AnimalDetailPage() {
                 href={`/animals/${animal.id}/apply`}
                 className="inline-flex items-center justify-center bg-primary-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary-700 transition-colors"
               >
-                Apply to Adopt {animal.name}
+                {ANIMAL_DETAIL.applyToAdopt(animal.name)}
               </Link>
             ) : (
               <div className="px-6 py-3 bg-gray-100 text-gray-500 rounded-lg text-center font-medium">
-                This animal is not currently available for adoption
+                {ANIMAL_DETAIL.notAvailable}
               </div>
             )}
             <Link
               href="/animals"
               className="inline-flex items-center justify-center bg-gray-100 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-200 transition-colors"
             >
-              Back to Animals
+              {ANIMAL_DETAIL.backToAnimals}
             </Link>
           </div>
         </div>

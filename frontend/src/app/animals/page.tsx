@@ -7,12 +7,13 @@ import type { Animal, AnimalSpecies } from "@/types/api";
 import { listAnimalsPublic } from "@/lib/public-api";
 import { STATUS_LABELS, statusBadgeClass, calculateAge } from "@/lib/animal-utils";
 import AnimalPlaceholder from "@/components/AnimalPlaceholder";
+import { ANIMALS_LIST, COMMON } from "@/lib/strings";
 
 const SPECIES_OPTIONS: { value: AnimalSpecies | ""; label: string }[] = [
-  { value: "", label: "All Species" },
-  { value: "dog", label: "Dogs" },
-  { value: "cat", label: "Cats" },
-  { value: "other", label: "Other" },
+  { value: "", label: ANIMALS_LIST.allSpecies },
+  { value: "dog", label: ANIMALS_LIST.dogs },
+  { value: "cat", label: ANIMALS_LIST.cats },
+  { value: "other", label: ANIMALS_LIST.other },
 ];
 
 const PAGE_SIZE = 12;
@@ -39,7 +40,7 @@ export default function AnimalsPage() {
       setHasMore(result.length > PAGE_SIZE);
       setAnimals(result.slice(0, PAGE_SIZE));
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load animals");
+      setError(err instanceof Error ? err.message : COMMON.error);
     } finally {
       setIsLoading(false);
     }
@@ -59,11 +60,10 @@ export default function AnimalsPage() {
       {/* Page Header */}
       <div className="text-center mb-10">
         <h1 className="text-3xl md:text-4xl font-heading font-bold text-gray-900 mb-3">
-          Animals Available for Adoption
+          {ANIMALS_LIST.title}
         </h1>
         <p className="text-gray-500 max-w-2xl mx-auto">
-          Meet our furry friends who are looking for their forever home.
-          Click on any animal to learn more and start the adoption process.
+          {ANIMALS_LIST.subtitle}
         </p>
       </div>
 
@@ -88,7 +88,7 @@ export default function AnimalsPage() {
       {isLoading && (
         <div className="text-center py-12">
           <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-primary-600 border-r-transparent" />
-          <p className="mt-3 text-gray-500">Loading animals...</p>
+          <p className="mt-3 text-gray-500">{ANIMALS_LIST.loading}</p>
         </div>
       )}
 
@@ -100,7 +100,7 @@ export default function AnimalsPage() {
             onClick={fetchAnimals}
             className="px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
           >
-            Try Again
+            {ANIMALS_LIST.errorRetry}
           </button>
         </div>
       )}
@@ -108,9 +108,9 @@ export default function AnimalsPage() {
       {/* Empty State */}
       {!isLoading && !error && animals.length === 0 && (
         <div className="text-center py-12">
-          <p className="text-5xl mb-4">🐾</p>
+          <p className="text-5xl mb-4">{COMMON.paw}</p>
           <p className="text-gray-500 text-lg">
-            No animals available right now. Check back soon!
+            {ANIMALS_LIST.emptyState}
           </p>
         </div>
       )}
@@ -176,14 +176,14 @@ export default function AnimalsPage() {
               disabled={offset === 0}
               className="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              Previous
+              {ANIMALS_LIST.previous}
             </button>
             <button
               onClick={() => setOffset(offset + PAGE_SIZE)}
               disabled={!hasMore}
               className="px-4 py-2 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              Next
+              {ANIMALS_LIST.next}
             </button>
           </div>
         </>

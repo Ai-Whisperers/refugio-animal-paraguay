@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { api, ApiClientError } from "@/lib/api";
+import { CONTACT, COMMON } from "@/lib/strings";
 
 const SUBJECT_MIN_LENGTH = 10;
 const MESSAGE_MIN_LENGTH = 20;
@@ -88,7 +89,7 @@ export default function ContactPage() {
       if (err instanceof ApiClientError) {
         setSubmitError(err.detail);
       } else {
-        setSubmitError("An unexpected error occurred. Please try again.");
+        setSubmitError(COMMON.error);
       }
     } finally {
       setIsSubmitting(false);
@@ -100,14 +101,12 @@ export default function ContactPage() {
     return (
       <div className="max-w-2xl mx-auto px-4 py-16 text-center">
         <div className="bg-green-50 rounded-xl p-8 border border-green-200">
-          <p className="text-5xl mb-4">📬</p>
+          <p className="text-5xl mb-4">{"\u{1F4EC}"}</p>
           <h1 className="text-2xl font-heading font-bold text-gray-900 mb-3">
-            Message Sent!
+            {CONTACT.successTitle}
           </h1>
           <p className="text-gray-600 mb-6">
-            Thank you for reaching out. We have received your message and will
-            get back to you at <strong>{visitorEmail}</strong> as soon as
-            possible.
+            {CONTACT.successMessage}
           </p>
           <button
             onClick={() => {
@@ -119,7 +118,7 @@ export default function ContactPage() {
             }}
             className="px-6 py-2 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition-colors"
           >
-            Send Another Message
+            {CONTACT.sendAnother}
           </button>
         </div>
       </div>
@@ -132,28 +131,27 @@ export default function ContactPage() {
       {/* Header */}
       <div className="text-center mb-10">
         <h1 className="text-3xl md:text-4xl font-heading font-bold text-gray-900 mb-3">
-          Contact Us
+          {CONTACT.title}
         </h1>
         <p className="text-gray-500 max-w-lg mx-auto">
-          Have a question about adoption, volunteering, or donations? Send us a
-          message and we will respond within 1-2 business days.
+          {CONTACT.subtitle}
         </p>
       </div>
 
       {/* Contact Info Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-10">
         <div className="bg-gray-50 rounded-lg p-4 text-center">
-          <p className="text-2xl mb-1">📍</p>
+          <p className="text-2xl mb-1">{"\u{1F4CD}"}</p>
           <p className="text-sm font-medium text-gray-900">Location</p>
           <p className="text-xs text-gray-500">Asuncion, Paraguay</p>
         </div>
         <div className="bg-gray-50 rounded-lg p-4 text-center">
-          <p className="text-2xl mb-1">📧</p>
+          <p className="text-2xl mb-1">{"\u{1F4E7}"}</p>
           <p className="text-sm font-medium text-gray-900">Email</p>
           <p className="text-xs text-gray-500">info@refugioanimal.py</p>
         </div>
         <div className="bg-gray-50 rounded-lg p-4 text-center">
-          <p className="text-2xl mb-1">📱</p>
+          <p className="text-2xl mb-1">{"\u{1F4F1}"}</p>
           <p className="text-sm font-medium text-gray-900">WhatsApp</p>
           <p className="text-xs text-gray-500">+595 981 000 000</p>
         </div>
@@ -178,7 +176,7 @@ export default function ContactPage() {
             htmlFor="visitor_name"
             className="block text-sm font-medium text-gray-700 mb-1"
           >
-            Your Name <span className="text-red-500">*</span>
+            {CONTACT.fullName} <span className="text-red-500">*</span>
           </label>
           <input
             id="visitor_name"
@@ -202,7 +200,7 @@ export default function ContactPage() {
             htmlFor="visitor_email"
             className="block text-sm font-medium text-gray-700 mb-1"
           >
-            Email Address <span className="text-red-500">*</span>
+            {CONTACT.email} <span className="text-red-500">*</span>
           </label>
           <input
             id="visitor_email"
@@ -225,7 +223,7 @@ export default function ContactPage() {
             htmlFor="subject"
             className="block text-sm font-medium text-gray-700 mb-1"
           >
-            Subject <span className="text-red-500">*</span>
+            {CONTACT.subject} <span className="text-red-500">*</span>
           </label>
           <input
             id="subject"
@@ -249,7 +247,7 @@ export default function ContactPage() {
             htmlFor="message"
             className="block text-sm font-medium text-gray-700 mb-1"
           >
-            Message <span className="text-red-500">*</span>
+            {CONTACT.message} <span className="text-red-500">*</span>
           </label>
           <textarea
             id="message"
@@ -280,7 +278,7 @@ export default function ContactPage() {
           disabled={isSubmitting}
           className="w-full bg-primary-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
-          {isSubmitting ? "Sending..." : "Send Message"}
+          {isSubmitting ? CONTACT.submitting : CONTACT.submit}
         </button>
       </form>
     </div>

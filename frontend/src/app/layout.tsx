@@ -3,13 +3,13 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { SITE_TITLE, SITE_DESCRIPTION, SKIP_LINK } from "@/lib/strings";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
-  title: "Refugio Animal Paraguay",
-  description:
-    "Animal shelter in Paraguay - adopt, donate, volunteer. Giving animals a second chance at life.",
+  title: SITE_TITLE,
+  description: SITE_DESCRIPTION,
   keywords: ["animal shelter", "Paraguay", "adoption", "rescue", "donate"],
 };
 
@@ -30,7 +30,7 @@ export default function RootLayout({
     <html lang="es" className={inter.variable}>
       <body className="flex flex-col min-h-screen font-sans">
         <a href="#main-content" className="skip-link">
-          Skip to main content
+          {SKIP_LINK}
         </a>
         <Navbar />
         <main id="main-content" className="flex-1">
