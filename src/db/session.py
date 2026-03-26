@@ -30,7 +30,7 @@ def init_engine(settings: Settings) -> AsyncEngine:
     Must be called once during application startup (inside FastAPI lifespan).
     Subsequent calls to get_db() will reuse the cached engine.
     """
-    global _engine, _session_factory  # noqa: PLW0603
+    global _engine, _session_factory
 
     _engine = create_async_engine(
         str(settings.database_url),
@@ -51,10 +51,19 @@ async def dispose_engine() -> None:
 
     Must be called during application shutdown (inside FastAPI lifespan).
     """
-    global _engine  # noqa: PLW0603
+    global _engine
     if _engine is not None:
         await _engine.dispose()
         _engine = None
+
+
+def get_session_factory() -> async_sessionmaker[AsyncSession] | None:
+    """Return the module-level session factory, or None if not initialised.
+
+    Used by components that need to create their own sessions outside
+    the request lifecycle (e.g., event bus handlers).
+    """
+    return _session_factory
 
 
 async def get_db() -> AsyncGenerator[AsyncSession, None]:

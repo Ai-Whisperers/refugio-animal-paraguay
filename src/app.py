@@ -15,12 +15,16 @@ from fastapi import FastAPI
 from src.api.adopters import router as adopters_router
 from src.api.adoption_requests import router as adoption_requests_router
 from src.api.animals import router as animals_router
+from src.api.audit_logs import router as audit_logs_router
 from src.api.auth import router as auth_router
 from src.api.donations import router as donations_router
 from src.api.donors import router as donors_router
 from src.api.health import router as health_router
+from src.audit.middleware import AUDIT_EVENT_TYPE, AuditMiddleware
+from src.audit.service import audit_event_handler
 from src.config import Settings, get_settings
 from src.db.session import dispose_engine, init_engine
+from src.events.base import event_bus
 
 
 @asynccontextmanager
@@ -28,7 +32,10 @@ async def lifespan(_app: FastAPI) -> AsyncGenerator[None, None]:
     """Manage application lifecycle: open DB engine on startup, close on shutdown."""
     settings: Settings = get_settings()
     init_engine(settings)
+    # Register audit event handler with the event bus
+    event_bus.subscribe(AUDIT_EVENT_TYPE, audit_event_handler)
     yield
+    event_bus.unsubscribe(AUDIT_EVENT_TYPE, audit_event_handler)
     await dispose_engine()
 
 
@@ -43,6 +50,9 @@ def create_app() -> FastAPI:
         lifespan=lifespan,
     )
 
+    # Audit middleware — records all authenticated mutating requests
+    app.add_middleware(AuditMiddleware)
+
     app.include_router(health_router)
     app.include_router(auth_router)
     app.include_router(animals_router)
@@ -50,6 +60,7 @@ def create_app() -> FastAPI:
     app.include_router(adoption_requests_router)
     app.include_router(donors_router)
     app.include_router(donations_router)
+    app.include_router(audit_logs_router)
 
     return app
 
