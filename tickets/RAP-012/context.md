@@ -1,20 +1,19 @@
 # RAP-012 Context
 
-## STATUS: ACTIVE
+## STATUS: COMPLETED
 **Last updated**: 2026-03-26
 
 ## Current Focus
-Implementing intake record model, migration, schemas, and API endpoints.
+All work complete. PR ready for review.
 
 ## Technical State
 - Branch: feature/RAP-012-animal-intake (from develop)
-- Existing patterns: follows src/db/models/animal.py, src/api/animals.py conventions
-- Animal model already has AnimalStatus.INTAKE status value
+- 6 new files, 3 modified files
+- 39 new tests (20 unit + 19 integration)
+- Migration 005 applied
 
 ## Next Steps
-1. Create IntakeRecord model
-2. Write Alembic migration
-3. Create schemas and API router
+None — ticket complete.
 
 ## Blockers
 None
@@ -23,3 +22,5 @@ None
 - Intake creates both Animal and IntakeRecord in a single POST endpoint
 - Quarantine is a stub (log only) pending EPIC-4
 - Photos use existing AnimalPhoto system — intake doesn't add a separate photo model
+- Intake router registered before animals router to avoid path conflicts
+- Used StrEnum (Python 3.11+) instead of str + Enum per ruff UP042
