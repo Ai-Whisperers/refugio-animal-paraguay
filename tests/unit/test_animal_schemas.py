@@ -81,6 +81,8 @@ class TestAnimalResponse:
             name = "Bolt"
             species = "dog"
             status = "available"
+            gender = None
+            size = None
             birth_date = None
             description = None
             primary_photo_url = None

@@ -5,7 +5,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from src.db.models.animal import AnimalSpecies, AnimalStatus
+from src.db.models.animal import AnimalGender, AnimalSize, AnimalSpecies, AnimalStatus
 
 
 class PhotoCreate(BaseModel):
@@ -35,6 +35,8 @@ class AnimalCreate(BaseModel):
     name: str = Field(..., min_length=1, max_length=255)
     species: AnimalSpecies = AnimalSpecies.DOG
     status: AnimalStatus = AnimalStatus.INTAKE
+    gender: AnimalGender | None = None
+    size: AnimalSize | None = None
     birth_date: date | None = None
     description: str | None = None
     primary_photo_url: str | None = None
@@ -46,6 +48,8 @@ class AnimalUpdate(BaseModel):
     name: str | None = Field(default=None, min_length=1, max_length=255)
     species: AnimalSpecies | None = None
     status: AnimalStatus | None = None
+    gender: AnimalGender | None = None
+    size: AnimalSize | None = None
     birth_date: date | None = None
     description: str | None = None
     primary_photo_url: str | None = None
@@ -60,6 +64,8 @@ class AnimalResponse(BaseModel):
     name: str
     species: AnimalSpecies
     status: AnimalStatus
+    gender: AnimalGender | None
+    size: AnimalSize | None
     birth_date: date | None
     description: str | None
     primary_photo_url: str | None

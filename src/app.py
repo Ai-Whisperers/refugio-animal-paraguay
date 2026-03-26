@@ -19,6 +19,7 @@ from src.api.auth import router as auth_router
 from src.api.donations import router as donations_router
 from src.api.donors import router as donors_router
 from src.api.health import router as health_router
+from src.api.public_animals import router as public_animals_router
 from src.config import Settings, get_settings
 from src.db.session import dispose_engine, init_engine
 
@@ -50,6 +51,7 @@ def create_app() -> FastAPI:
     app.include_router(adoption_requests_router)
     app.include_router(donors_router)
     app.include_router(donations_router)
+    app.include_router(public_animals_router)
 
     return app
 
