@@ -26,6 +26,7 @@ from src.api.donations import router as donations_router
 from src.api.donors import router as donors_router
 from src.api.health import router as health_router
 from src.api.in_kind_donations import router as in_kind_donations_router
+from src.api.notifications import router as notifications_router
 from src.api.public import router as public_router
 from src.api.public_adoption import router as public_adoption_router
 from src.api.public_contact import router as public_contact_router
@@ -38,6 +39,7 @@ from src.middleware.error_handler import register_exception_handlers
 from src.middleware.rate_limiter import configure_limiter, limiter
 from src.middleware.request_id import RequestIDMiddleware
 from src.notifications.handlers import NotificationHandlers
+from src.notifications.in_app_handlers import InAppNotificationHandlers
 from src.notifications.service import EmailService
 from src.notifications.templates import TemplateRenderer
 
@@ -58,6 +60,10 @@ async def lifespan(application: FastAPI) -> AsyncGenerator[None, None]:
     renderer = TemplateRenderer()
     notification_handlers = NotificationHandlers(email_service, renderer)
     notification_handlers.register(event_bus)
+
+    # Register in-app notification handlers on the event bus
+    in_app_handlers = InAppNotificationHandlers()
+    in_app_handlers.register(event_bus)
 
     yield
 
@@ -114,6 +120,7 @@ def create_app() -> FastAPI:
     application.include_router(public_contact_router)
     application.include_router(webhooks_router)
     application.include_router(consents_router)
+    application.include_router(notifications_router)
 
     return application
 

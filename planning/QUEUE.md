@@ -91,23 +91,23 @@ Week 3-4:
 
 ## V3 — Communications (Weeks 9-12)
 
-| # | Story | Epic | Points |
-|---|-------|------|--------|
-| 1 | WhatsApp Integration | EPIC-6 S02 | 8 |
-| 2 | In-App Notifications | EPIC-6 S03 | 6 |
-| 3 | Notification Preferences | EPIC-6 S04 | 5 |
-| 4 | Adoption Notifications (status changes) | EPIC-2 S03 | 5 |
-| 5 | PDF Adoption Contracts | EPIC-2 S04 | 6 |
-| 6 | Post-Adoption Follow-up | EPIC-2 S05 | 8 |
-| 7 | Tigo Money Integration (PYG) | EPIC-3 S03 | 8 |
-| 8 | Sponsor Update Notifications | EPIC-14 S02 | 6 |
-| 9 | Campaign Progress & Social Proof | EPIC-14 S04 | 5 |
-| 10 | Impact Report Generator | EPIC-13 S03 | 7 |
-| 11 | Fund Allocation Tracking | EPIC-13 S04 | 6 |
-| 12 | GDPR Data Deletion | EPIC-13 S06 | 5 |
-| 13 | Success Stories Page | EPIC-11 S06 | 5 |
-| 14 | About & Educational Pages | EPIC-11 S03 | 8 |
-| 15 | Multi-Language (ES + EN) | EPIC-11 S03 | 5 |
+| # | Story | Epic | Points | Status |
+|---|-------|------|--------|--------|
+| 1 | WhatsApp Integration | EPIC-6 S02 | 8 | |
+| 2 | In-App Notifications | EPIC-6 S03 | 6 | DONE (PR #32) |
+| 3 | Notification Preferences | EPIC-6 S04 | 5 | |
+| 4 | Adoption Notifications (status changes) | EPIC-2 S03 | 5 | |
+| 5 | PDF Adoption Contracts | EPIC-2 S04 | 6 | |
+| 6 | Post-Adoption Follow-up | EPIC-2 S05 | 8 | |
+| 7 | Tigo Money Integration (PYG) | EPIC-3 S03 | 8 | |
+| 8 | Sponsor Update Notifications | EPIC-14 S02 | 6 | |
+| 9 | Campaign Progress & Social Proof | EPIC-14 S04 | 5 | |
+| 10 | Impact Report Generator | EPIC-13 S03 | 7 | |
+| 11 | Fund Allocation Tracking | EPIC-13 S04 | 6 | |
+| 12 | GDPR Data Deletion | EPIC-13 S06 | 5 | DONE (PR #31) |
+| 13 | Success Stories Page | EPIC-11 S06 | 5 | |
+| 14 | About & Educational Pages | EPIC-11 S03 | 8 | |
+| 15 | Multi-Language (ES + EN) | EPIC-11 S03 | 5 | |
 
 ---
 

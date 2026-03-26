@@ -7,6 +7,7 @@ from .audit_log import AuditAction, AuditLog
 from .contact_submission import ContactFormType, ContactSubmission
 from .donation import CurrencyCode, Donation, DonationStatus, Donor, PaymentMethod
 from .in_kind_donation import InKindDonation, ItemType
+from .notification import Notification, NotificationType
 from .user_consent import ConsentMethod, ConsentStatus, ConsentType, UserConsent
 
 __all__ = [
@@ -21,6 +22,9 @@ __all__ = [
     "AnimalStatus",
     "AuditAction",
     "AuditLog",
+    "ConsentMethod",
+    "ConsentStatus",
+    "ConsentType",
     "ContactFormType",
     "ContactSubmission",
     "CurrencyCode",
@@ -29,9 +33,8 @@ __all__ = [
     "Donor",
     "InKindDonation",
     "ItemType",
+    "Notification",
+    "NotificationType",
     "PaymentMethod",
-    "ConsentMethod",
-    "ConsentStatus",
-    "ConsentType",
     "UserConsent",
 ]
