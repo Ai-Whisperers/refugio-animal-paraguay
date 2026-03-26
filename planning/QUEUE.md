@@ -80,7 +80,7 @@ Week 3-4:
 | 5 | GDPR Consent Tracking | EPIC-13 S07 | 5 | DONE (PR #26) |
 | 6 | Cash Donation Recording | EPIC-3 S06 | 3 | DONE (PR #16) |
 | 7 | In-Kind Donation Recording | EPIC-14 S05 | 5 | DONE (PR #17) |
-| 8 | Sponsorship Tiers & Matching | EPIC-14 S01 | 8 | READY |
+| 8 | Sponsorship Tiers & Matching | EPIC-14 S01 | 8 | DONE (PR #28) |
 | 9 | Campaign Management | EPIC-14 S03 | 6 | READY |
 | 10 | Donation Landing Page | EPIC-11 S04 | 13 | READY |
 | 11 | Donation Dashboard (Staff) | EPIC-3 S04 | 6 | BLOCKED on #4 |

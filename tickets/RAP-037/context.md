@@ -1,23 +1,18 @@
 # RAP-037 Context
 
-## STATUS: ACTIVE
+## STATUS: COMPLETED
 **Last updated**: 2026-03-26
 
 ## Current Focus
-Implementing sponsorship model, service, API, and tests.
+Sponsorship tiers delivered. PR #28 created.
 
 ## Technical State
-- Donor model exists with stripe-related fields
-- Animal model exists with status tracking
-- Stripe SDK v15 integrated, webhook handler exists
-- SEPA mandate pattern established (similar lifecycle management)
-
-## Next Steps
-1. Create Sponsorship model + SponsorshipTier/SponsorshipStatus enums
-2. Create Alembic migration
-3. Build schemas, service, API
-4. Extend webhooks for subscription events
-5. Write tests
+- Sponsorship model with tier enum (bronze/silver/gold) and lifecycle states
+- Stripe Subscription integration (create, pause, resume, cancel, tier change)
+- 5 API endpoints: POST create, GET donor/animal sponsors, PATCH update, DELETE cancel
+- Webhook handling for customer.subscription.updated/deleted
+- Alembic migration 010 with partial unique index
+- 19 unit tests + 10 integration tests
 
 ## Blockers
 - None
