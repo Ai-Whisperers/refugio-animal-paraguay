@@ -128,6 +128,12 @@ class Donation(Base):
         sa.String(50),
         nullable=True,
     )
+    # Fund category for transparency reporting (medical, food, operations, etc.)
+    fund_category: Mapped[str | None] = mapped_column(
+        sa.String(20),
+        nullable=True,
+        index=True,
+    )
     notes: Mapped[str | None] = mapped_column(sa.Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         sa.TIMESTAMP(timezone=True),
