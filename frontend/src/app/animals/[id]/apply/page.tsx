@@ -7,6 +7,7 @@ import Link from "next/link";
 import type { Animal } from "@/types/api";
 import { getAnimalPublic, submitAdoptionApplication } from "@/lib/public-api";
 import { ApiClientError } from "@/lib/api";
+import { speciesEmoji } from "@/lib/animal-utils";
 
 /** Validation errors per field. */
 interface FormErrors {
@@ -217,7 +218,7 @@ export default function AdoptionApplicationPage() {
           />
         ) : (
           <div className="w-16 h-16 rounded-lg bg-gray-100 flex items-center justify-center text-2xl">
-            {animal.species === "dog" ? "🐕" : animal.species === "cat" ? "🐈" : "🐾"}
+            {speciesEmoji(animal.species)}
           </div>
         )}
         <div>
