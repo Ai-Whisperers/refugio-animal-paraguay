@@ -85,7 +85,7 @@ Week 3-4:
 | 10 | Donation Landing Page | EPIC-11 S04 | 13 | READY |
 | 11 | Donation Dashboard (Staff) | EPIC-3 S04 | 6 | BLOCKED on #4 |
 | 12 | Email Notification System | EPIC-6 S01 | 8 | DONE (PR #18) |
-| 13 | GDPR Data Export | EPIC-13 S02 | 6 | READY |
+| 13 | GDPR Data Export | EPIC-13 S02 | 6 | DONE (PR #30) |
 
 ---
 
