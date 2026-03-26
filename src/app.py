@@ -17,6 +17,7 @@ from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 
 from src.api.admin import router as admin_router
+from src.api.public_adoption import router as public_adoption_router
 from src.api.adopters import router as adopters_router
 from src.api.adoption_requests import router as adoption_requests_router
 from src.api.animals import router as animals_router
@@ -106,6 +107,7 @@ def create_app() -> FastAPI:
     application.include_router(in_kind_donations_router)
     application.include_router(admin_router)
     application.include_router(public_router)
+    application.include_router(public_adoption_router)
 
     return application
 
