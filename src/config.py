@@ -79,6 +79,23 @@ class Settings(BaseSettings):
             raise ValueError("secret_key must be at least 32 characters")
         return value
 
+    # CORS
+    allowed_origins: str = Field(
+        default="http://localhost:3000,http://localhost:3001",
+        description="Comma-separated list of allowed CORS origins.",
+    )
+
+    @property
+    def cors_origins(self) -> list[str]:
+        """Parse ALLOWED_ORIGINS into a list of origin strings."""
+        return [origin.strip() for origin in self.allowed_origins.split(",") if origin.strip()]
+
+    # Rate Limiting
+    rate_limit_enabled: bool = Field(
+        default=True,
+        description="Enable/disable rate limiting. Disable in tests.",
+    )
+
     @property
     def is_production(self) -> bool:
         """True when running in the production environment."""
