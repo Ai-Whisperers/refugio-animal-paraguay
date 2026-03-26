@@ -25,19 +25,20 @@ from src.api.auth import router as auth_router
 from src.api.consents import router as consents_router
 from src.api.donations import router as donations_router
 from src.api.donors import router as donors_router
-from src.api.fund_allocations import router as fund_allocations_router  # noqa: F401, E501
-from src.api.gdpr_export import router as gdpr_export_router
 from src.api.follow_ups import router as follow_ups_router
+from src.api.fund_allocations import router as fund_allocations_router
 from src.api.gdpr import router as gdpr_router
+from src.api.gdpr_export import router as gdpr_export_router
 from src.api.health import router as health_router
 from src.api.impact_reports import router as impact_reports_router
 from src.api.in_kind_donations import router as in_kind_donations_router
-from src.api.notifications import router as notifications_router
 from src.api.notification_preferences import router as notification_preferences_router
+from src.api.notifications import router as notifications_router
 from src.api.public import router as public_router
 from src.api.public_adoption import router as public_adoption_router
 from src.api.public_campaigns import router as public_campaigns_router
 from src.api.public_contact import router as public_contact_router
+from src.api.sepa import router as sepa_router
 from src.api.webhooks import router as webhooks_router
 from src.audit.middleware import AuditMiddleware
 from src.config import Settings, get_settings
@@ -128,6 +129,7 @@ def create_app() -> FastAPI:
     application.include_router(public_adoption_router)
     application.include_router(public_campaigns_router)
     application.include_router(public_contact_router)
+    application.include_router(sepa_router)
     application.include_router(webhooks_router)
     application.include_router(admin_campaigns_router)
     application.include_router(consents_router)
