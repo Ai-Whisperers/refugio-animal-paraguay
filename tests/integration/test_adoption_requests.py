@@ -78,7 +78,7 @@ async def test_create_adoption_request_unknown_animal_returns_404(
         json={"animal_id": str(uuid4()), "adopter_id": adopter_id},
     )
     assert response.status_code == 404
-    assert response.json()["detail"] == "Animal not found"
+    assert response.json()["message"] == "Animal not found"
 
 
 @pytest.mark.asyncio
@@ -92,7 +92,7 @@ async def test_create_adoption_request_unknown_adopter_returns_404(
         json={"animal_id": animal_id, "adopter_id": str(uuid4())},
     )
     assert response.status_code == 404
-    assert response.json()["detail"] == "Adopter not found"
+    assert response.json()["message"] == "Adopter not found"
 
 
 @pytest.mark.asyncio
@@ -196,7 +196,7 @@ async def test_get_adoption_request_returns_200(client: AsyncClient) -> None:
 async def test_get_adoption_request_unknown_id_returns_404(client: AsyncClient) -> None:
     response = await client.get(f"/adoption-requests/{uuid4()}")
     assert response.status_code == 404
-    assert response.json()["detail"] == "Adoption request not found"
+    assert response.json()["message"] == "Adoption request not found"
 
 
 # ---------------------------------------------------------------------------
