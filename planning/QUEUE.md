@@ -37,7 +37,7 @@ Stories are ordered by dependency and priority. Work top-to-bottom. Each story b
 
 | # | Story | Epic | Points | Status | Track |
 |---|-------|------|--------|--------|-------|
-| 1 | CI/CD Pipeline (GitHub Actions) | EPIC-9 S02 | 8 | READY | Backend |
+| 1 | CI/CD Pipeline (GitHub Actions) | EPIC-9 S02 | 8 | DONE | Backend |
 | 2 | Animal Intake Workflow | EPIC-1 S06 | 8 | READY | Backend |
 | 3 | CORS + Rate Limiting + Error Standardization | Cross-cutting | 5 | READY | Backend |
 | 4 | Next.js 14 Project Scaffold | EPIC-11 | 5 | READY | Frontend |
