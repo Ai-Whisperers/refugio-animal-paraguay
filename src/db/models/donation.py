@@ -10,7 +10,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from ..base import Base
 
 
-class CurrencyCode(str, enum.Enum):
+class CurrencyCode(enum.StrEnum):
     """Supported currencies — must match chk_donations_currency CHECK constraint exactly."""
 
     EUR = "EUR"
@@ -18,7 +18,7 @@ class CurrencyCode(str, enum.Enum):
     USD = "USD"
 
 
-class PaymentMethod(str, enum.Enum):
+class PaymentMethod(enum.StrEnum):
     """Payment methods — must match chk_donations_payment_method CHECK constraint exactly."""
 
     STRIPE = "stripe"
@@ -26,7 +26,7 @@ class PaymentMethod(str, enum.Enum):
     TRANSFER = "transfer"
 
 
-class DonationStatus(str, enum.Enum):
+class DonationStatus(enum.StrEnum):
     """Donation lifecycle status — must match chk_donations_status CHECK constraint exactly."""
 
     PENDING = "pending"
@@ -122,6 +122,11 @@ class Donation(Base):
         sa.String(20),
         nullable=False,
         server_default="pending",
+    )
+    # Paper receipt reference for cash donations — cross-references physical receipt book
+    receipt_number: Mapped[str | None] = mapped_column(
+        sa.String(50),
+        nullable=True,
     )
     notes: Mapped[str | None] = mapped_column(sa.Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
