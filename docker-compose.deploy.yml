@@ -1,0 +1,86 @@
+# Traefik-compatible deployment for sunstein.cloud VPS
+# Uses refugio-net bridge network (Traefik connected to it)
+# Usage: docker compose -f docker-compose.deploy.yml up -d
+services:
+  db:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: refugio_prod
+      POSTGRES_USER: refugio_user
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+    volumes:
+      - refugio_postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U refugio_user -d refugio_prod"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - internal
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    restart: always
+    environment:
+      DATABASE_URL: postgresql+asyncpg://refugio_user:${POSTGRES_PASSWORD}@db:5432/refugio_prod
+      APP_ENV: production
+      DEBUG: "false"
+      SECRET_KEY: ${SECRET_KEY:?SECRET_KEY is required}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
+      SMTP_ENABLED: "false"
+      EMAIL_FROM_ADDRESS: noreply@sunstein.cloud
+      EMAIL_FROM_NAME: Refugio Animal Paraguay
+      ALLOWED_ORIGINS: https://sunstein.cloud,https://www.sunstein.cloud
+      RATE_LIMIT_ENABLED: "true"
+    depends_on:
+      db:
+        condition: service_healthy
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.refugio-api.rule: "Host(`sunstein.cloud`) && PathPrefix(`/petShelter/api`)"
+      traefik.http.routers.refugio-api.entrypoints: websecure
+      traefik.http.routers.refugio-api.tls.certresolver: letsencryptresolver
+      traefik.http.routers.refugio-api.priority: "10"
+      traefik.http.routers.refugio-api.middlewares: refugio-api-strip
+      traefik.http.middlewares.refugio-api-strip.stripprefix.prefixes: /petShelter/api
+      traefik.http.services.refugio-api.loadbalancer.server.port: "8000"
+      traefik.docker.network: refugio-net
+    networks:
+      - internal
+      - refugio-net
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: https://sunstein.cloud/petShelter/api
+        NEXT_PUBLIC_BASE_PATH: /petShelter
+    restart: always
+    depends_on:
+      - api
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.refugio-frontend.rule: "Host(`sunstein.cloud`) && PathPrefix(`/petShelter`)"
+      traefik.http.routers.refugio-frontend.entrypoints: websecure
+      traefik.http.routers.refugio-frontend.tls.certresolver: letsencryptresolver
+      traefik.http.routers.refugio-frontend.priority: "5"
+      traefik.http.services.refugio-frontend.loadbalancer.server.port: "3000"
+      traefik.docker.network: refugio-net
+    networks:
+      - internal
+      - refugio-net
+
+volumes:
+  refugio_postgres_data:
+
+networks:
+  internal:
+    driver: bridge
+  refugio-net:
+    external: true
