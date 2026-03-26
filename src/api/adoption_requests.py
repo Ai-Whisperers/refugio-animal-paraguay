@@ -5,6 +5,7 @@ Endpoints:
   GET    /adoption-requests/{id}         — single request or 404
   POST   /adoption-requests              — create, returns 201
   PATCH  /adoption-requests/{id}/status  — transition status; approved sets animal → adopted
+  POST   /adoption-requests/{id}/contract — generate adoption contract PDF
 """
 
 from datetime import UTC, datetime
@@ -30,7 +31,9 @@ from src.schemas.adoption_request import (
     AdoptionRequestCreate,
     AdoptionRequestResponse,
     AdoptionRequestStatusUpdate,
+    ContractGeneratedResponse,
 )
+from src.services.contract_service import ContractData, ContractPDFGenerator
 
 router = APIRouter(prefix="/adoption-requests", tags=["adoption-requests"])
 
@@ -193,3 +196,76 @@ async def update_adoption_request_status(
         await event_bus.publish(event)
 
     return req
+
+
+@router.post(
+    "/{request_id}/contract",
+    response_model=ContractGeneratedResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+async def generate_adoption_contract(
+    request_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    _: User = Depends(require_staff),
+) -> dict:
+    """Generate a PDF adoption contract for an approved request.
+
+    Only requests with status 'approved' can have contracts generated.
+    Re-generating overwrites the previous PDF.
+    """
+    req = await db.get(AdoptionRequest, request_id)
+    if req is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Adoption request not found",
+        )
+
+    if req.status != AdoptionRequestStatus.APPROVED.value:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
+            detail="Contract can only be generated for approved adoption requests",
+        )
+
+    # Load related adopter and animal
+    adopter = await db.get(Adopter, req.adopter_id)
+    if adopter is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Adopter not found for this request",
+        )
+
+    animal = await db.get(Animal, req.animal_id)
+    if animal is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Animal not found for this request",
+        )
+
+    contract_data = ContractData(
+        request_id=req.id,
+        adopter_name=adopter.full_name,
+        adopter_email=adopter.email,
+        adopter_phone=adopter.phone,
+        adopter_address=adopter.address,
+        animal_name=animal.name,
+        animal_species=animal.species,
+        animal_breed=animal.breed,
+        approved_at=req.decided_at,
+    )
+
+    generator = ContractPDFGenerator()
+    pdf_path = generator.generate(contract_data)
+
+    now = datetime.now(UTC)
+    req.contract_pdf_path = str(pdf_path)
+    req.contract_generated_at = now
+    req.updated_at = now
+
+    await db.flush()
+    await db.refresh(req)
+
+    return {
+        "request_id": req.id,
+        "contract_pdf_path": req.contract_pdf_path,
+        "contract_generated_at": req.contract_generated_at,
+    }
