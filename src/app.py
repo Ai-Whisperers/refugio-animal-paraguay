@@ -29,6 +29,7 @@ from src.api.in_kind_donations import router as in_kind_donations_router
 from src.api.public import router as public_router
 from src.api.public_adoption import router as public_adoption_router
 from src.api.public_contact import router as public_contact_router
+from src.api.sponsorships import router as sponsorships_router
 from src.api.webhooks import router as webhooks_router
 from src.audit.middleware import AuditMiddleware
 from src.config import Settings, get_settings
@@ -114,6 +115,7 @@ def create_app() -> FastAPI:
     application.include_router(public_contact_router)
     application.include_router(webhooks_router)
     application.include_router(consents_router)
+    application.include_router(sponsorships_router)
 
     return application
 

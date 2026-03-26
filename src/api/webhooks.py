@@ -21,6 +21,7 @@ from src.db.models.donation import Donation, DonationStatus
 from src.db.session import get_db
 from src.events.bus import EventBus
 from src.events.domain_events import create_donation_received
+from src.services.sponsorship_service import handle_subscription_updated
 
 logger = logging.getLogger(__name__)
 
@@ -30,12 +31,16 @@ router = APIRouter(prefix="/webhooks", tags=["webhooks"])
 EVENT_PAYMENT_INTENT_SUCCEEDED = "payment_intent.succeeded"
 EVENT_PAYMENT_INTENT_FAILED = "payment_intent.payment_failed"
 EVENT_CHARGE_REFUNDED = "charge.refunded"
+EVENT_SUBSCRIPTION_UPDATED = "customer.subscription.updated"
+EVENT_SUBSCRIPTION_DELETED = "customer.subscription.deleted"
 
 HANDLED_EVENT_TYPES = frozenset(
     {
         EVENT_PAYMENT_INTENT_SUCCEEDED,
         EVENT_PAYMENT_INTENT_FAILED,
         EVENT_CHARGE_REFUNDED,
+        EVENT_SUBSCRIPTION_UPDATED,
+        EVENT_SUBSCRIPTION_DELETED,
     }
 )
 
@@ -225,6 +230,22 @@ async def stripe_webhook(
     # Extract the data object from the event using dict-style access
     # Stripe StripeObject supports [] but not .get() in v15
     data_obj: Any = event["data"]["object"]
+
+    # Handle subscription events (sponsorships) separately — they use subscription ID
+    if event_type in (EVENT_SUBSCRIPTION_UPDATED, EVENT_SUBSCRIPTION_DELETED):
+        sub_id = data_obj.get("id")
+        if not sub_id:
+            return {"status": "skipped", "reason": "no_subscription_id"}
+
+        sub_status = data_obj.get("status", "canceled" if event_type == EVENT_SUBSCRIPTION_DELETED else "active")
+        period_end = data_obj.get("current_period_end")
+
+        sponsorship = await handle_subscription_updated(
+            db, sub_id, sub_status, period_end
+        )
+        result = "updated" if sponsorship else "sponsorship_not_found"
+        return {"status": "processed", "event_type": event_type, "result": result}
+
     payment_intent_id = _extract_payment_intent_id_from_object(data_obj, event_type)
     if not payment_intent_id:
         logger.warning(
