@@ -17,7 +17,6 @@ import pytest_asyncio
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from httpx import ASGITransport, AsyncClient
-
 from src.middleware.error_handler import _build_response, register_error_handlers
 from src.middleware.rate_limit import AUTH_RATE_LIMIT, limiter
 from src.middleware.request_id import RequestIDMiddleware
@@ -39,7 +38,12 @@ def _make_test_app(*, rate_limit_enabled: bool = False) -> FastAPI:
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
-        expose_headers=["X-Request-ID", "X-RateLimit-Limit", "X-RateLimit-Remaining", "X-RateLimit-Reset"],
+        expose_headers=[
+            "X-Request-ID",
+            "X-RateLimit-Limit",
+            "X-RateLimit-Remaining",
+            "X-RateLimit-Reset",
+        ],
     )
 
     # Rate limiting
@@ -98,9 +102,7 @@ async def rate_limited_client() -> AsyncClient:
 @pytest.mark.integration
 class TestCORS:
     @pytest.mark.asyncio
-    async def test_cors_preflight_returns_allowed_origin(
-        self, app_client: AsyncClient
-    ) -> None:
+    async def test_cors_preflight_returns_allowed_origin(self, app_client: AsyncClient) -> None:
         """OPTIONS request from allowed origin gets CORS headers."""
         response = await app_client.options(
             "/test-health",
@@ -114,9 +116,7 @@ class TestCORS:
         assert "GET" in response.headers.get("access-control-allow-methods", "")
 
     @pytest.mark.asyncio
-    async def test_cors_allows_credentials(
-        self, app_client: AsyncClient
-    ) -> None:
+    async def test_cors_allows_credentials(self, app_client: AsyncClient) -> None:
         """CORS allows credentials (cookies, auth headers)."""
         response = await app_client.options(
             "/test-health",
@@ -128,9 +128,7 @@ class TestCORS:
         assert response.headers.get("access-control-allow-credentials") == "true"
 
     @pytest.mark.asyncio
-    async def test_cors_rejects_unknown_origin(
-        self, app_client: AsyncClient
-    ) -> None:
+    async def test_cors_rejects_unknown_origin(self, app_client: AsyncClient) -> None:
         """Requests from unlisted origins don't get CORS allow header."""
         response = await app_client.options(
             "/test-health",
@@ -148,9 +146,7 @@ class TestCORS:
 @pytest.mark.integration
 class TestRequestID:
     @pytest.mark.asyncio
-    async def test_response_includes_request_id(
-        self, app_client: AsyncClient
-    ) -> None:
+    async def test_response_includes_request_id(self, app_client: AsyncClient) -> None:
         """Every response includes an X-Request-ID header."""
         response = await app_client.get("/test-health")
         assert "x-request-id" in response.headers
@@ -159,9 +155,7 @@ class TestRequestID:
         assert len(request_id) == 36
 
     @pytest.mark.asyncio
-    async def test_client_supplied_request_id_preserved(
-        self, app_client: AsyncClient
-    ) -> None:
+    async def test_client_supplied_request_id_preserved(self, app_client: AsyncClient) -> None:
         """If the client sends X-Request-ID, the server echoes it back."""
         response = await app_client.get(
             "/test-health",
@@ -176,9 +170,7 @@ class TestRequestID:
 @pytest.mark.integration
 class TestErrorStandardization:
     @pytest.mark.asyncio
-    async def test_404_returns_standard_format(
-        self, app_client: AsyncClient
-    ) -> None:
+    async def test_404_returns_standard_format(self, app_client: AsyncClient) -> None:
         """Non-existent route returns standard ErrorResponse."""
         response = await app_client.get("/nonexistent-route")
         assert response.status_code == 404
@@ -188,9 +180,7 @@ class TestErrorStandardization:
         assert "request_id" in body
 
     @pytest.mark.asyncio
-    async def test_error_response_includes_request_id(
-        self, app_client: AsyncClient
-    ) -> None:
+    async def test_error_response_includes_request_id(self, app_client: AsyncClient) -> None:
         """Error responses include the X-Request-ID for correlation."""
         response = await app_client.get(
             "/nonexistent-route",
@@ -232,9 +222,7 @@ class TestErrorStandardization:
 @pytest.mark.integration
 class TestRateLimiting:
     @pytest.mark.asyncio
-    async def test_auth_rate_limit_triggers_429(
-        self, rate_limited_client: AsyncClient
-    ) -> None:
+    async def test_auth_rate_limit_triggers_429(self, rate_limited_client: AsyncClient) -> None:
         """Exceeding 5 requests/minute on rate-limited endpoint returns 429."""
         triggered = False
         for _ in range(8):
@@ -250,9 +238,7 @@ class TestRateLimiting:
             pytest.skip("Rate limiter did not trigger — may be test environment issue")
 
     @pytest.mark.asyncio
-    async def test_429_includes_retry_after_header(
-        self, rate_limited_client: AsyncClient
-    ) -> None:
+    async def test_429_includes_retry_after_header(self, rate_limited_client: AsyncClient) -> None:
         """429 response includes a Retry-After header."""
         for _ in range(8):
             response = await rate_limited_client.post("/test-auth")

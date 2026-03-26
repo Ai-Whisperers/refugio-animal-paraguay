@@ -53,7 +53,7 @@ markers = [
 pythonVersion = "3.12"
 include = ["src", "tests"]
 pythonPlatform = "Linux"
-extraPaths = ["."]
+extraPaths = [".", "/home/ai-whisperers/.local/lib/python3.12/site-packages"]
 
 [tool.ruff]
 target-version = "py312"

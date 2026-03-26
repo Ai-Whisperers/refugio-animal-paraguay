@@ -31,9 +31,7 @@ class Settings(BaseSettings):
     def validate_database_url(cls, value: str) -> str:
         # asyncpg driver required for async SQLAlchemy; psycopg2 is sync-only.
         if not value.startswith("postgresql+asyncpg://"):
-            raise ValueError(
-                "database_url must use the asyncpg driver: postgresql+asyncpg://..."
-            )
+            raise ValueError("database_url must use the asyncpg driver: postgresql+asyncpg://...")
         return value
 
     # Application

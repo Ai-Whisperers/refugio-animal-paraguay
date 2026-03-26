@@ -9,7 +9,7 @@ import logging
 from fastapi import FastAPI, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
-from slowapi.errors import RateLimitExceeded
+from slowapi.errors import RateLimitExceeded  # type: ignore[import-untyped]
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from src.schemas.error import ErrorResponse, ValidationErrorDetail
@@ -42,9 +42,7 @@ def _build_response(
     )
 
 
-async def validation_error_handler(
-    request: Request, exc: RequestValidationError
-) -> JSONResponse:
+async def validation_error_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
     """422 — Pydantic/FastAPI validation errors with field-level details."""
     details = [
         ValidationErrorDetail(
@@ -63,9 +61,7 @@ async def validation_error_handler(
     )
 
 
-async def http_exception_handler(
-    request: Request, exc: StarletteHTTPException
-) -> JSONResponse:
+async def http_exception_handler(request: Request, exc: StarletteHTTPException) -> JSONResponse:
     """4xx/5xx — FastAPI/Starlette HTTPException."""
     error_code = _status_to_error_code(exc.status_code)
     return _build_response(

@@ -8,8 +8,8 @@ Rate limiting can be toggled off via RATE_LIMIT_ENABLED=false in settings.
 When disabled, the limiter is still attached but uses a permissive limit.
 """
 
-from slowapi import Limiter
-from slowapi.util import get_remote_address
+from slowapi import Limiter  # type: ignore[import-untyped]
+from slowapi.util import get_remote_address  # type: ignore[import-untyped]
 from starlette.requests import Request
 from starlette.responses import Response
 
@@ -34,9 +34,5 @@ def add_rate_limit_headers(request: Request, response: Response) -> None:
         response.headers["X-RateLimit-Limit"] = str(
             getattr(window_stats, "limit", DEFAULT_RATE_LIMIT)
         )
-        response.headers["X-RateLimit-Remaining"] = str(
-            getattr(window_stats, "remaining", "")
-        )
-        response.headers["X-RateLimit-Reset"] = str(
-            getattr(window_stats, "reset_at", "")
-        )
+        response.headers["X-RateLimit-Remaining"] = str(getattr(window_stats, "remaining", ""))
+        response.headers["X-RateLimit-Reset"] = str(getattr(window_stats, "reset_at", ""))
