@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Adoption Request Update</h2>
+<p>Dear {{ adopter_name }},</p>
+
+<p>Your adoption request for <strong>{{ animal_name }}</strong> has been updated.</p>
+
+<p>
+  <strong>Previous status:</strong> {{ old_status | replace("_", " ") | title }}<br>
+  <strong>New status:</strong> {{ new_status | replace("_", " ") | title }}
+</p>
+
+{% if new_status == "approved" %}
+<p>Congratulations! Your adoption request has been approved. Our team will contact you shortly to arrange the next steps.</p>
+{% elif new_status == "rejected" %}
+<p>We regret to inform you that your adoption request was not approved at this time. Please don't hesitate to reach out if you have questions or would like to explore other animals available for adoption.</p>
+{% elif new_status == "under_review" %}
+<p>Your application is now being reviewed by our team. We will notify you once a decision has been made.</p>
+{% else %}
+<p>If you have any questions about your application, please contact us.</p>
+{% endif %}
+
+<p>Thank you for your interest in giving an animal a loving home.</p>
+{% endblock %}

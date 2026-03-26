@@ -32,6 +32,9 @@ from src.events.bus import EventBus
 from src.middleware.error_handler import register_exception_handlers
 from src.middleware.rate_limiter import configure_limiter, limiter
 from src.middleware.request_id import RequestIDMiddleware
+from src.notifications.handlers import NotificationHandlers
+from src.notifications.service import EmailService
+from src.notifications.templates import TemplateRenderer
 
 
 @asynccontextmanager
@@ -44,6 +47,12 @@ async def lifespan(application: FastAPI) -> AsyncGenerator[None, None]:
     event_bus = EventBus()
     application.state.event_bus = event_bus
     await event_bus.start()
+
+    # Register email notification handlers on the event bus
+    email_service = EmailService(settings)
+    renderer = TemplateRenderer()
+    notification_handlers = NotificationHandlers(email_service, renderer)
+    notification_handlers.register(event_bus)
 
     yield
 
