@@ -1,0 +1,158 @@
+"""Public (unauthenticated) campaign browsing endpoints.
+
+Endpoints:
+  GET /public/campaigns             — list active campaigns with progress
+  GET /public/campaigns/{id}        — campaign detail with progress stats
+"""
+
+from uuid import UUID
+
+from fastapi import APIRouter, Depends, HTTPException, Query, status
+from sqlalchemy import func, select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from src.db.models.campaign import Campaign, CampaignDonation, CampaignStatus, FundCategory
+from src.db.models.donation import Donation, DonationStatus
+from src.db.session import get_db
+from src.schemas.campaign import (
+    CampaignListResponse,
+    CampaignPublicResponse,
+)
+
+router = APIRouter(prefix="/public/campaigns", tags=["public-campaigns"])
+
+DEFAULT_PAGE_SIZE = 12
+MAX_PAGE_SIZE = 50
+
+
+def _build_campaign_public_response(
+    campaign: Campaign,
+    raised_amount_cents: int,
+    donation_count: int,
+) -> CampaignPublicResponse:
+    """Build a public campaign response with computed progress fields."""
+    progress = (
+        min((raised_amount_cents / campaign.target_amount_cents) * 100, 100.0)
+        if campaign.target_amount_cents > 0
+        else 0.0
+    )
+    return CampaignPublicResponse(
+        id=campaign.id,
+        title=campaign.title,
+        description=campaign.description,
+        impact_story=campaign.impact_story,
+        target_amount_cents=campaign.target_amount_cents,
+        raised_amount_cents=raised_amount_cents,
+        currency=campaign.currency,  # type: ignore[arg-type]
+        fund_category=campaign.fund_category,  # type: ignore[arg-type]
+        status=campaign.status,  # type: ignore[arg-type]
+        image_url=campaign.image_url,
+        deadline=campaign.deadline,
+        min_donation_cents=campaign.min_donation_cents,
+        max_donation_cents=campaign.max_donation_cents,
+        allow_overfunding=campaign.allow_overfunding,
+        donation_count=donation_count,
+        progress_percentage=round(progress, 1),
+        created_at=campaign.created_at,
+    )
+
+
+@router.get("", response_model=CampaignListResponse)
+async def list_active_campaigns(
+    category: FundCategory | None = Query(default=None, description="Filter by fund category"),
+    page: int = Query(default=1, ge=1, description="Page number (1-based)"),
+    page_size: int = Query(
+        default=DEFAULT_PAGE_SIZE, ge=1, le=MAX_PAGE_SIZE, description="Items per page"
+    ),
+    db: AsyncSession = Depends(get_db),
+) -> CampaignListResponse:
+    """List active campaigns with progress stats.
+
+    Only campaigns with status='active' are shown publicly.
+    Results include computed raised amount and donation count.
+    """
+    base_query = select(Campaign).where(Campaign.status == CampaignStatus.ACTIVE.value)
+
+    if category is not None:
+        base_query = base_query.where(Campaign.fund_category == category.value)
+
+    # Count total matching campaigns
+    count_query = select(func.count()).select_from(base_query.subquery())
+    total_result = await db.execute(count_query)
+    total = total_result.scalar_one()
+
+    # Fetch paginated campaigns
+    offset = (page - 1) * page_size
+    data_query = base_query.order_by(Campaign.created_at.desc()).offset(offset).limit(page_size)
+    result = await db.execute(data_query)
+    campaigns = list(result.scalars().all())
+
+    # Compute raised amounts for all campaigns in a single query
+    items = []
+    for campaign in campaigns:
+        raised_query = (
+            select(
+                func.coalesce(func.sum(Donation.amount_cents), 0),
+                func.count(Donation.id),
+            )
+            .select_from(CampaignDonation)
+            .join(Donation, Donation.id == CampaignDonation.donation_id)
+            .where(
+                CampaignDonation.campaign_id == campaign.id,
+                Donation.status == DonationStatus.COMPLETED.value,
+            )
+        )
+        raised_result = await db.execute(raised_query)
+        row = raised_result.one()
+        raised_cents = int(row[0])
+        count = int(row[1])
+
+        items.append(_build_campaign_public_response(campaign, raised_cents, count))
+
+    return CampaignListResponse(
+        items=items,
+        total=total,
+        page=page,
+        page_size=page_size,
+    )
+
+
+@router.get("/{campaign_id}", response_model=CampaignPublicResponse)
+async def get_campaign_detail(
+    campaign_id: UUID,
+    db: AsyncSession = Depends(get_db),
+) -> CampaignPublicResponse:
+    """Get a single campaign with progress stats.
+
+    Returns 404 if the campaign does not exist or is not active.
+    """
+    campaign = await db.get(Campaign, campaign_id)
+
+    if campaign is None or campaign.status not in (
+        CampaignStatus.ACTIVE.value,
+        CampaignStatus.COMPLETED.value,
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Campaign not found",
+        )
+
+    # Compute raised amount
+    raised_query = (
+        select(
+            func.coalesce(func.sum(Donation.amount_cents), 0),
+            func.count(Donation.id),
+        )
+        .select_from(CampaignDonation)
+        .join(Donation, Donation.id == CampaignDonation.donation_id)
+        .where(
+            CampaignDonation.campaign_id == campaign.id,
+            Donation.status == DonationStatus.COMPLETED.value,
+        )
+    )
+    raised_result = await db.execute(raised_query)
+    row = raised_result.one()
+    raised_cents = int(row[0])
+    count = int(row[1])
+
+    return _build_campaign_public_response(campaign, raised_cents, count)

@@ -17,6 +17,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.dependencies import require_staff
+from src.db.models.campaign import Campaign, CampaignDonation, CampaignStatus
 from src.db.models.donation import Donation, DonationStatus, Donor
 from src.db.models.user import User
 from src.db.session import get_db
@@ -60,6 +61,31 @@ async def create_donation(
                 detail="Donor not found",
             )
 
+    # Verify campaign exists and is active if a campaign_id was supplied
+    if payload.campaign_id is not None:
+        campaign = await db.get(Campaign, payload.campaign_id)
+        if campaign is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Campaign not found",
+            )
+        if campaign.status != CampaignStatus.ACTIVE.value:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Campaign is not accepting donations",
+            )
+        # Validate donation amount against campaign limits
+        if campaign.min_donation_cents and payload.amount_cents < campaign.min_donation_cents:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=f"Minimum donation for this campaign is {campaign.min_donation_cents} cents",
+            )
+        if campaign.max_donation_cents and payload.amount_cents > campaign.max_donation_cents:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=f"Maximum donation for this campaign is {campaign.max_donation_cents} cents",
+            )
+
     donation = Donation(
         donor_id=payload.donor_id,
         amount_cents=payload.amount_cents,
@@ -70,6 +96,16 @@ async def create_donation(
     db.add(donation)
     await db.flush()
     await db.refresh(donation)
+
+    # Link donation to campaign if specified
+    if payload.campaign_id is not None:
+        campaign_donation = CampaignDonation(
+            campaign_id=payload.campaign_id,
+            donation_id=donation.id,
+        )
+        db.add(campaign_donation)
+        await db.flush()
+
     return donation
 
 

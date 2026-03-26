@@ -37,6 +37,7 @@ class DonationCreate(BaseModel):
     """Fields for creating a donation record."""
 
     donor_id: UUID | None = None
+    campaign_id: UUID | None = None
     # Amount in smallest currency unit (cents for EUR/USD, guaraníes for PYG)
     amount_cents: int = Field(..., gt=0)
     currency: CurrencyCode = CurrencyCode.EUR

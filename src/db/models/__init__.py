@@ -4,6 +4,7 @@ from .adopter import Adopter
 from .adoption_request import AdoptionRequest, AdoptionRequestStatus
 from .animal import Animal, AnimalGender, AnimalPhoto, AnimalSize, AnimalSpecies, AnimalStatus
 from .audit_log import AuditAction, AuditLog
+from .campaign import Campaign, CampaignDonation, CampaignStatus, FundCategory
 from .contact_submission import ContactFormType, ContactSubmission
 from .donation import CurrencyCode, Donation, DonationStatus, Donor, PaymentMethod
 from .fund_allocation import FundAllocation, FundCategory  # noqa: F401
@@ -23,6 +24,9 @@ __all__ = [
     "AnimalStatus",
     "AuditAction",
     "AuditLog",
+    "Campaign",
+    "CampaignDonation",
+    "CampaignStatus",
     "ConsentMethod",
     "ConsentStatus",
     "ConsentType",
