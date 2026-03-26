@@ -3,14 +3,13 @@
 import os
 from logging.config import fileConfig
 
+# Import all models to populate Base.metadata
+import src.db.models  # noqa: F401
 from alembic import context
 from sqlalchemy import engine_from_config, pool
 
-# Import all models to populate Base.metadata
-import src.db.models  # noqa: F401
-
 # Import Base so Alembic can use metadata for --autogenerate
-from src.db.base import Base  # noqa: F401
+from src.db.base import Base
 
 config = context.config
 

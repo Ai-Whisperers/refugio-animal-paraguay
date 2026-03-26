@@ -17,9 +17,7 @@ def _make_request(event_bus: EventBus | None = None) -> Request:
     else:
         # Simulate missing attribute
         del state.event_bus
-        type(state).event_bus = property(
-            lambda self: (_ for _ in ()).throw(AttributeError)
-        )
+        type(state).event_bus = property(lambda self: (_ for _ in ()).throw(AttributeError))
     app = MagicMock()
     app.state = state
     request.app = app

@@ -67,9 +67,7 @@ async def test_create_donor_with_all_fields(client: AsyncClient) -> None:
 async def test_create_donor_duplicate_email_returns_409(client: AsyncClient) -> None:
     email = f"donor-{uuid4().hex[:8]}@example.com"
     await client.post("/donors", json={"full_name": "First", "email": email})
-    response = await client.post(
-        "/donors", json={"full_name": "Second", "email": email}
-    )
+    response = await client.post("/donors", json={"full_name": "Second", "email": email})
     assert response.status_code == 409
 
 
@@ -102,9 +100,7 @@ async def test_create_donor_empty_name_returns_422(client: AsyncClient) -> None:
 @pytest.mark.integration
 async def test_get_donor_returns_donor(client: AsyncClient) -> None:
     email = f"donor-{uuid4().hex[:8]}@example.com"
-    create_resp = await client.post(
-        "/donors", json={"full_name": "Test Donor", "email": email}
-    )
+    create_resp = await client.post("/donors", json={"full_name": "Test Donor", "email": email})
     donor_id = create_resp.json()["id"]
 
     response = await client.get(f"/donors/{donor_id}")
@@ -124,18 +120,13 @@ async def test_get_donor_not_found_returns_404(client: AsyncClient) -> None:
 async def test_get_donor_requires_auth(client: AsyncClient) -> None:
     from httpx import ASGITransport
     from httpx import AsyncClient as PlainClient
-
     from src.app import app
 
     email = f"donor-{uuid4().hex[:8]}@example.com"
-    create_resp = await client.post(
-        "/donors", json={"full_name": "Auth Test", "email": email}
-    )
+    create_resp = await client.post("/donors", json={"full_name": "Auth Test", "email": email})
     donor_id = create_resp.json()["id"]
 
-    async with PlainClient(
-        transport=ASGITransport(app=app), base_url="http://test"
-    ) as anon:
+    async with PlainClient(transport=ASGITransport(app=app), base_url="http://test") as anon:
         response = await anon.get(f"/donors/{donor_id}")
     assert response.status_code == 401
 
@@ -165,9 +156,7 @@ async def test_create_donation_returns_201(client: AsyncClient) -> None:
 @pytest.mark.integration
 async def test_create_donation_with_donor(client: AsyncClient) -> None:
     email = f"donor-{uuid4().hex[:8]}@example.com"
-    donor_resp = await client.post(
-        "/donors", json={"full_name": "Linked Donor", "email": email}
-    )
+    donor_resp = await client.post("/donors", json={"full_name": "Linked Donor", "email": email})
     donor_id = donor_resp.json()["id"]
 
     response = await client.post(
@@ -231,9 +220,7 @@ async def test_create_donation_pyg_cash(client: AsyncClient) -> None:
 @pytest.mark.asyncio
 @pytest.mark.integration
 async def test_create_stripe_intent_returns_intent(client: AsyncClient) -> None:
-    donation_resp = await client.post(
-        "/donations", json={"amount_cents": 2000, "currency": "EUR"}
-    )
+    donation_resp = await client.post("/donations", json={"amount_cents": 2000, "currency": "EUR"})
     donation_id = donation_resp.json()["id"]
 
     mock_intent = MagicMock()
@@ -241,9 +228,7 @@ async def test_create_stripe_intent_returns_intent(client: AsyncClient) -> None:
     mock_intent.client_secret = "pi_test_mock_intent_secret_key"
 
     with (
-        patch(
-            "src.api.donations.stripe.PaymentIntent.create", return_value=mock_intent
-        ),
+        patch("src.api.donations.stripe.PaymentIntent.create", return_value=mock_intent),
         patch.dict("os.environ", {"STRIPE_SECRET_KEY": "sk_test_fake_key"}),
     ):
         response = await client.post(f"/donations/{donation_id}/stripe-intent")
@@ -284,9 +269,7 @@ async def test_create_stripe_intent_pyg_returns_422(client: AsyncClient) -> None
 @pytest.mark.asyncio
 @pytest.mark.integration
 async def test_create_stripe_intent_no_key_returns_503(client: AsyncClient) -> None:
-    donation_resp = await client.post(
-        "/donations", json={"amount_cents": 1000, "currency": "EUR"}
-    )
+    donation_resp = await client.post("/donations", json={"amount_cents": 1000, "currency": "EUR"})
     donation_id = donation_resp.json()["id"]
 
     # Ensure STRIPE_SECRET_KEY is absent
@@ -350,12 +333,9 @@ async def test_list_donations_pagination(client: AsyncClient) -> None:
 async def test_list_donations_requires_auth(client: AsyncClient) -> None:
     from httpx import ASGITransport
     from httpx import AsyncClient as PlainClient
-
     from src.app import app
 
-    async with PlainClient(
-        transport=ASGITransport(app=app), base_url="http://test"
-    ) as anon:
+    async with PlainClient(transport=ASGITransport(app=app), base_url="http://test") as anon:
         response = await anon.get("/donations")
     assert response.status_code == 401
 
@@ -394,16 +374,11 @@ async def test_get_donation_not_found_returns_404(client: AsyncClient) -> None:
 async def test_get_donation_requires_auth(client: AsyncClient) -> None:
     from httpx import ASGITransport
     from httpx import AsyncClient as PlainClient
-
     from src.app import app
 
-    create_resp = await client.post(
-        "/donations", json={"amount_cents": 1000, "currency": "EUR"}
-    )
+    create_resp = await client.post("/donations", json={"amount_cents": 1000, "currency": "EUR"})
     donation_id = create_resp.json()["id"]
 
-    async with PlainClient(
-        transport=ASGITransport(app=app), base_url="http://test"
-    ) as anon:
+    async with PlainClient(transport=ASGITransport(app=app), base_url="http://test") as anon:
         response = await anon.get(f"/donations/{donation_id}")
     assert response.status_code == 401

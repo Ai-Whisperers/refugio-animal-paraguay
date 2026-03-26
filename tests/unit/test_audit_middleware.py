@@ -1,6 +1,5 @@
 """Unit tests for audit trail middleware utilities."""
 
-
 from src.audit.middleware import (
     AUDITABLE_METHODS,
     EXCLUDED_PATHS,
@@ -30,9 +29,7 @@ class TestExtractResourceInfo:
 
     def test_nested_resource_with_id(self) -> None:
         test_uuid = "550e8400-e29b-41d4-a716-446655440000"
-        resource_type, resource_id = _extract_resource_info(
-            f"/admin/audit-logs/{test_uuid}"
-        )
+        resource_type, resource_id = _extract_resource_info(f"/admin/audit-logs/{test_uuid}")
         assert resource_type == "admin.audit-logs"
         assert resource_id == test_uuid
 

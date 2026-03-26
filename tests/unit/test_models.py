@@ -7,7 +7,7 @@ Tests validate:
 - __init__.py exports all public symbols
 """
 
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
 from uuid import uuid4
 
 from src.db.models import (
@@ -136,7 +136,7 @@ class TestAdopterModel:
         assert adopter.deleted_at is None
 
     def test_optional_fields_accept_values(self) -> None:
-        consent_at = datetime.now(timezone.utc)
+        consent_at = datetime.now(UTC)
         adopter = Adopter(
             full_name="Ana Martínez",
             email="ana@example.com",
@@ -149,7 +149,7 @@ class TestAdopterModel:
         assert adopter.gdpr_consent_at == consent_at
 
     def test_deleted_at_supports_soft_delete(self) -> None:
-        deleted_at = datetime.now(timezone.utc)
+        deleted_at = datetime.now(UTC)
         adopter = Adopter(
             full_name="Test User",
             email="test@example.com",
@@ -171,7 +171,7 @@ class TestAdoptionRequestModel:
     def test_instantiate_with_required_fields(self) -> None:
         animal_id = uuid4()
         adopter_id = uuid4()
-        submitted = datetime.now(timezone.utc)
+        submitted = datetime.now(UTC)
 
         req = AdoptionRequest(
             animal_id=animal_id,
@@ -189,14 +189,14 @@ class TestAdoptionRequestModel:
             animal_id=uuid4(),
             adopter_id=uuid4(),
             status="pending",
-            submitted_at=datetime.now(timezone.utc),
+            submitted_at=datetime.now(UTC),
         )
         assert req.decided_at is None
         assert req.notes is None
 
     def test_optional_fields_accept_values(self) -> None:
-        submitted = datetime.now(timezone.utc)
-        decided = datetime.now(timezone.utc)
+        submitted = datetime.now(UTC)
+        decided = datetime.now(UTC)
         req = AdoptionRequest(
             animal_id=uuid4(),
             adopter_id=uuid4(),
@@ -214,7 +214,7 @@ class TestAdoptionRequestModel:
             animal_id=uuid4(),
             adopter_id=uuid4(),
             status="pending",
-            submitted_at=datetime.now(timezone.utc),
+            submitted_at=datetime.now(UTC),
         )
         assert hasattr(req, "animal")
         assert hasattr(req, "adopter")
@@ -224,7 +224,7 @@ class TestAdoptionRequestModel:
             animal_id=uuid4(),
             adopter_id=uuid4(),
             status=AdoptionRequestStatus.APPROVED,
-            submitted_at=datetime.now(timezone.utc),
+            submitted_at=datetime.now(UTC),
         )
         assert req.status == "approved"
 

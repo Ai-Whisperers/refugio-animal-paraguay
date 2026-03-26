@@ -156,9 +156,7 @@ async def _handle_charge_refunded(
     return "refunded"
 
 
-def _extract_payment_intent_id_from_object(
-    data_object: Any, event_type: str
-) -> str | None:
+def _extract_payment_intent_id_from_object(data_object: Any, event_type: str) -> str | None:
     """Extract the payment intent ID from a Stripe event's data.object.
 
     For payment_intent events, the object IS the payment intent (id field).
@@ -204,18 +202,18 @@ async def stripe_webhook(
             sig_header=sig_header,
             secret=webhook_secret,
         )
-    except ValueError:
+    except ValueError as exc:
         logger.warning("Stripe webhook: invalid payload")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Invalid payload",
-        )
-    except stripe.SignatureVerificationError:
+        ) from exc
+    except stripe.SignatureVerificationError as exc:
         logger.warning("Stripe webhook: invalid signature")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Invalid signature",
-        )
+        ) from exc
 
     event_type: str = event["type"]
 

@@ -12,7 +12,6 @@ from uuid import uuid4
 
 import pytest
 from httpx import ASGITransport, AsyncClient
-
 from src.app import app
 from src.config import Settings
 from src.db.session import init_engine
@@ -110,9 +109,7 @@ async def test_patch_animal_without_token_returns_401() -> None:
     async with AsyncClient(
         transport=ASGITransport(app=app), base_url="http://test"
     ) as unauthenticated:
-        response = await unauthenticated.patch(
-            f"/animals/{uuid4()}", json={"name": "x"}
-        )
+        response = await unauthenticated.patch(f"/animals/{uuid4()}", json={"name": "x"})
     assert response.status_code == 401
 
 

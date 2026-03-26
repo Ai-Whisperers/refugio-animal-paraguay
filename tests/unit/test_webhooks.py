@@ -8,7 +8,6 @@ from unittest.mock import AsyncMock, MagicMock
 from uuid import uuid4
 
 import pytest
-
 from src.api.webhooks import (
     EVENT_CHARGE_REFUNDED,
     EVENT_PAYMENT_INTENT_FAILED,
@@ -27,44 +26,32 @@ class TestExtractPaymentIntentId:
 
     def test_extracts_id_from_payment_intent_succeeded(self) -> None:
         data_obj = {"id": "pi_123abc", "amount": 5000}
-        result = _extract_payment_intent_id_from_object(
-            data_obj, EVENT_PAYMENT_INTENT_SUCCEEDED
-        )
+        result = _extract_payment_intent_id_from_object(data_obj, EVENT_PAYMENT_INTENT_SUCCEEDED)
         assert result == "pi_123abc"
 
     def test_extracts_id_from_payment_intent_failed(self) -> None:
         data_obj = {"id": "pi_456def", "amount": 3000}
-        result = _extract_payment_intent_id_from_object(
-            data_obj, EVENT_PAYMENT_INTENT_FAILED
-        )
+        result = _extract_payment_intent_id_from_object(data_obj, EVENT_PAYMENT_INTENT_FAILED)
         assert result == "pi_456def"
 
     def test_extracts_payment_intent_from_charge_refunded(self) -> None:
         data_obj = {"id": "ch_789ghi", "payment_intent": "pi_123abc"}
-        result = _extract_payment_intent_id_from_object(
-            data_obj, EVENT_CHARGE_REFUNDED
-        )
+        result = _extract_payment_intent_id_from_object(data_obj, EVENT_CHARGE_REFUNDED)
         assert result == "pi_123abc"
 
     def test_returns_none_for_unknown_event_type(self) -> None:
         data_obj = {"id": "pi_123abc"}
-        result = _extract_payment_intent_id_from_object(
-            data_obj, "unknown.event_type"
-        )
+        result = _extract_payment_intent_id_from_object(data_obj, "unknown.event_type")
         assert result is None
 
     def test_returns_none_when_id_missing(self) -> None:
         data_obj = {"amount": 5000}
-        result = _extract_payment_intent_id_from_object(
-            data_obj, EVENT_PAYMENT_INTENT_SUCCEEDED
-        )
+        result = _extract_payment_intent_id_from_object(data_obj, EVENT_PAYMENT_INTENT_SUCCEEDED)
         assert result is None
 
     def test_returns_none_when_payment_intent_missing_from_charge(self) -> None:
         data_obj = {"id": "ch_789ghi"}
-        result = _extract_payment_intent_id_from_object(
-            data_obj, EVENT_CHARGE_REFUNDED
-        )
+        result = _extract_payment_intent_id_from_object(data_obj, EVENT_CHARGE_REFUNDED)
         assert result is None
 
 

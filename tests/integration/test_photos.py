@@ -81,12 +81,9 @@ async def test_add_photo_requires_auth(client: AsyncClient) -> None:
     # Send request without Authorization header
     from httpx import ASGITransport
     from httpx import AsyncClient as RawClient
-
     from src.app import app
 
-    async with RawClient(
-        transport=ASGITransport(app=app), base_url="http://test"
-    ) as anon:
+    async with RawClient(transport=ASGITransport(app=app), base_url="http://test") as anon:
         response = await anon.post(
             f"/animals/{animal_id}/photos",
             json={"url": "https://example.com/photo.jpg"},
@@ -162,12 +159,9 @@ async def test_delete_photo_requires_auth(client: AsyncClient) -> None:
 
     from httpx import ASGITransport
     from httpx import AsyncClient as RawClient
-
     from src.app import app
 
-    async with RawClient(
-        transport=ASGITransport(app=app), base_url="http://test"
-    ) as anon:
+    async with RawClient(transport=ASGITransport(app=app), base_url="http://test") as anon:
         response = await anon.delete(f"/animals/{animal_id}/photos/{photo_id}")
     assert response.status_code == 401
 
@@ -259,9 +253,7 @@ async def test_patch_animal_primary_photo_url(client: AsyncClient) -> None:
         json={"primary_photo_url": "https://example.com/updated-cover.jpg"},
     )
     assert response.status_code == 200
-    assert (
-        response.json()["primary_photo_url"] == "https://example.com/updated-cover.jpg"
-    )
+    assert response.json()["primary_photo_url"] == "https://example.com/updated-cover.jpg"
 
 
 @pytest.mark.asyncio

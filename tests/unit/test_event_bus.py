@@ -95,9 +95,7 @@ class TestPublish:
         handler.assert_called_once_with(event)
 
     @pytest.mark.asyncio
-    async def test_publish_delivers_to_multiple_subscribers(
-        self, bus: EventBus
-    ) -> None:
+    async def test_publish_delivers_to_multiple_subscribers(self, bus: EventBus) -> None:
         handler_a = AsyncMock()
         handler_b = AsyncMock()
         bus.subscribe(EventType.DONATION_RECEIVED, handler_a)
@@ -116,9 +114,7 @@ class TestPublish:
         handler_b.assert_called_once_with(event)
 
     @pytest.mark.asyncio
-    async def test_publish_skips_event_with_no_subscribers(
-        self, bus: EventBus
-    ) -> None:
+    async def test_publish_skips_event_with_no_subscribers(self, bus: EventBus) -> None:
         await bus.start()
         event = DomainEvent(
             event_type=EventType.ANIMAL_STATUS_CHANGED,
@@ -177,9 +173,7 @@ class TestIdempotency:
         handler.assert_called_once_with(event_a)
 
     @pytest.mark.asyncio
-    async def test_different_idempotency_keys_both_processed(
-        self, bus: EventBus
-    ) -> None:
+    async def test_different_idempotency_keys_both_processed(self, bus: EventBus) -> None:
         handler = AsyncMock()
         bus.subscribe(EventType.DONATION_RECEIVED, handler)
         await bus.start()

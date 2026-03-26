@@ -52,7 +52,5 @@ async def get_donor(
 ) -> Donor:
     donor = await db.get(Donor, donor_id)
     if donor is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Donor not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Donor not found")
     return donor

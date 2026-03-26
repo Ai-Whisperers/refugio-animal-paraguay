@@ -94,9 +94,7 @@ class EventBus:
             RuntimeError: If the bus has not been started.
         """
         if not self._running:
-            raise RuntimeError(
-                "EventBus is not running. Call start() before publishing events."
-            )
+            raise RuntimeError("EventBus is not running. Call start() before publishing events.")
 
         key = event.event_type.value
 
@@ -186,8 +184,7 @@ class EventBus:
                 await asyncio.wait_for(queue.join(), timeout=5.0)
             except TimeoutError:
                 logger.warning(
-                    "Timeout waiting for event queue %s to drain. "
-                    "%d events may be lost.",
+                    "Timeout waiting for event queue %s to drain. " "%d events may be lost.",
                     key,
                     queue.qsize(),
                 )

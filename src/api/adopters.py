@@ -52,9 +52,7 @@ async def get_adopter(
 ) -> Adopter:
     adopter = await db.get(Adopter, adopter_id)
     if adopter is None or adopter.deleted_at is not None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Adopter not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Adopter not found")
     return adopter
 
 
@@ -93,9 +91,7 @@ async def update_adopter(
 ) -> Adopter:
     adopter = await db.get(Adopter, adopter_id)
     if adopter is None or adopter.deleted_at is not None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Adopter not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Adopter not found")
 
     for field, value in payload.model_dump(exclude_unset=True).items():
         setattr(adopter, field, value)
@@ -114,9 +110,7 @@ async def delete_adopter(
 ) -> Response:
     adopter = await db.get(Adopter, adopter_id)
     if adopter is None or adopter.deleted_at is not None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Adopter not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Adopter not found")
 
     # Soft delete — preserves GDPR audit trail and FK references
     adopter.deleted_at = datetime.now(UTC)

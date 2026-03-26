@@ -23,35 +23,19 @@ def upgrade() -> None:
     conn = op.get_bind()
 
     # Add columns only if they don't already exist
-    conn.execute(
-        sa.text(
-            "ALTER TABLE animals ADD COLUMN IF NOT EXISTS breed VARCHAR(100)"
-        )
-    )
-    conn.execute(
-        sa.text(
-            "ALTER TABLE animals ADD COLUMN IF NOT EXISTS size VARCHAR(20)"
-        )
-    )
-    conn.execute(
-        sa.text(
-            "ALTER TABLE animals ADD COLUMN IF NOT EXISTS gender VARCHAR(20)"
-        )
-    )
+    conn.execute(sa.text("ALTER TABLE animals ADD COLUMN IF NOT EXISTS breed VARCHAR(100)"))
+    conn.execute(sa.text("ALTER TABLE animals ADD COLUMN IF NOT EXISTS size VARCHAR(20)"))
+    conn.execute(sa.text("ALTER TABLE animals ADD COLUMN IF NOT EXISTS gender VARCHAR(20)"))
 
     # CHECK constraints (idempotent — drop if exists, then create)
-    conn.execute(
-        sa.text("ALTER TABLE animals DROP CONSTRAINT IF EXISTS chk_animals_size")
-    )
+    conn.execute(sa.text("ALTER TABLE animals DROP CONSTRAINT IF EXISTS chk_animals_size"))
     conn.execute(
         sa.text(
             "ALTER TABLE animals ADD CONSTRAINT chk_animals_size "
             "CHECK (size IS NULL OR size IN ('small', 'medium', 'large', 'extra_large'))"
         )
     )
-    conn.execute(
-        sa.text("ALTER TABLE animals DROP CONSTRAINT IF EXISTS chk_animals_gender")
-    )
+    conn.execute(sa.text("ALTER TABLE animals DROP CONSTRAINT IF EXISTS chk_animals_gender"))
     conn.execute(
         sa.text(
             "ALTER TABLE animals ADD CONSTRAINT chk_animals_gender "
@@ -60,18 +44,10 @@ def upgrade() -> None:
     )
 
     # Indexes (idempotent — CREATE INDEX IF NOT EXISTS)
-    conn.execute(
-        sa.text("CREATE INDEX IF NOT EXISTS ix_animals_breed ON animals (breed)")
-    )
-    conn.execute(
-        sa.text("CREATE INDEX IF NOT EXISTS ix_animals_size ON animals (size)")
-    )
-    conn.execute(
-        sa.text("CREATE INDEX IF NOT EXISTS ix_animals_gender ON animals (gender)")
-    )
-    conn.execute(
-        sa.text("CREATE INDEX IF NOT EXISTS ix_animals_species ON animals (species)")
-    )
+    conn.execute(sa.text("CREATE INDEX IF NOT EXISTS ix_animals_breed ON animals (breed)"))
+    conn.execute(sa.text("CREATE INDEX IF NOT EXISTS ix_animals_size ON animals (size)"))
+    conn.execute(sa.text("CREATE INDEX IF NOT EXISTS ix_animals_gender ON animals (gender)"))
+    conn.execute(sa.text("CREATE INDEX IF NOT EXISTS ix_animals_species ON animals (species)"))
     # Partial index for the most common public query: available animals
     conn.execute(
         sa.text(

@@ -12,14 +12,20 @@ from unittest.mock import MagicMock, patch
 from uuid import uuid4
 
 import pytest
-from httpx import AsyncClient
+import stripe as stripe_lib
+from httpx import AsyncClient, Response
 
 # ---------------------------------------------------------------------------
-# Helpers
+# Constants
 # ---------------------------------------------------------------------------
 
 WEBHOOK_URL = "/webhooks/stripe"
 WEBHOOK_SECRET = "whsec_test_secret_for_integration_tests"
+
+
+# ---------------------------------------------------------------------------
+# Helpers
+# ---------------------------------------------------------------------------
 
 
 def _make_stripe_event(event_type: str, data_object: dict) -> dict:
@@ -32,6 +38,43 @@ def _make_stripe_event(event_type: str, data_object: dict) -> dict:
     }
 
 
+async def _create_donation_with_intent(
+    client: AsyncClient, amount_cents: int, intent_id: str
+) -> str:
+    """Create a donation and assign a stripe payment intent ID. Returns donation_id."""
+    resp = await client.post(
+        "/donations",
+        json={"amount_cents": amount_cents, "currency": "EUR", "payment_method": "stripe"},
+    )
+    assert resp.status_code == 201
+    donation_id = resp.json()["id"]
+
+    with patch("src.api.donations.stripe") as mock_stripe:
+        mock_intent = MagicMock()
+        mock_intent.id = intent_id
+        mock_intent.client_secret = f"{intent_id}_secret"
+        mock_stripe.PaymentIntent.create.return_value = mock_intent
+
+        with patch.dict("os.environ", {"STRIPE_SECRET_KEY": "sk_test_fake"}):
+            intent_resp = await client.post(f"/donations/{donation_id}/stripe-intent")
+            assert intent_resp.status_code == 200
+
+    return donation_id
+
+
+async def _send_webhook(client: AsyncClient, event: dict) -> Response:
+    """Send a webhook event with mocked Stripe signature verification."""
+    with (
+        patch.dict("os.environ", {"STRIPE_WEBHOOK_SECRET": WEBHOOK_SECRET}),
+        patch("stripe.Webhook.construct_event", return_value=event),
+    ):
+        return await client.post(
+            WEBHOOK_URL,
+            content=json.dumps(event).encode(),
+            headers={"stripe-signature": "t=123,v1=valid"},
+        )
+
+
 # ---------------------------------------------------------------------------
 # POST /webhooks/stripe — signature verification
 # ---------------------------------------------------------------------------
@@ -41,11 +84,13 @@ def _make_stripe_event(event_type: str, data_object: dict) -> dict:
 @pytest.mark.integration
 async def test_webhook_returns_400_for_invalid_signature(client: AsyncClient) -> None:
     """Invalid Stripe signature should return 400."""
-    with patch("src.api.webhooks.get_settings") as mock_settings:
-        settings = MagicMock()
-        settings.stripe_webhook_secret = WEBHOOK_SECRET
-        mock_settings.return_value = settings
-
+    with (
+        patch.dict("os.environ", {"STRIPE_WEBHOOK_SECRET": WEBHOOK_SECRET}),
+        patch(
+            "stripe.Webhook.construct_event",
+            side_effect=stripe_lib.SignatureVerificationError("bad sig", "sig_header"),
+        ),
+    ):
         response = await client.post(
             WEBHOOK_URL,
             content=b'{"type": "payment_intent.succeeded"}',
@@ -58,17 +103,13 @@ async def test_webhook_returns_400_for_invalid_signature(client: AsyncClient) ->
 @pytest.mark.integration
 async def test_webhook_returns_503_when_secret_not_configured(client: AsyncClient) -> None:
     """Missing webhook secret should return 503."""
-    with patch("src.api.webhooks.get_settings") as mock_settings:
-        settings = MagicMock()
-        settings.stripe_webhook_secret = ""
-        mock_settings.return_value = settings
-
-        response = await client.post(
-            WEBHOOK_URL,
-            content=b'{"type": "payment_intent.succeeded"}',
-            headers={"stripe-signature": "t=123,v1=sig"},
-        )
-        assert response.status_code == 503
+    # Default Settings has stripe_webhook_secret="" so this returns 503
+    response = await client.post(
+        WEBHOOK_URL,
+        content=b'{"type": "payment_intent.succeeded"}',
+        headers={"stripe-signature": "t=123,v1=sig"},
+    )
+    assert response.status_code == 503
 
 
 # ---------------------------------------------------------------------------
@@ -80,44 +121,14 @@ async def test_webhook_returns_503_when_secret_not_configured(client: AsyncClien
 @pytest.mark.integration
 async def test_webhook_payment_succeeded_updates_donation(client: AsyncClient) -> None:
     """Successful payment webhook marks donation as completed."""
-    # Create a donation first
-    donation_resp = await client.post(
-        "/donations",
-        json={"amount_cents": 5000, "currency": "EUR", "payment_method": "stripe"},
-    )
-    assert donation_resp.status_code == 201
-    donation = donation_resp.json()
-    donation_id = donation["id"]
+    intent_id = f"pi_succ_{uuid4().hex[:8]}"
+    donation_id = await _create_donation_with_intent(client, 5000, intent_id)
 
-    # Simulate Stripe PaymentIntent creation (set the intent ID on the donation)
-    with patch("src.api.donations.stripe") as mock_stripe:
-        mock_intent = MagicMock()
-        mock_intent.id = "pi_test_succeeded"
-        mock_intent.client_secret = "pi_test_succeeded_secret_123"
-        mock_stripe.PaymentIntent.create.return_value = mock_intent
-
-        with patch.dict("os.environ", {"STRIPE_SECRET_KEY": "sk_test_fake"}):
-            intent_resp = await client.post(f"/donations/{donation_id}/stripe-intent")
-            assert intent_resp.status_code == 200
-
-    # Now send the webhook event (mock signature verification)
     event = _make_stripe_event(
         "payment_intent.succeeded",
-        {"id": "pi_test_succeeded", "amount": 5000, "currency": "eur"},
+        {"id": intent_id, "amount": 5000, "currency": "eur"},
     )
-
-    with patch("src.api.webhooks.stripe.Webhook.construct_event") as mock_construct:
-        mock_construct.return_value = event
-        with patch("src.api.webhooks.get_settings") as mock_settings:
-            settings = MagicMock()
-            settings.stripe_webhook_secret = WEBHOOK_SECRET
-            mock_settings.return_value = settings
-
-            response = await client.post(
-                WEBHOOK_URL,
-                content=json.dumps(event).encode(),
-                headers={"stripe-signature": "t=123,v1=valid"},
-            )
+    response = await _send_webhook(client, event)
 
     assert response.status_code == 200
     body = response.json()
@@ -139,51 +150,20 @@ async def test_webhook_payment_succeeded_updates_donation(client: AsyncClient) -
 @pytest.mark.integration
 async def test_webhook_payment_failed_updates_donation(client: AsyncClient) -> None:
     """Failed payment webhook marks donation as failed."""
-    # Create a donation
-    donation_resp = await client.post(
-        "/donations",
-        json={"amount_cents": 3000, "currency": "EUR", "payment_method": "stripe"},
-    )
-    assert donation_resp.status_code == 201
-    donation = donation_resp.json()
-    donation_id = donation["id"]
+    intent_id = f"pi_fail_{uuid4().hex[:8]}"
+    donation_id = await _create_donation_with_intent(client, 3000, intent_id)
 
-    # Set stripe intent ID
-    with patch("src.api.donations.stripe") as mock_stripe:
-        mock_intent = MagicMock()
-        mock_intent.id = "pi_test_failed"
-        mock_intent.client_secret = "pi_test_failed_secret_123"
-        mock_stripe.PaymentIntent.create.return_value = mock_intent
-
-        with patch.dict("os.environ", {"STRIPE_SECRET_KEY": "sk_test_fake"}):
-            intent_resp = await client.post(f"/donations/{donation_id}/stripe-intent")
-            assert intent_resp.status_code == 200
-
-    # Send failed webhook
     event = _make_stripe_event(
         "payment_intent.payment_failed",
-        {"id": "pi_test_failed", "amount": 3000, "currency": "eur"},
+        {"id": intent_id, "amount": 3000, "currency": "eur"},
     )
-
-    with patch("src.api.webhooks.stripe.Webhook.construct_event") as mock_construct:
-        mock_construct.return_value = event
-        with patch("src.api.webhooks.get_settings") as mock_settings:
-            settings = MagicMock()
-            settings.stripe_webhook_secret = WEBHOOK_SECRET
-            mock_settings.return_value = settings
-
-            response = await client.post(
-                WEBHOOK_URL,
-                content=json.dumps(event).encode(),
-                headers={"stripe-signature": "t=123,v1=valid"},
-            )
+    response = await _send_webhook(client, event)
 
     assert response.status_code == 200
     body = response.json()
     assert body["status"] == "processed"
     assert body["result"] == "failed"
 
-    # Verify donation status
     get_resp = await client.get(f"/donations/{donation_id}")
     assert get_resp.status_code == 200
     assert get_resp.json()["status"] == "failed"
@@ -198,72 +178,28 @@ async def test_webhook_payment_failed_updates_donation(client: AsyncClient) -> N
 @pytest.mark.integration
 async def test_webhook_charge_refunded_updates_donation(client: AsyncClient) -> None:
     """Refund webhook marks donation as refunded."""
-    # Create and complete a donation first
-    donation_resp = await client.post(
-        "/donations",
-        json={"amount_cents": 7500, "currency": "EUR", "payment_method": "stripe"},
-    )
-    assert donation_resp.status_code == 201
-    donation = donation_resp.json()
-    donation_id = donation["id"]
+    intent_id = f"pi_ref_{uuid4().hex[:8]}"
+    donation_id = await _create_donation_with_intent(client, 7500, intent_id)
 
-    # Set stripe intent ID
-    with patch("src.api.donations.stripe") as mock_stripe:
-        mock_intent = MagicMock()
-        mock_intent.id = "pi_test_refund"
-        mock_intent.client_secret = "pi_test_refund_secret_123"
-        mock_stripe.PaymentIntent.create.return_value = mock_intent
-
-        with patch.dict("os.environ", {"STRIPE_SECRET_KEY": "sk_test_fake"}):
-            intent_resp = await client.post(f"/donations/{donation_id}/stripe-intent")
-            assert intent_resp.status_code == 200
-
-    # First complete the donation via succeeded webhook
+    # First complete the donation
     succeeded_event = _make_stripe_event(
         "payment_intent.succeeded",
-        {"id": "pi_test_refund", "amount": 7500, "currency": "eur"},
+        {"id": intent_id, "amount": 7500, "currency": "eur"},
     )
-    with patch("src.api.webhooks.stripe.Webhook.construct_event") as mock_construct:
-        mock_construct.return_value = succeeded_event
-        with patch("src.api.webhooks.get_settings") as mock_settings:
-            settings = MagicMock()
-            settings.stripe_webhook_secret = WEBHOOK_SECRET
-            mock_settings.return_value = settings
-            await client.post(
-                WEBHOOK_URL,
-                content=json.dumps(succeeded_event).encode(),
-                headers={"stripe-signature": "t=123,v1=valid"},
-            )
+    await _send_webhook(client, succeeded_event)
 
-    # Now send refund webhook
+    # Then refund
     refund_event = _make_stripe_event(
         "charge.refunded",
-        {
-            "id": "ch_test_refund",
-            "payment_intent": "pi_test_refund",
-            "amount_refunded": 7500,
-        },
+        {"id": f"ch_{uuid4().hex[:8]}", "payment_intent": intent_id, "amount_refunded": 7500},
     )
-
-    with patch("src.api.webhooks.stripe.Webhook.construct_event") as mock_construct:
-        mock_construct.return_value = refund_event
-        with patch("src.api.webhooks.get_settings") as mock_settings:
-            settings = MagicMock()
-            settings.stripe_webhook_secret = WEBHOOK_SECRET
-            mock_settings.return_value = settings
-
-            response = await client.post(
-                WEBHOOK_URL,
-                content=json.dumps(refund_event).encode(),
-                headers={"stripe-signature": "t=123,v1=valid"},
-            )
+    response = await _send_webhook(client, refund_event)
 
     assert response.status_code == 200
     body = response.json()
     assert body["status"] == "processed"
     assert body["result"] == "refunded"
 
-    # Verify donation status
     get_resp = await client.get(f"/donations/{donation_id}")
     assert get_resp.status_code == 200
     assert get_resp.json()["status"] == "refunded"
@@ -279,19 +215,7 @@ async def test_webhook_charge_refunded_updates_donation(client: AsyncClient) -> 
 async def test_webhook_unhandled_event_returns_skipped(client: AsyncClient) -> None:
     """Unhandled event types return 200 with 'skipped' status."""
     event = _make_stripe_event("customer.created", {"id": "cus_123"})
-
-    with patch("src.api.webhooks.stripe.Webhook.construct_event") as mock_construct:
-        mock_construct.return_value = event
-        with patch("src.api.webhooks.get_settings") as mock_settings:
-            settings = MagicMock()
-            settings.stripe_webhook_secret = WEBHOOK_SECRET
-            mock_settings.return_value = settings
-
-            response = await client.post(
-                WEBHOOK_URL,
-                content=json.dumps(event).encode(),
-                headers={"stripe-signature": "t=123,v1=valid"},
-            )
+    response = await _send_webhook(client, event)
 
     assert response.status_code == 200
     body = response.json()
@@ -307,59 +231,20 @@ async def test_webhook_unhandled_event_returns_skipped(client: AsyncClient) -> N
 @pytest.mark.asyncio
 @pytest.mark.integration
 async def test_webhook_idempotent_duplicate_succeeded(client: AsyncClient) -> None:
-    """Sending the same succeeded event twice returns 'already_completed'."""
-    # Create a donation
-    donation_resp = await client.post(
-        "/donations",
-        json={"amount_cents": 2000, "currency": "EUR", "payment_method": "stripe"},
-    )
-    assert donation_resp.status_code == 201
-    donation_id = donation_resp.json()["id"]
-
-    # Set stripe intent ID
-    with patch("src.api.donations.stripe") as mock_stripe:
-        mock_intent = MagicMock()
-        mock_intent.id = "pi_test_idempotent"
-        mock_intent.client_secret = "pi_test_idempotent_secret"
-        mock_stripe.PaymentIntent.create.return_value = mock_intent
-
-        with patch.dict("os.environ", {"STRIPE_SECRET_KEY": "sk_test_fake"}):
-            await client.post(f"/donations/{donation_id}/stripe-intent")
+    """Sending the same succeeded event twice returns 'already_completed' on second call."""
+    intent_id = f"pi_idem_{uuid4().hex[:8]}"
+    await _create_donation_with_intent(client, 2000, intent_id)
 
     event = _make_stripe_event(
         "payment_intent.succeeded",
-        {"id": "pi_test_idempotent", "amount": 2000, "currency": "eur"},
+        {"id": intent_id, "amount": 2000, "currency": "eur"},
     )
 
-    # First call
-    with patch("src.api.webhooks.stripe.Webhook.construct_event") as mock_construct:
-        mock_construct.return_value = event
-        with patch("src.api.webhooks.get_settings") as mock_settings:
-            settings = MagicMock()
-            settings.stripe_webhook_secret = WEBHOOK_SECRET
-            mock_settings.return_value = settings
+    resp1 = await _send_webhook(client, event)
+    assert resp1.json()["result"] == "completed"
 
-            resp1 = await client.post(
-                WEBHOOK_URL,
-                content=json.dumps(event).encode(),
-                headers={"stripe-signature": "t=123,v1=valid"},
-            )
-            assert resp1.json()["result"] == "completed"
-
-    # Second call (duplicate)
-    with patch("src.api.webhooks.stripe.Webhook.construct_event") as mock_construct:
-        mock_construct.return_value = event
-        with patch("src.api.webhooks.get_settings") as mock_settings:
-            settings = MagicMock()
-            settings.stripe_webhook_secret = WEBHOOK_SECRET
-            mock_settings.return_value = settings
-
-            resp2 = await client.post(
-                WEBHOOK_URL,
-                content=json.dumps(event).encode(),
-                headers={"stripe-signature": "t=123,v1=valid"},
-            )
-            assert resp2.json()["result"] == "already_completed"
+    resp2 = await _send_webhook(client, event)
+    assert resp2.json()["result"] == "already_completed"
 
 
 # ---------------------------------------------------------------------------
@@ -375,19 +260,7 @@ async def test_webhook_donation_not_found_returns_processed(client: AsyncClient)
         "payment_intent.succeeded",
         {"id": "pi_does_not_exist", "amount": 1000, "currency": "eur"},
     )
-
-    with patch("src.api.webhooks.stripe.Webhook.construct_event") as mock_construct:
-        mock_construct.return_value = event
-        with patch("src.api.webhooks.get_settings") as mock_settings:
-            settings = MagicMock()
-            settings.stripe_webhook_secret = WEBHOOK_SECRET
-            mock_settings.return_value = settings
-
-            response = await client.post(
-                WEBHOOK_URL,
-                content=json.dumps(event).encode(),
-                headers={"stripe-signature": "t=123,v1=valid"},
-            )
+    response = await _send_webhook(client, event)
 
     assert response.status_code == 200
     assert response.json()["result"] == "donation_not_found"

@@ -97,9 +97,7 @@ def _extract_user_id_from_token(request: Request) -> UUID | None:
 class AuditMiddleware(BaseHTTPMiddleware):
     """Middleware that records audit log entries for authenticated write requests."""
 
-    async def dispatch(
-        self, request: Request, call_next: RequestResponseEndpoint
-    ) -> Response:
+    async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
         response = await call_next(request)
 
         # Only audit write methods

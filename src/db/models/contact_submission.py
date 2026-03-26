@@ -48,15 +48,11 @@ class ContactSubmission(Base):
         nullable=True,
     )
     # Audit fields
-    ip_address: Mapped[str | None] = mapped_column(
-        sa.String(45), nullable=True
-    )
+    ip_address: Mapped[str | None] = mapped_column(sa.String(45), nullable=True)
     responded_at: Mapped[datetime | None] = mapped_column(
         sa.TIMESTAMP(timezone=True), nullable=True
     )
-    deleted_at: Mapped[datetime | None] = mapped_column(
-        sa.TIMESTAMP(timezone=True), nullable=True
-    )
+    deleted_at: Mapped[datetime | None] = mapped_column(sa.TIMESTAMP(timezone=True), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         sa.TIMESTAMP(timezone=True),
         nullable=False,

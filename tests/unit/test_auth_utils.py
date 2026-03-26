@@ -4,7 +4,6 @@ from datetime import timedelta
 
 import pytest
 from jose import JWTError
-
 from src.auth.utils import (
     create_access_token,
     decode_access_token,

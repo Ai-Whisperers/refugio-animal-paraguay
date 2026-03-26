@@ -24,6 +24,7 @@ from src.middleware.rate_limiter import configure_limiter
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 @pytest.fixture
 def _ensure_engine() -> None:
     """Ensure DB engine is initialized on current event loop."""
@@ -159,9 +160,7 @@ async def test_rate_limiting_returns_429_when_exceeded(_ensure_engine: None) -> 
     # Re-enable rate limiting for this test
     configure_limiter(enabled=True)
     try:
-        async with AsyncClient(
-            transport=ASGITransport(app=app), base_url="http://test"
-        ) as c:
+        async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as c:
             # Send 6 requests (limit is 5/minute on auth)
             responses = []
             for _ in range(7):

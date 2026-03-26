@@ -18,9 +18,7 @@ async def _create_animal(client: AsyncClient, name: str = "TestAnimal") -> str:
 
 async def _create_adopter(client: AsyncClient) -> str:
     email = f"adopter-{uuid4().hex[:8]}@example.com"
-    resp = await client.post(
-        "/adopters", json={"full_name": "Test Adopter", "email": email}
-    )
+    resp = await client.post("/adopters", json={"full_name": "Test Adopter", "email": email})
     assert resp.status_code == 201
     return resp.json()["id"]
 
@@ -138,9 +136,7 @@ async def test_list_adoption_requests_returns_200(client: AsyncClient) -> None:
 async def test_list_adoption_requests_filter_by_status(client: AsyncClient) -> None:
     animal_id = await _create_animal(client)
     adopter_id = await _create_adopter(client)
-    await client.post(
-        "/adoption-requests", json={"animal_id": animal_id, "adopter_id": adopter_id}
-    )
+    await client.post("/adoption-requests", json={"animal_id": animal_id, "adopter_id": adopter_id})
 
     response = await client.get("/adoption-requests?status=pending")
     assert response.status_code == 200
@@ -152,9 +148,7 @@ async def test_list_adoption_requests_filter_by_status(client: AsyncClient) -> N
 async def test_list_adoption_requests_filter_by_animal_id(client: AsyncClient) -> None:
     animal_id = await _create_animal(client, name="FilterAnimal")
     adopter_id = await _create_adopter(client)
-    await client.post(
-        "/adoption-requests", json={"animal_id": animal_id, "adopter_id": adopter_id}
-    )
+    await client.post("/adoption-requests", json={"animal_id": animal_id, "adopter_id": adopter_id})
 
     response = await client.get(f"/adoption-requests?animal_id={animal_id}")
     assert response.status_code == 200
@@ -233,9 +227,7 @@ async def test_approve_sets_animal_status_to_adopted(client: AsyncClient) -> Non
     )
     request_id = create.json()["id"]
 
-    await client.patch(
-        f"/adoption-requests/{request_id}/status", json={"status": "approved"}
-    )
+    await client.patch(f"/adoption-requests/{request_id}/status", json={"status": "approved"})
 
     animal_response = await client.get(f"/animals/{animal_id}")
     assert animal_response.json()["status"] == "adopted"
@@ -302,9 +294,7 @@ async def test_cannot_approve_already_rejected(client: AsyncClient) -> None:
     )
     request_id = create.json()["id"]
 
-    await client.patch(
-        f"/adoption-requests/{request_id}/status", json={"status": "rejected"}
-    )
+    await client.patch(f"/adoption-requests/{request_id}/status", json={"status": "rejected"})
     response = await client.patch(
         f"/adoption-requests/{request_id}/status", json={"status": "approved"}
     )
@@ -321,9 +311,7 @@ async def test_cannot_transition_from_cancelled(client: AsyncClient) -> None:
     )
     request_id = create.json()["id"]
 
-    await client.patch(
-        f"/adoption-requests/{request_id}/status", json={"status": "cancelled"}
-    )
+    await client.patch(f"/adoption-requests/{request_id}/status", json={"status": "cancelled"})
     response = await client.patch(
         f"/adoption-requests/{request_id}/status", json={"status": "approved"}
     )

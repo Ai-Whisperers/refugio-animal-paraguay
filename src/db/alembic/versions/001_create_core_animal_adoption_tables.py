@@ -174,16 +174,10 @@ def upgrade() -> None:
     )
 
     # Indexes for common queries
-    op.create_index(
-        "idx_adoption_requests_animal_id", "adoption_requests", ["animal_id"]
-    )
-    op.create_index(
-        "idx_adoption_requests_adopter_id", "adoption_requests", ["adopter_id"]
-    )
+    op.create_index("idx_adoption_requests_animal_id", "adoption_requests", ["animal_id"])
+    op.create_index("idx_adoption_requests_adopter_id", "adoption_requests", ["adopter_id"])
     op.create_index("idx_adoption_requests_status", "adoption_requests", ["status"])
-    op.create_index(
-        "idx_adoption_requests_created_at", "adoption_requests", ["created_at"]
-    )
+    op.create_index("idx_adoption_requests_created_at", "adoption_requests", ["created_at"])
 
     # EXCLUDE constraint: One active (pending) request per animal
     # Prevents duplicate pending applications for the same animal

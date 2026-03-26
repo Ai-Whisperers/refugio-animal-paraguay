@@ -98,12 +98,8 @@ def upgrade() -> None:
             nullable=False,
             server_default=sa.func.now(),
         ),
-        sa.CheckConstraint(
-            "amount_cents > 0", name="chk_donations_amount_cents_positive"
-        ),
-        sa.CheckConstraint(
-            "currency IN ('EUR', 'PYG', 'USD')", name="chk_donations_currency"
-        ),
+        sa.CheckConstraint("amount_cents > 0", name="chk_donations_amount_cents_positive"),
+        sa.CheckConstraint("currency IN ('EUR', 'PYG', 'USD')", name="chk_donations_currency"),
         sa.CheckConstraint(
             "payment_method IN ('stripe', 'cash', 'transfer')",
             name="chk_donations_payment_method",

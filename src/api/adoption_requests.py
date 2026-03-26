@@ -86,9 +86,7 @@ async def get_adoption_request(
     return req
 
 
-@router.post(
-    "", response_model=AdoptionRequestResponse, status_code=status.HTTP_201_CREATED
-)
+@router.post("", response_model=AdoptionRequestResponse, status_code=status.HTTP_201_CREATED)
 async def create_adoption_request(
     payload: AdoptionRequestCreate,
     db: AsyncSession = Depends(get_db),
