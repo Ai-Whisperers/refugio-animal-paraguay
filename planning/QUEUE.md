@@ -41,7 +41,7 @@ Stories are ordered by dependency and priority. Work top-to-bottom. Each story b
 | 2 | Animal Intake Workflow | EPIC-1 S06 | 8 | DONE (PR #3) | Backend |
 | 3 | CORS + Rate Limiting + Error Standardization | Cross-cutting | 5 | READY | Backend |
 | 4 | Next.js 14 Project Scaffold | EPIC-11 | 5 | READY | Frontend |
-| 5 | Animal Browsing Page (public) | EPIC-11 S01 | 8 | READY | Frontend |
+| 5 | Animal Browsing Page (public) | EPIC-11 S01 | 8 | DONE (PR #6) | Backend |
 
 ### Sprint 2 (Weeks 3-4): Admin Panel + Polish
 
