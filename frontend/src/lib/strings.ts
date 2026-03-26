@@ -7,7 +7,7 @@
 // --- Layout / Global ---
 export const SITE_TITLE = "Refugio Animal Paraguay";
 export const SITE_DESCRIPTION =
-  "Refugio de animales en Paraguay \u2014 adopta, dona, se voluntario. Dando a los animales una segunda oportunidad.";
+  "Refugio de animales en Paraguay — adopta, dona, se voluntario. Dando a los animales una segunda oportunidad.";
 export const SKIP_LINK = "Saltar al contenido principal";
 
 // --- Navbar ---
@@ -33,20 +33,20 @@ export const FOOTER = {
   volunteer: "Ser Voluntario",
   foster: "Acogida",
   copyright: (year: number) =>
-    `\u00A9 ${year} Refugio Animal Paraguay. Todos los derechos reservados.`,
+    `© ${year} Refugio Animal Paraguay. Todos los derechos reservados.`,
 } as const;
 
 // --- Homepage ---
 export const HOME = {
   heroTitle: "Cada animal merece un hogar lleno de amor",
   heroSubtitle:
-    "Refugio Animal Paraguay rescata, rehabilita y encuentra hogares para animales que lo necesitan. Sumate a hacer la diferencia \u2014 adopta, dona o se voluntario.",
+    "Refugio Animal Paraguay rescata, rehabilita y encuentra hogares para animales que lo necesitan. Sumate a hacer la diferencia — adopta, dona o se voluntario.",
   meetAnimals: "Conoce nuestros animales",
-  donateNow: "Donar ahora",
+  donateNow: "Quiero donar",
   statsRescued: "Animales rescatados",
   statsAdoptions: "Adopciones exitosas",
   statsVolunteers: "Voluntarios activos",
-  howToHelpTitle: "\u00BFComo podes ayudar?",
+  howToHelpTitle: "¿Como podes ayudar?",
   adoptTitle: "Adoptar",
   adoptDescription:
     "Dale un hogar para siempre a un animal rescatado. Explora los animales disponibles y comenza tu camino de adopcion.",
@@ -56,6 +56,39 @@ export const HOME = {
   volunteerTitle: "Ser Voluntario",
   volunteerDescription:
     "Unite a nuestro equipo de voluntarios. Ayuda con el cuidado diario, eventos y programas de difusion.",
+  trustTeamTitle: "Nuestro Equipo",
+  trustTeam: [
+    { name: "Ana Rodriguez", role: "Directora del Refugio" },
+    { name: "Dr. Carlos Benitez", role: "Veterinario Principal" },
+    { name: "Laura Gomez", role: "Coordinadora de Adopciones" },
+    { name: "Miguel Torres", role: "Coordinador de Voluntarios" },
+  ],
+  trustLocationTitle: "Donde Encontrarnos",
+  trustAddress: "Asuncion, Paraguay",
+  trustHours: "Lunes a Sabado: 8:00 - 17:00",
+  trustWhatsApp: "+595 981 000 000",
+  trustEmail: "contacto@refugio.org.py",
+  socialProofTitle: "Historias de Adopcion",
+  testimonials: [
+    {
+      quote: "Adoptamos a Max hace 6 meses y cambio nuestras vidas. Cada dia nos despierta con alegria.",
+      name: "Maria y Juan",
+      animal: "Max (perro)",
+    },
+    {
+      quote: "Mia era tímida cuando llego, pero con amor encontro confianza y ahora es la mascota mas feliz del barrio.",
+      name: "Sofia",
+      animal: "Mia (gata)",
+    },
+    {
+      quote: "No podemos imaginar la vida sin Buddy. Gracias al refugio por hacernos una familia completa.",
+      name: "Los Martinez",
+      animal: "Buddy (perro)",
+    },
+  ],
+  footerCtaText: "Cada adopcion, donacion o hora de voluntariado hace una diferencia enorme.",
+  footerCtaWhatsApp: "Escribinos por WhatsApp",
+  footerCtaDonate: "Hacer una donacion",
 } as const;
 
 // --- Animals List ---
@@ -69,7 +102,7 @@ export const ANIMALS_LIST = {
   other: "Otros",
   loading: "Cargando animales...",
   errorRetry: "Intentar de nuevo",
-  emptyState: "\u00A1No hay animales disponibles ahora. Volve pronto!",
+  emptyState: "¡No hay animales disponibles ahora. Volve pronto!",
   previous: "Anterior",
   next: "Siguiente",
 } as const;
@@ -122,14 +155,14 @@ export const ADOPTION_FORM = {
   gdprRequired:
     "Debes dar tu consentimiento para el procesamiento de datos para enviar esta solicitud.",
   // Success
-  successTitle: "\u00A1Solicitud enviada!",
+  successTitle: "¡Solicitud enviada!",
   successMessage: (name: string, email: string) =>
-    `\u00A1Gracias por tu interes en adoptar a ${name}! Recibimos tu solicitud y la revisaremos pronto. Recibiras una confirmacion en ${email}.`,
+    `¡Gracias por tu interes en adoptar a ${name}! Recibimos tu solicitud y la revisaremos pronto. Recibiras una confirmacion en ${email}.`,
   backTo: (name: string) => `Volver a ${name}`,
   browseMore: "Ver mas animales",
   // Errors
   animalNotAvailable: "Este animal no esta disponible para adopcion actualmente.",
-  submitError: "Algo salio mal al enviar. \u00BFPodes intentar de nuevo?",
+  submitError: "Algo salio mal al enviar. ¿Podes intentar de nuevo?",
 } as const;
 
 // --- Contact ---
@@ -143,9 +176,9 @@ export const CONTACT = {
   message: "Mensaje",
   submit: "Enviar mensaje",
   submitting: "Enviando...",
-  successTitle: "\u00A1Mensaje enviado!",
+  successTitle: "¡Mensaje enviado!",
   successMessage:
-    "\u00A1Gracias por escribirnos! Te respondemos lo antes posible.",
+    "¡Gracias por escribirnos! Te respondemos lo antes posible.",
   sendAnother: "Enviar otro mensaje",
 } as const;
 
@@ -269,7 +302,7 @@ export const VOLUNTEER = {
     "Ser mayor de 16 anos (menores con autorizacion de un tutor)",
     "Disponibilidad minima de 4 horas por semana",
     "Amor por los animales y ganas de aprender",
-    "No se requiere experiencia previa \u2014 te capacitamos",
+    "No se requiere experiencia previa — te capacitamos",
   ],
   howToJoinTitle: "Como unirte",
   howToJoinSteps: [
@@ -318,11 +351,10 @@ export const FOSTER = {
   whatsappNumber: "+595 981 000 000",
 } as const;
 
-
 // --- Common ---
 export const COMMON = {
   loading: "Cargando...",
-  error: "Algo salio mal. \u00BFPodes intentar de nuevo?",
+  error: "Algo salio mal. ¿Podes intentar de nuevo?",
   paw: "\u{1F43E}",
 } as const;
 
