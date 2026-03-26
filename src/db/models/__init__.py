@@ -11,6 +11,16 @@ from .fund_allocation import FundAllocation, FundCategory  # noqa: F401
 from .in_kind_donation import InKindDonation, ItemType
 from .notification import Notification, NotificationType
 from .notification_preference import NotificationChannel, NotificationPreference
+from .sponsorship import (
+    BRONZE_AMOUNT_CENTS,
+    GOLD_AMOUNT_CENTS,
+    SILVER_AMOUNT_CENTS,
+    Sponsorship,
+    SponsorshipFrequency,
+    SponsorshipStatus,
+    SponsorshipTier,
+    SponsorshipTierLevel,
+)
 from .user_consent import ConsentMethod, ConsentStatus, ConsentType, UserConsent
 
 __all__ = [
@@ -25,6 +35,7 @@ __all__ = [
     "AnimalStatus",
     "AuditAction",
     "AuditLog",
+    "BRONZE_AMOUNT_CENTS",
     "Campaign",
     "CampaignDonation",
     "CampaignStatus",
@@ -39,6 +50,7 @@ __all__ = [
     "Donor",
     "FundAllocation",
     "FundCategory",
+    "GOLD_AMOUNT_CENTS",
     "InKindDonation",
     "ItemType",
     "Notification",
@@ -46,5 +58,11 @@ __all__ = [
     "NotificationChannel",
     "NotificationPreference",
     "PaymentMethod",
+    "SILVER_AMOUNT_CENTS",
+    "Sponsorship",
+    "SponsorshipFrequency",
+    "SponsorshipStatus",
+    "SponsorshipTier",
+    "SponsorshipTierLevel",
     "UserConsent",
 ]

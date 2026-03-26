@@ -4,7 +4,6 @@ from unittest.mock import AsyncMock, MagicMock, patch
 from uuid import uuid4
 
 import pytest
-
 from src.services.gdpr_deletion_service import (
     ANONYMIZED_ADDRESS,
     ANONYMIZED_NAME,
