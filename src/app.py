@@ -38,6 +38,7 @@ from src.api.public import router as public_router
 from src.api.public_adoption import router as public_adoption_router
 from src.api.public_campaigns import router as public_campaigns_router
 from src.api.public_contact import router as public_contact_router
+from src.api.sepa import router as sepa_router
 from src.api.webhooks import router as webhooks_router
 from src.audit.middleware import AuditMiddleware
 from src.config import Settings, get_settings
@@ -128,6 +129,7 @@ def create_app() -> FastAPI:
     application.include_router(public_adoption_router)
     application.include_router(public_campaigns_router)
     application.include_router(public_contact_router)
+    application.include_router(sepa_router)
     application.include_router(webhooks_router)
     application.include_router(admin_campaigns_router)
     application.include_router(consents_router)
