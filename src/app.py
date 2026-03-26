@@ -1,0 +1,46 @@
+"""FastAPI application factory and lifespan.
+
+Entry point for the Refugio Animal Paraguay API. Creates the FastAPI app,
+registers routers, and manages the database engine lifecycle via lifespan.
+
+Run locally:
+    uvicorn src.app:app --reload
+"""
+
+from collections.abc import AsyncGenerator
+from contextlib import asynccontextmanager
+
+from fastapi import FastAPI
+
+from src.api.health import router as health_router
+from src.config import Settings, get_settings
+from src.db.session import dispose_engine, init_engine
+
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI) -> AsyncGenerator[None, None]:
+    """Manage application lifecycle: open DB engine on startup, close on shutdown."""
+    settings: Settings = get_settings()
+    init_engine(settings)
+    yield
+    await dispose_engine()
+
+
+def create_app() -> FastAPI:
+    """Create and configure the FastAPI application."""
+    settings = get_settings()
+
+    app = FastAPI(
+        title=settings.app_name,
+        version="0.1.0",
+        debug=settings.debug,
+        lifespan=lifespan,
+    )
+
+    app.include_router(health_router)
+
+    return app
+
+
+# Module-level app instance — used by uvicorn and test client
+app = create_app()
