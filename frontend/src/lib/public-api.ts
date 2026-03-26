@@ -20,6 +20,10 @@ const NO_AUTH = { requiresAuth: false } as const;
 export interface AnimalListParams {
   species?: AnimalSpecies;
   status?: AnimalStatus;
+  size?: string;
+  age_min?: number;
+  age_max?: number;
+  search?: string;
   offset?: number;
   limit?: number;
 }
@@ -34,6 +38,12 @@ export async function listAnimalsPublic(
   const searchParams = new URLSearchParams();
   if (params.species) searchParams.set("species", params.species);
   if (params.status) searchParams.set("status", params.status);
+  if (params.size) searchParams.set("size", params.size);
+  if (params.age_min !== undefined)
+    searchParams.set("age_min", String(params.age_min));
+  if (params.age_max !== undefined)
+    searchParams.set("age_max", String(params.age_max));
+  if (params.search) searchParams.set("search", params.search);
   if (params.offset !== undefined)
     searchParams.set("offset", String(params.offset));
   if (params.limit !== undefined)
