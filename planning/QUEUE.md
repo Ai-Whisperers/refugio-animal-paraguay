@@ -77,7 +77,7 @@ Week 3-4:
 | 1 | Event Bus Infrastructure | EPIC-9 S05 | 8 | DONE (PR #14) |
 | 2 | Audit Trail System | EPIC-13 S01 | 7 | DONE (PR #15) |
 | 3 | Stripe Webhook Processing | EPIC-3 S01 (remaining) | 8 | DONE (PR #25) |
-| 4 | SEPA Direct Debit | EPIC-3 S02 | 8 | READY |
+| 4 | SEPA Direct Debit | EPIC-3 S02 | 8 | DONE (PR #53) |
 | 5 | GDPR Consent Tracking | EPIC-13 S07 | 5 | DONE (PR #26) |
 | 6 | Cash Donation Recording | EPIC-3 S06 | 3 | DONE (PR #16) |
 | 7 | In-Kind Donation Recording | EPIC-14 S05 | 5 | DONE (PR #17) |
