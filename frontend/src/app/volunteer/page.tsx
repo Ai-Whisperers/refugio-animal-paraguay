@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import DynamicIcon from "@/components/DynamicIcon";
+import { Check, Phone } from "lucide-react";
 import { VOLUNTEER, SITE_TITLE } from "@/lib/strings";
 
 export const metadata: Metadata = {
@@ -33,7 +35,7 @@ export default function VolunteerPage() {
                 key={activity.title}
                 className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 text-center"
               >
-                <div className="text-3xl mb-3">{activity.icon}</div>
+                <div className="mb-3 text-primary-600"><DynamicIcon name={activity.icon} className="h-8 w-8" /></div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">
                   {activity.title}
                 </h3>
@@ -56,9 +58,7 @@ export default function VolunteerPage() {
                 key={req}
                 className="flex items-start gap-3 bg-white rounded-lg p-4 border border-gray-100"
               >
-                <span className="text-primary-600 font-bold mt-0.5">
-                  {"\u{2713}"}
-                </span>
+                <Check className="text-primary-600 h-5 w-5 flex-shrink-0 mt-0.5" />
                 <span className="text-gray-700">{req}</span>
               </li>
             ))}
@@ -127,7 +127,7 @@ export default function VolunteerPage() {
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors"
           >
-            {"\u{1F4F1}"} WhatsApp: {VOLUNTEER.whatsappNumber}
+            <Phone className="h-5 w-5" /> WhatsApp: {VOLUNTEER.whatsappNumber}
           </a>
         </div>
       </section>

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { User, MapPin } from "lucide-react";
 import { ABOUT, SITE_TITLE } from "@/lib/strings";
 
 export const metadata: Metadata = {
@@ -48,8 +49,8 @@ export default function AboutPage() {
                 key={member.name}
                 className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 text-center"
               >
-                <div className="w-16 h-16 rounded-full bg-primary-100 flex items-center justify-center text-2xl mx-auto mb-4">
-                  {"\u{1F9D1}"}
+                <div className="w-16 h-16 rounded-full bg-primary-100 flex items-center justify-center mx-auto mb-4">
+                  <User className="h-8 w-8 text-primary-600" />
                 </div>
                 <h3 className="font-semibold text-gray-900">{member.name}</h3>
                 <p className="text-sm text-gray-500 mt-1">{member.role}</p>
@@ -67,7 +68,7 @@ export default function AboutPage() {
           </h2>
           <div className="bg-gray-50 rounded-xl p-6 sm:p-8 border border-gray-100">
             <div className="flex items-start gap-4">
-              <span className="text-3xl">{"\u{1F4CD}"}</span>
+              <MapPin className="h-5 w-5 text-primary-600 flex-shrink-0 mt-0.5" />
               <div className="space-y-2">
                 <p className="font-semibold text-gray-900">
                   {ABOUT.locationAddress}

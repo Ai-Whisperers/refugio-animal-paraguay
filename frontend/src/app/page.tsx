@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Home, Heart, Users, MapPin, Clock, Phone, Mail } from "lucide-react";
+import { Home, Heart, Users, MapPin, Clock, Phone, Mail, Star } from "lucide-react";
 import { HOME } from "@/lib/strings";
 
 export default function HomePage() {
@@ -209,9 +209,7 @@ export default function HomePage() {
               >
                 <div className="flex gap-1 mb-4">
                   {[...Array(5)].map((_: unknown, i: number) => (
-                    <span key={i} className="text-orange-400">
-                      {"\u2605"}
-                    </span>
+                    <Star key={i} className="h-5 w-5 text-orange-400 fill-orange-400" aria-hidden="true" />
                   ))}
                 </div>
                 <p className="text-gray-700 italic mb-4 leading-relaxed">
