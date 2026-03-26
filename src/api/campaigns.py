@@ -45,9 +45,7 @@ def _enrich_response(campaign: object, progress: dict[str, int]) -> CampaignResp
     resp.raised_amount_cents = progress["raised_amount_cents"]
     resp.donor_count = progress["donor_count"]
     if resp.goal_amount_cents > 0:
-        resp.progress_pct = round(
-            (resp.raised_amount_cents / resp.goal_amount_cents) * 100, 2
-        )
+        resp.progress_pct = round((resp.raised_amount_cents / resp.goal_amount_cents) * 100, 2)
     return resp
 
 
@@ -88,9 +86,7 @@ async def list_campaigns_endpoint(
     featured_only: bool = Query(default=False),
 ) -> CampaignListResponse:
     """List campaigns with optional status and featured filters."""
-    campaigns = await list_campaigns(
-        db, status_filter=status_filter, featured_only=featured_only
-    )
+    campaigns = await list_campaigns(db, status_filter=status_filter, featured_only=featured_only)
 
     items = []
     for c in campaigns:
