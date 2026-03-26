@@ -7,7 +7,7 @@ integration for recurring donor payments.
 from __future__ import annotations
 
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any, cast
 from uuid import UUID
 
@@ -57,16 +57,15 @@ async def create_sponsorship(
         raise ValueError(f"Donor {donor_id} not found")
 
     # Check for existing active/paused sponsorship for this animal
-    stmt = (
-        select(Sponsorship)
-        .where(
-            Sponsorship.donor_id == donor_id,
-            Sponsorship.animal_id == animal_id,
-            Sponsorship.status.in_([
+    stmt = select(Sponsorship).where(
+        Sponsorship.donor_id == donor_id,
+        Sponsorship.animal_id == animal_id,
+        Sponsorship.status.in_(
+            [
                 SponsorshipStatus.ACTIVE.value,
                 SponsorshipStatus.PAUSED.value,
-            ]),
-        )
+            ]
+        ),
     )
     result = await db.execute(stmt)
     existing = result.scalar_one_or_none()
@@ -115,9 +114,7 @@ async def create_sponsorship(
             },
         )
         stripe_subscription_id = subscription.id
-        current_period_end = datetime.fromtimestamp(
-            subscription["current_period_end"], tz=timezone.utc
-        )
+        current_period_end = datetime.fromtimestamp(subscription["current_period_end"], tz=UTC)
 
     sponsorship = Sponsorship(
         donor_id=donor_id,
@@ -169,7 +166,7 @@ async def update_sponsorship(
 
     if action == "pause" and sponsorship.status == SponsorshipStatus.ACTIVE.value:
         sponsorship.status = SponsorshipStatus.PAUSED.value
-        sponsorship.paused_at = datetime.now(timezone.utc)
+        sponsorship.paused_at = datetime.now(UTC)
 
         if stripe_api_key and sponsorship.stripe_subscription_id:
             stripe.api_key = stripe_api_key
@@ -248,7 +245,7 @@ async def cancel_sponsorship(
         return sponsorship
 
     sponsorship.status = SponsorshipStatus.CANCELLED.value
-    sponsorship.cancelled_at = datetime.now(timezone.utc)
+    sponsorship.cancelled_at = datetime.now(UTC)
 
     if stripe_api_key and sponsorship.stripe_subscription_id:
         stripe.api_key = stripe_api_key
@@ -283,10 +280,12 @@ async def get_animal_sponsors(
         select(Sponsorship)
         .where(
             Sponsorship.animal_id == animal_id,
-            Sponsorship.status.in_([
-                SponsorshipStatus.ACTIVE.value,
-                SponsorshipStatus.PAUSED.value,
-            ]),
+            Sponsorship.status.in_(
+                [
+                    SponsorshipStatus.ACTIVE.value,
+                    SponsorshipStatus.PAUSED.value,
+                ]
+            ),
         )
         .order_by(Sponsorship.created_at.desc())
     )
@@ -313,9 +312,7 @@ async def handle_subscription_updated(
     Returns:
         Updated Sponsorship or None if not found.
     """
-    stmt = select(Sponsorship).where(
-        Sponsorship.stripe_subscription_id == stripe_subscription_id
-    )
+    stmt = select(Sponsorship).where(Sponsorship.stripe_subscription_id == stripe_subscription_id)
     result = await db.execute(stmt)
     sponsorship = result.scalar_one_or_none()
     if sponsorship is None:
@@ -338,9 +335,9 @@ async def handle_subscription_updated(
         sponsorship.status = mapped_status
 
         if mapped_status == SponsorshipStatus.CANCELLED.value:
-            sponsorship.cancelled_at = datetime.now(timezone.utc)
+            sponsorship.cancelled_at = datetime.now(UTC)
         elif mapped_status == SponsorshipStatus.PAUSED.value:
-            sponsorship.paused_at = datetime.now(timezone.utc)
+            sponsorship.paused_at = datetime.now(UTC)
 
         logger.info(
             "Webhook: updated sponsorship %s status to %s",
@@ -349,9 +346,7 @@ async def handle_subscription_updated(
         )
 
     if current_period_end is not None:
-        sponsorship.current_period_end = datetime.fromtimestamp(
-            current_period_end, tz=timezone.utc
-        )
+        sponsorship.current_period_end = datetime.fromtimestamp(current_period_end, tz=UTC)
 
     await db.flush()
     return sponsorship

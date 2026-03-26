@@ -17,7 +17,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.dependencies import require_staff
-from src.auth.models import User
+from src.db.models.user import User
 from src.config import Settings, get_settings
 from src.db.models.animal import Animal
 from src.db.models.donation import Donor

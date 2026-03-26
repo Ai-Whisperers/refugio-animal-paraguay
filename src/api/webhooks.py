@@ -237,12 +237,12 @@ async def stripe_webhook(
         if not sub_id:
             return {"status": "skipped", "reason": "no_subscription_id"}
 
-        sub_status = data_obj.get("status", "canceled" if event_type == EVENT_SUBSCRIPTION_DELETED else "active")
+        sub_status = data_obj.get(
+            "status", "canceled" if event_type == EVENT_SUBSCRIPTION_DELETED else "active"
+        )
         period_end = data_obj.get("current_period_end")
 
-        sponsorship = await handle_subscription_updated(
-            db, sub_id, sub_status, period_end
-        )
+        sponsorship = await handle_subscription_updated(db, sub_id, sub_status, period_end)
         result = "updated" if sponsorship else "sponsorship_not_found"
         return {"status": "processed", "event_type": event_type, "result": result}
 

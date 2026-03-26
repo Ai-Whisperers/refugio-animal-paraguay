@@ -31,9 +31,9 @@ class SponsorshipTier(enum.StrEnum):
 
 # Tier pricing in cents (configurable defaults)
 TIER_AMOUNT_CENTS: dict[str, int] = {
-    SponsorshipTier.BRONZE: 1000,   # $10/month
-    SponsorshipTier.SILVER: 2500,   # $25/month
-    SponsorshipTier.GOLD: 5000,     # $50/month
+    SponsorshipTier.BRONZE: 1000,  # $10/month
+    SponsorshipTier.SILVER: 2500,  # $25/month
+    SponsorshipTier.GOLD: 5000,  # $50/month
 }
 
 
@@ -140,8 +140,8 @@ class Sponsorship(Base):
     )
 
     # Relationships
-    donor: Mapped["Donor"] = relationship("Donor", lazy="select")
-    animal: Mapped["Animal"] = relationship("Animal", lazy="select")
+    donor: Mapped[Donor] = relationship("Donor", lazy="select")
+    animal: Mapped[Animal] = relationship("Animal", lazy="select")
 
     __table_args__ = (
         sa.CheckConstraint(

@@ -22,6 +22,9 @@ __all__ = [
     "AnimalStatus",
     "AuditAction",
     "AuditLog",
+    "ConsentMethod",
+    "ConsentStatus",
+    "ConsentType",
     "ContactFormType",
     "ContactSubmission",
     "CurrencyCode",
@@ -34,8 +37,5 @@ __all__ = [
     "Sponsorship",
     "SponsorshipStatus",
     "SponsorshipTier",
-    "ConsentMethod",
-    "ConsentStatus",
-    "ConsentType",
     "UserConsent",
 ]
