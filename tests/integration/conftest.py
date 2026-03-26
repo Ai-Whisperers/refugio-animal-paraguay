@@ -37,9 +37,7 @@ async def client() -> AsyncGenerator[AsyncClient, None]:
     engine = init_engine(settings)
 
     # Upsert test staff user (ON CONFLICT keeps idempotent across runs)
-    session_factory = async_sessionmaker(
-        bind=engine, class_=AsyncSession, expire_on_commit=False
-    )
+    session_factory = async_sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
     async with session_factory() as session:
         await session.execute(
             text("""
