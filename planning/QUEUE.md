@@ -47,7 +47,7 @@ Stories are ordered by dependency and priority. Work top-to-bottom. Each story b
 
 | # | Story | Epic | Points | Status | Track |
 |---|-------|------|--------|--------|-------|
-| 6 | Staff Admin Panel — Animals + Adoptions | EPIC-7 S01 (partial) | 8 | DONE (PR #TBD) | Frontend |
+| 6 | Staff Admin Panel — Animals + Adoptions | EPIC-7 S01 (partial) | 8 | DONE (PR #21) | Frontend |
 | 7 | Adoption Application Form (public) | EPIC-11 S01 | 5 | READY | Frontend |
 | 8 | Mobile-First Responsive Design | EPIC-11 S05 | 5 | READY | Frontend |
 | 9 | Password Reset Flow | EPIC-10 S02 (partial) | 5 | DONE (PR #12) | Backend |
