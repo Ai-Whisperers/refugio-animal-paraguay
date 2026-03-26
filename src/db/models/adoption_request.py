@@ -69,10 +69,12 @@ class AdoptionRequest(Base):
     animal: Mapped["Animal"] = relationship(  # type: ignore[name-defined]  # noqa: F821
         "Animal",
         foreign_keys=[animal_id],
+        back_populates="adoption_requests",
         lazy="select",
     )
     adopter: Mapped["Adopter"] = relationship(  # type: ignore[name-defined]  # noqa: F821
         "Adopter",
         foreign_keys=[adopter_id],
+        back_populates="adoption_requests",
         lazy="select",
     )

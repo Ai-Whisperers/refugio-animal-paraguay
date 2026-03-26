@@ -4,7 +4,7 @@ from datetime import datetime
 from uuid import UUID
 
 import sqlalchemy as sa
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ..base import Base
 
@@ -47,4 +47,11 @@ class Adopter(Base):
         nullable=False,
         server_default=sa.func.now(),
         onupdate=sa.func.now(),
+    )
+
+    # Back-reference from AdoptionRequest.adopter
+    adoption_requests: Mapped[list["AdoptionRequest"]] = relationship(  # type: ignore[name-defined]  # noqa: F821
+        "AdoptionRequest",
+        back_populates="adopter",
+        lazy="select",
     )

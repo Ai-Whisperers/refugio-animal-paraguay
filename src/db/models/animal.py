@@ -5,7 +5,7 @@ from datetime import date, datetime
 from uuid import UUID
 
 import sqlalchemy as sa
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ..base import Base
 
@@ -63,4 +63,11 @@ class Animal(Base):
         nullable=False,
         server_default=sa.func.now(),
         onupdate=sa.func.now(),
+    )
+
+    # Back-reference from AdoptionRequest.animal
+    adoption_requests: Mapped[list["AdoptionRequest"]] = relationship(  # type: ignore[name-defined]  # noqa: F821
+        "AdoptionRequest",
+        back_populates="animal",
+        lazy="select",
     )

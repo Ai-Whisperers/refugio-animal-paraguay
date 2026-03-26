@@ -103,6 +103,10 @@ class TestAnimalModel:
         animal = Animal(id=animal_id, name="Rex", species="dog", status="available")
         assert animal.id == animal_id
 
+    def test_back_reference_attribute_exists(self) -> None:
+        animal = Animal(name="Buddy", species="dog", status="available")
+        assert hasattr(animal, "adoption_requests")
+
     def test_tablename(self) -> None:
         assert Animal.__tablename__ == "animals"
 
@@ -152,6 +156,10 @@ class TestAdopterModel:
             deleted_at=deleted_at,
         )
         assert adopter.deleted_at == deleted_at
+
+    def test_back_reference_attribute_exists(self) -> None:
+        adopter = Adopter(full_name="Test User", email="t@example.com")
+        assert hasattr(adopter, "adoption_requests")
 
     def test_tablename(self) -> None:
         assert Adopter.__tablename__ == "adopters"
