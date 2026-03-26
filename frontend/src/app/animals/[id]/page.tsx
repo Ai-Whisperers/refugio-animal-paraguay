@@ -4,53 +4,9 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import type { Animal, AnimalStatus } from "@/types/api";
+import type { Animal } from "@/types/api";
 import { getAnimalPublic } from "@/lib/public-api";
-
-const STATUS_LABELS: Record<AnimalStatus, string> = {
-  intake: "New Arrival",
-  quarantine: "Quarantine",
-  available: "Available for Adoption",
-  foster: "In Foster Care",
-  under_treatment: "Under Medical Treatment",
-  adopted: "Adopted",
-  deceased: "Deceased",
-};
-
-function statusBadgeClass(status: AnimalStatus): string {
-  switch (status) {
-    case "available":
-      return "bg-green-100 text-green-800";
-    case "adopted":
-      return "bg-blue-100 text-blue-800";
-    case "foster":
-      return "bg-purple-100 text-purple-800";
-    case "under_treatment":
-      return "bg-yellow-100 text-yellow-800";
-    case "quarantine":
-      return "bg-red-100 text-red-800";
-    case "intake":
-      return "bg-gray-100 text-gray-800";
-    default:
-      return "bg-gray-100 text-gray-600";
-  }
-}
-
-function calculateAge(birthDate: string): string {
-  const birth = new Date(birthDate);
-  const now = new Date();
-  const months =
-    (now.getFullYear() - birth.getFullYear()) * 12 +
-    (now.getMonth() - birth.getMonth());
-
-  if (months < 1) return "Less than 1 month old";
-  if (months < 12) return `${months} month${months === 1 ? "" : "s"} old`;
-
-  const years = Math.floor(months / 12);
-  const remaining = months % 12;
-  if (remaining === 0) return `${years} year${years === 1 ? "" : "s"} old`;
-  return `${years} year${years === 1 ? "" : "s"}, ${remaining} month${remaining === 1 ? "" : "s"} old`;
-}
+import { STATUS_LABELS, statusBadgeClass, calculateAge, speciesEmoji } from "@/lib/animal-utils";
 
 export default function AnimalDetailPage() {
   const params = useParams<{ id: string }>();
@@ -130,11 +86,7 @@ export default function AnimalDetailPage() {
             />
           ) : (
             <div className="w-full h-64 md:h-96 bg-gray-100 flex items-center justify-center text-8xl">
-              {animal.species === "dog"
-                ? "🐕"
-                : animal.species === "cat"
-                  ? "🐈"
-                  : "🐾"}
+              {speciesEmoji(animal.species)}
             </div>
           )}
         </div>

@@ -3,8 +3,10 @@
 import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import type { Animal, AnimalSpecies, AnimalStatus } from "@/types/api";
+import type { Animal, AnimalSpecies } from "@/types/api";
 import { listAnimalsPublic } from "@/lib/public-api";
+import { STATUS_LABELS, statusBadgeClass, calculateAge } from "@/lib/animal-utils";
+import AnimalPlaceholder from "@/components/AnimalPlaceholder";
 
 const SPECIES_OPTIONS: { value: AnimalSpecies | ""; label: string }[] = [
   { value: "", label: "All Species" },
@@ -14,47 +16,6 @@ const SPECIES_OPTIONS: { value: AnimalSpecies | ""; label: string }[] = [
 ];
 
 const PAGE_SIZE = 12;
-
-/** Human-readable status labels for display. */
-const STATUS_LABELS: Record<AnimalStatus, string> = {
-  intake: "New Arrival",
-  quarantine: "Quarantine",
-  available: "Available",
-  foster: "In Foster",
-  under_treatment: "Under Treatment",
-  adopted: "Adopted",
-  deceased: "Deceased",
-};
-
-/** Status badge color mapping. */
-function statusBadgeClass(status: AnimalStatus): string {
-  switch (status) {
-    case "available":
-      return "bg-green-100 text-green-800";
-    case "adopted":
-      return "bg-blue-100 text-blue-800";
-    case "foster":
-      return "bg-purple-100 text-purple-800";
-    case "under_treatment":
-      return "bg-yellow-100 text-yellow-800";
-    case "quarantine":
-      return "bg-red-100 text-red-800";
-    case "intake":
-      return "bg-gray-100 text-gray-800";
-    default:
-      return "bg-gray-100 text-gray-600";
-  }
-}
-
-/** Placeholder image when no photo is set. */
-function AnimalPlaceholder({ species }: { species: AnimalSpecies }) {
-  const emoji = species === "dog" ? "🐕" : species === "cat" ? "🐈" : "🐾";
-  return (
-    <div className="w-full h-48 bg-gray-100 flex items-center justify-center text-5xl">
-      {emoji}
-    </div>
-  );
-}
 
 export default function AnimalsPage() {
   const [animals, setAnimals] = useState<Animal[]>([]);
@@ -229,21 +190,4 @@ export default function AnimalsPage() {
       )}
     </div>
   );
-}
-
-/** Calculate a human-readable age from a birth date string. */
-function calculateAge(birthDate: string): string {
-  const birth = new Date(birthDate);
-  const now = new Date();
-  const months =
-    (now.getFullYear() - birth.getFullYear()) * 12 +
-    (now.getMonth() - birth.getMonth());
-
-  if (months < 1) return "< 1 month";
-  if (months < 12) return `${months} month${months === 1 ? "" : "s"}`;
-
-  const years = Math.floor(months / 12);
-  const remainingMonths = months % 12;
-  if (remainingMonths === 0) return `${years} year${years === 1 ? "" : "s"}`;
-  return `${years}y ${remainingMonths}m`;
 }

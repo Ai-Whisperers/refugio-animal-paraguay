@@ -4,7 +4,7 @@ export default function HomePage() {
   return (
     <div>
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-primary-50 to-shelter-warm py-12 sm:py-16 md:py-20 px-4">
+      <section className="bg-gradient-to-br from-primary-50 to-orange-50 py-12 sm:py-16 md:py-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-3xl sm:text-4xl md:text-5xl font-heading font-bold text-gray-900 mb-4 sm:mb-6 leading-tight">
             Every Animal Deserves a Loving Home
