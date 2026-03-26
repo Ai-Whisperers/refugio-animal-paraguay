@@ -5,6 +5,7 @@ from .adoption_request import AdoptionRequest, AdoptionRequestStatus
 from .animal import Animal, AnimalGender, AnimalPhoto, AnimalSize, AnimalSpecies, AnimalStatus
 from .audit_log import AuditAction, AuditLog
 from .contact_submission import ContactFormType, ContactSubmission
+from .data_export import DataExportRequest, DataExportStatus, DataSubjectType
 from .donation import CurrencyCode, Donation, DonationStatus, Donor, PaymentMethod
 from .in_kind_donation import InKindDonation, ItemType
 from .user_consent import ConsentMethod, ConsentStatus, ConsentType, UserConsent
@@ -21,17 +22,20 @@ __all__ = [
     "AnimalStatus",
     "AuditAction",
     "AuditLog",
+    "ConsentMethod",
+    "ConsentStatus",
+    "ConsentType",
     "ContactFormType",
     "ContactSubmission",
     "CurrencyCode",
+    "DataExportRequest",
+    "DataExportStatus",
+    "DataSubjectType",
     "Donation",
     "DonationStatus",
     "Donor",
     "InKindDonation",
     "ItemType",
     "PaymentMethod",
-    "ConsentMethod",
-    "ConsentStatus",
-    "ConsentType",
     "UserConsent",
 ]
