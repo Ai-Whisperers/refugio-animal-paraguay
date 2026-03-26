@@ -5,10 +5,9 @@ Database-dependent fixtures live in tests/integration/conftest.py.
 """
 
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import pytest
-
 
 # ---------------------------------------------------------------------------
 # Deterministic IDs for reproducible tests
@@ -84,4 +83,4 @@ def make_intake_data(**overrides: object) -> dict:
 @pytest.fixture
 def frozen_now() -> datetime:
     """A fixed UTC datetime for deterministic timestamp tests."""
-    return datetime(2026, 3, 26, 12, 0, 0, tzinfo=timezone.utc)
+    return datetime(2026, 3, 26, 12, 0, 0, tzinfo=UTC)

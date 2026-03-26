@@ -180,6 +180,7 @@ Domain knowledge loaded on demand via skills:
 | PostgreSQL patterns | `.claude/skills/postgresql-patterns.md` | Schema design, indexing, migrations, query optimization |
 | Python patterns | `.claude/skills/python-patterns.md` | Async, retry, logging, type hints, dataclasses |
 | CI/CD patterns | `.claude/skills/cicd-patterns.md` | GitHub Actions, pipelines, deployment, quality gates |
+| Next.js patterns | `.claude/skills/nextjs-patterns.md` | App Router, Tailwind, components, API integration |
 
 ## Specialist Agents
 

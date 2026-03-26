@@ -434,15 +434,63 @@ CLAIM: TASK-0.1.1 - Vitest setup
 
 ---
 
+## Rollback Procedures
+
+### Broken Feature Branch
+If a scheduled task creates a branch with failing tests or broken code:
+```bash
+# Option 1: Delete the branch entirely
+git branch -D feature/RAP-NNN-description
+git push origin --delete feature/RAP-NNN-description
+
+# Option 2: Reset to last good commit
+git checkout feature/RAP-NNN-description
+git log --oneline -10  # find last good commit
+git reset --hard <good-commit-sha>
+git push --force-with-lease origin feature/RAP-NNN-description
+```
+
+### Broken PR
+```bash
+# Close the PR without merging
+gh pr close <PR-NUMBER>
+# Then clean up the branch as above
+```
+
+### Ticket Cleanup
+If a ticket was partially completed:
+1. Update `tickets/RAP-NNN/context.md` — set STATUS: PAUSED, add RESUME_POINT
+2. Log the issue in `tickets/RAP-NNN/progress.md`
+3. In `planning/QUEUE.md`, change the story status back to READY
+
+### Database Migration Rollback
+If a migration was applied but the code is broken:
+```bash
+# Find the previous migration
+PYTHONPATH=. python3 -m alembic history
+# Downgrade to previous
+PYTHONPATH=. python3 -m alembic downgrade -1
+```
+
+---
+
+## Queue Status Check
+
+Run `./scripts/queue-status.sh` to cross-reference QUEUE.md with actual ticket directories, branches, and PRs. Use this to detect drift between documented and actual state.
+
+---
+
 ## Resources
 
 - **QUEUE.md** — Current task status and availability
 - **CLAIMING.md** — Who claimed what and when
 - **Epic folders** — `EPIC-X-title/` directories with story & task files
-- **Tech stack** — Next.js 14+, PostgreSQL, Prisma, Vitest, Playwright
+- **Tech stack** — Python 3.12, FastAPI, SQLAlchemy 2.x, PostgreSQL 16, Next.js 14
 - **Git repo** — `/home/ai-whisperers/Projects/refugio-animal-paraguay`
+- **Scripts** — `scripts/queue-status.sh` (queue/branch reconciliation)
+- **Orchestrator log** — `planning/orchestrator-log.md` (automated run history)
 
 ---
 
-**Last updated**: 2026-03-25  
+**Last updated**: 2026-03-26
 **Maintained by**: Refugio Animal Paraguay Team
