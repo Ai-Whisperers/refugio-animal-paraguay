@@ -1,112 +1,95 @@
-"""Fund allocations router.
+"""Fund allocation (expense tracking) router.
 
 Endpoints:
-  POST   /fund-allocations              -- record a new expense (staff only)
-  GET    /fund-allocations              -- paginated list with filters (staff only)
-  GET    /fund-allocations/{id}         -- single allocation (staff only)
-  PATCH  /fund-allocations/{id}         -- update allocation (staff only)
-  DELETE /fund-allocations/{id}         -- delete allocation (admin only)
-  GET    /fund-allocations/summary      -- category breakdown for date range (staff)
-  GET    /fund-allocations/trends       -- period-over-period comparison (staff)
-  GET    /fund-allocations/public       -- public transparency breakdown (no auth)
+  GET    /fund-allocations                    - list allocations (filter by category/date)
+  GET    /fund-allocations/{id}               - single allocation detail
+  POST   /fund-allocations                    - record new expense
+  GET    /fund-allocations/summary             - allocation breakdown by category
 """
 
-from datetime import datetime
+from datetime import UTC, datetime, timedelta
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.auth.dependencies import require_admin, require_staff
-from src.db.models.fund_allocation import FundCategory
+from src.auth.dependencies import require_staff
+from src.db.models.fund_allocation import FundAllocation
 from src.db.models.user import User
 from src.db.session import get_db
 from src.schemas.fund_allocation import (
-    CategoryBreakdown,
     FundAllocationCreate,
     FundAllocationResponse,
     FundAllocationSummary,
-    FundAllocationTrends,
-    FundAllocationUpdate,
 )
-from src.services import fund_allocation_service
+from src.services.fund_allocation_service import (
+    create_allocation,
+    get_allocation_breakdown,
+)
 
 router = APIRouter(prefix="/fund-allocations", tags=["fund-allocations"])
 
+_DEFAULT_LIMIT = 20
+_MAX_LIMIT = 100
+
 
 @router.get("/summary", response_model=FundAllocationSummary)
-async def get_allocation_summary(
-    start_date: datetime = Query(..., description="Period start (inclusive)"),
-    end_date: datetime = Query(..., description="Period end (inclusive)"),
-    currency: str = Query(default="PYG", pattern=r"^(EUR|PYG|USD)$"),
-    _user: User = Depends(require_staff),
+async def allocation_summary(
+    start_date: datetime | None = Query(default=None),
+    end_date: datetime | None = Query(default=None),
+    currency: str = Query(default="PYG", max_length=3),
     db: AsyncSession = Depends(get_db),
-) -> FundAllocationSummary:
-    """Get fund allocation breakdown by category for a date range."""
-    breakdown_data = await fund_allocation_service.get_category_breakdown(
-        db, start_date, end_date, currency
-    )
-    total = sum(item["total_cents"] for item in breakdown_data)
-    breakdown = [CategoryBreakdown(**item) for item in breakdown_data]
+    _: User = Depends(require_staff),
+) -> dict:
+    """Get fund allocation breakdown by category for a date range.
 
-    return FundAllocationSummary(
-        start_date=start_date,
-        end_date=end_date,
-        currency=currency,
-        total_allocated_cents=total,
-        breakdown=breakdown,
-    )
-
-
-@router.get("/trends", response_model=FundAllocationTrends)
-async def get_allocation_trends(
-    current_start: datetime = Query(..., description="Current period start"),
-    current_end: datetime = Query(..., description="Current period end"),
-    previous_start: datetime = Query(..., description="Previous period start"),
-    previous_end: datetime = Query(..., description="Previous period end"),
-    currency: str = Query(default="PYG", pattern=r"^(EUR|PYG|USD)$"),
-    _user: User = Depends(require_staff),
-    db: AsyncSession = Depends(get_db),
-) -> FundAllocationTrends:
-    """Compare fund allocations between two periods."""
-    trends_data = await fund_allocation_service.get_period_trends(
-        db, current_start, current_end, previous_start, previous_end, currency
-    )
-
-    return FundAllocationTrends(
-        current_start=current_start,
-        current_end=current_end,
-        previous_start=previous_start,
-        previous_end=previous_end,
-        currency=currency,
-        trends=trends_data,
-    )
-
-
-@router.get("/public", response_model=FundAllocationSummary)
-async def get_public_breakdown(
-    start_date: datetime = Query(..., description="Period start (inclusive)"),
-    end_date: datetime = Query(..., description="Period end (inclusive)"),
-    currency: str = Query(default="PYG", pattern=r"^(EUR|PYG|USD)$"),
-    db: AsyncSession = Depends(get_db),
-) -> FundAllocationSummary:
-    """Public transparency endpoint — category breakdown without auth.
-
-    Shows only top-level breakdown (no vendor/recipient details).
+    Defaults to last 12 months if no dates provided.
     """
-    breakdown_data = await fund_allocation_service.get_category_breakdown(
-        db, start_date, end_date, currency
-    )
-    total = sum(item["total_cents"] for item in breakdown_data)
-    breakdown = [CategoryBreakdown(**item) for item in breakdown_data]
+    if end_date is None:
+        end_date = datetime.now(UTC)
+    if start_date is None:
+        start_date = end_date - timedelta(days=365)
 
-    return FundAllocationSummary(
-        start_date=start_date,
-        end_date=end_date,
-        currency=currency,
-        total_allocated_cents=total,
-        breakdown=breakdown,
+    return await get_allocation_breakdown(db, start_date, end_date, currency)
+
+
+@router.get("", response_model=list[FundAllocationResponse])
+async def list_allocations(
+    category: str | None = Query(default=None),
+    offset: int = Query(default=0, ge=0),
+    limit: int = Query(default=_DEFAULT_LIMIT, ge=1, le=_MAX_LIMIT),
+    db: AsyncSession = Depends(get_db),
+    _: User = Depends(require_staff),
+) -> list[FundAllocation]:
+    """List fund allocations with optional category filter."""
+    stmt = (
+        select(FundAllocation)
+        .offset(offset)
+        .limit(limit)
+        .order_by(FundAllocation.transaction_date.desc())
     )
+    if category is not None:
+        stmt = stmt.where(FundAllocation.category == category)
+
+    result = await db.execute(stmt)
+    return list(result.scalars().all())
+
+
+@router.get("/{allocation_id}", response_model=FundAllocationResponse)
+async def get_allocation(
+    allocation_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    _: User = Depends(require_staff),
+) -> FundAllocation:
+    """Get a single fund allocation by ID."""
+    allocation = await db.get(FundAllocation, allocation_id)
+    if allocation is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Fund allocation not found",
+        )
+    return allocation
 
 
 @router.post(
@@ -114,105 +97,20 @@ async def get_public_breakdown(
     response_model=FundAllocationResponse,
     status_code=status.HTTP_201_CREATED,
 )
-async def create_allocation(
-    body: FundAllocationCreate,
-    user: User = Depends(require_staff),
+async def create_fund_allocation(
+    payload: FundAllocationCreate,
     db: AsyncSession = Depends(get_db),
-) -> FundAllocationResponse:
+    current_user: User = Depends(require_staff),
+) -> FundAllocation:
     """Record a new fund allocation (expense)."""
-    allocation = await fund_allocation_service.create_allocation(
-        db=db,
-        category=body.category,
-        amount_cents=body.amount_cents,
-        currency=body.currency,
-        description=body.description,
-        transaction_date=body.transaction_date,
-        recorded_by_user_id=user.id,
-        receipt_reference=body.receipt_reference,
-        notes=body.notes,
-    )
-    await db.commit()
-    return FundAllocationResponse.model_validate(allocation)
-
-
-@router.get("", response_model=list[FundAllocationResponse])
-async def list_allocations(
-    category: FundCategory | None = Query(default=None),
-    currency: str | None = Query(default=None, pattern=r"^(EUR|PYG|USD)$"),
-    start_date: datetime | None = Query(default=None),
-    end_date: datetime | None = Query(default=None),
-    offset: int = Query(default=0, ge=0),
-    limit: int = Query(default=50, ge=1, le=200),
-    _user: User = Depends(require_staff),
-    db: AsyncSession = Depends(get_db),
-) -> list[FundAllocationResponse]:
-    """Paginated list of fund allocations with optional filters."""
-    items, _total = await fund_allocation_service.list_allocations(
+    return await create_allocation(
         db,
-        category=category,
-        currency=currency,
-        start_date=start_date,
-        end_date=end_date,
-        offset=offset,
-        limit=limit,
+        category=payload.category.value,
+        amount_cents=payload.amount_cents,
+        currency=payload.currency,
+        description=payload.description,
+        transaction_date=payload.transaction_date,
+        recorded_by_user_id=current_user.id,
+        receipt_reference=payload.receipt_reference,
+        notes=payload.notes,
     )
-    return [FundAllocationResponse.model_validate(item) for item in items]
-
-
-@router.get("/{allocation_id}", response_model=FundAllocationResponse)
-async def get_allocation(
-    allocation_id: UUID,
-    _user: User = Depends(require_staff),
-    db: AsyncSession = Depends(get_db),
-) -> FundAllocationResponse:
-    """Get a single fund allocation by ID."""
-    allocation = await fund_allocation_service.get_allocation(db, allocation_id)
-    if allocation is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Fund allocation {allocation_id} not found",
-        )
-    return FundAllocationResponse.model_validate(allocation)
-
-
-@router.patch("/{allocation_id}", response_model=FundAllocationResponse)
-async def update_allocation(
-    allocation_id: UUID,
-    body: FundAllocationUpdate,
-    _user: User = Depends(require_staff),
-    db: AsyncSession = Depends(get_db),
-) -> FundAllocationResponse:
-    """Update an existing fund allocation."""
-    allocation = await fund_allocation_service.get_allocation(db, allocation_id)
-    if allocation is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Fund allocation {allocation_id} not found",
-        )
-
-    updates = body.model_dump(exclude_unset=True)
-    if not updates:
-        return FundAllocationResponse.model_validate(allocation)
-
-    allocation = await fund_allocation_service.update_allocation(
-        db, allocation, updates
-    )
-    await db.commit()
-    return FundAllocationResponse.model_validate(allocation)
-
-
-@router.delete("/{allocation_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_allocation(
-    allocation_id: UUID,
-    _user: User = Depends(require_admin),
-    db: AsyncSession = Depends(get_db),
-) -> None:
-    """Delete a fund allocation record. Admin only."""
-    allocation = await fund_allocation_service.get_allocation(db, allocation_id)
-    if allocation is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Fund allocation {allocation_id} not found",
-        )
-    await fund_allocation_service.delete_allocation(db, allocation)
-    await db.commit()
