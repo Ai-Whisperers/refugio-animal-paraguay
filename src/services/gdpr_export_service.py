@@ -62,7 +62,9 @@ async def create_export_request(
         export_req.error_message = "Export generation failed"
 
     await db.flush()
-    logger.info("Data export %s for %s %s: %s", export_req.id, subject_type, subject_id, export_req.status)
+    logger.info(
+        "Data export %s for %s %s: %s", export_req.id, subject_type, subject_id, export_req.status
+    )
     return export_req
 
 
@@ -140,7 +142,9 @@ async def _aggregate_donor_data(db: AsyncSession, donor_id: UUID) -> dict:
 
     # In-kind donations
     in_kind_result = await db.execute(
-        select(InKindDonation).where(InKindDonation.donor_id == donor_id).order_by(InKindDonation.created_at.desc())
+        select(InKindDonation)
+        .where(InKindDonation.donor_id == donor_id)
+        .order_by(InKindDonation.created_at.desc())
     )
     in_kind_donations = list(in_kind_result.scalars().all())
 
@@ -209,7 +213,11 @@ async def _aggregate_adopter_data(db: AsyncSession, adopter_id: UUID) -> dict:
     """Aggregate all personal data for an adopter."""
     adopter = await db.get(Adopter, adopter_id)
     if adopter is None:
-        return {"error": "Adopter not found", "subject_type": "adopter", "subject_id": str(adopter_id)}
+        return {
+            "error": "Adopter not found",
+            "subject_type": "adopter",
+            "subject_id": str(adopter_id),
+        }
 
     # Adoption requests
     requests_result = await db.execute(
@@ -237,7 +245,9 @@ async def _aggregate_adopter_data(db: AsyncSession, adopter_id: UUID) -> dict:
             "email": adopter.email,
             "phone": adopter.phone,
             "address": adopter.address,
-            "gdpr_consent_at": adopter.gdpr_consent_at.isoformat() if adopter.gdpr_consent_at else None,
+            "gdpr_consent_at": (
+                adopter.gdpr_consent_at.isoformat() if adopter.gdpr_consent_at else None
+            ),
             "created_at": adopter.created_at.isoformat(),
             "updated_at": adopter.updated_at.isoformat(),
         },
@@ -273,13 +283,18 @@ async def _aggregate_staff_data(db: AsyncSession, user_id: UUID) -> dict:
 
     # Consent records
     consents_result = await db.execute(
-        select(UserConsent).where(UserConsent.user_id == user_id).order_by(UserConsent.created_at.desc())
+        select(UserConsent)
+        .where(UserConsent.user_id == user_id)
+        .order_by(UserConsent.created_at.desc())
     )
     consents = list(consents_result.scalars().all())
 
     # Audit log entries where this user is the actor
     audit_result = await db.execute(
-        select(AuditLog).where(AuditLog.user_id == user_id).order_by(AuditLog.timestamp.desc()).limit(1000)
+        select(AuditLog)
+        .where(AuditLog.user_id == user_id)
+        .order_by(AuditLog.timestamp.desc())
+        .limit(1000)
     )
     audit_entries = list(audit_result.scalars().all())
 
