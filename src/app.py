@@ -21,6 +21,7 @@ from src.api.adopters import router as adopters_router
 from src.api.adoption_requests import router as adoption_requests_router
 from src.api.animals import router as animals_router
 from src.api.auth import router as auth_router
+from src.api.campaigns import router as campaigns_router
 from src.api.consents import router as consents_router
 from src.api.donations import router as donations_router
 from src.api.donors import router as donors_router
@@ -114,6 +115,7 @@ def create_app() -> FastAPI:
     application.include_router(public_contact_router)
     application.include_router(webhooks_router)
     application.include_router(consents_router)
+    application.include_router(campaigns_router)
 
     return application
 

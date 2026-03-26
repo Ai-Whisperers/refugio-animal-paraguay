@@ -128,6 +128,13 @@ class Donation(Base):
         sa.String(50),
         nullable=True,
     )
+    # Optional: link donation to a fundraising campaign
+    campaign_id: Mapped[UUID | None] = mapped_column(
+        sa.UUID(as_uuid=True),
+        sa.ForeignKey("campaigns.id", ondelete="SET NULL"),
+        nullable=True,
+        index=True,
+    )
     notes: Mapped[str | None] = mapped_column(sa.Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         sa.TIMESTAMP(timezone=True),
