@@ -13,6 +13,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
 from src.api.adopters import router as adopters_router
+from src.api.adoption_requests import router as adoption_requests_router
 from src.api.animals import router as animals_router
 from src.api.health import router as health_router
 from src.config import Settings, get_settings
@@ -42,6 +43,7 @@ def create_app() -> FastAPI:
     app.include_router(health_router)
     app.include_router(animals_router)
     app.include_router(adopters_router)
+    app.include_router(adoption_requests_router)
 
     return app
 
