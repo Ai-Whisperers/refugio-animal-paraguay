@@ -177,8 +177,13 @@ async def _handle_invoice_payment_succeeded(
         logger.debug("Invoice payment_succeeded without subscription, skipping")
         return "not_subscription"
 
-    # Find the parent donation record for this subscription
-    stmt = select(Donation).where(Donation.stripe_subscription_id == subscription_id)
+    # Find the most recent donation record for this subscription
+    stmt = (
+        select(Donation)
+        .where(Donation.stripe_subscription_id == subscription_id)
+        .order_by(Donation.created_at.desc())
+        .limit(1)
+    )
     result = await db.execute(stmt)
     donation = result.scalar_one_or_none()
 
@@ -228,7 +233,12 @@ async def _handle_invoice_payment_failed(
     if not subscription_id:
         return "not_subscription"
 
-    stmt = select(Donation).where(Donation.stripe_subscription_id == subscription_id)
+    stmt = (
+        select(Donation)
+        .where(Donation.stripe_subscription_id == subscription_id)
+        .order_by(Donation.created_at.desc())
+        .limit(1)
+    )
     result = await db.execute(stmt)
     donation = result.scalar_one_or_none()
 
@@ -262,7 +272,12 @@ async def _handle_subscription_deleted(
     if not subscription_id:
         return "no_subscription_id"
 
-    stmt = select(Donation).where(Donation.stripe_subscription_id == subscription_id)
+    stmt = (
+        select(Donation)
+        .where(Donation.stripe_subscription_id == subscription_id)
+        .order_by(Donation.created_at.desc())
+        .limit(1)
+    )
     result = await db.execute(stmt)
     donation = result.scalar_one_or_none()
 

@@ -268,9 +268,11 @@ async def create_subscription(
         donor_id=payload.donor_id,
         amount_cents=payload.amount_cents,
         currency=payload.currency.value,
-        payment_method=PaymentMethod.SEPA_DEBIT.value
-        if payload.payment_method_id.startswith("pm_sepa")
-        else PaymentMethod.STRIPE.value,
+        payment_method=(
+            PaymentMethod.SEPA_DEBIT.value
+            if payload.payment_method_id.startswith("pm_sepa")
+            else PaymentMethod.STRIPE.value
+        ),
         stripe_subscription_id=subscription.id,
         stripe_customer_id=customer_id,
         is_recurring=True,
@@ -314,8 +316,13 @@ async def cancel_subscription(
     Cancels the Stripe subscription and updates the local donation record.
     The subscription will stop at the end of the current billing period.
     """
-    # Verify donation with this subscription exists
-    stmt = select(Donation).where(Donation.stripe_subscription_id == subscription_id)
+    # Verify donation with this subscription exists (most recent if multiple)
+    stmt = (
+        select(Donation)
+        .where(Donation.stripe_subscription_id == subscription_id)
+        .order_by(Donation.created_at.desc())
+        .limit(1)
+    )
     result = await db.execute(stmt)
     donation = result.scalar_one_or_none()
 
