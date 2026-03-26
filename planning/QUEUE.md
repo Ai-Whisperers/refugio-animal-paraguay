@@ -41,17 +41,17 @@ Stories are ordered by dependency and priority. Work top-to-bottom. Each story b
 | 2 | Animal Intake Workflow | EPIC-1 S06 | 8 | DONE (PR #3) | Backend |
 | 3 | CORS + Rate Limiting + Error Standardization | Cross-cutting | 5 | DONE (PR #13) | Backend |
 | 4 | Next.js 14 Project Scaffold | EPIC-11 | 5 | DONE (PR #19) | Frontend |
-| 5 | Animal Browsing Page (public) | EPIC-11 S01 | 8 | READY | Frontend |
+| 5 | Animal Browsing Page (public) | EPIC-11 S01 | 8 | DONE (PR #20) | Backend |
 
 ### Sprint 2 (Weeks 3-4): Admin Panel + Polish
 
 | # | Story | Epic | Points | Status | Track |
 |---|-------|------|--------|--------|-------|
 | 6 | Staff Admin Panel — Animals + Adoptions | EPIC-7 S01 (partial) | 8 | READY | Frontend |
-| 7 | Adoption Application Form (public) | EPIC-11 S01 | 5 | BLOCKED #5 | Frontend |
-| 8 | Mobile-First Responsive Design | EPIC-11 S05 | 5 | BLOCKED #5 | Frontend |
+| 7 | Adoption Application Form (public) | EPIC-11 S01 | 5 | READY | Frontend |
+| 8 | Mobile-First Responsive Design | EPIC-11 S05 | 5 | READY | Frontend |
 | 9 | Password Reset Flow | EPIC-10 S02 (partial) | 5 | DONE (PR #12) | Backend |
-| 10 | Contact & Inquiry Form | EPIC-11 S02 | 8 | BLOCKED #5 | Frontend |
+| 10 | Contact & Inquiry Form | EPIC-11 S02 | 8 | READY | Frontend |
 
 **V1 remaining**: ~65 points, 10 work items
 
@@ -84,7 +84,7 @@ Week 3-4:
 | 9 | Campaign Management | EPIC-14 S03 | 6 | BLOCKED on V1 frontend |
 | 10 | Donation Landing Page | EPIC-11 S04 | 13 | BLOCKED on V1 frontend |
 | 11 | Donation Dashboard (Staff) | EPIC-3 S04 | 6 | BLOCKED on #3, #4 |
-| 12 | Email Notification System | EPIC-6 S01 | 8 | DONE (PR #18) |
+| 12 | Email Notification System | EPIC-6 S01 | 8 | BLOCKED on #1 |
 | 13 | GDPR Data Export | EPIC-13 S02 | 6 | BLOCKED on #2, #5 |
 
 ---

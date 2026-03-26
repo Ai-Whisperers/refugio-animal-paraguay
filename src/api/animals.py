@@ -18,7 +18,14 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.dependencies import require_staff
-from src.db.models.animal import Animal, AnimalPhoto, AnimalSpecies, AnimalStatus
+from src.db.models.animal import (
+    Animal,
+    AnimalGender,
+    AnimalPhoto,
+    AnimalSize,
+    AnimalSpecies,
+    AnimalStatus,
+)
 from src.db.models.user import User
 from src.db.session import get_db
 from src.schemas.animal import (
@@ -60,9 +67,7 @@ async def get_animal(
 ) -> Animal:
     animal = await db.get(Animal, animal_id)
     if animal is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Animal not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Animal not found")
     return animal
 
 
@@ -76,6 +81,9 @@ async def create_animal(
         name=payload.name,
         species=payload.species.value,
         status=payload.status.value,
+        breed=payload.breed,
+        size=payload.size.value if payload.size else None,
+        gender=payload.gender.value if payload.gender else None,
         birth_date=payload.birth_date,
         description=payload.description,
         primary_photo_url=payload.primary_photo_url,
@@ -95,14 +103,12 @@ async def update_animal(
 ) -> Animal:
     animal = await db.get(Animal, animal_id)
     if animal is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Animal not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Animal not found")
 
     updates = payload.model_dump(exclude_unset=True)
     for field, value in updates.items():
         # Enum fields stored as plain strings in DB
-        if isinstance(value, (AnimalSpecies, AnimalStatus)):
+        if isinstance(value, (AnimalSpecies, AnimalStatus, AnimalSize, AnimalGender)):
             value = value.value
         setattr(animal, field, value)
 
@@ -122,9 +128,7 @@ async def delete_animal(
 ) -> Response:
     animal = await db.get(Animal, animal_id)
     if animal is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Animal not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Animal not found")
     await db.delete(animal)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
@@ -142,9 +146,7 @@ async def add_animal_photo(
 ) -> AnimalPhoto:
     animal = await db.get(Animal, animal_id)
     if animal is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Animal not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Animal not found")
     photo = AnimalPhoto(
         animal_id=animal_id,
         url=payload.url,
@@ -174,8 +176,6 @@ async def delete_animal_photo(
     result = await db.execute(stmt)
     photo = result.scalar_one_or_none()
     if photo is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Photo not found"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Photo not found")
     await db.delete(photo)
     return Response(status_code=status.HTTP_204_NO_CONTENT)
