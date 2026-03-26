@@ -1,0 +1,60 @@
+# Refugio Animal Paraguay
+
+> Animal shelter management platform for a Paraguay-based rescue shelter with European donor network integration.
+
+## Project
+
+Refugio Animal Paraguay is a web platform managing:
+- Animal records, health tracking, and adoption workflows
+- Donation processing for both local (PYG) and international/EU (EUR) donors
+- Volunteer coordination and scheduling
+- Shelter operations and reporting
+
+**Owner context**: Dutch owner relocating to Paraguay. European (particularly Dutch/German) donor base is critical — donation flows must reflect EU standards including GDPR compliance, SEPA Direct Debit, and EUR currency handling.
+
+## Source
+
+- Repository: https://github.com/ (private)
+- Docs: `docs/` directory
+- Architecture decisions: `docs/adr/`
+
+## Tech Stack
+
+- Backend: Python / FastAPI
+- Database: PostgreSQL
+- Payments: Stripe (EU/EUR) + local bank transfer (PYG)
+- Auth: JWT-based
+- Language: Spanish/English bilingual platform
+
+## Key Domains
+
+### Animals
+Profiles for dogs, cats, and other animals including: photos, medical history, vaccination records, adoption status, foster history.
+
+### Adoptions
+Application workflow: submission → staff review → approval → home visit → completion. Supports Paraguayan legal requirements for animal adoption.
+
+### Donations
+Dual-currency: EUR (Stripe, SEPA Direct Debit) and PYG (local bank transfer, cash). GDPR-compliant EU donor data handling. Recurring donation support.
+
+### Volunteers
+Registration, shift scheduling, task assignment, hour tracking.
+
+## Development Context
+
+Uses a structured `.claude/` framework with:
+- Ticket-based development workflow (`tickets/RAP-NNN/`)
+- Architecture Decision Records (`docs/adr/`)
+- Rules and commands for consistent AI-assisted development
+
+## Compliance
+
+- **GDPR**: EU donor PII handled per GDPR; Stripe DPA in place
+- **Paraguayan law**: Adoption processes follow local animal welfare regulations
+- **Financial**: EUR amounts stored as NUMERIC(12,2); PYG is a zero-decimal currency
+
+## Optional
+
+- Skills reference: `.claude/skills/`
+- Domain documentation: `docs/DATA-MODEL.md`, `docs/COMPLIANCE.md`
+- User personas: `docs/USER-PERSONAS.md`

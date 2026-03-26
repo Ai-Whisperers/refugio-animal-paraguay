@@ -1,0 +1,119 @@
+# Environment & Secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.p12
+*.pfx
+id_rsa*
+credentials.json
+secrets.json
+service-account*.json
+
+# Claude Code local settings (hooks config — contains local paths, never commit)
+.claude/settings.local.json
+
+# Firecrawl research cache (local research data, not project source)
+.firecrawl/
+
+# Legacy CI/CD from another project (Eneve.Domain / .NET) — not applicable
+cicd/
+
+# Virtual environment
+venv/
+
+# Ticket workspace (local only — don't commit current.md or work-in-progress)
+tickets/current.md
+tickets/*/data/
+tickets/*/logs/
+tickets/*/work/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+dist/
+develop-eggs/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+.mypy_cache/
+.dmypy.json
+dmypy.json
+.ruff_cache/
+.pytest_cache/
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+.npm
+.yarn/cache
+.yarn/unplugged
+dist/
+.next/
+.nuxt/
+.output/
+.cache/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+*.log.*
+
+# Docker
+.dockerenv
+
+# Database
+*.sqlite
+*.db
+
+# Coverage & Reports
+coverage/
+.nyc_output/
+reports/
+
+# Build artifacts
+*.pyc
+*.pyo
+*.pyd
+build/
+dist/
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db

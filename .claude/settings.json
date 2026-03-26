@@ -1,0 +1,45 @@
+{
+  "model": "claude-sonnet-4-6",
+  "permissions": {
+    "allow": [
+      "Bash(git *)",
+      "Bash(npm *)",
+      "Bash(yarn *)",
+      "Bash(pnpm *)",
+      "Bash(pytest *)",
+      "Bash(python *)",
+      "Bash(python3 *)",
+      "Bash(pip *)",
+      "Bash(pip3 *)",
+      "Bash(docker ps)",
+      "Bash(docker logs *)",
+      "Bash(docker-compose ps)",
+      "Bash(pre-commit *)",
+      "Bash(black *)",
+      "Bash(isort *)",
+      "Bash(flake8 *)",
+      "Bash(mypy *)",
+      "Bash(ruff *)",
+      "Bash(bandit *)",
+      "Bash(node *)",
+      "Bash(npx *)",
+      "Bash(tsc *)",
+      "Bash(eslint *)",
+      "Bash(prettier *)"
+    ],
+    "deny": [
+      "Bash(rm -rf *)",
+      "Bash(sudo rm *)",
+      "Bash(DROP TABLE *)",
+      "Bash(drop table *)",
+      "Bash(TRUNCATE *)",
+      "Bash(truncate *)",
+      "Bash(DELETE FROM *)",
+      "Bash(delete from *)"
+    ]
+  },
+  "env": {
+    "CLAUDE_BASH_MAINTAIN_PROJECT_WORKING_DIR": "1",
+    "CLAUDE_AUTOCOMPACT_PCT_OVERRIDE": "60"
+  }
+}

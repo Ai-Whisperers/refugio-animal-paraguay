@@ -39,12 +39,9 @@ release/1.2
 
 ### Anti-patterns
 ```
-❌ my-branch
-❌ fix-stuff
-❌ feature/new_feature      (underscores)
-❌ feature/RAP42            (missing hyphen)
-❌ Feature/RAP-42-thing     (capital F)
-❌ feature/RAP-42-this-is-way-too-long-a-name
+❌ my-branch                            (no ticket ID)
+❌ feature/new_feature                  (underscores)
+❌ Feature/RAP-42-this-is-way-too-long  (capital F, too long)
 ```
 
 ---
@@ -63,7 +60,7 @@ RAP-NNN: [imperative verb] [what changed]
 ### Rules
 - **Always** reference ticket ID
 - **Imperative mood**: "Add", "Fix", "Update", "Remove" — not "Added", "Fixes", "Updates"
-- **Specific**: Describe what changed, not what you did ("Add donor validation" not "Work on donations")
+- **Specific**: Describe what changed, not what you did
 - **50 chars** for subject line (80 max)
 - **Body**: Use when explaining why (non-obvious decisions, tradeoffs)
 
@@ -74,70 +71,13 @@ RAP-42: Add adoption request submission form
 RAP-67: Fix email validation for international donors
 
 Donors from EU countries were failing the old regex.
-Updated to use a standards-compliant pattern that handles
-all valid international email formats.
-
-RAP-91: Update payment gateway timeout from 10s to 30s
-
-Closes #91
+Updated to use a standards-compliant pattern.
 ```
 
 ### Anti-patterns
 ```
 ❌ fix bug
-❌ wip
-❌ updated stuff
-❌ RAP-42 - changed form
-❌ Add adoption request submission form (missing ticket ID)
-```
-
----
-
-## Branch Lifecycle
-
-### Feature/Fix Flow
-
-```
-1. Branch from develop
-   git checkout develop
-   git pull origin develop
-   git checkout -b feature/RAP-42-adoption-form
-
-2. Work on branch
-   - Commit frequently with proper messages
-   - Keep branch updated with develop (rebase or merge)
-
-3. Before PR: pre-commit validation
-   - Run /pre-commit-check
-   - All quality gates must pass
-
-4. Open PR: feature/RAP-42 → develop
-   - PR title: "RAP-42: Add adoption request form"
-   - Link ticket in description
-   - Self-review diff before requesting review
-
-5. After review: merge to develop
-   - Squash or rebase merge (no merge commits unless needed)
-   - Delete branch after merge
-
-6. develop → release/x.y → main
-   - Via release branch
-   - Tag on main after merge
-```
-
-### Hotfix Flow
-
-```
-1. Branch from main
-   git checkout main
-   git checkout -b hotfix/RAP-91-payment-timeout
-
-2. Fix, test, validate
-
-3. PR: hotfix/RAP-91 → main
-   Simultaneously: cherry-pick or merge to develop
-
-4. Tag release on main
+❌ Add adoption request submission form  (missing ticket ID)
 ```
 
 ---
@@ -165,9 +105,6 @@ RAP-NNN: [Link or description]
 - [ ] Tested locally
 - [ ] Unit tests pass
 - [ ] Manual test: [describe scenario]
-
-## Notes (optional)
-Any reviewer guidance, known issues, or follow-up tickets.
 ```
 
 ### Definition of Done (PR checklist)
@@ -183,27 +120,16 @@ Any reviewer guidance, known issues, or follow-up tickets.
 
 ## Protected Branches
 
-`main` and `develop` are protected:
-- Direct commits forbidden
-- Require PR with at least 1 review
-- All CI/CD checks must pass
-- No force pushes
+`main` and `develop`: direct commits forbidden, require PR + 1 review, all CI checks must pass, no force pushes.
 
 ---
 
 ## Tag Strategy
 
-For releases:
 ```
 v1.0.0       ← Production release
 v1.0.0-rc.1  ← Release candidate
 v1.0.0-beta  ← Beta testing
-```
-
-Tag after merging release branch to main:
-```bash
-git tag -a v1.2.0 -m "Release v1.2.0: [summary]"
-git push origin v1.2.0
 ```
 
 ---

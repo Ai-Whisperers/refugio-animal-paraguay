@@ -17,20 +17,9 @@
      /____________\
 ```
 
-**Unit tests** cover:
-- Validation functions
-- Business logic / domain rules
-- Data transformations
-- Error conditions and edge cases
-
-**Integration tests** cover:
-- Service + database interactions
-- API endpoint handlers
-- Multi-service workflows
-
-**E2E tests** cover (keep minimal):
-- Critical user journeys (donation flow, adoption submission)
-- Smoke tests post-deploy
+**Unit tests**: validation functions, business logic, data transformations, error conditions.
+**Integration tests**: service + database interactions, API endpoint handlers, multi-service workflows.
+**E2E tests**: critical user journeys (donation flow, adoption submission), smoke tests post-deploy.
 
 ---
 
@@ -46,11 +35,7 @@
 Coverage must **never decrease** with a merge to main.
 
 ```bash
-# Run coverage
 pytest --cov=src --cov-report=term-missing --cov-fail-under=80
-
-# HTML report for detailed analysis
-pytest --cov=src --cov-report=html && open htmlcov/index.html
 ```
 
 ---
@@ -88,7 +73,6 @@ def test_donation_amount_rounds_to_two_decimal_places() -> None:
 # ❌ Numbered, vague
 def test_email_1() -> None:
 def test_donation() -> None:
-def test_valid() -> None:
 ```
 
 ### AAA Pattern
@@ -107,28 +91,6 @@ def test_adoption_request_sets_animal_status_to_reserved() -> None:
     # Assert
     assert request.status == AdoptionRequestStatus.PENDING
     assert animal.status == AnimalStatus.RESERVED
-```
-
-### Fixture Discipline
-
-```python
-# conftest.py
-import pytest
-from typing import Generator
-from myapp.db import Database
-
-@pytest.fixture
-def db() -> Generator[Database, None, None]:
-    """Clean test database per test."""
-    database = Database(url=TEST_DATABASE_URL)
-    database.create_tables()
-    yield database
-    database.drop_all_tables()  # always clean up
-
-@pytest.fixture
-def sample_animal(db: Database) -> Animal:
-    """Minimal valid animal for tests that need an existing record."""
-    return db.animals.create(name="Buddy", status="available", species="dog")
 ```
 
 ### Mocking Rules
@@ -150,52 +112,6 @@ with patch("src.adoptions.validate_adopter") as mock_validate:
 
 ---
 
-## Integration Tests
-
-```python
-# tests/integration/test_adoption_flow.py
-import pytest
-from myapp.db import TestDatabase
-
-@pytest.mark.integration
-class TestAdoptionFlow:
-    """Integration tests — require real test database."""
-
-    def test_full_adoption_request_flow(self, db: TestDatabase) -> None:
-        animal = db.animals.create(name="Buddy", status="available")
-        adopter = db.adopters.create(email="adopter@example.com")
-
-        request = submit_adoption_request(adopter.id, animal.id)
-
-        assert request.status == "pending"
-        assert db.animals.get(animal.id).status == "reserved"
-        assert db.notifications.count() == 1  # notification was queued
-```
-
-Run integration tests separately:
-
-```bash
-pytest -m integration tests/integration/    # only integration
-pytest -m "not integration" tests/          # skip integration (fast CI)
-```
-
----
-
-## Async Tests
-
-```python
-import pytest
-
-@pytest.mark.asyncio
-async def test_send_donation_confirmation_async() -> None:
-    result = await send_confirmation_email_async(donor_id="uuid", amount=50.0)
-    assert result.status == "sent"
-```
-
-Install: `pip install pytest-asyncio` and configure `asyncio_mode = "auto"` in `pytest.ini`.
-
----
-
 ## Test Anti-Patterns
 
 ```python
@@ -210,8 +126,6 @@ def test_calls_validate_email():
     mock.assert_called_once()  # tests HOW, not WHAT
 
 # ❌ Shared mutable state between tests
-GLOBAL_DB = Database()  # mutated by one test, corrupts the next
-
 class TestAdoptions:
     animals = []  # shared — test order matters!
 
@@ -222,14 +136,6 @@ class TestAdoptions:
 @pytest.mark.skip  # Why? No reason given.
 def test_payment_processing():
     ...
-
-# ❌ Over-asserting — fragile when implementation changes
-def test_process_adoption():
-    result = process_adoption(...)
-    assert result.id is not None
-    assert result.created_at is not None
-    assert result.updated_at == result.created_at  # implementation detail
-    assert result._internal_state == "initialized"  # private field!
 ```
 
 ---

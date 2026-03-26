@@ -10,10 +10,13 @@
 
 ## Current Phase
 
-**Phase 0 — Foundation (active)**: Documentation, planning, and framework setup only. No application code exists. Tech stack decided (see Project Tech Stack section below). First ticket pending.
+**Phase 0 — Foundation**: Documentation, planning, framework setup. **COMPLETED.**
+**Phase 1 — Data Layer**: PostgreSQL schema, Alembic migrations, seed data. **COMPLETED** (RAP-001, RAP-002).
+**Phase 2 — API Scaffold**: FastAPI routes, auth, basic CRUD. **COMPLETED** (RAP-003 through RAP-010).
 
-**Phase 1 — Data Layer (next)**: PostgreSQL schema, Alembic migrations, seed data.
-**Phase 2 — API Scaffold (future)**: FastAPI routes, auth, basic CRUD.
+**Phase 3 — Feature Expansion (next)**: Medical records, volunteer management, notifications, frontend.
+
+**Current state**: 30 source files, 18 test files (95 tests passing), full CRUD APIs (animals, adopters, adoption requests, donors, donations), JWT auth with roles, animal photo gallery, Stripe donations, Docker containerization with auto-migrations. 4 Alembic migrations applied.
 
 ---
 
@@ -277,5 +280,5 @@ Good/bad examples that calibrate output quality — read when creating the corre
 
 ---
 
-*Last updated: 2026-03-25*
-*Version: 1.3.0*
+*Last updated: 2026-03-26*
+*Version: 1.4.0*

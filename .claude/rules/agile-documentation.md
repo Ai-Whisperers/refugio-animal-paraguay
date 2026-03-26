@@ -14,12 +14,6 @@ Epic        ← Strategic goal, 2+ sprints, contains multiple features
             └── Task    ← Implementation step, hours
 ```
 
-**Sizing guide**:
-- Epic: weeks/months, too big to estimate precisely
-- Feature: 1-2 week sprints, estimable
-- User Story: 1-5 story points, fits in a sprint
-- Task: 1-8 hours
-
 ---
 
 ## Epic Structure
@@ -45,28 +39,9 @@ Epic        ← Strategic goal, 2+ sprints, contains multiple features
 - [ ] [FEAT-2] Feature name — brief description
 - [ ] [FEAT-3] Feature name — brief description
 
-## Success Metrics
-- Metric 1: [measurable target]
-- Metric 2: [measurable target]
-
 ## Dependencies
 - Depends on: [system/team]
 - Blocks: [downstream work]
-
-## Status
-- [ ] Planning
-- [ ] In Progress
-- [ ] Complete
-```
-
-### Epic Examples for Refugio Animal Paraguay
-
-```
-[EPIC-1] Animal Adoption Platform
-[EPIC-2] Donor Management & EU Fundraising
-[EPIC-3] Shelter Operations Dashboard
-[EPIC-4] Volunteer Coordination
-[EPIC-5] Reporting & Analytics
 ```
 
 ---
@@ -115,7 +90,7 @@ The feature is complete when:
 
 ## Parent Epic
 ## Problem Statement
-What technical problem does this solve? What's the risk if we don't do it?
+What technical problem does this solve?
 
 ## Proposed Solution
 Technical approach at high level.
@@ -127,9 +102,7 @@ Technical approach at high level.
 ## Definition of Done
 - [ ] Implementation complete
 - [ ] Tests added/updated
-- [ ] Performance benchmarks met (if applicable)
 - [ ] No regressions
-- [ ] Runbook updated (if ops impact)
 ```
 
 ---
@@ -149,9 +122,6 @@ As a [role], I want [goal/action] so that [benefit/outcome].
 ## Story
 As a **[role]**, I want **[goal]** so that **[benefit]**.
 
-## Context
-Why does this story exist? What problem does it solve?
-
 ## Acceptance Criteria
 **Given** [initial context/state]
 **When** [user action or event]
@@ -166,10 +136,7 @@ Additional criteria:
 - [ ] Unit tests written and passing (80%+ coverage)
 - [ ] Integration test for happy path
 - [ ] Edge cases handled (empty state, errors)
-- [ ] UI responsive (if applicable)
-- [ ] Accessibility: WCAG 2.1 AA
 - [ ] Deployed to staging and verified
-- [ ] No regressions in related features
 
 ## Technical Notes (optional)
 Key technical considerations, API endpoints, data model changes.
@@ -189,9 +156,6 @@ Key technical considerations, API endpoints, data model changes.
 ❌ "As a developer, I want to refactor the auth module"
    — Developers are not the user. Use Technical Feature instead.
 
-❌ Story without acceptance criteria
-   — How will we know when it's done?
-
 ✅ GOOD: "As a volunteer, I want to register for a shift online
    so that I don't have to call the shelter."
    — Clear role, clear action, clear benefit.
@@ -201,8 +165,6 @@ Key technical considerations, API endpoints, data model changes.
 
 ## Story Splitting Patterns
 
-### Patterns for splitting
-
 **By workflow step**:
 ```
 Before: User can complete adoption process
@@ -211,24 +173,6 @@ After:
   US-2: Shelter reviews and approves request
   US-3: User receives approval notification
   US-4: User schedules pickup visit
-```
-
-**By data type/variation**:
-```
-Before: System supports international donors
-After:
-  US-1: System accepts EUR donations
-  US-2: System accepts USD donations
-  US-3: System handles currency conversion display
-```
-
-**By happy path + edge cases**:
-```
-Before: User can manage their animal's medical records
-After:
-  US-1: User can view animal's medical history [MVP]
-  US-2: User can add a new medical record
-  US-3: User can attach vet documents to records
 ```
 
 **By role/permission level**:
@@ -243,8 +187,6 @@ After:
 ---
 
 ## Project-Specific Roles
-
-For Refugio Animal Paraguay, story roles include:
 
 | Role | Description |
 |------|-------------|

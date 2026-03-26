@@ -18,24 +18,11 @@
 | **Format** | Consistent formatting | Prettier / Black |
 | **Security** | No secrets in code, no vulnerable deps | Bandit / npm audit / gitleaks |
 
-### Pre-Commit Validation Workflow
-
-```
-1. Make code changes
-2. Run validation: check each gate above
-3. Review ALL warnings and errors
-4. Fix all issues (see: When to suppress vs fix)
-5. Re-run validation — confirm clean
-6. Commit ONLY after clean pass
-```
-
-**Fast feedback** — validation should take <60 seconds. If slow, optimize.
-
 ---
 
 ## Diagnostic Message Standards
 
-Every error message, validation failure, and warning must follow the **WHAT + WHY + HOW** structure.
+Every error message must follow the **WHAT + WHY + HOW** structure.
 
 ### Structure
 
@@ -49,29 +36,15 @@ Every error message, validation failure, and warning must follow the **WHAT + WH
 
 ### Severity Levels
 
-**🔴 ERROR (Blocker)**
-- Prevents build, test, or deployment
-- Must fix before commit — no exceptions
-- Required fields: WHAT + WHY + HOW + WHERE + EXAMPLE
+| Level | When | Required fields |
+|-------|------|----------------|
+| **🔴 ERROR** | Prevents build/test/deploy | WHAT + WHY + HOW + WHERE |
+| **🟡 WARNING** | Violates standards, code still runs | WHAT + IMPACT + HOW + WHERE |
+| **🔵 INFO** | Helpful context, not a problem | WHAT + CONTEXT |
 
-**🟡 WARNING (Should fix)**
-- Code runs but violates standards
-- Must fix before commit (zero-tolerance)
-- Required fields: WHAT + IMPACT + HOW + WHERE
-
-**🔵 INFO (FYI)**
-- Helpful context, not a problem
-- Optional to act on
-- Required fields: WHAT + CONTEXT
-
-### Good vs Bad Diagnostic Examples
+### Example
 
 ```
-❌ BAD: "Error: validation failed"
-   - No WHAT: What validation? What failed?
-   - No WHY: Why is this an error?
-   - No HOW: What do I do?
-
 ✅ GOOD:
 🔴 ERROR: Donor email format invalid
    Why:   EU donor API requires RFC 5322 compliant emails — non-standard
@@ -80,76 +53,21 @@ Every error message, validation failure, and warning must follow the **WHAT + WH
            or use the existing validateDonorEmail() utility in src/utils/validation.ts
    Where: src/components/DonorForm.tsx:47
    Help:  /pre-commit-check to re-validate after fix
-```
 
-```
-❌ BAD: "Test failed"
-
-✅ GOOD:
-🔴 ERROR: Unit test failure — AdoptionService.submitRequest()
-   Why:   AdoptionService.submitRequest() throws when adopter has pending
-           applications — this would crash the adoption form for returning users.
-   Fix:   1. Open tests/adoption.test.ts:83
-           2. Check that the mock returns pendingCount: 0 by default
-           3. The test expects an error for valid input — update assertion
-   Where: tests/adoption.test.ts:83
+❌ BAD: "Error: validation failed"
+   (No WHAT, no WHY, no HOW)
 ```
 
 ---
 
-## Tool-Specific Validation Commands
+## Validation Commands (Python)
 
-### Python Projects
 ```bash
-# Full validation sequence
 ruff check .              # Linting (fast)
 mypy src/                 # Type checking
 black --check .           # Format check
 pytest --tb=short         # Tests
 bandit -r src/            # Security scan
-```
-
-### Node.js/TypeScript Projects
-```bash
-# Full validation sequence
-npm run lint              # ESLint
-npm run type-check        # TypeScript
-npm run format:check      # Prettier
-npm test                  # Jest/Vitest
-npm audit                 # Dependency security
-```
-
-### Common pre-commit script pattern (Python)
-```python
-#!/usr/bin/env python3
-"""Pre-commit validation script."""
-import subprocess
-import sys
-
-checks = [
-    (["ruff", "check", "."], "Linting"),
-    (["mypy", "src/"], "Type checking"),
-    (["black", "--check", "."], "Formatting"),
-    (["pytest", "--tb=short", "-q"], "Tests"),
-]
-
-failed = []
-for cmd, name in checks:
-    result = subprocess.run(cmd, capture_output=True, text=True)
-    if result.returncode != 0:
-        print(f"🔴 {name} FAILED:")
-        print(result.stdout)
-        print(result.stderr)
-        failed.append(name)
-    else:
-        print(f"✅ {name} passed")
-
-if failed:
-    print(f"\n❌ {len(failed)} check(s) failed: {', '.join(failed)}")
-    print("Fix all issues before committing.")
-    sys.exit(1)
-else:
-    print("\n✅ All checks passed — ready to commit")
 ```
 
 ---
@@ -159,14 +77,9 @@ else:
 - **Target**: 80% line coverage for new code
 - **Never decrease** overall coverage with a PR
 - **Critical paths** (payment, auth, data integrity): 95%+
-- Coverage reports must be reviewed in PR, not just passing/failing
 
 ```bash
-# Python
 pytest --cov=src --cov-report=term-missing --cov-fail-under=80
-
-# Node.js
-jest --coverage --coverageThreshold='{"global":{"lines":80}}'
 ```
 
 ---

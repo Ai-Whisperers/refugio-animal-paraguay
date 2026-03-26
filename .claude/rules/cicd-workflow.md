@@ -7,105 +7,29 @@
 
 ## 5-Stage Quality Gate Architecture
 
-Every pipeline must implement these stages in order:
-
 ```
-Stage 1: Build & Validate
-  ↓ (fails = block)
-Stage 2: Security Scan
-  ↓ (Critical/High = block)
-Stage 3: Test & Coverage
-  ↓ (below threshold = block)
-Stage 4: Package & Sign
-  ↓ (package errors = block)
-Stage 5: Deploy / Publish
+Stage 1: Build & Validate    → lint (zero warnings), type check, unit tests
+Stage 2: Security Scan       → dependency scan, secret detection, SAST
+Stage 3: Test & Coverage     → full test suite, coverage threshold enforcement
+Stage 4: Package & Sign      → versioned artifact, SBOM, build metadata
+Stage 5: Deploy / Publish    → deploy, smoke tests, health check
 ```
 
-### Stage 1: Build & Validate
+Each stage blocks the next on failure.
 
-```yaml
-# Purpose: Fail fast on code quality issues
-steps:
-  - install dependencies
-  - lint (zero warnings)
-  - type check (zero errors)
-  - compile/build
-  - run unit tests
-  - verify documentation completeness
-```
+### Fail Conditions by Stage
 
-**Fail conditions**:
-- Any lint warning
-- Any type error
-- Build failure
-- Any test failure
-
-### Stage 2: Security Scan
-
-```yaml
-# Purpose: Block vulnerable dependencies and secret exposure
-steps:
-  - dependency vulnerability scan (pip-audit / npm audit)
-  - secret detection (gitleaks / detect-secrets)
-  - SAST scan if applicable
-```
-
-**Fail conditions**:
-- Critical or High severity vulnerability
-- Any detected secret or credential
-- Known malicious package
-
-### Stage 3: Test & Coverage
-
-```yaml
-# Purpose: Enforce quality thresholds by branch
-steps:
-  - run full test suite
-  - generate coverage report
-  - enforce threshold:
-      main: 80%
-      develop: 75%
-      feature/*: 70%
-  - generate coverage artifact
-```
-
-**Fail conditions**:
-- Coverage below branch threshold
-- Any test failure
-- Flaky tests (>1 retry needed) — investigate, don't retry silently
-
-### Stage 4: Package & Sign
-
-```yaml
-# Purpose: Create versioned, traceable artifacts
-steps:
-  - determine version from tag or branch
-  - build package/container
-  - generate SBOM (Software Bill of Materials)
-  - sign artifact
-  - attach build metadata (git SHA, timestamp, pipeline ID)
-```
-
-### Stage 5: Deploy / Publish
-
-```yaml
-# Purpose: Automated deployment with gates
-steps:
-  - deploy to target environment
-  - run smoke tests
-  - verify deployment health
-  - update deployment record
-```
+| Stage | Blocks on |
+|-------|-----------|
+| 1: Build & Validate | Any lint warning, type error, test failure, build failure |
+| 2: Security Scan | Critical/High vulnerability, any detected secret |
+| 3: Test & Coverage | Below branch threshold, any test failure, flaky tests |
+| 4: Package & Sign | Package errors, signing failure |
+| 5: Deploy | Failed smoke tests, health check failure |
 
 ---
 
 ## Tag-Based Versioning
-
-### Tag Format
-
-```
-[type]-[version][-suffix]
-```
 
 ### Tag Types
 
@@ -117,20 +41,13 @@ steps:
 | `coverage-*` | Coverage analysis only | Runs stages 1-3 only |
 | `security-*` | Security audit only | Runs stages 1-2 only |
 
-### Versioning Strategy
-
-Follow Semantic Versioning (`MAJOR.MINOR.PATCH`):
+### Semantic Versioning
 
 ```
-MAJOR: Breaking change (API change, database migration requiring downtime)
+MAJOR: Breaking change (API change, migration requiring downtime)
 MINOR: New feature (backwards compatible)
 PATCH: Bug fix (backwards compatible)
 ```
-
-**Pre-release suffixes**:
-- `-alpha.N` — Unstable, internal testing
-- `-beta.N` — Feature complete, wider testing
-- `-rc.N` — Release candidate, final validation
 
 ---
 
@@ -146,43 +63,7 @@ PATCH: Bug fix (backwards compatible)
 
 ---
 
-## Local Validation Before Push
-
-```bash
-#!/usr/bin/env bash
-# scripts/validate-local.sh
-set -e
-
-echo "=== Stage 1: Build & Validate ==="
-npm run lint           # or: ruff check .
-npm run type-check     # or: mypy src/
-npm run build          # or: python -m py_compile ...
-
-echo "=== Stage 2: Security ==="
-npm audit              # or: pip-audit
-# gitleaks detect --source=.
-
-echo "=== Stage 3: Tests ==="
-npm test -- --coverage
-
-echo "✅ All local checks passed — safe to push"
-```
-
----
-
 ## Environment Configuration
-
-### Environment Variables (never hardcoded)
-
-```yaml
-# .env.example (committed — no real values)
-DATABASE_URL=postgresql://user:password@localhost:5432/refugio_dev
-PAYMENT_API_KEY=your_payment_api_key_here
-EMAIL_SERVICE_KEY=your_email_key_here
-
-# .env (never committed — real values)
-# Listed in .gitignore
-```
 
 ### Environment Tiers
 
@@ -192,59 +73,18 @@ EMAIL_SERVICE_KEY=your_email_key_here
 | `staging` | Integration testing | Anonymized copy | develop merge |
 | `production` | Live users | Real | release tag |
 
-**Rule**: Never use production credentials in staging or development.
+**Rule**: Never use production credentials in staging or development. All secrets in env vars — never in YAML or code.
 
 ---
 
-## Pipeline Configuration Standards
-
-### YAML Pipeline Quality
-
-```yaml
-# ✅ GOOD — Explicit, descriptive step names
-- name: "Run unit tests with coverage"
-  run: pytest --cov=src --cov-fail-under=80
-
-# ❌ BAD — Opaque
-- run: pytest
-```
-
-```yaml
-# ✅ GOOD — Fail on warning, not just error
-- name: "Lint with zero-warning policy"
-  run: |
-    ruff check . --exit-non-zero-on-fix
-    exit_code=$?
-    if [ $exit_code -ne 0 ]; then
-      echo "🔴 Linting failed — fix all warnings before merging"
-      exit 1
-    fi
-```
-
-### Required Pipeline Outputs
+## Required Pipeline Outputs
 
 Every pipeline run must produce:
-- Build log (always)
+- Build log
 - Test results (JUnit XML or equivalent)
 - Coverage report (HTML + summary)
 - Security scan report
 - SBOM (for release builds)
-
----
-
-## Deployment Rollback
-
-Every deployment must have a defined rollback path:
-
-```bash
-# Rollback procedure (document in runbook):
-1. Identify previous stable version tag
-2. Re-deploy previous version:
-   git tag rollback-[date] [previous-stable-sha]
-   git push origin rollback-[date]
-3. Verify health checks pass
-4. Create incident ticket to investigate root cause
-```
 
 ---
 
@@ -257,7 +97,6 @@ Pipeline setup:
 - [ ] Coverage threshold enforced per branch (Stage 3)
 - [ ] No secrets in pipeline YAML or logs
 - [ ] Tag-based versioning configured
-- [ ] Local validation script matches CI stages
 
 Before tagging a release:
 - [ ] All tests pass on release branch

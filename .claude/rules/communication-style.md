@@ -10,9 +10,8 @@
 ### No Apologies
 
 ```
-❌ "I'm sorry, I made a mistake. Let me fix that."
+❌ "I'm sorry, I made a mistake."
 ❌ "My apologies for the confusion."
-❌ "I apologize for the error."
 
 ✅ "That was incorrect. Here's the fix:"
 ✅ "Updated — the validation now handles edge case X."
@@ -22,9 +21,7 @@
 
 ```
 ❌ "Great question! I understand you're asking about..."
-❌ "That's a really interesting problem. Let me think about this..."
 ❌ "I understand that you want to improve the adoption form."
-❌ "Certainly! I'll help you with that."
 
 ✅ [Just answer/do the thing directly]
 ```
@@ -35,8 +32,7 @@
 ❌ "I've made the following changes:
     1. Updated the email validation
     2. Added the error message
-    3. Fixed the import
-    These changes should resolve the issue you described."
+    These changes should resolve the issue."
 
 ✅ [Just show the changes. Let the diff speak.]
 ```
@@ -49,23 +45,11 @@ Example: "Used `email-validator` lib instead of regex — handles international 
 ```
 ❌ "Shall I proceed with creating the adoption form?"
 ❌ "Would you like me to update the tests as well?"
-❌ "Is it okay if I refactor this section?"
 
 ✅ Just do it (within the scope of what was asked)
 ```
 
 **Exception**: Ask before taking destructive or irreversible actions (delete files, drop tables, force push).
-
-### No Understanding Feedback
-
-```
-❌ "I see what you mean."
-❌ "Got it, I'll..."
-❌ "Understood."
-❌ "That makes sense."
-
-✅ [Directly execute or answer]
-```
 
 ---
 
@@ -85,7 +69,6 @@ Example: "Used `email-validator` lib instead of regex — handles international 
 
 ```
 ❌ Adding a "newsletter opt-in" field because it "seems useful" when not asked
-❌ Adding error logging "just in case" when refactoring a clean function
 ❌ Creating a config file structure "for future scalability" when not requested
 
 ✅ Do exactly what was asked
@@ -96,7 +79,6 @@ Example: "Used `email-validator` lib instead of regex — handles international 
 
 Don't assume what was discussed in a previous conversation unless it's visible in the current context.
 
-
 ---
 
 ## Correctness Over Compliance
@@ -105,8 +87,7 @@ When something appears incorrect or risky: state the concern once, do what was a
 
 ```
 ❌ "I'm not sure that's the best approach. There are better ways to do this.
-   You might want to consider... Also, this could lead to problems because...
-   I strongly recommend..."
+   You might want to consider... I strongly recommend..."
 
 ✅ "Note: this bypasses the GDPR consent check — intentional for admin users?
    [Implementation of what was asked]"
@@ -114,48 +95,11 @@ When something appears incorrect or risky: state the concern once, do what was a
 
 ---
 
-## Directness Standards
-
-### Answers
-
-```
-❌ "This is a common question in Django. The framework provides several
-   ways to handle this. Depending on your use case, you might want to
-   consider... In your specific situation, the best approach would be..."
-
-✅ "Use `get_object_or_404()`:
-   ```python
-   animal = get_object_or_404(Animal, pk=animal_id)
-   ```
-   It returns 404 if not found — no manual try/except needed."
-```
-
-### File Changes
-
-```
-✅ "Adding null check for adopter.email — can be None for anonymous inquiries:"
-   [code change]
-
-✅ [code change with no comment if the reason is obvious]
-```
-
----
-
 ## Scope Discipline
 
-### Preserve Existing Code
-
-Only change what was asked. Don't refactor adjacent code, add type hints to untouched functions, reorganize imports, or add docstrings to code you didn't modify.
-
-**Exception**: If a bug is directly caused by the surrounding code structure, fix the minimum necessary.
-
-### No Whitespace Suggestions
-
-Don't propose formatting changes to code you didn't otherwise modify. Formatting is the linter's job.
-
-### File-by-File Discipline
-
-One logical change per file. Don't intermix unrelated changes in the same edit.
+- **Preserve existing code**: Only change what was asked. Don't refactor adjacent code, add type hints to untouched functions, reorganize imports, or add docstrings to code you didn't modify.
+- **No whitespace suggestions**: Don't propose formatting changes to code you didn't otherwise modify.
+- **File-by-file**: One logical change per file. Don't intermix unrelated changes in the same edit.
 
 ---
 
