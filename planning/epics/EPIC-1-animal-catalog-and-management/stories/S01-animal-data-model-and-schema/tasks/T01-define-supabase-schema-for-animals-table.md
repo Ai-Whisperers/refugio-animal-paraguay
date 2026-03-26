@@ -1,134 +1,86 @@
 ---
-task: T01
-story: S01
 epic: EPIC-1
-title: Define Supabase schema for animals table
-status: ready
+story: S01
+task: T01
+title: Define SQLAlchemy Animal Model and Alembic Migration
+status: pending
+effort_hours: 3
 priority: high
-agent_type: code
-created: 2026-03-25T17:13:26.725560
-claimed_by: null
-claimed_at: null
-branch: null
-pr_url: null
+dependencies: []
 ---
 
-# T01: Define Supabase schema for animals table
+## Overview
 
-## Description
+Define the Animal SQLAlchemy model in the backend source code and create the corresponding Alembic migration that produces the animals table in PostgreSQL. This task establishes the canonical data structure for all animal records in the system. Every subsequent feature — the catalog API, adoption workflow, photo management, and veterinary records — depends on this model being complete and correct before any other data work begins.
 
-Write the SQL migration that creates the `animals` table in Supabase with all required columns, constraints, indexes, and Row Level Security policies. This is the foundational schema that every other EPIC-1 story depends on.
+## Why This Matters
+
+The Animal model is the central entity in the entire platform. Its column definitions, enum constraints, and relationships determine how animal data flows through every layer of the application. Defining the model correctly now prevents costly migration churn later. The enum types for status, species, and gender must be defined as both Python enums (for type safety in business logic) and as PostgreSQL enum types (for database-level constraint enforcement). The indexes defined here directly affect query performance on the public catalog endpoint, which is the most frequently accessed route in the entire system.
 
 ## Context
 
-- Architecture reference: `docs/ARCHITECTURE.md` — Supabase Schema section
-- Migration location: `supabase/migrations/`
-- Supabase project: configured via `NEXT_PUBLIC_SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` in `.env.local`
-- Run migrations with: `supabase db push` (local) or via Supabase dashboard (remote)
+The project uses SQLAlchemy 2.x with the declarative base pattern and Pydantic v2 for request and response schemas. Access control is enforced entirely at the FastAPI layer using JWT dependencies — there are no PostgreSQL Row Level Security policies in this system. Staff and admin roles are determined from JWT token claims and enforced by FastAPI dependency injection before any SQLAlchemy query executes. Alembic manages all schema changes. No table is ever created or modified directly against the database. Every schema change must have a corresponding Alembic migration file that can be applied with alembic upgrade head and rolled back cleanly with alembic downgrade.
 
-## Schema to implement
+## Implementation Steps
 
-```sql
--- Enable UUID extension (if not already enabled)
-create extension if not exists "uuid-ossp";
+### Step 1: Define Python Enums for Animal Attributes
 
-create table public.animals (
-  id              uuid primary key default uuid_generate_v4(),
-  name            text not null,
-  species         text not null check (species in ('dog', 'cat', 'rabbit', 'bird', 'other')),
-  breed           text,
-  age_years       integer check (age_years >= 0),
-  age_months      integer check (age_months >= 0 and age_months < 12),
-  gender          text not null check (gender in ('male', 'female', 'unknown')),
-  size            text check (size in ('small', 'medium', 'large', 'extra_large')),
-  color           text,
-  description     text,
-  status          text not null default 'available'
-                    check (status in ('available', 'pending', 'adopted', 'foster', 'medical_hold', 'deceased')),
-  intake_date     date not null default current_date,
-  intake_type     text check (intake_type in ('stray', 'surrender', 'transfer', 'born_in_shelter')),
-  microchip_id    text unique,
-  is_vaccinated   boolean not null default false,
-  is_sterilized   boolean not null default false,
-  is_microchipped boolean not null default false,
-  special_needs   text,
-  good_with_kids  boolean,
-  good_with_dogs  boolean,
-  good_with_cats  boolean,
-  energy_level    text check (energy_level in ('low', 'medium', 'high')),
-  shelter_id      uuid references public.shelters(id) on delete restrict,
-  created_at      timestamptz not null default now(),
-  updated_at      timestamptz not null default now()
-);
+In src/models/animal.py, define three Python enums using the standard library enum module. The AnimalStatus enum covers the lifecycle states an animal can be in: available (ready for adoption inquiry), reserved (an adoption application is under review), adopted (adoption completed), medical_hold (receiving veterinary treatment and not currently available for adoption), and deceased. The AnimalSpecies enum covers the main species the shelter handles: dog, cat, rabbit, bird, and other. The AnimalGender enum has values male and female.
 
--- Auto-update updated_at
-create or replace function public.handle_updated_at()
-returns trigger language plpgsql as $$
-begin
-  new.updated_at = now();
-  return new;
-end;
-$$;
+Each enum class should inherit from both str and Enum so that values serialize naturally as strings in JSON responses without requiring custom serializers. This inheritance pattern integrates cleanly with Pydantic v2 schemas and avoids the need for explicit json_encoders configuration.
 
-create trigger animals_updated_at
-  before update on public.animals
-  for each row execute procedure public.handle_updated_at();
+### Step 2: Define the Animal SQLAlchemy Model
 
--- Indexes for common query patterns
-create index animals_status_idx on public.animals(status);
-create index animals_species_idx on public.animals(species);
-create index animals_shelter_id_idx on public.animals(shelter_id);
-create index animals_intake_date_idx on public.animals(intake_date desc);
+In the same file src/models/animal.py, define the Animal class inheriting from the SQLAlchemy declarative Base imported from src/database.py. The table name is animals.
 
--- Row Level Security
-alter table public.animals enable row level security;
+The primary key is an integer column named id with autoincrement set to True. Using an integer primary key rather than a UUID simplifies join queries, improves index performance, and makes API URLs more readable.
 
--- Public read for available animals (adoption catalog is public)
-create policy "Anyone can view available animals"
-  on public.animals for select
-  using (status = 'available');
+The remaining columns are as follows. The name column is a String type, non-nullable, and holds the animal's given name at the shelter. The species column is a SQLAlchemy Enum type constructed from the AnimalSpecies Python enum, non-nullable. The breed column is a String type, nullable, for the specific breed within the species — many rescued animals have unknown breed. The gender column is a SQLAlchemy Enum type constructed from AnimalGender, non-nullable. The approximate_age_months column is an Integer type, nullable, because age is often unknown for rescued animals. The weight_kg column is a Numeric type with precision 5 and scale 2, nullable. The status column is a SQLAlchemy Enum type constructed from AnimalStatus, non-nullable, with a server_default set to the string value of AnimalStatus.available so new records are available without requiring explicit assignment. The description column is a Text type, nullable, for the freeform prose description shown on the public catalog. The is_featured column is a Boolean type, non-nullable, defaulting to False, used to highlight specific animals on the homepage. The is_vaccinated column is a Boolean type, nullable. The is_neutered column is a Boolean type, nullable. The microchip_number column is a String of length 50, nullable, with a unique constraint. The intake_date column is a Date type, non-nullable, recording the date the animal arrived at the shelter. The shelter_id column is an Integer type referencing shelters.id as a foreign key, non-nullable. The created_at column is a DateTime type with timezone set to True, non-nullable, with server_default set to func.now(). The updated_at column is a DateTime type with timezone set to True, nullable, with onupdate set to func.now() so SQLAlchemy automatically refreshes this column on every UPDATE statement.
 
--- Staff can read all animals
-create policy "Staff can view all animals"
-  on public.animals for select
-  using (auth.jwt() ->> 'role' in ('staff', 'admin'));
+Define a SQLAlchemy relationship from Animal to Shelter using the relationship() function with the attribute named shelter. Define the corresponding back-reference on Shelter so that accessing shelter.animals returns the list of Animal records associated with that shelter.
 
--- Staff can insert
-create policy "Staff can insert animals"
-  on public.animals for insert
-  with check (auth.jwt() ->> 'role' in ('staff', 'admin'));
+### Step 3: Define PostgreSQL Indexes
 
--- Staff can update
-create policy "Staff can update animals"
-  on public.animals for update
-  using (auth.jwt() ->> 'role' in ('staff', 'admin'));
+Indexes on the animals table are defined inside the __table_args__ tuple on the Animal model class using SQLAlchemy's Index constructor. Define four indexes: one on the status column, because the public catalog API filters by status available on nearly every request; one on the species column, because species filtering is the second most common query parameter; one on shelter_id, because shelter-scoped queries need this for efficient JOIN execution; and one on intake_date, because the admin dashboard sorts and filters by intake date for monthly reporting. Name each index descriptively using the pattern ix_animals followed by the column name.
 
--- Only admin can delete (soft delete preferred via status)
-create policy "Admin can delete animals"
-  on public.animals for delete
-  using (auth.jwt() ->> 'role' = 'admin');
-```
+### Step 4: Define Pydantic v2 Schemas
+
+In src/schemas/animal.py, define three Pydantic v2 model classes. AnimalBase contains all fields that appear in both creation requests and responses: name, species, breed, gender, approximate_age_months, weight_kg, status, description, is_featured, is_vaccinated, is_neutered, microchip_number, intake_date, and shelter_id. AnimalCreate inherits from AnimalBase and adds no additional fields — it represents the request body for POST /animals. AnimalResponse inherits from AnimalBase and adds id, created_at, and updated_at. All three classes configure model_config equal to ConfigDict(from_attributes=True) so that Pydantic can construct response instances directly from SQLAlchemy ORM objects returned by session queries.
+
+### Step 5: Create the Alembic Migration
+
+Generate the initial migration for the animals table by running alembic revision with the --autogenerate flag after the Animal model is defined and the model file is imported in the Alembic env.py. Alembic reads the model definition, compares it against the current database state, and generates a migration file in alembic/versions/.
+
+Review the generated migration file before applying it. Confirm that the upgrade function creates the PostgreSQL enum types first, then creates the animals table with all columns and constraints, then creates all four indexes in the correct order. Confirm that the downgrade function drops the indexes, drops the table, and drops the enum types in reverse order.
+
+Apply the migration with alembic upgrade head and verify the table was created correctly.
+
+### Step 6: Enforce Access Control via FastAPI Dependencies
+
+Access to animal data is controlled at the FastAPI route layer. The GET /animals and GET /animals/{id} routes are public and require no authentication. The POST /animals, PATCH /animals/{id}, and DELETE /animals/{id} routes require a valid JWT token with a staff or admin role claim.
+
+Access control is implemented as a FastAPI dependency function in src/dependencies/auth.py. The dependency reads the Authorization header, decodes the JWT token using the python-jose library, extracts the role claim, and raises HTTPException with status code 403 if the role does not have permission for the requested operation. Route handlers receive the current user object via Depends() and never read the Authorization header directly. There are no PostgreSQL RLS policies anywhere in this system — all access control logic lives in FastAPI dependencies.
 
 ## Acceptance Criteria
 
-- [ ] Migration file created at `supabase/migrations/YYYYMMDDHHMMSS_create_animals_table.sql`
-- [ ] All columns defined with correct types and constraints
-- [ ] `updated_at` trigger implemented and working
-- [ ] All 4 indexes created
-- [ ] RLS enabled with 5 policies (public read available, staff read all, staff insert, staff update, admin delete)
-- [ ] Migration applies cleanly via `supabase db push` with no errors
-- [ ] `supabase db diff` shows no unexpected drift after applying
+- The Animal class is defined in src/models/animal.py using SQLAlchemy 2.x declarative syntax with all columns, enum types, indexes, and the shelter relationship
+- AnimalStatus, AnimalSpecies, and AnimalGender are Python enums that inherit from both str and Enum
+- The Alembic migration file applies cleanly with alembic upgrade head and rolls back cleanly with alembic downgrade
+- The animals table exists in PostgreSQL after migration with all columns, constraints, enum types, and indexes present
+- Pydantic v2 schemas AnimalBase, AnimalCreate, and AnimalResponse are defined in src/schemas/animal.py with ConfigDict(from_attributes=True)
+- The FastAPI auth dependency enforces staff and admin role requirement on all write endpoints
+- No RLS policies exist in the database — all access control is enforced in the FastAPI dependency layer
 
-## Implementation Notes
+## Common Issues and Solutions
 
-- Do NOT use Prisma — all schema changes go through Supabase SQL migrations
-- Migration filename must be timestamped: `supabase db migrate new create_animals_table` generates the file
-- The `shelters` table may not exist yet — handle with a conditional or create a minimal shelters table in the same migration
-- `species` enum uses a check constraint (not a PostgreSQL ENUM type) to allow easier future expansion without `ALTER TYPE`
-- `status` field uses soft deletes — prefer updating status to 'deceased' over hard DELETE
+If Alembic does not detect the Animal model during autogenerate, the model file is not being imported when Alembic loads the metadata. The fix is to import the Animal model in alembic/env.py before target_metadata is assigned, so SQLAlchemy registers the table in the metadata object that Alembic inspects.
 
-## Related
+If the PostgreSQL enum types already exist from a previous failed migration attempt, the upgrade function will fail with a type already exists error. Add conditional checks to the CREATE TYPE statements, or drop the orphaned types manually before re-running the migration.
 
-- EPIC-1 / S01 — Animal data model and schema
-- Blocked by: none
-- Blocks: T02 (migrations), S02 (CRUD operations), S03 (adoption request), S04 (photo upload — needs animal record to exist)
+If onupdate on updated_at does not fire, verify that the SQLAlchemy session calls session.commit() after updates rather than only session.flush(). The onupdate hook fires during SQL UPDATE generation, which only happens at flush or commit time.
+
+## Related Tasks
+
+- S01/T02: Configure Alembic migration workflow and database management commands — the tooling that applies and manages this migration
+- S01/T03: Implement seed data for testing — test animals that populate the animals table created here
+- S03/T01: Veterinary records model — defines a foreign key relationship pointing to the animals.id column defined here

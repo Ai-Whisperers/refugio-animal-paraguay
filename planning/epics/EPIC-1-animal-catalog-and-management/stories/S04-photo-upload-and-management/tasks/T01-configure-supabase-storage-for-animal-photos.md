@@ -1,220 +1,80 @@
 ---
-task: T01
-story: S04
 epic: EPIC-1
-title: Configure Supabase Storage for animal photos
-status: ready
+story: S04
+task: T01
+title: Create animal_photos Table and SQLAlchemy Model
+status: pending
+effort_hours: 3
 priority: high
-agent_type: devops
-created: 2026-03-25T17:13:26.726769
-claimed_by: null
-claimed_at: null
-branch: null
-pr_url: null
+dependencies:
+  - S01/T01-define-supabase-schema-for-animals-table
 ---
 
-# T01: Configure Supabase Storage for animal photos
+## Overview
 
-## Description
+Create the animal_photos database table via an Alembic migration, define the corresponding SQLAlchemy model, and configure the photos relationship on the Animal model. This task establishes the data layer that all photo operations — uploading, listing, deleting, and designating a primary photo — will read from and write to. It is the prerequisite for every other photo-related task in this story and for the photo gallery endpoint in S03/T03.
 
-Set up Supabase Storage buckets for animal photo management. This replaces any Cloudinary integration — all media storage goes through Supabase Storage. Configure buckets, access policies, and the service layer that the upload component (T02) will use.
+## Why This Matters
+
+The initial animal data model stored photo information as a single URL column on the animals table. That approach cannot represent multiple photos per animal, cannot track upload order, and cannot designate a primary photo independently from gallery photos. The animal_photos table solves all three by giving each photo its own row, with a foreign key to the animal it belongs to, a flag indicating whether it is the primary photo, and a timestamp that establishes the canonical display order for gallery photos.
+
+Decoupling photos from the animals row also means that photo uploads and deletions do not touch the animals table at all, which avoids unnecessary row locking on the most heavily-read table in the database during photo management operations.
 
 ## Context
 
-- Architecture reference: `docs/ARCHITECTURE.md` — Storage Buckets section
-- Do NOT use Cloudinary, S3, or any third-party CDN — Supabase Storage only
-- Public bucket for serving animal photos to unauthenticated visitors (adoption catalog)
-- Supabase Storage uses the same RLS policy system as the database
+The animal_photos table is referenced by the S03/T01 detail endpoint (which joins photos into the animal detail response), by the S03/T03 photo gallery endpoint (which queries photos independently), and by the S04/T02 upload endpoint (which inserts new rows). All three of those tasks depend on this migration being applied before they can be tested with real data.
 
-## Bucket structure to implement
+The AnimalPhoto SQLAlchemy model lives in src/models/animal_photo.py and follows the same pattern as the Animal model: it uses the declarative base from src/database/base.py and declares all columns with explicit types. The photos relationship on the Animal model uses a lazy loading configuration of selectin by default, so that any query that loads an Animal instance will automatically include its photos list without requiring a second query when the photos attribute is accessed.
 
-```
-animals-photos/           ← Public bucket (adoption catalog photos)
-  {animal_id}/
-    primary.webp          ← Main photo (required)
-    gallery/
-      {uuid}.webp         ← Additional photos
-      {uuid}.webp
+## Implementation Steps
 
-adoption-documents/       ← Private bucket (adoption paperwork)
-  {adoption_id}/
-    application.pdf
-    id_copy.pdf
+### Step 1: Create the Alembic Migration
 
-medical-documents/        ← Private bucket (vet records)
-  {animal_id}/
-    {date}-{type}.pdf
-```
+In the alembic/versions directory, create a new migration file with a descriptive name such as create_animal_photos_table. The migration's upgrade function creates a table named animal_photos with the following columns: an id column as a serial integer primary key, an animal_id column as an integer with a foreign key constraint referencing the animals table's id column and a cascade delete rule so that deleting an animal automatically deletes all its photos, a url column as a non-nullable text string containing the path or fully qualified URL to the photo file, an is_primary column as a non-nullable boolean defaulting to false, and a created_at column as a timestamp with timezone defaulting to the current time at the database server.
 
-## SQL migration to create buckets and policies
+The migration also creates a partial unique index on the pair of animal_id and is_primary where is_primary is true. This index enforces the constraint that at most one photo per animal can have is_primary set to true at the database level. Without this constraint, a bug in the application layer could silently create multiple primary photos for the same animal, causing non-deterministic ordering in the detail response. The migration's downgrade function drops the index first and then drops the table.
 
-Create `supabase/migrations/YYYYMMDDHHMMSS_create_storage_buckets.sql`:
+After writing the migration file, run it against the development database and confirm that the animal_photos table appears with the expected columns and constraints.
 
-```sql
--- Create storage buckets
-insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
-values
-  ('animals-photos', 'animals-photos', true, 5242880,  -- 5MB limit
-   array['image/jpeg', 'image/png', 'image/webp']),
+### Step 2: Define the AnimalPhoto SQLAlchemy Model
 
-  ('adoption-documents', 'adoption-documents', false, 10485760,  -- 10MB limit
-   array['application/pdf', 'image/jpeg', 'image/png']),
+In src/models/animal_photo.py, define a SQLAlchemy declarative model class named AnimalPhoto that maps to the animal_photos table. The class declares the same columns as the migration: id as an integer primary key with autoincrement, animal_id as an integer foreign key to animals.id with ondelete set to CASCADE, url as a non-nullable string, is_primary as a non-nullable boolean with a server default of false, and created_at as a DateTime with timezone and a server default of the current timestamp.
 
-  ('medical-documents', 'medical-documents', false, 10485760,  -- 10MB limit
-   array['application/pdf', 'image/jpeg', 'image/png'])
-on conflict (id) do nothing;
+The model does not need any methods beyond what SQLAlchemy provides. It does not need a relationship back to the Animal model — the relationship is defined on Animal, not on AnimalPhoto, to keep the photo model simple and avoid circular import issues.
 
--- animals-photos: public read (anyone can view adoption catalog photos)
-create policy "Public read for animal photos"
-  on storage.objects for select
-  using (bucket_id = 'animals-photos');
+### Step 3: Add the Photos Relationship to the Animal Model
 
--- animals-photos: staff can upload/update
-create policy "Staff can upload animal photos"
-  on storage.objects for insert
-  with check (
-    bucket_id = 'animals-photos'
-    and auth.jwt() ->> 'role' in ('staff', 'admin')
-  );
+In src/models/animal.py, import AnimalPhoto and add a photos relationship attribute to the Animal class. The relationship targets the AnimalPhoto model and uses the back_populates parameter to name the reverse attribute on AnimalPhoto as animal, though that reverse attribute is not used in practice. The relationship uses lazy set to selectin so that loading any Animal instance will issue a second SELECT to fetch all its photos immediately, making them available on the instance without requiring a subsequent query. The order_by parameter specifies that photos should be ordered by is_primary descending first and then by created_at ascending, so that when any code accesses animal.photos, the primary photo is always the first element in the list.
 
-create policy "Staff can update animal photos"
-  on storage.objects for update
-  using (
-    bucket_id = 'animals-photos'
-    and auth.jwt() ->> 'role' in ('staff', 'admin')
-  );
+This ordering on the relationship definition ensures that the ordering is applied consistently by every piece of code that accesses photos through the relationship, without requiring each caller to specify the order independently.
 
-create policy "Staff can delete animal photos"
-  on storage.objects for delete
-  using (
-    bucket_id = 'animals-photos'
-    and auth.jwt() ->> 'role' in ('staff', 'admin')
-  );
+### Step 4: Write Unit Tests for the Model
 
--- adoption-documents: staff read all, adopter reads own
-create policy "Staff can access adoption documents"
-  on storage.objects for select
-  using (
-    bucket_id = 'adoption-documents'
-    and auth.jwt() ->> 'role' in ('staff', 'admin')
-  );
+In tests/unit/test_models.py, add a unit test that constructs an Animal instance and two AnimalPhoto instances manually (without a database session) and verifies that the relationship attribute is accessible. This test does not require a database connection — it only checks that the relationship is defined correctly as a Python attribute on the Animal class and that AnimalPhoto instances can be appended to it.
 
-create policy "Staff can upload adoption documents"
-  on storage.objects for insert
-  with check (
-    bucket_id = 'adoption-documents'
-    and auth.jwt() ->> 'role' in ('staff', 'admin')
-  );
-
--- medical-documents: staff only
-create policy "Staff can access medical documents"
-  on storage.objects for select
-  using (
-    bucket_id = 'medical-documents'
-    and auth.jwt() ->> 'role' in ('staff', 'admin', 'vet')
-  );
-
-create policy "Staff can upload medical documents"
-  on storage.objects for insert
-  with check (
-    bucket_id = 'medical-documents'
-    and auth.jwt() ->> 'role' in ('staff', 'admin', 'vet')
-  );
-```
-
-## StorageService implementation
-
-Create `src/services/storage-service.ts`:
-
-```typescript
-import { createServerClient } from '@/lib/supabase/server'
-import { BaseService, ServiceResult } from './base-service'
-
-const ANIMAL_PHOTOS_BUCKET = 'animals-photos'
-const MAX_PHOTO_SIZE_MB = 5
-const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp']
-
-export interface UploadPhotoResult {
-  path: string
-  publicUrl: string
-}
-
-export class StorageService extends BaseService {
-  async uploadAnimalPhoto(
-    animalId: string,
-    file: File,
-    slot: 'primary' | 'gallery'
-  ): Promise<ServiceResult<UploadPhotoResult>> {
-    return this.handleError(async () => {
-      // Validate file type and size
-      if (!ALLOWED_TYPES.includes(file.type)) {
-        throw new Error(`File type not allowed. Use: ${ALLOWED_TYPES.join(', ')}`)
-      }
-      if (file.size > MAX_PHOTO_SIZE_MB * 1024 * 1024) {
-        throw new Error(`File exceeds ${MAX_PHOTO_SIZE_MB}MB limit`)
-      }
-
-      const ext = file.name.split('.').pop() ?? 'jpg'
-      const path =
-        slot === 'primary'
-          ? `${animalId}/primary.${ext}`
-          : `${animalId}/gallery/${crypto.randomUUID()}.${ext}`
-
-      const { data, error } = await this.supabase.storage
-        .from(ANIMAL_PHOTOS_BUCKET)
-        .upload(path, file, { upsert: slot === 'primary' })
-
-      if (error) throw error
-
-      const { data: urlData } = this.supabase.storage
-        .from(ANIMAL_PHOTOS_BUCKET)
-        .getPublicUrl(data.path)
-
-      return { path: data.path, publicUrl: urlData.publicUrl }
-    }, 'Failed to upload animal photo')
-  }
-
-  async deleteAnimalPhoto(path: string): Promise<ServiceResult<void>> {
-    return this.handleError(async () => {
-      const { error } = await this.supabase.storage
-        .from(ANIMAL_PHOTOS_BUCKET)
-        .remove([path])
-      if (error) throw error
-    }, 'Failed to delete animal photo')
-  }
-
-  getPublicUrl(path: string): string {
-    const { data } = this.supabase.storage
-      .from(ANIMAL_PHOTOS_BUCKET)
-      .getPublicUrl(path)
-    return data.publicUrl
-  }
-}
-```
+In tests/integration/test_animal_photos_table.py, add an integration test that uses the test database session to create an animal, insert two photo rows with different is_primary values, and verify that querying the animal with the photos relationship loaded returns both photos with the primary photo appearing first. A second integration test verifies that deleting the animal cascades to delete its photo rows.
 
 ## Acceptance Criteria
 
-- [ ] Migration file creates all 3 buckets with correct `public`, size limit, and mime type settings
-- [ ] RLS policies applied: `animals-photos` public read, staff write; `adoption-documents` staff only; `medical-documents` staff+vet only
-- [ ] `src/services/storage-service.ts` created extending `BaseService`
-- [ ] `StorageService.uploadAnimalPhoto()` validates file type and size before upload
-- [ ] `StorageService.uploadAnimalPhoto()` returns `ServiceResult<UploadPhotoResult>` (never throws)
-- [ ] `StorageService.deleteAnimalPhoto()` implemented
-- [ ] `StorageService.getPublicUrl()` implemented as a synchronous helper
-- [ ] Migration applies cleanly via `supabase db push`
-- [ ] Storage bucket visible in local Supabase Studio at http://localhost:54323
+- The Alembic migration applies cleanly without errors in both upgrade and downgrade directions
+- The animal_photos table exists with columns id, animal_id, url, is_primary, and created_at
+- The partial unique index on animal_id where is_primary is true exists and prevents inserting a second primary photo for the same animal
+- The AnimalPhoto SQLAlchemy model maps to the animal_photos table and all columns are correctly typed
+- The Animal model has a photos relationship that returns photos ordered by is_primary descending and created_at ascending
+- The cascade delete rule causes animal photo rows to be deleted when the parent animal is deleted
+- Integration tests confirm the ordering and cascade behavior
 
-## Implementation Notes
+## Common Issues and Solutions
 
-- Do NOT install or use the Cloudinary SDK, Cloudinary Node.js package, or any `cloudinary.*` references
-- Public URLs for `animals-photos` are permanent and can be cached by the browser/CDN — no signed URLs needed for animal photos
-- `adoption-documents` and `medical-documents` require signed URLs (temporary, expire) — implement in a follow-up task if needed
-- WebP is the preferred output format for photos — the upload component (T02) will handle conversion client-side before sending
-- The `primary.{ext}` path uses `upsert: true` so replacing the primary photo doesn't leave orphan files
+If the partial unique index constraint is violated during testing, verify that the test setup does not insert two rows with is_primary equal to true for the same animal. The correct approach when changing the primary photo is to update the existing primary row to set is_primary to false before inserting or updating the new primary row. The application service layer is responsible for this two-step update, not the database constraint — the constraint only catches bugs where the service layer fails to clear the old primary flag.
 
-## Related
+If the photos relationship returns an empty list for an animal that has photos in the database, verify that the selectin lazy loading strategy is configured on the relationship and that the query was executed within an open AsyncSession. With async SQLAlchemy, if the session is closed before the relationship is accessed, the selectin load will not fire and the collection will appear empty.
 
-- EPIC-1 / S04 — Photo upload and management
-- Depends on: T01 in S01 (animals table must exist for animal_id references)
-- Blocks: T02 (upload component needs the StorageService to be ready)
-- Architecture: `docs/ARCHITECTURE.md` — Storage Buckets section
+If the cascade delete is not removing photo rows when an animal is deleted, verify that the foreign key column on animal_photos declares ondelete equal to CASCADE at the SQLAlchemy level and that the database-level constraint also specifies ON DELETE CASCADE. SQLAlchemy's cascade parameter on the relationship does not generate the SQL ON DELETE CASCADE clause — that must be set separately on the Column definition.
+
+## Related Tasks
+
+- S01/T01: Animal model — the parent table this migration references via foreign key
+- S03/T01: Animal detail endpoint — queries photos via the relationship
+- S03/T03: Photo gallery endpoint — queries photos directly from animal_photos
+- S04/T02: Photo upload endpoint — inserts rows into animal_photos

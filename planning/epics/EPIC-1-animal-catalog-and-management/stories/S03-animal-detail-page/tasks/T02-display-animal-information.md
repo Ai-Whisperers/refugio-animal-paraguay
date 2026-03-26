@@ -1,206 +1,80 @@
 ---
-task: T02
-story: S03
 epic: EPIC-1
-title: Display animal information
-status: ready
+story: S03
+task: T02
+title: Define AnimalDetailResponse Schema and Service Function
+status: pending
+effort_hours: 2
 priority: medium
-agent_type: frontend
-created: 2026-03-25T17:13:26.726458
+dependencies:
+  - S01/T01-define-supabase-schema-for-animals-table
+  - S03/T01-create-detail-page-component
 ---
 
-# T02: Display animal information
+## Overview
 
-## Description
+Define the full AnimalDetailResponse Pydantic v2 schema that represents every piece of information available about a single animal, and implement the SQLAlchemy service function that retrieves the animal record with its associated photos. The detail response is deliberately wider than the catalog summary: while AnimalSummaryResponse contains only the fields needed to render a catalog card, AnimalDetailResponse contains all fields that a visitor would want to see when deciding whether to adopt an animal.
 
-Build the `AnimalDetailView` Server Component that renders all information about a single animal. Includes the primary photo, animal metadata (species, age, sex, weight, location), the adoption story description, and the "Quiero adoptarlo" CTA button that leads to the adoption request flow.
+## Why This Matters
+
+The detail response schema is the contract between the backend and every client that renders an animal detail page. All fields that the detail page needs — the animal's description, vaccination and neutering status, intake date, microchip number, weight, and photo list — must be present in this schema. If a field is added to the page later but is not included in this schema, the frontend will have to either call a second endpoint or wait for a breaking schema change. Defining the full schema now prevents both outcomes. The schema also communicates which fields are nullable, which tells the frontend exactly which fields it must handle gracefully by showing placeholder text or omitting the display element.
 
 ## Context
 
-- Server Component (no `'use client'`) — data already fetched by the page
-- CSS: Tailwind CSS 3.4.19 PINNED — use CSS vars, NOT hardcoded colors
-- Status badge: show current status with color-coded label (available = green, reserved = yellow, adopted = gray)
-- CTA button visible only when `status === 'available'`
-- Photo gallery rendered by `AnimalPhotoGallery` component (T03) — slot it into the layout here
+The animals table stores the complete record. The animal_photos table stores zero or more photos per animal. The detail response assembles both into a single response object. The photos field of the detail response is populated by the same left outer join used in the catalog endpoint to resolve primary_photo_url, but in the detail case, all photos are returned as a list of AnimalPhotoResponse objects rather than just the primary URL.
 
-## Files to create
+The status field in the response tells the frontend whether to show the adoption request call-to-action. When status equals available, the frontend should display a button that leads to the adoption request flow defined in EPIC-2. When status equals reserved, the frontend should display a message indicating that an adoption process is already in progress. When status equals medical_hold, adopted, or deceased, the frontend should suppress the call-to-action entirely. The backend does not make this presentation decision — it returns the status and leaves the rendering choice to the frontend.
 
-### `src/components/animals/AnimalDetailView.tsx`
+## Implementation Steps
 
-```typescript
-import Image from 'next/image'
-import Link from 'next/link'
-import { AnimalPhotoGallery } from './AnimalPhotoGallery'
+### Step 1: Define the AnimalPhotoResponse Schema
 
-interface AnimalDetailViewProps {
-  animal: {
-    id: string
-    name: string
-    species: string
-    breed: string | null
-    age_years: number
-    age_months: number
-    sex: string
-    weight_kg: number | null
-    status: string
-    description: string | null
-    intake_date: string | null
-    intake_reason: string | null
-    location: string | null
-    microchip_number: string | null
-    is_featured: boolean
-    photo_primary_url: string | null
-    photo_gallery_urls: string[] | null
-  }
-}
+In src/schemas/animal.py, define a Pydantic v2 model named AnimalPhotoResponse that represents one photo from the animal_photos table. The schema contains the id field as an integer, the url field as a string containing the fully qualified or relative path to the photo file, the is_primary field as a boolean indicating whether this is the designated primary photo, and the created_at field as a datetime. The model uses ConfigDict with from_attributes set to True to enable construction from SQLAlchemy model instances.
 
-const SPECIES_LABELS: Record<string, string> = { dog: 'Perro', cat: 'Gato' }
-const SEX_LABELS: Record<string, string> = { male: 'Macho', female: 'Hembra' }
-const INTAKE_REASON_LABELS: Record<string, string> = {
-  abandoned: 'Abandonado',
-  rescue: 'Rescatado',
-  surrendered: 'Entregado por dueño',
-  stray: 'Callejero',
-}
-const STATUS_CONFIG: Record<string, { label: string; className: string }> = {
-  available: { label: 'Disponible', className: 'bg-green-100 text-green-800' },
-  reserved: { label: 'Reservado', className: 'bg-yellow-100 text-yellow-800' },
-  adopted: { label: 'Adoptado', className: 'bg-gray-100 text-gray-600' },
-  medical_hold: { label: 'En tratamiento médico', className: 'bg-blue-100 text-blue-800' },
-}
-const PLACEHOLDER_IMAGE = '/images/animal-placeholder.webp'
+### Step 2: Define the AnimalDetailResponse Schema
 
-function formatAge(years: number, months: number): string {
-  if (years === 0) return months <= 1 ? '1 mes' : `${months} meses`
-  if (years === 1) return '1 año'
-  return `${years} años`
-}
+In src/schemas/animal.py, define a Pydantic v2 model named AnimalDetailResponse that extends the base animal fields with the full set of columns. The schema contains the following fields: id as an integer, name as a string, species as the AnimalSpecies enum serialized as a string, breed as a nullable string, gender as the AnimalGender enum serialized as a string, approximate_age_months as a nullable integer, weight_kg as a nullable Decimal, status as the AnimalStatus enum serialized as a string, description as a nullable string, is_featured as a boolean, is_vaccinated as a nullable boolean, is_neutered as a nullable boolean, microchip_number as a nullable string, intake_date as a nullable date, shelter_id as an integer, created_at as a datetime, updated_at as a datetime, and photos as a list of AnimalPhotoResponse instances.
 
-export function AnimalDetailView({ animal }: AnimalDetailViewProps) {
-  const statusConfig = STATUS_CONFIG[animal.status] ?? { label: animal.status, className: 'bg-gray-100 text-gray-600' }
+The distinction between nullable booleans for is_vaccinated and is_neutered and a plain false boolean is significant: None means the information is not recorded or not applicable (as is common for rabbits and birds where these fields are not routinely tracked by the shelter), while False means the animal has been explicitly recorded as not vaccinated or not neutered. The frontend can use this distinction to display different messages to potential adopters — for example, showing "vaccination status unknown" versus "not vaccinated."
 
-  return (
-    <div className="space-y-8">
-      {/* Breadcrumb */}
-      <nav className="text-sm text-[var(--text-secondary)]">
-        <a href="/animales" className="hover:text-[var(--color-primary)] transition-colors">
-          Animales en adopción
-        </a>
-        <span className="mx-2">›</span>
-        <span className="text-[var(--text-primary)]">{animal.name}</span>
-      </nav>
+The model uses ConfigDict with from_attributes set to True and populate_by_name set to True.
 
-      {/* Main content grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {/* Photo */}
-        <div>
-          <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-[var(--bg-skeleton)]">
-            <Image
-              src={animal.photo_primary_url ?? PLACEHOLDER_IMAGE}
-              alt={`Foto de ${animal.name}`}
-              fill
-              sizes="(max-width: 768px) 100vw, 50vw"
-              className="object-cover"
-              priority
-            />
-            <span className={`absolute top-3 left-3 text-xs font-medium px-2 py-1 rounded-full ${statusConfig.className}`}>
-              {statusConfig.label}
-            </span>
-          </div>
+### Step 3: Define the Service Function
 
-          {/* Photo gallery (T03) */}
-          {animal.photo_gallery_urls && animal.photo_gallery_urls.length > 0 && (
-            <div className="mt-3">
-              <AnimalPhotoGallery
-                animalName={animal.name}
-                photos={animal.photo_gallery_urls}
-                primaryPhoto={animal.photo_primary_url}
-              />
-            </div>
-          )}
-        </div>
+In src/services/animal_service.py, define a function named get_animal_by_id that accepts a SQLAlchemy AsyncSession and an integer animal_id and returns either an Animal model instance with its associated photos loaded, or None if no matching record exists.
 
-        {/* Info */}
-        <div className="space-y-6">
-          <div>
-            <h1 className="text-3xl font-bold text-[var(--text-primary)]">{animal.name}</h1>
-            <p className="text-lg text-[var(--text-secondary)] mt-1">
-              {SPECIES_LABELS[animal.species] ?? animal.species}
-              {animal.breed ? ` · ${animal.breed}` : ''}
-            </p>
-          </div>
+The function constructs a SQLAlchemy select statement that queries the Animal model filtered by the given id. It performs a selectinload or joinedload of the animal's photos relationship so that the photos are available on the returned Animal instance without requiring additional queries from the route handler. The function uses scalar_one_or_none() to return either the single matching Animal instance or None when no record exists.
 
-          {/* Key stats */}
-          <dl className="grid grid-cols-2 gap-4">
-            {[
-              { label: 'Sexo', value: SEX_LABELS[animal.sex] ?? animal.sex },
-              { label: 'Edad', value: formatAge(animal.age_years, animal.age_months) },
-              ...(animal.weight_kg ? [{ label: 'Peso', value: `${animal.weight_kg} kg` }] : []),
-              ...(animal.location ? [{ label: 'Ubicación', value: animal.location }] : []),
-              ...(animal.intake_reason ? [{ label: 'Ingresó por', value: INTAKE_REASON_LABELS[animal.intake_reason] ?? animal.intake_reason }] : []),
-              ...(animal.microchip_number ? [{ label: 'Microchip', value: animal.microchip_number }] : []),
-            ].map(({ label, value }) => (
-              <div key={label} className="bg-[var(--bg-card)] rounded-lg p-3 border border-[var(--border-subtle)]">
-                <dt className="text-xs text-[var(--text-tertiary)] uppercase tracking-wide">{label}</dt>
-                <dd className="mt-1 text-sm font-medium text-[var(--text-primary)]">{value}</dd>
-              </div>
-            ))}
-          </dl>
+The route handler calls get_animal_by_id and raises a 404 HTTPException when the result is None. The route handler then constructs AnimalDetailResponse from the returned Animal instance using Pydantic's model_validate method with from_attributes enabled.
 
-          {/* Description */}
-          {animal.description && (
-            <div>
-              <h2 className="text-sm font-semibold text-[var(--text-primary)] uppercase tracking-wide mb-2">
-                Historia
-              </h2>
-              <p className="text-[var(--text-secondary)] leading-relaxed">{animal.description}</p>
-            </div>
-          )}
+### Step 4: Write Unit Tests for the Service Function
 
-          {/* CTA */}
-          {animal.status === 'available' && (
-            <Link
-              href={`/adoptar/${animal.id}`}
-              className="block w-full text-center py-3 px-6 bg-[var(--color-primary)] text-white font-semibold rounded-xl hover:opacity-90 transition-opacity"
-            >
-              Quiero adoptarlo
-            </Link>
-          )}
+In tests/unit/test_animal_service.py, add unit tests for the get_animal_by_id function. The test for a successful fetch creates a mock session that returns a single Animal instance when queried and verifies that the function returns that instance rather than None. The test for a missing animal creates a mock session that returns None from scalar_one_or_none and verifies that the function returns None.
 
-          {animal.status === 'reserved' && (
-            <p className="text-sm text-center text-[var(--text-secondary)] bg-[var(--bg-card)] rounded-xl p-3 border border-[var(--border-subtle)]">
-              Este animal ya tiene un proceso de adopción en curso.
-            </p>
-          )}
-        </div>
-      </div>
-    </div>
-  )
-}
-```
+These unit tests do not require a database connection — they use a mock AsyncSession that returns pre-constructed results, keeping them fast and deterministic.
 
 ## Acceptance Criteria
 
-- [ ] `AnimalDetailView` is a Server Component (no `'use client'`)
-- [ ] Status badge shown with correct label and style for each status value
-- [ ] "Quiero adoptarlo" CTA only appears when `status === 'available'`
-- [ ] `status === 'reserved'` shows a "proceso en curso" message instead of CTA
-- [ ] Age formatted in Spanish: "2 meses", "1 año", "3 años"
-- [ ] Breadcrumb navigation links back to `/animales`
-- [ ] `null` optional fields (weight, location, breed, microchip) are gracefully omitted from the stats grid
-- [ ] `AnimalPhotoGallery` only rendered when `photo_gallery_urls` has entries
-- [ ] Primary photo uses `priority` prop (above the fold — avoids LCP penalty)
-- [ ] All CSS uses CSS variable classes — no hardcoded Tailwind color utilities
+- AnimalPhotoResponse schema is defined with id, url, is_primary, and created_at fields
+- AnimalDetailResponse schema is defined with all fields described above, including nullable fields
+- The photos field in AnimalDetailResponse is typed as a list of AnimalPhotoResponse, not a list of strings
+- is_vaccinated and is_neutered are nullable booleans, not plain booleans, to distinguish unknown from false
+- The get_animal_by_id service function returns None when no matching record exists
+- The route handler returns a 404 when the service function returns None
+- The route handler constructs AnimalDetailResponse from the Animal instance using Pydantic's from_attributes behavior
+- Unit tests exist for the found and not-found cases
 
-## Implementation Notes
+## Common Issues and Solutions
 
-- Status badge uses hardcoded Tailwind color classes for the semantic colors (green/yellow/gray/blue) — this is intentional since status colors are fixed and not theme-dependent
-- CTA links to `/adoptar/[id]` — the adoption request flow (separate epic)
-- The stats grid uses a dynamic array to skip null fields — avoids empty `<dd>` cells
-- `AnimalPhotoGallery` is created in T03 and imported here
+If the photos field in the response is always an empty list even when photos exist in the database, the relationship loading strategy may not be configured correctly. Verify that the Animal SQLAlchemy model declares a photos relationship to the AnimalPhoto model and that the service function uses selectinload or joinedload to eagerly load the photos relationship before the session is closed. If the session is closed before the photos are accessed, SQLAlchemy will raise an error or return an empty collection depending on whether lazy loading is configured.
 
-## Related
+If is_vaccinated and is_neutered are being serialized as false instead of null when the database contains NULL, verify that the Pydantic field type is declared as Optional[bool] or bool | None rather than bool. A plain bool type will coerce None to False during validation.
 
-- Depends on: T01 (detail page fetches and passes animal data)
-- Blocks: T03 (photo gallery is a sub-component used here)
-- Part of: S03 — Animal Detail Page
+If the created_at and updated_at fields are being serialized as strings instead of ISO 8601 datetime strings, verify that the Pydantic model uses datetime as the field type and that Pydantic v2's default JSON serialization is not being bypassed. Pydantic v2 serializes datetime values as ISO 8601 strings by default.
+
+## Related Tasks
+
+- S01/T01: Animal model definition — the SQLAlchemy model whose fields this schema mirrors
+- S03/T01: Detail endpoint route handler — calls the service function defined here
+- S03/T03: Photo gallery endpoint — the separate endpoint for photo-only requests
+- S04/T01: Animal photo storage — creates the AnimalPhoto model and animal_photos table

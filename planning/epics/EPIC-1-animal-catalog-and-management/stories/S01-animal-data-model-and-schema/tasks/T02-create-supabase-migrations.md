@@ -1,156 +1,85 @@
 ---
-task: T02
-story: S01
 epic: EPIC-1
-title: Set up Supabase migration workflow and seed data
-status: ready
+story: S01
+task: T02
+title: Configure Alembic Migration Workflow and Database Management Commands
+status: pending
+effort_hours: 2
 priority: high
-agent_type: devops
-created: 2026-03-25T17:13:26.725653
-claimed_by: null
-claimed_at: null
-branch: null
-pr_url: null
+dependencies:
+  - T01-define-supabase-schema-for-animals-table
 ---
 
-# T02: Set up Supabase migration workflow and seed data
+## Overview
 
-## Description
+Establish the Alembic migration workflow as the single authoritative mechanism for all PostgreSQL schema changes. This task configures alembic.ini and alembic/env.py to connect to the correct database, documents the standard commands developers use to create, apply, and roll back migrations, and establishes the convention for running Alembic in both local development and CI/CD environments.
 
-Configure the Supabase CLI migration workflow so that schema changes are tracked as SQL files, reviewable in git, and reproducible across development and production environments. Also create seed data so developers can test the animal catalog without manually inserting records.
+## Why This Matters
+
+Without a documented migration workflow, developers apply schema changes ad hoc — some directly in psql, some by editing the database container, and some by running Alembic. This divergence makes it impossible to replay the schema creation reliably, breaks staging and production deployments, and causes test failures when the test database schema diverges from what the application expects. Establishing Alembic as the single path for all schema changes means any developer can clone the repository, run one command, and have a fully initialized database matching the current codebase state.
 
 ## Context
 
-- Architecture reference: `docs/ARCHITECTURE.md`
-- Supabase CLI docs: `supabase --help` or `npx supabase --help`
-- Migrations live in: `supabase/migrations/`
-- Seed data lives in: `supabase/seed.sql`
-- Local Supabase: started with `supabase start` (requires Docker)
+The project uses Alembic with SQLAlchemy 2.x. Alembic uses the same DATABASE_URL environment variable that FastAPI uses for its connection pool. The development database runs in Docker; the test database is a separate PostgreSQL database that the pytest fixtures connect to. The alembic/env.py file must import all SQLAlchemy models so that --autogenerate can detect model changes. This is a common footgun: if a model is not imported in env.py, Alembic does not see it and will not generate a migration for it.
 
-## Tasks to implement
+## Implementation Steps
 
-### 1. Supabase CLI setup
+### Step 1: Configure alembic.ini
 
-Ensure `supabase/config.toml` exists and is configured for the project:
+The alembic.ini file at the repository root contains the script_location key pointing to the alembic/ directory. The sqlalchemy.url key in alembic.ini should be set to a placeholder value that is overridden at runtime by the env.py file reading the DATABASE_URL environment variable. Never hardcode the actual database credentials into alembic.ini, as that file is committed to version control.
 
-```toml
-project_id = "refugio-animal-paraguay"
+### Step 2: Configure alembic/env.py
 
-[db]
-port = 54322
-shadow_port = 54320
-major_version = 15
+The env.py file is the entry point Alembic uses to establish the database connection and discover models. At the top of env.py, import all SQLAlchemy model classes: at minimum, import Animal from src.models.animal and Base from src.database. Set target_metadata to Base.metadata after all model imports are complete. This is what enables --autogenerate to produce accurate migrations.
 
-[api]
-port = 54321
-schemas = ["public", "storage", "graphql_public"]
-extra_search_path = ["public", "extensions"]
+In the run_migrations_online function, read the DATABASE_URL from the environment using os.environ and pass it to create_engine rather than reading it from alembic.ini. This ensures that the same env.py works in local development (where DATABASE_URL points to the Docker container), in CI/CD (where it points to the GitHub Actions PostgreSQL service), and in production (where it reads from a secrets manager or environment injection).
 
-[studio]
-port = 54323
+### Step 3: Define Standard Development Commands
 
-[auth]
-site_url = "http://localhost:3000"
-additional_redirect_urls = ["https://localhost:3000"]
-```
+Document the following commands as the standard workflow for all schema work. These should be written into the project README and referenced in any onboarding documentation.
 
-### 2. Package.json scripts
+To apply all pending migrations and bring the database to the current head state, run alembic upgrade head. This is the command that the application startup sequence should call automatically via a startup event in src/main.py, so that the database schema is always current when the FastAPI application starts. Alternatively, run it as a separate step before starting the application.
 
-Add to `package.json`:
-```json
-{
-  "scripts": {
-    "db:start": "supabase start",
-    "db:stop": "supabase stop",
-    "db:reset": "supabase db reset",
-    "db:push": "supabase db push",
-    "db:diff": "supabase db diff",
-    "db:migrate": "supabase db migrate new",
-    "db:seed": "supabase db reset --db-url $DATABASE_URL",
-    "db:types": "supabase gen types typescript --local > src/types/database.types.ts"
-  }
-}
-```
+To generate a new migration after modifying a SQLAlchemy model, run alembic revision with the --autogenerate flag and a descriptive message using the --message flag. The message should describe what changed, such as "add microchip number to animals table" or "create adoption requests table." Alembic generates a timestamped migration file in alembic/versions/. Always review the generated file before committing it — autogenerate is helpful but not infallible, especially for index changes and server defaults.
 
-### 3. Seed data
+To roll back the most recent migration, run alembic downgrade minus one. To roll back to a specific migration, run alembic downgrade followed by the migration's revision identifier, which is the alphanumeric prefix in the migration filename.
 
-Create `supabase/seed.sql` with realistic sample animals for local development:
+To inspect the current migration state of the database, run alembic current. This shows the revision identifier of the most recently applied migration. To see the full migration history, run alembic history with the --verbose flag.
 
-```sql
--- Seed: Sample animals for local development
--- Does not run in production
+To reset the development database completely (drop all tables and re-apply migrations from scratch), drop the database manually in psql and re-run alembic upgrade head. There is no single Alembic command for a full reset — this is intentional, as destructive operations on a database should require explicit human action rather than a one-liner script.
 
-insert into public.animals (
-  name, species, breed, age_years, age_months, gender, size, color,
-  description, status, intake_date, intake_type,
-  is_vaccinated, is_sterilized, is_microchipped,
-  good_with_kids, good_with_dogs, good_with_cats, energy_level
-) values
-  ('Luna', 'dog', 'Mestizo', 2, 0, 'female', 'medium', 'café y blanco',
-   'Luna es una perra cariñosa y juguetona. Se lleva bien con niños y otros perros.',
-   'available', '2026-01-15', 'stray',
-   true, true, false, true, true, false, 'medium'),
+### Step 4: Handle the Test Database
 
-  ('Misi', 'cat', 'Doméstico', 1, 6, 'male', 'small', 'negro',
-   'Misi es tranquilo y le encanta estar en interiores. Ideal para apartamento.',
-   'available', '2026-02-01', 'surrender',
-   true, true, false, true, false, true, 'low'),
+The pytest test suite uses a separate database named after the main database with a test_ prefix, or a dedicated test database URL configured in the TEST_DATABASE_URL environment variable. The test database must have migrations applied before the test suite runs. The conftest.py file at the repository root includes a session-scoped fixture that runs alembic upgrade head against the test database URL at the start of each pytest session and, optionally, alembic downgrade base at the end to leave the database clean.
 
-  ('Thor', 'dog', 'Labrador mestizo', 3, 0, 'male', 'large', 'amarillo',
-   'Thor es activo y necesita espacio para correr. Muy leal y protector.',
-   'available', '2026-01-28', 'stray',
-   true, false, false, false, true, false, 'high'),
+This ensures that the test database schema always matches the current migration head, even after developers add new migrations. There is no separate mechanism for initializing the test schema — Alembic is the single source of truth for both development and test databases.
 
-  ('Cleo', 'cat', 'Siamés mestizo', 4, 0, 'female', 'small', 'beige y marrón',
-   'Cleo es independiente pero afectuosa con su familia. No se lleva bien con otros gatos.',
-   'available', '2026-02-10', 'surrender',
-   true, true, true, true, false, false, 'low'),
+### Step 5: Seed Data Separation
 
-  ('Max', 'dog', 'Mestizo pequeño', 5, 0, 'male', 'small', 'blanco y negro',
-   'Max es un perro mayor tranquilo, perfecto para una familia tranquila.',
-   'pending', '2025-12-01', 'stray',
-   true, true, true, true, true, true, 'low');
-```
+Migration files in alembic/versions/ should contain only schema changes — CREATE TABLE, CREATE INDEX, ALTER TABLE, CREATE TYPE, and their inverses. Seed data (representative test animals, default shelter records) must not live in migration files, because migrations must be reversible and seed data complicates rollbacks. Seed data lives in a dedicated file, described in T03.
 
-### 4. TypeScript type generation
-
-After migrations run, generate TypeScript types:
-```bash
-npm run db:types
-```
-
-This creates `src/types/database.types.ts` — auto-generated, never edit manually.
-
-### 5. .gitignore additions
-
-Ensure `supabase/.branches` and `supabase/.temp` are gitignored:
-```
-# In .gitignore
-supabase/.branches
-supabase/.temp
-```
+The one exception is default configuration values for shelter settings that the application cannot function without. If the application requires a row in a settings table to start correctly, that INSERT can live in its own migration file clearly labeled as data migration. Document this clearly in the migration's docstring.
 
 ## Acceptance Criteria
 
-- [ ] `supabase/config.toml` configured for the project
-- [ ] `package.json` has all `db:*` scripts
-- [ ] `supabase/seed.sql` contains at least 5 realistic sample animals in Spanish
-- [ ] `supabase db reset` runs cleanly (applies migrations + seed without errors)
-- [ ] `npm run db:types` generates `src/types/database.types.ts` successfully
-- [ ] `.gitignore` excludes Supabase temporary files
-- [ ] `supabase/` directory is committed (migrations + config + seed, not temp files)
-- [ ] README includes local development database setup instructions
+- alembic/env.py imports all model classes and sets target_metadata to Base.metadata
+- alembic/env.py reads DATABASE_URL from the environment, not from alembic.ini
+- alembic upgrade head applies all existing migrations without error against a fresh database
+- alembic downgrade minus one reverses the most recent migration without error
+- alembic revision --autogenerate detects changes when a model column is added
+- The test database setup in conftest.py applies migrations before the test session begins
+- No credentials are hardcoded in alembic.ini or env.py
 
-## Implementation Notes
+## Common Issues and Solutions
 
-- Seed data uses Spanish descriptions — this is the production language of the platform
-- `supabase db reset` drops and recreates the local database — safe locally, never run against production
-- `DATABASE_URL` for local dev: `postgresql://postgres:postgres@localhost:54322/postgres`
-- TypeScript types are auto-generated — add `src/types/database.types.ts` to `.gitignore` OR commit it (team choice — document the decision)
-- Migration filenames are timestamped by the CLI — never rename them after creation
+If alembic revision --autogenerate produces an empty migration (no detected changes), a model file is not imported in env.py. Add the missing import and re-run autogenerate.
 
-## Related
+If alembic upgrade head fails with a table already exists error, the database was initialized by some mechanism other than Alembic. The cleanest resolution is to stamp the database with the correct revision using alembic stamp followed by the head revision identifier, which tells Alembic the schema is already current without re-applying migrations.
 
-- EPIC-1 / S01 — Animal data model and schema
-- Depends on: T01 (animals table schema must exist before seeding)
-- Blocks: S02 (CRUD operations need working local database)
+If the test database migration fixture runs but tests still fail with missing table errors, the session fixture may be scoped incorrectly. Ensure the migration fixture uses session scope (runs once per pytest session) rather than function scope (which would try to apply migrations before every test function and fail on the second run because the table already exists).
+
+## Related Tasks
+
+- S01/T01: Define SQLAlchemy Animal model — creates the model that this workflow manages
+- S01/T03: Implement seed data for testing — the seed mechanism that runs after migrations initialize the schema
+- EPIC-9/S02: CI/CD pipeline configuration — wires alembic upgrade head into the deployment pipeline

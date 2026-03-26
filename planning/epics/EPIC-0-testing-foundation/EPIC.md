@@ -1,7 +1,7 @@
 ---
 id: EPIC-0
 title: Testing Foundation
-description: Establish comprehensive testing infrastructure and best practices
+description: Establish comprehensive testing infrastructure and best practices for FastAPI + PostgreSQL backend
 status: ready
 priority: critical
 estimated_effort: 40 hours
@@ -20,212 +20,95 @@ Testing infrastructure is not a "nice to have" feature to be added later. It mus
 
 1. **All subsequent code must be testable** — developers writing features in later epics need the testing framework ready
 2. **Quality gates require tests** — CI/CD pipeline enforces test coverage, which requires infrastructure
-3. **Blocks architectural decisions** — testing choices (unit vs integration vs E2E) influence how features are structured
+3. **Blocks architectural decisions** — testing choices influence how features are structured
 4. **Enables confidence** — teams can refactor and optimize knowing tests catch regressions
 
 **Critical dependency**: EPIC-0 must be **complete and merged to main** before any developer starts work on EPIC-1, EPIC-4, EPIC-5, etc.
 
 ## Scope
 
-This epic covers:
+This epic covers the FastAPI backend testing stack. All testing infrastructure is for Python services using pytest and httpx.
 
-### Testing Frameworks & Tools
+### Testing Frameworks and Tools
 
-- **Vitest**: Lightning-fast unit testing framework (replaces Jest for Next.js 14)
-- **React Testing Library**: Modern component testing focusing on user behavior
-- **Mock Service Worker (MSW)**: API mocking without modifying production code
-- **Playwright**: End-to-end browser testing
-- **Coverage instrumentation**: Tracking and reporting test coverage metrics
+The primary test runner is pytest with the asyncio plugin for testing async FastAPI endpoints. HTTP integration tests use httpx with ASGITransport to call FastAPI directly without a network socket. Database tests run against a real PostgreSQL test database seeded via Alembic migrations; there is no in-memory database substitute. Test coverage is measured by pytest-cov targeting an 80% minimum threshold.
 
 ### Testing Strategy Layers
 
-```
-┌─────────────────────────────────────┐
-│  E2E Testing (Playwright)           │ User journeys across entire app
-├─────────────────────────────────────┤
-│  Integration Testing (Vitest)       │ Component + API interaction
-├─────────────────────────────────────┤
-│  Component Testing (RTL)            │ Individual component behavior
-├─────────────────────────────────────┤
-│  Unit Testing (Vitest)              │ Pure functions, utilities
-├─────────────────────────────────────┤
-│  API Mocking (MSW)                  │ Intercept and mock HTTP requests
-└─────────────────────────────────────┘
-```
+Unit tests cover pure Python functions: validation logic, business rules, data transformations, currency calculations, and permission checks. These tests have no I/O dependencies and run entirely in memory.
+
+Integration tests cover FastAPI route handlers calling SQLAlchemy against a live PostgreSQL test database. Each integration test receives a fresh database transaction that is rolled back after the test completes, ensuring isolation without requiring a full database reset between tests.
+
+End-to-end tests cover complete user journeys such as the donation flow and adoption submission. These tests run against a running server with a seeded database and verify the full stack from HTTP request to database state.
 
 ### Testing Best Practices
 
-- Test organization structure (unit, integration, e2e directories)
-- Naming conventions for test files (`.test.ts`, `.spec.ts`)
-- Test data fixtures and factories
-- Mocking strategies (MSW for external APIs, mocks for internal dependencies)
-- Coverage requirements and measurement
-- CI/CD integration with GitHub Actions
-- Documentation for developers on how to write tests
+Test files are organized in a tests directory mirroring the src directory structure: unit tests in tests/unit, integration tests in tests/integration, and end-to-end tests in tests/e2e. Fixtures for authentication tokens, database sessions, and test users are defined in tests/conftest.py and shared across the test suite. Each test follows the Arrange-Act-Assert pattern. Test names describe behavior using the convention test_verb_subject_condition.
 
 ## Stories in This Epic
 
-This epic contains 5 stories:
-
 | Story ID | Title | Purpose |
 |----------|-------|---------|
-| **S01** | Test Infrastructure Setup | Install and configure Vitest, React Testing Library, MSW, Playwright |
-| **S02** | Component Testing Foundation | Write tests for reusable components, establish patterns |
-| **S03** | API Integration Testing | Test API calls with MSW mocking, error scenarios |
-| **S04** | E2E Testing Infrastructure | Set up Playwright, basic user journey tests |
-| **S05** | Coverage & CI/CD Integration | Measure coverage, enforce thresholds, integrate with GitHub Actions |
+| S01 | Test Infrastructure Setup | Install pytest, httpx, pytest-asyncio, pytest-cov, configure test database |
+| S02 | API Mocking and HTTP Testing | Configure httpx AsyncClient with ASGITransport for endpoint testing |
+| S03 | Database Test Fixtures | Create conftest.py with session, client, and user fixtures |
+| S04 | End-to-End Test Infrastructure | Configure full-stack test scenarios with seeded data |
+| S05 | Coverage and CI/CD Integration | Enforce coverage thresholds in GitHub Actions |
 
 ## Technical Architecture
 
-### Directory Structure
+The test configuration lives in pyproject.toml under the tool.pytest.ini_options section. The asyncio mode is set to auto so that async test functions run without requiring explicit event loop management. The test database URL is loaded from environment variables so that developers can run tests against a local PostgreSQL instance without affecting the development database.
 
-```
-app/
-├── (auth)/
-├── (dashboard)/
-├── api/
-└── __tests__/          ← Test directory
-    ├── unit/           ← Pure function tests
-    ├── integration/    ← Component + API tests
-    └── e2e/            ← Playwright scenarios
-
-lib/
-└── __tests__/
-    └── utils/          ← Utility function tests
-
-components/
-└── __tests__/          ← Component tests co-located with components
-    └── AnimalCard.test.tsx
-
-playwright/
-├── fixtures/           ← Test data and setup
-├── pages/              ← Page object models
-└── tests/              ← E2E test suites
-```
-
-### Configuration Files
-
-**Vitest Configuration** (`vitest.config.ts`):
-- ESM module resolution
-- jsdom environment for DOM testing
-- TypeScript support
-- Coverage reporting (80% threshold)
-
-**MSW Configuration** (`lib/msw/`):
-- API request handlers
-- Fixtures for common responses
-- Error response patterns
-- Development and testing modes
-
-**Playwright Configuration** (`playwright.config.ts`):
-- Chromium, Firefox, WebKit browsers
-- Base URL configuration
-- Timeout and retry settings
-- Screenshot/video capture on failure
+The shared conftest.py file at the project root defines three key fixtures. The db_session fixture creates a database session and wraps each test in a transaction that is rolled back at the end, preventing test pollution. The client fixture creates an httpx.AsyncClient bound to the FastAPI app via ASGITransport, allowing full request-response cycle testing without a running server process. The auth_headers fixture generates a valid JWT token for each role (admin, staff, vet, volunteer, adopter, foster) so that protected endpoints can be tested with the correct authorization.
 
 ## Success Criteria
 
-- ✅ All testing frameworks installed and configured
-- ✅ Sample unit tests written demonstrating patterns
-- ✅ Sample component tests written with React Testing Library
-- ✅ MSW configured and working for API mocking
-- ✅ Playwright E2E tests running successfully
-- ✅ CI/CD pipeline enforces 80% test coverage
-- ✅ Test documentation available for developers
-- ✅ GitHub Actions workflow runs tests on every PR
+- All testing packages installed and importable in the project virtual environment
+- pytest runs successfully against the test database with zero errors
+- httpx.AsyncClient successfully calls at least one FastAPI endpoint in a test
+- Database session rollback between tests is verified by isolation tests
+- Coverage report shows 80% or above for all src modules
+- GitHub Actions workflow runs the full test suite on every pull request
 
 ## Dependencies
 
-### Blocks (what this epic enables)
+### Blocks
 
-- **EPIC-1** (Animal Catalog) — depends on component testing setup
-- **EPIC-2** (Adoption Process) — depends on form testing patterns
-- **EPIC-3** (Lost & Found) — depends on component testing
-- **EPIC-4** (Donations) — depends on payment integration testing
-- **EPIC-5** (Admin Panel) — depends on auth testing patterns
-- **EPIC-6** (User Portal) — depends on full testing stack
-- **EPIC-8** (Infrastructure) — depends on API testing setup
+- EPIC-1 (Animal Catalog) — depends on test fixtures for animals
+- EPIC-2 (Adoption Process) — depends on form validation test patterns
+- EPIC-3 (Donation Systems) — depends on Stripe mock patterns
+- EPIC-4 (Medical Records) — depends on audit log test patterns
+- EPIC-5 (Volunteer Management) — depends on auth role test fixtures
+- EPIC-6 (Communications) — depends on email and WhatsApp mock patterns
 
-### Blocked By (prerequisites)
+### Blocked By
 
 - None — this is the foundational epic
-- Assumes Next.js 14 project initialized with TypeScript
+- Assumes Python 3.12 virtual environment and PostgreSQL 16 are available locally
 
 ## Effort Estimate
 
 | Story | Estimated Hours | Complexity |
 |-------|-----------------|-----------|
-| S01 - Setup | 8 hours | Medium (configuration heavy) |
-| S02 - Component Testing | 12 hours | Medium (pattern establishment) |
-| S03 - API Integration | 10 hours | Medium (MSW mastery) |
-| S04 - E2E Testing | 7 hours | Low (Playwright is intuitive) |
-| S05 - Coverage & CI/CD | 3 hours | Low (automation) |
+| S01 - Setup | 8 hours | Medium (environment configuration) |
+| S02 - API Mocking | 10 hours | Medium (async patterns) |
+| S03 - DB Fixtures | 12 hours | Medium (rollback isolation) |
+| S04 - E2E | 7 hours | Low (seeding and assertions) |
+| S05 - Coverage CI/CD | 3 hours | Low (automation) |
 | **TOTAL** | **40 hours** | **Medium** |
-
-Effort assumes:
-- 2 developers working in parallel (S01 splits into Vitest + Playwright setup)
-- Moderate familiarity with testing concepts
-- Access to project initialization and configuration
 
 ## Risk Factors
 
 | Risk | Likelihood | Impact | Mitigation |
 |------|-----------|--------|-----------|
-| Vitest + Next.js 14 compatibility | Low | High | Use current versions, check docs |
-| MSW learning curve | Medium | Medium | Pair programming, documentation |
-| E2E test flakiness | Medium | High | Explicit waits, retry logic, good selectors |
-| Coverage threshold too strict | Low | Medium | Start at 70%, increase incrementally |
-
-## Resources
-
-### Documentation Links
-
-- [Vitest Official Docs](https://vitest.dev/)
-- [React Testing Library Docs](https://testing-library.com/react)
-- [Mock Service Worker Docs](https://mswjs.io/)
-- [Playwright Docs](https://playwright.dev/)
-
-### Internal References
-
-- Tech Stack Reference: `AGENT-GUIDE.md` > Tech Stack Reference section
-- Architecture Patterns: `docs/ARCHITECTURE.md` (if exists)
-- Testing Strategy: `docs/TESTING-STRATEGY.md` (if exists)
-
-## Next Steps After Completion
-
-Once EPIC-0 is merged to main:
-
-1. **Communicate completion** — notify team that testing foundation is ready
-2. **Unlock feature work** — agents can claim tasks from EPIC-1, EPIC-4, EPIC-8
-3. **Enforce coverage** — all future PRs must maintain 80% test coverage
-4. **Document learnings** — capture testing patterns discovered during S02-S03
-5. **Plan for scaling** — consider performance testing infrastructure for EPIC-7
-
-## Progress Tracking
-
-Track progress using the task queue:
-
-```bash
-# View all tasks in this epic
-grep "EPIC-0" planning/QUEUE.md
-
-# Check which tasks are ready
-grep "status: ready" planning/epics/EPIC-0-testing-foundation/stories/*/tasks/*.md
-
-# Monitor active claims
-cat planning/CLAIMING.md  # Check EPIC-0 rows
-```
-
-## Communication
-
-- Updates to task files after each work session
-- Merge PRs promptly to unblock downstream work
-- Slack notifications when epic reaches "review" status
-- Final completion announcement before EPIC-1 work begins
+| Async event loop conflicts in pytest | Medium | High | Use pytest-asyncio with asyncio_mode=auto |
+| Test database isolation failures | Low | High | Verify rollback fixture with explicit isolation test |
+| Coverage threshold too strict initially | Low | Medium | Start at 70%, increase to 80% after first sprint |
+| Stripe webhook testing complexity | Medium | Medium | Use Stripe test mode and stripe-mock for unit tests |
 
 ---
 
 **Created**: 2026-03-25
 **Epic Lead**: [To be assigned]
-**Status**: 🟢 Ready for work
-**Priority**: 🔴 CRITICAL — Must complete before feature work
+**Status**: Ready for work
+**Priority**: CRITICAL — Must complete before feature work

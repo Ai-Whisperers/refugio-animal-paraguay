@@ -1,169 +1,78 @@
 ---
-task: T01
-story: S03
 epic: EPIC-1
-title: Create detail page component
-status: ready
+story: S03
+task: T01
+title: Define FastAPI Animal Detail Endpoint
+status: pending
+effort_hours: 2
 priority: medium
-agent_type: frontend
-created: 2026-03-25T17:13:26.726373
+dependencies:
+  - S01/T01-define-supabase-schema-for-animals-table
+  - S02/T01-create-catalog-page-layout
 ---
 
-# T01: Create detail page component
+## Overview
 
-## Description
+Implement the public-facing FastAPI endpoint that returns the full record for a single animal, identified by its integer primary key. This endpoint is the data source for the animal detail page — the page a visitor reaches when they click on an animal card in the catalog and want to learn everything about that specific animal before deciding to submit an adoption request. The endpoint returns a detailed response schema that contains every field visible on the detail page, including all nullable fields omitted from the catalog summary.
 
-Create the public-facing animal detail page at `/animales/[id]` using Next.js 14 App Router. This page shows full information about a single animal and includes the primary CTA (adoption request button). Server-side rendered for SEO — each animal gets its own indexed page.
+## Why This Matters
+
+The animal detail page is where adoption decisions are made. The endpoint must return a complete picture of the animal — description, vaccination status, neutering status, microchip number, intake date, and all other fields — so the frontend has everything it needs without making additional requests. The endpoint also establishes the HTTP 404 behavior for invalid or stale animal IDs: a user who bookmarked a detail page for an animal that was later removed from the system should receive a clear 404 response rather than a malformed page.
 
 ## Context
 
-- Route: `app/(public)/animales/[id]/page.tsx`
-- Dynamic segment `[id]` is the animal's UUID
-- `generateMetadata` exports per-animal Open Graph metadata for social sharing
-- `generateStaticParams` is NOT used — pages are server-rendered on demand (shelter adds animals frequently)
-- No auth required — public page
+The endpoint is public — no authentication is required to view animal details. This is consistent with the catalog endpoint: the shelter wants potential adopters to be able to browse and research animals without creating an account. The endpoint lives in the same router file as the catalog endpoint, at src/routers/animals.py, and is registered on the FastAPI application in src/main.py with the same /animals prefix.
 
-## Files to create
+The path parameter is an integer, not a UUID, because the animals table uses an integer autoincrement primary key. The path is GET /animals/{id} where id is a positive integer. FastAPI validates the path parameter type automatically and returns a 422 Unprocessable Entity response if the id cannot be parsed as an integer.
 
-### `app/(public)/animales/[id]/page.tsx`
+## Implementation Steps
 
-```typescript
-import { notFound } from 'next/navigation'
-import type { Metadata } from 'next'
-import { createServerClient } from '@/lib/supabase/server'
-import { AnimalDetailView } from '@/components/animals/AnimalDetailView'
+### Step 1: Define the Route Handler
 
-interface AnimalDetailPageProps {
-  params: { id: string }
-}
+In src/routers/animals.py, add a new route at GET /animals/{id} with a response model of AnimalDetailResponse. The route handler is an async function that accepts an integer id path parameter and a SQLAlchemy AsyncSession via the database dependency. The handler queries the animals table for a record matching the given id. If no record is found, the handler raises an HTTPException with status code 404 and a detail message indicating the animal was not found. If a record is found, the handler constructs and returns an AnimalDetailResponse instance.
 
-export async function generateMetadata(
-  { params }: AnimalDetailPageProps
-): Promise<Metadata> {
-  const supabase = createServerClient()
-  const { data: animal } = await supabase
-    .from('animals')
-    .select('name, species, description, photo_primary_url')
-    .eq('id', params.id)
-    .single()
+The query includes a left outer join to the animal_photos table so that the response includes the list of photos associated with the animal. The photos are ordered by is_primary descending and then by created_at ascending, placing the primary photo first in the list. If no photos exist, the photos field of the response is an empty list.
 
-  if (!animal) return { title: 'Animal no encontrado' }
+### Step 2: Define the Not-Found Behavior
 
-  const speciesLabel = animal.species === 'dog' ? 'perro' : 'gato'
+When the requested animal id does not exist in the database, the endpoint returns a 404 response with a JSON body containing a detail field. The status code is 404 because the resource genuinely does not exist — this is different from the catalog empty-state behavior, where the catalog resource exists but has zero results for a filter combination. A 404 on the detail endpoint tells the frontend to display a not-found page rather than an empty detail view.
 
-  return {
-    title: `${animal.name} — ${speciesLabel} en adopción | Refugio Animal Paraguay`,
-    description: animal.description?.slice(0, 155) ?? `Conocé a ${animal.name} y ayudalo a encontrar un hogar.`,
-    openGraph: {
-      title: `Adoptá a ${animal.name}`,
-      description: animal.description?.slice(0, 155) ?? '',
-      images: animal.photo_primary_url ? [animal.photo_primary_url] : [],
-    },
-  }
-}
+The 404 also applies when the animal exists but has a status other than available, if the business rules call for hiding non-available animals from the public. In the initial implementation, the detail endpoint returns all animals regardless of status, so a staff member who shares a direct link to an animal that is in medical_hold status will still see the detail page. The status field in the response tells the frontend whether to show or suppress the adoption request call-to-action button — the backend does not make that presentation decision.
 
-export default async function AnimalDetailPage({ params }: AnimalDetailPageProps) {
-  const supabase = createServerClient()
+### Step 3: Add HTTP Caching Headers
 
-  const { data: animal, error } = await supabase
-    .from('animals')
-    .select(`
-      id, name, species, breed, age_years, age_months, sex,
-      weight_kg, status, description, intake_date, intake_reason,
-      location, microchip_number, is_featured,
-      photo_primary_url, photo_gallery_urls
-    `)
-    .eq('id', params.id)
-    .single()
+The animal detail endpoint is public and the data for a specific animal changes infrequently within a short time window. Add a Cache-Control header with max-age set to 60 seconds to allow browser and CDN caching of individual animal pages. This is a shorter max-age than the catalog page because an animal's status can change — for example, from available to reserved — and stale detail pages that still show the adoption CTA for a reserved animal would be misleading. Sixty seconds balances caching efficiency with freshness.
 
-  if (error || !animal) notFound()
+### Step 4: Write Integration Tests
 
-  return (
-    <main className="min-h-screen bg-[var(--bg-base)]">
-      <div className="max-w-4xl mx-auto px-4 py-8">
-        <AnimalDetailView animal={animal} />
-      </div>
-    </main>
-  )
-}
-```
+In tests/integration/test_animals.py, add integration tests for the detail endpoint. The test for a successful fetch creates an animal using the animal fixture, sends a GET request to /animals/{animal.id}, and verifies that the response status is 200 and that the response body contains the expected id, name, and status fields matching the created animal.
 
-### `app/(public)/animales/[id]/not-found.tsx`
+The test for a not-found response sends a GET request to /animals/NONEXISTENT_ANIMAL_ID (using the 999999 constant from conftest.py) and verifies that the response status is 404.
 
-```typescript
-import Link from 'next/link'
-
-export default function AnimalNotFound() {
-  return (
-    <main className="min-h-screen bg-[var(--bg-base)] flex items-center justify-center">
-      <div className="text-center px-4">
-        <h2 className="text-2xl font-semibold text-[var(--text-primary)] mb-2">
-          Animal no encontrado
-        </h2>
-        <p className="text-[var(--text-secondary)] mb-6">
-          Este animal ya no está disponible o el enlace es incorrecto.
-        </p>
-        <Link
-          href="/animales"
-          className="px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg hover:opacity-90 transition-opacity"
-        >
-          Ver todos los animales
-        </Link>
-      </div>
-    </main>
-  )
-}
-```
-
-### `app/(public)/animales/[id]/error.tsx`
-
-```typescript
-'use client'
-
-interface ErrorProps {
-  error: Error
-  reset: () => void
-}
-
-export default function AnimalDetailError({ error, reset }: ErrorProps) {
-  return (
-    <main className="min-h-screen bg-[var(--bg-base)] flex items-center justify-center">
-      <div className="text-center px-4">
-        <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-2">
-          No pudimos cargar la información del animal
-        </h2>
-        <p className="text-[var(--text-secondary)] mb-6">{error.message}</p>
-        <button
-          onClick={reset}
-          className="px-4 py-2 bg-[var(--color-primary)] text-white rounded-lg hover:opacity-90 transition-opacity"
-        >
-          Intentar de nuevo
-        </button>
-      </div>
-    </main>
-  )
-}
-```
+The test for a non-available animal creates an animal with status medical_hold using the unavailable_animal fixture, fetches it by id, and verifies that the response status is 200 and that the status field in the response body equals medical_hold. This test documents that the detail endpoint does not filter by status — it returns all animals that exist in the database.
 
 ## Acceptance Criteria
 
-- [ ] `app/(public)/animales/[id]/page.tsx` created as a Server Component
-- [ ] `generateMetadata` fetches animal name, species, description, photo for Open Graph
-- [ ] Page calls `notFound()` when animal UUID does not exist — renders `not-found.tsx`
-- [ ] `not-found.tsx` includes a link back to `/animales`
-- [ ] `error.tsx` is `'use client'` with a reset button
-- [ ] Layout uses CSS variable classes — no hardcoded Tailwind colors
-- [ ] TypeScript: no type errors
+- The GET /animals/{id} endpoint returns a 200 response with an AnimalDetailResponse body when the animal exists
+- The endpoint returns a 404 response when the requested id does not exist
+- The endpoint returns all animals regardless of status — status filtering is a frontend responsibility
+- The response includes a photos list, ordered with the primary photo first
+- No authentication is required to call this endpoint
+- Response includes a Cache-Control header with max-age 60
+- A non-integer id path parameter results in a 422 response from FastAPI's automatic validation
 
-## Implementation Notes
+## Common Issues and Solutions
 
-- `notFound()` from `next/navigation` triggers the nearest `not-found.tsx` — no need to return a 404 component manually
-- `generateMetadata` and the page component make separate Supabase queries — this is intentional (Next.js deduplicates fetch calls with the same URL in the same request, but Supabase client calls use connection pooling so the overhead is minimal)
-- `AnimalDetailView` component is built in T02
-- Photo gallery is built in T03 as a sub-component of `AnimalDetailView`
+If the 404 response is not being returned for a missing animal, verify that the handler checks whether the SQLAlchemy query result is None before constructing the response. A scalar_one_or_none() call returns None when no matching record exists, but scalar_one() raises a NoResultFound exception that propagates as a 500 if not caught.
 
-## Related
+If the photos list is not included in the response, verify that the query performs a left outer join to the animal_photos table and that the AnimalDetailResponse schema includes a photos field typed as a list of AnimalPhotoResponse objects.
 
-- Depends on: S01/T01 (animals table), S01/T02 (TypeScript types), S02/T02 (AnimalCard links here)
-- Blocks: T02 (AnimalDetailView), T03 (photo gallery)
-- Part of: S03 — Animal Detail Page
+If the photos list is empty for an animal that has photos, verify that the animal_photos table exists and that the foreign key join is on the correct column. During early development before the photo upload infrastructure is built in S04, the photos list will always be empty because no photos have been inserted — this is expected behavior.
+
+## Related Tasks
+
+- S01/T01: Animal model definition — the SQLAlchemy model this endpoint queries
+- S02/T01: Catalog endpoint — shares the same router file and database dependency
+- S03/T02: AnimalDetailResponse schema — the full response shape this endpoint returns
+- S03/T03: Photo gallery endpoint — the separate /animals/{id}/photos route for lazy photo loading
+- S04/T01: Animal photo storage — the infrastructure that populates the photos list

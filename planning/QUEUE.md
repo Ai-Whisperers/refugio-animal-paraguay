@@ -1,286 +1,175 @@
-# Task Queue — Refugio Animal Paraguay
+# Development Queue — Refugio Animal Paraguay
 
-Master queue of all 71 tasks across 10 epics. Status indicators show task readiness.
-
-**Status Legend:**
-- 🟢 `ready` — Available for claiming
-- 🔒 `claimed` — Agent assigned, awaiting merge
-- 🔨 `in_progress` — Active development
-- 👀 `review` — In code review
-- ✅ `done` — Completed
-- 🚧 `blocked` — Waiting on dependency
+**Last updated**: 2026-03-26
+**Active version**: V1 (MVP)
+**Tech stack**: Python 3.12, FastAPI, SQLAlchemy 2.x, PostgreSQL 16, Next.js 14
 
 ---
 
-## EPIC-0: Foundation & Setup (7 tasks)
+## How This Queue Works
 
-| ID | Task | Status | Story | Assignee |
-|----|------|--------|-------|----------|
-| E0-T1 | Project scaffold with TypeScript | 🟢 ready | S0-1 | — |
-| E0-T2 | Environment configuration (.env, Docker) | 🟢 ready | S0-1 | — |
-| E0-T3 | GitHub Actions CI/CD pipeline | 🟢 ready | S0-2 | — |
-| E0-T4 | PostgreSQL + Prisma setup | 🟢 ready | S0-2 | — |
-| E0-T5 | Redis + BullMQ configuration | 🟢 ready | S0-2 | — |
-| E0-T6 | Documentation structure & README | 🟢 ready | S0-3 | — |
-| E0-T7 | Project planning tools (QUEUE.md, AGENT-GUIDE.md) | ✅ done | S0-3 | — |
+Stories are ordered by dependency and priority. Work top-to-bottom. Each story becomes a ticket when started (`/start-ticket RAP-NNN`). A story is "ready" when all its dependencies are met.
+
+**Status**: DONE = delivered | READY = can start now | BLOCKED = waiting on dependency
 
 ---
 
-## EPIC-1: Core Infrastructure (11 tasks)
+## Already Delivered (RAP-001 through RAP-010)
 
-### S1-1: Database Schema & Migrations
+| Story | Epic | Ticket | What was built |
+|-------|------|--------|---------------|
+| Animal Data Model & Schema | EPIC-1 S01 | RAP-001, RAP-002 | PostgreSQL schema, 6 ORM models, 4 migrations |
+| Animal CRUD API | EPIC-1 S02-S03 | RAP-003, RAP-004 | 7 endpoints, pagination, filters |
+| Photo Upload & Management | EPIC-1 S04 | RAP-008 | Photo gallery, upload/delete |
+| Adopter CRUD API | EPIC-2 | RAP-005 | Soft-delete, GDPR consent tracking |
+| Adoption Request API | EPIC-2 S01-S02 | RAP-006 | State machine, status transitions |
+| JWT Auth + RBAC | EPIC-10 S01, S04 | RAP-007 | Login, roles (admin/staff/adopter) |
+| Stripe Foundation | EPIC-3 S01 (partial) | RAP-009 | PaymentIntent, donor/donation models |
+| Docker Setup | EPIC-9 S01 | RAP-010 | Multi-stage build, Compose, auto-migrations |
 
-| ID | Task | Status | Story | Assignee |
-|----|------|--------|-------|----------|
-| E1-T1 | Create database schema (animals, medical records, adoptions) | 🟢 ready | S1-1 | — |
-| E1-T2 | Implement Prisma migrations for initial schema | 🟢 ready | S1-1 | — |
-| E1-T3 | Add database indexes for performance | 🟢 ready | S1-1 | — |
-| E1-T4 | Seed database with test animals | 🟢 ready | S1-1 | — |
-
-### S1-2: Authentication & Authorization
-
-| ID | Task | Status | Story | Assignee |
-|----|------|--------|-------|----------|
-| E1-T5 | Implement JWT authentication | 🟢 ready | S1-2 | — |
-| E1-T6 | Create role-based access control (RBAC) system | 🟢 ready | S1-2 | — |
-| E1-T7 | Add session management with Redis | 🟢 ready | S1-2 | — |
-
-### S1-3: Error Handling & Logging
-
-| ID | Task | Status | Story | Assignee |
-|----|------|--------|-------|----------|
-| E1-T8 | Implement structured logging with Winston | 🟢 ready | S1-3 | — |
-| E1-T9 | Create error handling middleware | 🟢 ready | S1-3 | — |
-| E1-T10 | Setup Sentry for error tracking | 🟢 ready | S1-3 | — |
-| E1-T11 | Create health check endpoints | 🟢 ready | S1-3 | — |
+**Delivered**: 30 source files, 204 tests (96 unit + 108 integration), 80.42% coverage
 
 ---
 
-## EPIC-2: Backend APIs (13 tasks)
+## V1 — MVP Sprint Queue
 
-### S2-1: Animal Management API
+### Sprint 1 (Weeks 1-2): Foundation + Frontend Start
 
-| ID | Task | Status | Story | Assignee |
-|----|------|--------|-------|----------|
-| E2-T1 | Create /animals endpoints (CRUD) | 🟢 ready | S2-1 | — |
-| E2-T2 | Implement animal search & filtering | 🟢 ready | S2-1 | — |
-| E2-T3 | Add animal status tracking (available, adopted, medical hold) | 🟢 ready | S2-1 | — |
-| E2-T4 | Create medical history endpoints | 🟢 ready | S2-1 | — |
+| # | Story | Epic | Points | Status | Track |
+|---|-------|------|--------|--------|-------|
+| 1 | CI/CD Pipeline (GitHub Actions) | EPIC-9 S02 | 8 | READY | Backend |
+| 2 | Animal Intake Workflow | EPIC-1 S06 | 8 | READY | Backend |
+| 3 | CORS + Rate Limiting + Error Standardization | Cross-cutting | 5 | READY | Backend |
+| 4 | Next.js 14 Project Scaffold | EPIC-11 | 5 | READY | Frontend |
+| 5 | Animal Browsing Page (public) | EPIC-11 S01 | 8 | READY | Frontend |
 
-### S2-2: Adoption & Applicant API
+### Sprint 2 (Weeks 3-4): Admin Panel + Polish
 
-| ID | Task | Status | Story | Assignee |
-|----|------|--------|-------|----------|
-| E2-T5 | Create /applicants endpoints (CRUD) | 🟢 ready | S2-2 | — |
-| E2-T6 | Implement adoption application workflow | 🟢 ready | S2-2 | — |
-| E2-T7 | Add approval/rejection logic with notifications | 🟢 ready | S2-2 | — |
-| E2-T8 | Create adoption agreement generation API | 🟢 ready | S2-2 | — |
+| # | Story | Epic | Points | Status | Track |
+|---|-------|------|--------|--------|-------|
+| 6 | Staff Admin Panel — Animals + Adoptions | EPIC-7 S01 (partial) | 8 | BLOCKED #4 | Frontend |
+| 7 | Adoption Application Form (public) | EPIC-11 S01 | 5 | BLOCKED #5 | Frontend |
+| 8 | Mobile-First Responsive Design | EPIC-11 S05 | 5 | BLOCKED #5 | Frontend |
+| 9 | Password Reset Flow | EPIC-10 S02 (partial) | 5 | READY | Backend |
+| 10 | Contact & Inquiry Form | EPIC-11 S02 | 8 | BLOCKED #5 | Frontend |
 
-### S2-3: Donation & Payment API
+**V1 remaining**: ~65 points, 10 work items
 
-| ID | Task | Status | Story | Assignee |
-|----|------|--------|-------|----------|
-| E2-T9 | Integrate Stripe payment processing | 🟢 ready | S2-3 | — |
-| E2-T10 | Integrate PayPal payment processing | 🟢 ready | S2-3 | — |
-| E2-T11 | Implement Tigo Money integration (Paraguay) | 🟢 ready | S2-3 | — |
-| E2-T12 | Create donation tracking & receipts API | 🟢 ready | S2-3 | — |
-| E2-T13 | Add recurring donation management | 🟢 ready | S2-3 | — |
+### Parallel Tracks
 
----
+```
+Week 1-2:
+  Backend:  #1 CI/CD → #2 Intake → #3 API Hardening
+  Frontend: #4 Scaffold → #5 Animal Browsing
 
-## EPIC-3: Frontend — Core Pages (12 tasks)
-
-### S3-1: Authentication Pages
-
-| ID | Task | Status | Story | Assignee |
-|----|------|--------|-------|----------|
-| E3-T1 | Create login page | 🟢 ready | S3-1 | — |
-| E3-T2 | Create signup page with role selection | 🟢 ready | S3-1 | — |
-| E3-T3 | Implement password reset flow | 🟢 ready | S3-1 | — |
-
-### S3-2: Animal Browsing & Search
-
-| ID | Task | Status | Story | Assignee |
-|----|------|--------|-------|----------|
-| E3-T4 | Create animal gallery page | 🟢 ready | S3-2 | — |
-| E3-T5 | Create animal detail page | 🟢 ready | S3-2 | — |
-| E3-T6 | Implement search & filter UI | 🟢 ready | S3-2 | — |
-
-### S3-3: Dashboard Pages
-
-| ID | Task | Status | Story | Assignee |
-|----|------|--------|-------|----------|
-| E3-T7 | Create admin dashboard (overview) | 🟢 ready | S3-3 | — |
-| E3-T8 | Create staff dashboard (animal management) | 🟢 ready | S3-3 | — |
-| E3-T9 | Create adopter dashboard (my animals, applications) | 🟢 ready | S3-3 | — |
-| E3-T10 | Create donor dashboard (donation history, impact) | 🟢 ready | S3-3 | — |
-
-### S3-4: Donation Pages
-
-| ID | Task | Status | Story | Assignee |
-|----|------|--------|-------|----------|
-| E3-T11 | Create donation form page | 🟢 ready | S3-4 | — |
-| E3-T12 | Create donation confirmation page | 🟢 ready | S3-4 | — |
+Week 3-4:
+  Backend:  #9 Password Reset → V2 prep (event bus, audit trail)
+  Frontend: #6 Admin Panel → #7 Adoption Form → #8 Mobile → #10 Contact
+```
 
 ---
 
-## EPIC-4: Frontend — Advanced Features (10 tasks)
+## V2 — Donations & EU Payments (Weeks 5-8)
 
-### S4-1: Adoption Application Flow
-
-| ID | Task | Status | Story | Assignee |
-|----|------|--------|-------|----------|
-| E4-T1 | Create adoption application form | 🟢 ready | S4-1 | — |
-| E4-T2 | Implement application status tracking UI | 🟢 ready | S4-1 | — |
-| E4-T3 | Create application review interface (staff) | 🟢 ready | S4-1 | — |
-
-### S4-2: Medical Records Management
-
-| ID | Task | Status | Story | Assignee |
-|----|------|--------|-------|----------|
-| E4-T4 | Create medical record entry form | 🟢 ready | S4-2 | — |
-| E4-T5 | Implement medical history timeline | 🟢 ready | S4-2 | — |
-| E4-T6 | Add PDF generation for medical records | 🟢 ready | S4-2 | — |
-
-### S4-3: Reporting & Analytics
-
-| ID | Task | Status | Story | Assignee |
-|----|------|--------|-------|----------|
-| E4-T7 | Create adoption statistics dashboard | 🟢 ready | S4-3 | — |
-| E4-T8 | Create donation analytics dashboard | 🟢 ready | S4-3 | — |
-| E4-T9 | Implement CSV export functionality | 🟢 ready | S4-3 | — |
-| E4-T10 | Create impact report generation | 🟢 ready | S4-3 | — |
+| # | Story | Epic | Points | Status |
+|---|-------|------|--------|--------|
+| 1 | Event Bus Infrastructure | EPIC-9 S05 | 8 | READY (can start late V1) |
+| 2 | Audit Trail System | EPIC-13 S01 | 7 | READY (can start late V1) |
+| 3 | Stripe Webhook Processing | EPIC-3 S01 (remaining) | 8 | BLOCKED on V1 |
+| 4 | SEPA Direct Debit | EPIC-3 S02 | 8 | BLOCKED on #3 |
+| 5 | GDPR Consent Tracking | EPIC-13 S07 | 5 | BLOCKED on #2 |
+| 6 | Cash Donation Recording | EPIC-3 S06 | 3 | READY |
+| 7 | In-Kind Donation Recording | EPIC-14 S05 | 5 | READY |
+| 8 | Sponsorship Tiers & Matching | EPIC-14 S01 | 8 | BLOCKED on #3 |
+| 9 | Campaign Management | EPIC-14 S03 | 6 | BLOCKED on V1 frontend |
+| 10 | Donation Landing Page | EPIC-11 S04 | 13 | BLOCKED on V1 frontend |
+| 11 | Donation Dashboard (Staff) | EPIC-3 S04 | 6 | BLOCKED on #3, #4 |
+| 12 | Email Notification System | EPIC-6 S01 | 8 | BLOCKED on #1 |
+| 13 | GDPR Data Export | EPIC-13 S02 | 6 | BLOCKED on #2, #5 |
 
 ---
 
-## EPIC-5: Email & Notifications (8 tasks)
+## V3 — Communications (Weeks 9-12)
 
-| ID | Task | Status | Story | Assignee |
-|----|------|--------|-------|----------|
-| E5-T1 | Setup email service (SendGrid/Nodemailer) | 🟢 ready | S5-1 | — |
-| E5-T2 | Create email templates (adoption updates, donation receipts) | 🟢 ready | S5-1 | — |
-| E5-T3 | Implement adoption status notification emails | 🟢 ready | S5-1 | — |
-| E5-T4 | Create donation confirmation emails | 🟢 ready | S5-1 | — |
-| E5-T5 | Implement SMS notifications (Paraguay-aware) | 🟢 ready | S5-2 | — |
-| E5-T6 | Add push notifications for mobile | 🟢 ready | S5-2 | — |
-| E5-T7 | Create notification preferences UI | 🟢 ready | S5-2 | — |
-| E5-T8 | Implement notification audit log | 🟢 ready | S5-2 | — |
-
----
-
-## EPIC-6: Testing & Quality (9 tasks)
-
-### S6-1: Unit & Integration Testing
-
-| ID | Task | Status | Story | Assignee |
-|----|------|--------|-------|----------|
-| E6-T1 | Create Vitest unit tests for API routes | 🟢 ready | S6-1 | — |
-| E6-T2 | Create Vitest unit tests for utilities | 🟢 ready | S6-1 | — |
-| E6-T3 | Create integration tests for database operations | 🟢 ready | S6-1 | — |
-| E6-T4 | Implement test coverage reporting | 🟢 ready | S6-1 | — |
-
-### S6-2: End-to-End Testing
-
-| ID | Task | Status | Story | Assignee |
-|----|------|--------|-------|----------|
-| E6-T5 | Create Playwright tests for adoption flow | 🟢 ready | S6-2 | — |
-| E6-T6 | Create Playwright tests for donation flow | 🟢 ready | S6-2 | — |
-| E6-T7 | Create Playwright tests for animal search | 🟢 ready | S6-2 | — |
-
-### S6-3: Performance & Security
-
-| ID | Task | Status | Story | Assignee |
-|----|------|--------|-------|----------|
-| E6-T8 | Implement security testing (OWASP) | 🟢 ready | S6-3 | — |
-| E6-T9 | Add performance testing & benchmarks | 🟢 ready | S6-3 | — |
+| # | Story | Epic | Points |
+|---|-------|------|--------|
+| 1 | WhatsApp Integration | EPIC-6 S02 | 8 |
+| 2 | In-App Notifications | EPIC-6 S03 | 6 |
+| 3 | Notification Preferences | EPIC-6 S04 | 5 |
+| 4 | Adoption Notifications (status changes) | EPIC-2 S03 | 5 |
+| 5 | PDF Adoption Contracts | EPIC-2 S04 | 6 |
+| 6 | Post-Adoption Follow-up | EPIC-2 S05 | 8 |
+| 7 | Tigo Money Integration (PYG) | EPIC-3 S03 | 8 |
+| 8 | Sponsor Update Notifications | EPIC-14 S02 | 6 |
+| 9 | Campaign Progress & Social Proof | EPIC-14 S04 | 5 |
+| 10 | Impact Report Generator | EPIC-13 S03 | 7 |
+| 11 | Fund Allocation Tracking | EPIC-13 S04 | 6 |
+| 12 | GDPR Data Deletion | EPIC-13 S06 | 5 |
+| 13 | Success Stories Page | EPIC-11 S06 | 5 |
+| 14 | About & Educational Pages | EPIC-11 S03 | 8 |
+| 15 | Multi-Language (ES + EN) | EPIC-11 S03 | 5 |
 
 ---
 
-## EPIC-7: DevOps & Deployment (7 tasks)
+## V4 — Operations (Weeks 13-18)
 
-### S7-1: Docker & Containers
-
-| ID | Task | Status | Story | Assignee |
-|----|------|--------|-------|----------|
-| E7-T1 | Create Dockerfile for backend | 🟢 ready | S7-1 | — |
-| E7-T2 | Create Dockerfile for frontend | 🟢 ready | S7-1 | — |
-| E7-T3 | Create docker-compose.yml for local development | 🟢 ready | S7-1 | — |
-
-### S7-2: Kubernetes & Cloud Deployment
-
-| ID | Task | Status | Story | Assignee |
-|----|------|--------|-------|----------|
-| E7-T4 | Create Kubernetes manifests for production | 🟢 ready | S7-2 | — |
-| E7-T5 | Setup AWS deployment pipeline | 🟢 ready | S7-2 | — |
-| E7-T6 | Implement auto-scaling policies | 🟢 ready | S7-2 | — |
-| E7-T7 | Setup monitoring & alerting (CloudWatch/Prometheus) | 🟢 ready | S7-2 | — |
-
----
-
-## EPIC-8: Security & Compliance (6 tasks)
-
-| ID | Task | Status | Story | Assignee |
-|----|------|--------|-------|----------|
-| E8-T1 | Implement SSL/TLS certificates | 🟢 ready | S8-1 | — |
-| E8-T2 | Add rate limiting & DDoS protection | 🟢 ready | S8-1 | — |
-| E8-T3 | Implement GDPR compliance (data privacy) | 🟢 ready | S8-2 | — |
-| E8-T4 | Add payment PCI-DSS compliance | 🟢 ready | S8-2 | — |
-| E8-T5 | Create security audit logging | 🟢 ready | S8-2 | — |
-| E8-T6 | Setup vulnerability scanning (Snyk, Dependabot) | 🟢 ready | S8-2 | — |
+| # | Story | Epic | Points |
+|---|-------|------|--------|
+| 1 | Medical Record Schema & API | EPIC-4 S01 | 8 |
+| 2 | Veterinary Notes & Documents | EPIC-4 S02 | 6 |
+| 3 | Medical Timeline & History | EPIC-4 S03 | 5 |
+| 4 | Vaccination & Medication Tracking | EPIC-4 S04 | 8 |
+| 5 | Volunteer Registration & Profiles | EPIC-5 S01 | 5 |
+| 6 | Volunteer Onboarding Checklist | EPIC-5 S05 | 5 |
+| 7 | Shift Scheduling System | EPIC-5 S02 | 8 |
+| 8 | Task Assignment & Tracking | EPIC-5 S03 | 6 |
+| 9 | Volunteer Recognition & Analytics | EPIC-5 S04 | 5 |
+| 10 | Foster Family Registration | EPIC-12 S01 | 5 |
+| 11 | Foster Placement & Matching | EPIC-12 S02 | 8 |
+| 12 | Foster Check-in & Monitoring | EPIC-12 S03 | 6 |
+| 13 | Foster-to-Adopt Pathway | EPIC-12 S04 | 6 |
+| 14 | Foster Supply & Cost Tracking | EPIC-12 S05 | 5 |
+| 15 | Outcome Metrics & Analytics | EPIC-13 S05 | 7 |
 
 ---
 
-## EPIC-9: Documentation & Launch (7 tasks)
+## V5 — Analytics & Scale (Weeks 19-24)
 
-### S9-1: User Documentation
-
-| ID | Task | Status | Story | Assignee |
-|----|------|--------|-------|----------|
-| E9-T1 | Create user guides (adopter, staff, donor) | 🟢 ready | S9-1 | — |
-| E9-T2 | Create API documentation (OpenAPI/Swagger) | 🟢 ready | S9-1 | — |
-| E9-T3 | Create deployment documentation | 🟢 ready | S9-1 | — |
-
-### S9-2: Testing & Launch
-
-| ID | Task | Status | Story | Assignee |
-|----|------|--------|-------|----------|
-| E9-T4 | Conduct UAT with stakeholders | 🟢 ready | S9-2 | — |
-| E9-T5 | Fix UAT feedback bugs | 🟢 ready | S9-2 | — |
-| E9-T6 | Perform production deployment | 🟢 ready | S9-2 | — |
-
-### S9-3: Post-Launch
-
-| ID | Task | Status | Story | Assignee |
-|----|------|--------|-------|----------|
-| E9-T7 | Setup production monitoring & support | 🟢 ready | S9-3 | — |
+| # | Story | Epic | Points |
+|---|-------|------|--------|
+| 1 | Admin Dashboard & Analytics | EPIC-7 S01 | 8 |
+| 2 | User & Role Management UI | EPIC-7 S02 | 6 |
+| 3 | Content & Settings Management | EPIC-7 S03 | 5 |
+| 4 | Reporting & Export | EPIC-7 S04 | 6 |
+| 5 | Admin Panel Localization | EPIC-7 S05 | 5 |
+| 6 | Advanced Search & Filters (tsvector) | EPIC-1 S05 | 8 |
+| 7 | Password Reset + Email Verification | EPIC-10 S02 (complete) | 5 |
+| 8 | Profile Management | EPIC-10 S03 | 5 |
+| 9 | E2E Testing (Playwright) | EPIC-8 S03 | 8 |
+| 10 | Performance & Security Testing | EPIC-8 S04 | 6 |
+| 11 | Production Deployment & TLS | EPIC-9 S03 | 8 |
+| 12 | Monitoring & Logging | EPIC-9 S04 | 6 |
 
 ---
 
-## Summary Statistics
+## Ticket ID Allocation
 
-| Epic | Total Tasks | Ready | Claimed | In Progress | Review | Done | Blocked |
-|------|-------------|-------|---------|-------------|--------|------|---------|
-| EPIC-0 | 7 | 6 | — | — | — | 1 | — |
-| EPIC-1 | 11 | 11 | — | — | — | — | — |
-| EPIC-2 | 13 | 13 | — | — | — | — | — |
-| EPIC-3 | 12 | 12 | — | — | — | — | — |
-| EPIC-4 | 10 | 10 | — | — | — | — | — |
-| EPIC-5 | 8 | 8 | — | — | — | — | — |
-| EPIC-6 | 9 | 9 | — | — | — | — | — |
-| EPIC-7 | 7 | 7 | — | — | — | — | — |
-| EPIC-8 | 6 | 6 | — | — | — | — | — |
-| EPIC-9 | 7 | 7 | — | — | — | — | — |
-| **TOTAL** | **90** | **79** | **0** | **0** | **0** | **1** | **0** |
+| Range | Version | Purpose |
+|-------|---------|---------|
+| RAP-001 to RAP-010 | Pre-V1 | Backend foundation (done) |
+| RAP-011 to RAP-030 | V1 | MVP frontend + CI/CD |
+| RAP-031 to RAP-050 | V2 | Donations + EU compliance |
+| RAP-051 to RAP-070 | V3 | Communications + workflow |
+| RAP-071 to RAP-095 | V4 | Operations |
+| RAP-096 to RAP-120 | V5 | Analytics + scale |
 
 ---
 
-## How to Use This Queue
+## Rules
 
-1. **Find a task**: Scan for 🟢 `ready` status
-2. **Claim it**: Create a PR with task details (see AGENT-GUIDE.md)
-3. **Update status**: Change status to 🔒 `claimed` in this file
-4. **Track progress**: Update status as you work (🔨 → 👀 → ✅)
-5. **Report completion**: Link merged PR in CLAIMING.md
-
-**Note**: This file is the source of truth. Update it as tasks progress.
-
+1. **Pick up top-to-bottom** — items are dependency-ordered
+2. **One ticket at a time** — use `/start-ticket RAP-NNN`
+3. **Run `make all-checks`** before every commit
+4. **Update this file** when completing stories (move to Done)
+5. **Never start a BLOCKED item** — check dependencies first
+6. **Commit often** — small, focused commits with ticket IDs

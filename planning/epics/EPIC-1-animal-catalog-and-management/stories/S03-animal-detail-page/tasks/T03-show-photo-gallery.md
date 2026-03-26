@@ -1,125 +1,80 @@
 ---
-task: T03
-story: S03
 epic: EPIC-1
-title: Show photo gallery
-status: ready
+story: S03
+task: T03
+title: Define Animal Photo Gallery Endpoint
+status: pending
+effort_hours: 2
 priority: medium
-agent_type: frontend
-created: 2026-03-25T17:13:26.726543
+dependencies:
+  - S03/T01-create-detail-page-component
+  - S03/T02-display-animal-information
+  - S04/T01-configure-supabase-storage-for-animal-photos
 ---
 
-# T03: Show photo gallery
+## Overview
 
-## Description
+Define the FastAPI endpoint that returns the ordered list of photos for a specific animal. While the animal detail endpoint (T01) already includes a photos list embedded in the AnimalDetailResponse, this separate endpoint allows clients to fetch or refresh the photo list independently — for example, if a frontend wants to implement a lazy-loading gallery that fetches photos only when the user scrolls to the photo section, or if an admin interface wants to reload the photo list after uploading a new photo without refetching the entire animal record.
 
-Build the `AnimalPhotoGallery` Client Component that displays a row of thumbnail images below the primary photo on the animal detail page. Clicking a thumbnail swaps the main displayed image. This is the only interactive element on the detail page — everything else is Server-rendered.
+## Why This Matters
+
+Separating the photo list endpoint from the animal detail endpoint follows the principle that resources should be independently addressable. The animal record and its photos are separate concerns: the animal record changes when staff update medical information or adoption status, while the photo list changes when volunteers upload new photos or designate a different primary photo. Clients that are subscribed to or caching the detail endpoint should not need to invalidate their cached animal record every time a photo is added. The dedicated photo endpoint allows targeted cache invalidation.
 
 ## Context
 
-- Client Component (`'use client'`) — needs `useState` for selected photo state
-- Thumbnails: max 6 photos from `photo_gallery_urls` array stored in Supabase Storage
-- Photos served from Supabase Storage public bucket `animals-photos`
-- CSS: Tailwind CSS 3.4.19 PINNED — use CSS vars, NOT hardcoded colors
-- `next/image` required for all images — never `<img>` tags
+The animal_photos table, defined in S04/T01, stores one row per photo per animal. Each row contains the animal_id foreign key, the photo URL or storage path, a boolean is_primary flag indicating whether this photo should be displayed as the main photo in the catalog and at the top of the detail page, and timestamps. The photo endpoint returns these rows ordered by is_primary descending and then by created_at ascending, so the primary photo always appears first in the list.
 
-## Files to create
+The maximum number of photos per animal is not enforced at the database level but is documented here for clarity: shelters typically upload between one and six photos per animal, and the frontend gallery implementation is designed around displaying up to six thumbnails. The photo endpoint returns all photos without a hard limit, so if a shelter uploads more than six photos the client receives all of them and is responsible for capping the gallery display.
 
-### `src/components/animals/AnimalPhotoGallery.tsx`
+## Implementation Steps
 
-```typescript
-'use client'
+### Step 1: Define the Route Handler
 
-import { useState } from 'react'
-import Image from 'next/image'
+In src/routers/animals.py, add a route at GET /animals/{id}/photos with a response model of a list of AnimalPhotoResponse objects. The route handler accepts an integer id path parameter and a SQLAlchemy AsyncSession. It first verifies that the animal with the given id exists by querying the animals table — if no animal exists, it raises a 404 HTTPException. It then queries the animal_photos table for all rows where animal_id matches the given id, orders them by is_primary descending and created_at ascending, and returns the resulting list.
 
-interface AnimalPhotoGalleryProps {
-  animalName: string
-  photos: string[]
-  primaryPhoto: string | null
-}
+Returning a 404 when the animal does not exist is important because it distinguishes between an animal with no photos (which returns 200 with an empty list) and an animal that does not exist at all (which returns 404). A client that receives an empty list knows the animal exists but has no photos yet — perhaps a new intake that has not been photographed. A client that receives a 404 knows the animal ID is invalid.
 
-const PLACEHOLDER_IMAGE = '/images/animal-placeholder.webp'
-const MAX_GALLERY_PHOTOS = 6
+### Step 2: Handle the Empty Photo List
 
-export function AnimalPhotoGallery({ animalName, photos, primaryPhoto }: AnimalPhotoGalleryProps) {
-  const allPhotos = [
-    ...(primaryPhoto ? [primaryPhoto] : []),
-    ...photos.filter((url) => url !== primaryPhoto),
-  ].slice(0, MAX_GALLERY_PHOTOS)
+When the animal exists but has no associated photos, the endpoint returns a 200 response with an empty JSON array. This is the expected state for newly created animals before S04's photo upload infrastructure is used. The frontend is responsible for showing a placeholder image when the photos list is empty — this is documented in the AnimalDetailResponse schema (S03/T02), where primary_photo_url is None when no photos exist.
 
-  const [selectedIndex, setSelectedIndex] = useState(0)
-  const selectedPhoto = allPhotos[selectedIndex] ?? PLACEHOLDER_IMAGE
+### Step 3: Define the Photo Ordering Service Function
 
-  if (allPhotos.length <= 1) return null
+In src/services/animal_service.py, define a function named get_animal_photos that accepts a SQLAlchemy AsyncSession and an integer animal_id and returns a list of AnimalPhoto model instances ordered by is_primary descending and created_at ascending. The function queries the animal_photos table directly without joining to the animals table — the route handler is responsible for verifying animal existence before calling this function.
 
-  return (
-    <div>
-      {/* Main selected photo */}
-      <div className="relative aspect-[4/3] rounded-xl overflow-hidden mb-3 bg-[var(--bg-skeleton)]">
-        <Image
-          src={selectedPhoto}
-          alt={`Foto ${selectedIndex + 1} de ${animalName}`}
-          fill
-          sizes="(max-width: 768px) 100vw, 50vw"
-          className="object-cover"
-        />
-      </div>
+This separation keeps the service function narrowly focused on the photo retrieval logic and makes it independently testable with a mock session that returns a pre-constructed list of photo instances.
 
-      {/* Thumbnail strip */}
-      <div className="flex gap-2 overflow-x-auto pb-1">
-        {allPhotos.map((url, idx) => (
-          <button
-            key={url}
-            onClick={() => setSelectedIndex(idx)}
-            aria-label={`Ver foto ${idx + 1} de ${animalName}`}
-            aria-pressed={idx === selectedIndex}
-            className={`
-              relative flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all
-              ${idx === selectedIndex
-                ? 'border-[var(--color-primary)] opacity-100'
-                : 'border-[var(--border-subtle)] opacity-70 hover:opacity-100 hover:border-[var(--color-primary)]'
-              }
-            `}
-          >
-            <Image
-              src={url}
-              alt={`Miniatura ${idx + 1}`}
-              fill
-              sizes="64px"
-              className="object-cover"
-            />
-          </button>
-        ))}
-      </div>
-    </div>
-  )
-}
-```
+### Step 4: Add HTTP Caching Headers
+
+The photo endpoint is public and benefits from aggressive caching since photos do not change frequently. Add a Cache-Control header with max-age set to 300 seconds (five minutes) for the photo list response. When new photos are uploaded via the admin interface, the cache will expire naturally, or the frontend can implement an explicit cache bust by appending a timestamp query parameter that causes the browser to treat the URL as new.
+
+### Step 5: Write Integration Tests
+
+In tests/integration/test_animals.py, add integration tests for the photo gallery endpoint. The test for the empty photo state creates an animal using the animal fixture and sends a GET request to /animals/{animal.id}/photos. The response should have status 200 and the body should be an empty JSON array, because no photos have been inserted for the test animal.
+
+The test for the not-found case sends a GET request to /animals/NONEXISTENT_ANIMAL_ID/photos and verifies that the response status is 404.
+
+Once the animal_photos table exists (after S04/T01 is implemented), an additional integration test should create an animal and insert two photo rows — one with is_primary equal to True and one with is_primary equal to False — and verify that the photo endpoint returns both photos with the primary photo appearing first in the list regardless of insertion order.
 
 ## Acceptance Criteria
 
-- [ ] `AnimalPhotoGallery` is a `'use client'` component using `useState`
-- [ ] Returns `null` when there is only one or zero photos (no gallery needed)
-- [ ] Primary photo (`photo_primary_url`) always appears first in the thumbnail strip
-- [ ] Clicking a thumbnail updates the main displayed image
-- [ ] Max 6 photos shown in gallery (additional photos silently truncated)
-- [ ] Active thumbnail has a visible border highlight using `--color-primary`
-- [ ] Each thumbnail button has `aria-pressed` for accessibility
-- [ ] All images use `next/image` with `fill` and appropriate `sizes`
-- [ ] All CSS uses CSS variable classes — no hardcoded Tailwind color utilities
-- [ ] TypeScript: no type errors
+- The GET /animals/{id}/photos endpoint returns a 200 response with a list of AnimalPhotoResponse objects when the animal exists
+- The endpoint returns an empty list when the animal exists but has no photos
+- The endpoint returns a 404 when the animal does not exist
+- Photos are ordered with is_primary equal to True first, then by created_at ascending
+- The response includes a Cache-Control header with max-age 300
+- Integration tests cover the empty-photos case and the not-found case
 
-## Implementation Notes
+## Common Issues and Solutions
 
-- `allPhotos` deduplicates primary photo from gallery array to avoid showing it twice — filter uses `!== primaryPhoto` URL comparison
-- `MAX_GALLERY_PHOTOS = 6` is a named constant — change here to affect the whole component
-- The main selected photo lives in the same component as thumbnails (`AnimalDetailView` slots this in below the static primary photo — so at small screen sizes users see both)
-- `overflow-x-auto` on the thumbnail strip handles mobile when there are many photos
-- Supabase Storage URLs are public and served directly — no signed URL needed for `animals-photos` bucket
+If the photo endpoint returns a 200 with an empty list for an animal that has photos, the query may be filtering on the wrong column or using the wrong foreign key. Verify that the query filters animal_photos rows by animal_id and not by id (the photo's own primary key). A common mistake when constructing the query is accidentally filtering on the photos table's own primary key column, which shares the name id with the path parameter.
 
-## Related
+If the primary photo is not appearing first in the response list, verify that the order_by clause specifies is_primary in descending order. SQLAlchemy's default sort direction is ascending, and ascending order on a boolean column in PostgreSQL places False before True, which is the opposite of the intended behavior.
 
-- Depends on: T01 (page), T02 (AnimalDetailView imports and renders this)
-- Photos stored in: `animals-photos` Supabase Storage bucket (EPIC-1/S04/T01)
-- Part of: S03 — Animal Detail Page
+If the photo endpoint returns a 404 for all requests even when the animal exists, verify that the existence check queries the animals table and not the animal_photos table. An animal with no photos does not have any rows in animal_photos, so checking for the animal's existence in animal_photos would incorrectly return a 404 for animals that simply have no photos yet.
+
+## Related Tasks
+
+- S03/T01: Detail endpoint — embeds photo list using the same ordering logic
+- S03/T02: AnimalPhotoResponse schema — the response model this endpoint returns as a list
+- S04/T01: Animal photo storage — creates the AnimalPhoto model and animal_photos table that this endpoint queries

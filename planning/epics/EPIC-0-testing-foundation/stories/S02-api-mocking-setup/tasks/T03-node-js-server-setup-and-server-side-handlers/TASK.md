@@ -2,863 +2,118 @@
 epic: EPIC-0
 story: S02
 task: T03
-title: "Node.js Server Setup and Server-Side Handlers"
-description: "Configure Mock Service Worker (MSW) for Node.js server-side testing with request handlers that mirror browser handlers"
+title: Organize pytest Integration Test Module Structure
+status: pending
 effort_hours: 2
 priority: high
 dependencies:
   - T01-install-and-configure-msw-for-browser-tests
   - T02-create-supabase-request-handlers
-status: planned
-created_date: 2026-03-25
-last_updated: 2026-03-25
-tags:
-  - testing
-  - mocking
-  - msw
-  - node.js
-  - server-side-testing
 ---
 
-## Acceptance Criteria
+## Overview
 
-### 1. Server-Side MSW Configuration
-- [ ] `.vitest/setup-server.ts` file created with setupServer configuration
-- [ ] setupServer aggregates all handlers (auth, REST, storage)
-- [ ] Server instance properly scoped for test isolation
-- [ ] Before/after hooks prevent handler state leakage
-- [ ] Server resets between tests to ensure clean state
+Establish the integration test module structure under tests/integration/ and document the patterns that all FastAPI integration test files must follow. Integration tests in this project differ from unit tests in two critical ways: they use the httpx.AsyncClient bound to the live FastAPI application via ASGITransport, and they interact with the test PostgreSQL database through the db_session fixture. This task defines where integration test files live, how they import shared fixtures, and what test organization patterns every integration test file must follow.
 
-### 2. Server-Side Handlers Setup
-- [ ] `.vitest/handlers/server.ts` created exporting server instance
-- [ ] All browser handlers (auth, REST, storage) imported and reused
-- [ ] Server-side handlers identical to browser handlers (DRY principle)
-- [ ] Handler layer is environment-agnostic
-- [ ] No browser-specific code in shared handlers
+## Why This Matters
 
-### 3. Test Utilities for Server-Side Testing
-- [ ] `.vitest/utils/server-test-helpers.ts` created with utility functions:
-  - `getAuthorizedHeaders()` — returns headers with mock JWT token
-  - `createMockUser()` — creates authenticated user context
-  - `createMockDonor()` — creates donor test data
-  - `createMockAnimal()` — creates animal test data
-  - `resetServerState()` — clears handler state between tests
-- [ ] Helper functions return typed objects matching Supabase response format
-- [ ] Helpers support customization (override defaults)
-- [ ] Handlers properly documented with TypeScript JSDoc
+Without a consistent module structure, integration tests scatter across the project and teams cannot predict where to find or add test coverage for a given endpoint. Defining this structure now ensures that future test files for authentication, animal endpoints, adoption workflows, and donation flows all follow the same import conventions, fixture usage patterns, and assertion styles. The structure established here directly mirrors the organization used in S03 (database fixtures) and the FastAPI router organization in src/routers/.
 
-### 4. Integration Tests Sample
-- [ ] `tests/integration/api/auth.integration.test.ts` created demonstrating:
-  - Server-side signup flow with successful JWT token return
-  - Login with email/password and token refresh
-  - Authenticated user profile retrieval
-  - Password recovery request flow
-  - Logout clearing session
-  - Error handling (400, 401, 404 responses)
-- [ ] All tests pass with server-side handlers
-- [ ] Tests verify JWT token in Authorization header
-- [ ] Tests validate response structure matches TypeScript types
+## Context
 
-### 5. REST API Integration Tests Sample
-- [ ] `tests/integration/api/animals.integration.test.ts` created demonstrating:
-  - Fetch animals list with pagination (Content-Range header)
-  - Fetch single animal by ID
-  - Create animal (POST with Authorization)
-  - Update animal (PATCH with Authorization)
-  - Multi-currency donation context (PYG, EUR, USD)
-  - Error handling (401 without token, 404 not found)
-- [ ] Tests verify paginated response structure
-- [ ] Tests verify animals sorted by adoption_priority
-- [ ] Tests validate Content-Range header format
+The previous tasks (T01 and T02) established the httpx.AsyncClient fixture and the SQLAlchemy data fixtures in tests/conftest.py. Those fixtures are available to every test file automatically through pytest's conftest discovery mechanism. This task focuses on the integration test subdirectory structure, the pytest marker configuration that labels tests as integration tests, and the sample test files that demonstrate correct patterns for authentication and CRUD endpoint testing.
 
-### 6. Storage API Integration Tests Sample
-- [ ] `tests/integration/api/storage.integration.test.ts` created demonstrating:
-  - File upload to animals bucket
-  - File retrieval by name
-  - File deletion
-  - List files in bucket
-  - Copy file operation
-  - Error handling (403 forbidden, 404 not found)
-- [ ] Tests verify file metadata in response
-- [ ] Tests validate bucket path structure
-- [ ] Tests verify proper blob handling
-
-### 7. TypeScript Configuration
-- [ ] vitest.config.ts updated with Node.js globals if needed
-- [ ] Environment-specific configuration for server tests
-- [ ] No conflicts between browser and server test environments
-
-### 8. Documentation
-- [ ] `.vitest/README.md` created documenting:
-  - MSW setup for both browser and server
-  - How to add new request handlers
-  - How to mock errors and edge cases
-  - How to test authenticated endpoints
-  - Common patterns for testing Supabase APIs
-- [ ] Examples provided for each handler type (auth, REST, storage)
-- [ ] Troubleshooting section for common issues
-
----
+Integration tests are defined as tests that issue HTTP requests through the FastAPI application and verify responses based on data that exists in the test database. They are slower than unit tests and require a running PostgreSQL test database, so they are separated from unit tests and marked with the pytest.mark.integration marker so developers can run unit tests in isolation during rapid iteration.
 
 ## Implementation Steps
 
-### Step 1: Create Server-Side MSW Setup
-
-**File**: `.vitest/setup-server.ts`
-
-```typescript
-import { setupServer } from 'msw/node';
-import { authHandlers } from './handlers/supabase-auth';
-import { restHandlers } from './handlers/supabase-rest';
-import { storageHandlers } from './handlers/supabase-storage';
-
-/**
- * Mock Service Worker server setup for Node.js test environment.
- * Aggregates all request handlers for auth, REST API, and storage.
- *
- * Usage in tests:
- * ```typescript
- * import { server } from '.vitest/setup-server';
- *
- * beforeAll(() => server.listen());
- * afterEach(() => server.resetHandlers());
- * afterAll(() => server.close());
- * ```
- */
-export const server = setupServer(
-  ...authHandlers,
-  ...restHandlers,
-  ...storageHandlers
-);
-
-// Log unhandled requests in development
-if (process.env.DEBUG_MSW) {
-  server.events.on('request:unhandled', ({ request }) => {
-    console.warn(`[MSW] Unhandled ${request.method} ${request.url}`);
-  });
-}
-```
-
-### Step 2: Create Server Handler Export
-
-**File**: `.vitest/handlers/server.ts`
-
-```typescript
-/**
- * Re-exports all MSW handlers for server-side use.
- * Ensures handlers are environment-agnostic (browser and server use same handlers).
- */
-
-export { authHandlers } from './supabase-auth';
-export { restHandlers } from './supabase-rest';
-export { storageHandlers } from './supabase-storage';
-
-// Export aggregated handlers list for setupServer
-import { authHandlers } from './supabase-auth';
-import { restHandlers } from './supabase-rest';
-import { storageHandlers } from './supabase-storage';
-
-export const allHandlers = [
-  ...authHandlers,
-  ...restHandlers,
-  ...storageHandlers,
-];
-```
-
-### Step 3: Create Server-Side Test Helpers
-
-**File**: `.vitest/utils/server-test-helpers.ts`
-
-```typescript
-import type { MockUser, MockDonor, MockAnimal, SupabaseAuthResponse } from '../handlers/types';
-
-const MOCK_JWT_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyLTEyMyIsImVtYWlsIjoiZG9ub3JAZXhhbXBsZS5jb20iLCJpYXQiOjE2Nzc5MTUwMDB9.mock_signature';
-
-/**
- * Returns HTTP headers with mock JWT token for authenticated requests.
- *
- * @param token - Optional custom JWT token (defaults to mock token)
- * @returns Object with Authorization header for Supabase API requests
- *
- * @example
- * const headers = getAuthorizedHeaders();
- * const response = await fetch(`${SUPABASE_URL}/rest/v1/animals`, { headers });
- */
-export function getAuthorizedHeaders(token: string = MOCK_JWT_TOKEN): Record<string, string> {
-  return {
-    Authorization: `Bearer ${token}`,
-    'Content-Type': 'application/json',
-  };
-}
-
-/**
- * Creates a mock user for authenticated test contexts.
- *
- * @param overrides - Partial user properties to override defaults
- * @returns Mock user object matching Supabase user schema
- *
- * @example
- * const user = createMockUser({ email: 'custom@example.com' });
- */
-export function createMockUser(overrides?: Partial<MockUser>): MockUser {
-  return {
-    id: 'user-123',
-    email: 'donor@example.com',
-    email_confirmed_at: '2026-03-01T00:00:00Z',
-    phone: null,
-    confirmation_sent_at: null,
-    confirmed_at: '2026-03-01T00:00:00Z',
-    recovery_sent_at: null,
-    last_sign_in_at: '2026-03-25T00:00:00Z',
-    app_metadata: { provider: 'email' },
-    user_metadata: { full_name: 'John Smith' },
-    aud: 'authenticated',
-    created_at: '2026-03-01T00:00:00Z',
-    updated_at: '2026-03-25T00:00:00Z',
-    ...overrides,
-  };
-}
-
-/**
- * Creates a mock donor for testing donor-related endpoints.
- *
- * @param overrides - Partial donor properties to override defaults
- * @returns Mock donor object with payment and location data
- *
- * @example
- * const europeanDonor = createMockDonor({
- *   country: 'NL',
- *   preferred_currency: 'EUR'
- * });
- */
-export function createMockDonor(overrides?: Partial<MockDonor>): MockDonor {
-  return {
-    id: 'donor-123',
-    user_id: 'user-123',
-    email: 'donor@example.com',
-    full_name: 'John Smith',
-    country: 'NL',
-    preferred_currency: 'EUR',
-    monthly_amount: 50.00,
-    payment_method: 'ideal',
-    is_active: true,
-    created_at: '2026-03-01T00:00:00Z',
-    updated_at: '2026-03-25T00:00:00Z',
-    ...overrides,
-  };
-}
-
-/**
- * Creates a mock animal for testing animal catalog endpoints.
- *
- * @param overrides - Partial animal properties to override defaults
- * @returns Mock animal object with shelter and adoption data
- *
- * @example
- * const adoptableAnimal = createMockAnimal({
- *   status: 'adoptable',
- *   adoption_priority: 1
- * });
- */
-export function createMockAnimal(overrides?: Partial<MockAnimal>): MockAnimal {
-  return {
-    id: 'animal-123',
-    shelter_id: 'shelter-001',
-    name: 'Luna',
-    species: 'dog',
-    breed: 'mixed',
-    age_months: 24,
-    gender: 'female',
-    status: 'available',
-    adoption_priority: 2,
-    description: 'Friendly and energetic dog',
-    image_url: 'https://example.com/luna.jpg',
-    arrival_date: '2025-12-01T00:00:00Z',
-    microchip_id: 'CHIP123456789',
-    medical_notes: 'Vaccinated, neutered',
-    created_at: '2025-12-01T00:00:00Z',
-    updated_at: '2026-03-25T00:00:00Z',
-    ...overrides,
-  };
-}
-
-/**
- * Resets server state between tests to ensure clean isolation.
- * Imported server must be accessible for this to work.
- *
- * @param server - MSW server instance from setup-server.ts
- *
- * @example
- * afterEach(() => resetServerState(server));
- */
-export async function resetServerState(server: any): Promise<void> {
-  server.resetHandlers();
-}
-```
-
-### Step 4: Create Sample Auth Integration Test
-
-**File**: `tests/integration/api/auth.integration.test.ts`
-
-```typescript
-import { beforeAll, afterEach, afterAll, describe, it, expect } from 'vitest';
-import { server } from '../../../.vitest/setup-server';
-import { getAuthorizedHeaders, createMockUser } from '../../../.vitest/utils/server-test-helpers';
-
-const SUPABASE_URL = process.env.VITE_SUPABASE_URL || 'https://project.supabase.co';
-
-describe('Supabase Auth API - Server-Side Integration Tests', () => {
-  beforeAll(() => server.listen());
-  afterEach(() => server.resetHandlers());
-  afterAll(() => server.close());
-
-  describe('POST /auth/v1/signup', () => {
-    it('should create new user with valid email and password', async () => {
-      const response = await fetch(`${SUPABASE_URL}/auth/v1/signup`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: 'newdonor@example.com',
-          password: 'secure_password_123',
-        }),
-      });
-
-      expect(response.status).toBe(200);
-      const data = await response.json();
-      expect(data.user).toBeDefined();
-      expect(data.user.email).toBe('newdonor@example.com');
-      expect(data.session).toBeDefined();
-      expect(data.session.access_token).toBeDefined();
-      expect(data.session.token_type).toBe('bearer');
-    });
-
-    it('should return 400 for invalid email', async () => {
-      const response = await fetch(`${SUPABASE_URL}/auth/v1/signup`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: 'invalid-email',
-          password: 'password123',
-        }),
-      });
-
-      expect(response.status).toBe(400);
-      const data = await response.json();
-      expect(data.error).toBeDefined();
-    });
-  });
-
-  describe('POST /auth/v1/token', () => {
-    it('should return access token with valid credentials (password grant)', async () => {
-      const response = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: 'donor@example.com',
-          password: 'password123',
-        }),
-      });
-
-      expect(response.status).toBe(200);
-      const data = await response.json();
-      expect(data.access_token).toBeDefined();
-      expect(data.token_type).toBe('bearer');
-      expect(data.refresh_token).toBeDefined();
-    });
-
-    it('should return 401 for invalid credentials', async () => {
-      const response = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=password`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: 'donor@example.com',
-          password: 'wrong_password',
-        }),
-      });
-
-      expect(response.status).toBe(401);
-    });
-  });
-
-  describe('GET /auth/v1/user', () => {
-    it('should return authenticated user profile', async () => {
-      const headers = getAuthorizedHeaders();
-      const response = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
-        method: 'GET',
-        headers,
-      });
-
-      expect(response.status).toBe(200);
-      const user = await response.json();
-      expect(user.id).toBe('user-123');
-      expect(user.email).toBe('donor@example.com');
-      expect(user.user_metadata).toBeDefined();
-    });
-
-    it('should return 401 without Authorization header', async () => {
-      const response = await fetch(`${SUPABASE_URL}/auth/v1/user`, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-      });
-
-      expect(response.status).toBe(401);
-    });
-  });
-
-  describe('POST /auth/v1/logout', () => {
-    it('should logout user and return 204', async () => {
-      const headers = getAuthorizedHeaders();
-      const response = await fetch(`${SUPABASE_URL}/auth/v1/logout`, {
-        method: 'POST',
-        headers,
-      });
-
-      expect(response.status).toBe(204);
-    });
-
-    it('should return 401 without token', async () => {
-      const response = await fetch(`${SUPABASE_URL}/auth/v1/logout`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-      });
-
-      expect(response.status).toBe(401);
-    });
-  });
-
-  describe('POST /auth/v1/recover', () => {
-    it('should send password recovery email', async () => {
-      const response = await fetch(`${SUPABASE_URL}/auth/v1/recover`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: 'donor@example.com',
-        }),
-      });
-
-      expect(response.status).toBe(200);
-      const data = await response.json();
-      expect(data.message).toContain('Recovery link sent');
-    });
-  });
-});
-```
-
-### Step 5: Create Sample Animals REST API Integration Test
-
-**File**: `tests/integration/api/animals.integration.test.ts`
-
-```typescript
-import { beforeAll, afterEach, afterAll, describe, it, expect } from 'vitest';
-import { server } from '../../../.vitest/setup-server';
-import { getAuthorizedHeaders, createMockAnimal } from '../../../.vitest/utils/server-test-helpers';
-
-const SUPABASE_URL = process.env.VITE_SUPABASE_URL || 'https://project.supabase.co';
-
-describe('Supabase REST API - Animals Endpoints Integration Tests', () => {
-  beforeAll(() => server.listen());
-  afterEach(() => server.resetHandlers());
-  afterAll(() => server.close());
-
-  describe('GET /rest/v1/animals', () => {
-    it('should return paginated list of animals', async () => {
-      const response = await fetch(`${SUPABASE_URL}/rest/v1/animals?limit=10&offset=0`, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-      });
-
-      expect(response.status).toBe(200);
-      const animals = await response.json();
-      expect(Array.isArray(animals)).toBe(true);
-      expect(animals.length).toBeGreaterThan(0);
-
-      const contentRange = response.headers.get('Content-Range');
-      expect(contentRange).toBeDefined();
-      expect(contentRange).toMatch(/\d+-\d+\/\d+/);
-    });
-
-    it('should filter animals by status', async () => {
-      const response = await fetch(`${SUPABASE_URL}/rest/v1/animals?status=eq.available`, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-      });
-
-      expect(response.status).toBe(200);
-      const animals = await response.json();
-      animals.forEach((animal: any) => {
-        expect(animal.status).toBe('available');
-      });
-    });
-
-    it('should sort animals by adoption priority', async () => {
-      const response = await fetch(`${SUPABASE_URL}/rest/v1/animals?order=adoption_priority.asc`, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-      });
-
-      expect(response.status).toBe(200);
-      const animals = await response.json();
-      for (let i = 0; i < animals.length - 1; i++) {
-        expect(animals[i].adoption_priority).toBeLessThanOrEqual(animals[i + 1].adoption_priority);
-      }
-    });
-  });
-
-  describe('GET /rest/v1/animals/:id', () => {
-    it('should return single animal by ID', async () => {
-      const response = await fetch(`${SUPABASE_URL}/rest/v1/animals/animal-123`, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-      });
-
-      expect(response.status).toBe(200);
-      const animal = await response.json();
-      expect(animal.id).toBe('animal-123');
-      expect(animal.name).toBe('Luna');
-      expect(animal.species).toBe('dog');
-    });
-
-    it('should return 404 for non-existent animal', async () => {
-      const response = await fetch(`${SUPABASE_URL}/rest/v1/animals/non-existent-id`, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' },
-      });
-
-      expect(response.status).toBe(404);
-    });
-  });
-
-  describe('POST /rest/v1/animals', () => {
-    it('should create new animal with authentication', async () => {
-      const headers = getAuthorizedHeaders();
-      const newAnimal = createMockAnimal({
-        name: 'Felix',
-        species: 'cat',
-        breed: 'siamese',
-      });
-
-      const response = await fetch(`${SUPABASE_URL}/rest/v1/animals`, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify(newAnimal),
-      });
-
-      expect(response.status).toBe(201);
-      const created = await response.json();
-      expect(created.name).toBe('Felix');
-      expect(created.id).toBeDefined();
-    });
-
-    it('should return 401 without authentication', async () => {
-      const response = await fetch(`${SUPABASE_URL}/rest/v1/animals`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(createMockAnimal()),
-      });
-
-      expect(response.status).toBe(401);
-    });
-  });
-
-  describe('PATCH /rest/v1/animals/:id', () => {
-    it('should update animal with authentication', async () => {
-      const headers = getAuthorizedHeaders();
-      const response = await fetch(`${SUPABASE_URL}/rest/v1/animals/animal-123`, {
-        method: 'PATCH',
-        headers,
-        body: JSON.stringify({
-          status: 'adopted',
-          adoption_date: '2026-03-25T00:00:00Z',
-        }),
-      });
-
-      expect(response.status).toBe(200);
-      const updated = await response.json();
-      expect(updated.status).toBe('adopted');
-    });
-
-    it('should return 401 without authentication', async () => {
-      const response = await fetch(`${SUPABASE_URL}/rest/v1/animals/animal-123`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: 'adopted' }),
-      });
-
-      expect(response.status).toBe(401);
-    });
-  });
-});
-```
-
-### Step 6: Create Sample Storage API Integration Test
-
-**File**: `tests/integration/api/storage.integration.test.ts`
-
-```typescript
-import { beforeAll, afterEach, afterAll, describe, it, expect } from 'vitest';
-import { server } from '../../../.vitest/setup-server';
-import { getAuthorizedHeaders } from '../../../.vitest/utils/server-test-helpers';
-
-const SUPABASE_URL = process.env.VITE_SUPABASE_URL || 'https://project.supabase.co';
-const ANIMALS_BUCKET = 'animals';
-
-describe('Supabase Storage API - Files Integration Tests', () => {
-  beforeAll(() => server.listen());
-  afterEach(() => server.resetHandlers());
-  afterAll(() => server.close());
-
-  describe('POST /storage/v1/b/:bucket/upload', () => {
-    it('should upload file to animals bucket with metadata', async () => {
-      const headers = getAuthorizedHeaders();
-
-      const formData = new FormData();
-      const blob = new Blob(['test image data'], { type: 'image/jpeg' });
-      formData.append('file', blob, 'luna-profile.jpg');
-      formData.append('bucket_id', ANIMALS_BUCKET);
-      formData.append('name', 'luna-profile.jpg');
-
-      const response = await fetch(
-        `${SUPABASE_URL}/storage/v1/b/${ANIMALS_BUCKET}/upload`,
-        {
-          method: 'POST',
-          headers: { Authorization: headers.Authorization },
-          body: formData,
-        }
-      );
-
-      expect(response.status).toBe(200);
-      const result = await response.json();
-      expect(result.Key).toBe('luna-profile.jpg');
-    });
-
-    it('should return 401 without authentication', async () => {
-      const formData = new FormData();
-      const blob = new Blob(['test'], { type: 'image/jpeg' });
-      formData.append('file', blob, 'test.jpg');
-
-      const response = await fetch(
-        `${SUPABASE_URL}/storage/v1/b/${ANIMALS_BUCKET}/upload`,
-        { method: 'POST', body: formData }
-      );
-
-      expect(response.status).toBe(401);
-    });
-  });
-
-  describe('GET /storage/v1/b/:bucket/o/:fileName', () => {
-    it('should retrieve file from animals bucket', async () => {
-      const headers = getAuthorizedHeaders();
-      const response = await fetch(
-        `${SUPABASE_URL}/storage/v1/b/${ANIMALS_BUCKET}/o/luna-profile.jpg`,
-        { method: 'GET', headers }
-      );
-
-      expect(response.status).toBe(200);
-      expect(response.headers.get('Content-Type')).toContain('image');
-    });
-
-    it('should return 404 for non-existent file', async () => {
-      const headers = getAuthorizedHeaders();
-      const response = await fetch(
-        `${SUPABASE_URL}/storage/v1/b/${ANIMALS_BUCKET}/o/nonexistent.jpg`,
-        { method: 'GET', headers }
-      );
-
-      expect(response.status).toBe(404);
-    });
-  });
-
-  describe('DELETE /storage/v1/b/:bucket/o/:fileName', () => {
-    it('should delete file from animals bucket', async () => {
-      const headers = getAuthorizedHeaders();
-      const response = await fetch(
-        `${SUPABASE_URL}/storage/v1/b/${ANIMALS_BUCKET}/o/luna-profile.jpg`,
-        { method: 'DELETE', headers }
-      );
-
-      expect(response.status).toBe(204);
-    });
-
-    it('should return 401 without authentication', async () => {
-      const response = await fetch(
-        `${SUPABASE_URL}/storage/v1/b/${ANIMALS_BUCKET}/o/luna-profile.jpg`,
-        { method: 'DELETE' }
-      );
-
-      expect(response.status).toBe(401);
-    });
-  });
-
-  describe('GET /storage/v1/b/:bucket/list', () => {
-    it('should list files in animals bucket', async () => {
-      const headers = getAuthorizedHeaders();
-      const response = await fetch(
-        `${SUPABASE_URL}/storage/v1/b/${ANIMALS_BUCKET}/list`,
-        { method: 'GET', headers }
-      );
-
-      expect(response.status).toBe(200);
-      const files = await response.json();
-      expect(Array.isArray(files)).toBe(true);
-    });
-  });
-});
-```
-
-### Step 7: Update vitest.config.ts
-
-Add Node.js globals configuration if needed:
-
-```typescript
-export default defineConfig({
-  test: {
-    // ... existing browser config ...
-    globals: true,
-    environment: 'jsdom',
-    setupFiles: ['.vitest/setup.ts'],
-    // Server-side tests can use the same config or override
-  },
-});
-```
-
-### Step 8: Create Documentation
-
-**File**: `.vitest/README.md`
-
-```markdown
-# Mock Service Worker (MSW) Setup
-
-This directory contains Mock Service Worker configuration for testing Supabase APIs in both browser and Node.js environments.
-
-## Structure
-
-```
-.vitest/
-├── setup.ts              # Browser test setup with beforeAll/afterEach hooks
-├── setup-server.ts       # Node.js server setup
-├── handlers/
-│   ├── supabase-auth.ts  # Authentication endpoint handlers
-│   ├── supabase-rest.ts  # REST API endpoint handlers
-│   ├── supabase-storage.ts # Storage endpoint handlers
-│   ├── server.ts         # Re-export handlers for server use
-│   └── types.ts          # TypeScript type definitions
-└── utils/
-    └── server-test-helpers.ts # Utility functions for tests
-```
-
-## Browser-Side Testing
-
-```typescript
-import { beforeAll, afterEach, afterAll } from 'vitest';
-import { server } from '.vitest/setup-server';
-
-describe('My API Test', () => {
-  beforeAll(() => server.listen());
-  afterEach(() => server.resetHandlers());
-  afterAll(() => server.close());
-
-  it('should fetch data', async () => {
-    const response = await fetch('https://project.supabase.co/rest/v1/animals');
-    expect(response.status).toBe(200);
-  });
-});
-```
-
-## Adding New Handlers
-
-1. Create new handler file in `handlers/` directory
-2. Export handlers as array: `export const myHandlers = [...]`
-3. Import and include in `setup-server.ts`
-4. Test with `server.use(handler)` override
-
-## Mocking Errors
-
-Override specific handlers for error scenarios:
-
-```typescript
-import { server } from '.vitest/setup-server';
-import { http, HttpResponse } from 'msw';
-
-it('should handle 401 errors', () => {
-  server.use(
-    http.get('https://project.supabase.co/rest/v1/animals', () => {
-      return HttpResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    })
-  );
-
-  // Test unauthorized access
-});
-```
-
-## Testing Authenticated Endpoints
-
-Use `getAuthorizedHeaders()` helper:
-
-```typescript
-import { getAuthorizedHeaders } from '.vitest/utils/server-test-helpers';
-
-const headers = getAuthorizedHeaders();
-const response = await fetch(url, { headers });
-```
-
-## Mock Data Helpers
-
-Create test data with builders:
-
-```typescript
-import {
-  createMockUser,
-  createMockDonor,
-  createMockAnimal,
-} from '.vitest/utils/server-test-helpers';
-
-const user = createMockUser({ email: 'custom@example.com' });
-const europeanDonor = createMockDonor({ country: 'NL', preferred_currency: 'EUR' });
-const adoptableAnimal = createMockAnimal({ status: 'adoptable' });
-```
-
-## Common Issues
-
-### "Unhandled request" warnings
-Verify the URL matches exactly. Check:
-- Correct Supabase URL (with protocol)
-- Query string parameters included in URL
-- HTTP method matches handler
-
-### JWT token not recognized
-Ensure `Authorization: Bearer <token>` header format. Use `getAuthorizedHeaders()` helper.
-
-### File upload test failing
-FormData handling: ensure blob and filename are set correctly.
-
-## Performance
-
-MSW is fast (~1-5ms per request). If tests slow down:
-- Use `afterEach(() => server.resetHandlers())` to clear state
-- Avoid creating new handlers inside tests
-- Batch assertions when possible
-```
-
----
-
-## Definition of Done
-
-- [ ] All implementation steps completed
-- [ ] All acceptance criteria verified
-- [ ] TypeScript compilation passes (zero errors)
-- [ ] All integration tests pass
-- [ ] Code follows project style conventions
-- [ ] Documentation updated (.vitest/README.md)
-- [ ] No console errors or warnings
-- [ ] Ready for code review
-
----
-
-## Notes
-
-- Server-side handlers are identical to browser handlers (DRY principle enforced)
-- Test helpers provide typed interfaces for mock data
-- Integration tests demonstrate each API endpoint category
-- Error scenarios (401, 404) included in tests
-- Multi-currency support (PYG, EUR, USD) included in mock donor data
-- All file paths follow project structure conventions
+### Step 1: Create the Integration Test Directory
+
+The integration test directory lives at tests/integration/ and contains one file per FastAPI router being tested. Each file name follows the pattern test_{router_name}.py, where router_name matches the module name in src/routers/. For example, the file that tests the animals router is tests/integration/test_animals.py, and the file that tests the auth router is tests/integration/test_auth.py. A __init__.py file in tests/integration/ is not required because pytest discovers tests through path configuration, but adding an empty one is acceptable.
+
+### Step 2: Configure the Integration Test Marker
+
+In pyproject.toml under the pytest configuration section, the integration marker must be declared with a description. The markers configuration key takes a list of strings, and the integration marker entry should read "integration: marks tests as integration tests requiring a running database and FastAPI application." This declaration prevents pytest from emitting warnings about unknown markers and documents the marker's purpose for new developers.
+
+Integration tests are run separately from unit tests using the pytest -m integration flag. The default pytest run without flags should execute all tests. CI/CD pipelines may run unit tests and integration tests as separate steps to provide faster feedback on unit failures before waiting for slower integration tests.
+
+### Step 3: Create the Auth Integration Test File
+
+The file tests/integration/test_auth.py contains integration tests for all endpoints in the authentication router. Each test function is decorated with pytest.mark.integration and is an async function decorated with pytest.mark.anyio (or, if asyncio_mode is set to auto in pytest configuration, the async def alone is sufficient).
+
+The test file imports the client fixture and the auth_headers fixtures from conftest.py via pytest's automatic fixture injection. It does not import the fixtures explicitly; it receives them as function arguments named client, admin_headers, staff_headers, and adopter_headers.
+
+The test for a successful login sends a POST request to the auth endpoint (the actual path is determined by the FastAPI router definition in src/routers/auth.py) with a JSON body containing a valid email and password. The test asserts that the response status code is 200, that the response body contains an access_token field, and that the token_type field is the string "bearer". The test does not validate the contents of the JWT payload; it only verifies that a token is returned in the expected shape.
+
+The test for login with invalid credentials sends a POST request to the same endpoint with a correct email but an incorrect password. The test asserts that the response status code is 401 and that the response body contains an error or detail field. The exact field name depends on how the FastAPI route formats error responses — this must match what the actual route returns.
+
+The test for accessing a protected endpoint without a token sends a GET request to the authenticated user profile endpoint without any Authorization header. The test asserts that the status code is 401 and that the response body contains the FastAPI HTTPException detail string. This test verifies that the JWT dependency in FastAPI is wired correctly and rejects unauthenticated requests.
+
+The test for accessing a protected endpoint with a valid token uses one of the auth_headers fixtures to send a GET request to the authenticated user profile endpoint. The test asserts that the status code is 200 and that the response body contains the user's email address, verifying that the JWT is decoded correctly and that the endpoint returns the authenticated user's data from the database.
+
+### Step 4: Create the Animals Integration Test File
+
+The file tests/integration/test_animals.py contains integration tests for the animals router. Each test is async and marked with pytest.mark.integration. The file receives the client fixture and the animal fixture from conftest.py.
+
+The test for retrieving a list of animals sends a GET request to the animals collection endpoint and asserts that the response status code is 200 and that the response body is a JSON array. The test also asserts that the array is not empty when the animal fixture has been invoked, meaning a test animal was created before the request was sent. The animal fixture is added as a function argument to this test so pytest creates the database record before the HTTP request is issued.
+
+The test for retrieving a single animal by ID sends a GET request to the animals detail endpoint using the animal fixture's database id. The URL is constructed by appending the id to the endpoint path. The test asserts that the response status code is 200 and that the response body contains the animal's name and species fields matching the values set by the animal fixture.
+
+The test for retrieving a non-existent animal sends a GET request to the animals detail endpoint using the NONEXISTENT_ANIMAL_ID constant defined in conftest.py. The test asserts that the response status code is 404 and that the response body contains a detail field. This test verifies that the FastAPI route returns a proper HTTP 404 exception rather than returning an empty response or a 200 with null data.
+
+The test for creating an animal sends a POST request to the animals collection endpoint with a JSON body describing a new animal. This endpoint requires authentication, so the test uses the staff_headers fixture to include an Authorization header. The test asserts that the response status code is 201 and that the response body contains the new animal's name and an id field assigned by the database. The test does not need to verify that the animal was committed to the database because the transaction rollback behavior means this animal will disappear after the test anyway; asserting the API response is sufficient.
+
+The test for creating an animal without authentication sends the same POST request but without an Authorization header. The test asserts that the response status code is 401, verifying that the animals create endpoint requires a valid JWT.
+
+The test for updating an animal sends a PATCH request to the animals detail endpoint using the animal fixture's id, with a JSON body containing a status field set to a different value than the fixture's default. The test uses staff_headers for the Authorization header and asserts that the response status code is 200 and that the response body contains the updated status value.
+
+### Step 5: Create the File Upload Integration Test File
+
+The file tests/integration/test_photos.py contains integration tests for the animal photo upload endpoint. The test for uploading a photo sends a POST request to the photo upload endpoint with a multipart form body containing a small synthetic image binary and a filename. The test uses staff_headers for authorization and asserts that the response status code is 201 and that the response body contains a file identifier or URL field.
+
+The test for uploading a photo without authentication sends the same multipart POST without an Authorization header and asserts that the response status code is 401.
+
+The test for retrieving photos for an animal sends a GET request to the animal photos listing endpoint using an animal fixture's id and asserts that the response status code is 200 and that the response body is a JSON array (which may be empty if no photos were uploaded within the current transaction).
+
+### Step 6: Write Fixture Lifecycle Documentation
+
+A comment block at the top of each integration test file explains the fixture lifecycle for that file. The comment describes which fixtures the file uses, confirms that all database records created by fixtures are rolled back after each test function, and notes that the httpx.AsyncClient is created fresh for each test function with ASGITransport binding it directly to the FastAPI application object. This documentation helps new contributors understand why test data from one test does not appear in the next test.
+
+### Step 7: Verify Test Discovery
+
+After creating the test files, run pytest --collect-only tests/integration/ to verify that all test functions are discovered correctly. The output should list each test function with its full path. If pytest reports "no tests ran" or collection errors, the most common causes are incorrect asyncio_mode configuration, missing fixtures, or incorrect marker declarations in pyproject.toml.
+
+## Acceptance Criteria
+
+- tests/integration/ directory exists and contains test_auth.py, test_animals.py, and test_photos.py
+- All test functions in tests/integration/ are decorated or configured for async execution and succeed when run with pytest tests/integration/
+- The pytest.mark.integration marker is declared in pyproject.toml with a description and produces no marker warnings when tests run
+- The test for GET /animals/{id} with a valid database id returns 200 and the animal's name field
+- The test for GET /animals/{id} with NONEXISTENT_ANIMAL_ID returns 404
+- The test for POST /animals without an Authorization header returns 401
+- The test for POST /animals with staff_headers returns 201
+- Running pytest tests/ executes both unit and integration tests; running pytest -m integration executes only integration tests; running pytest -m "not integration" executes only unit tests
+- All test files contain the fixture lifecycle comment block explaining rollback behavior
+
+## Common Issues and Solutions
+
+If an integration test receives a 404 for an endpoint that should exist, the FastAPI router may not be included in the application's router registration. Check that the router for the endpoint under test is mounted in the main FastAPI application factory function in src/main.py.
+
+If an integration test receives a 422 Unprocessable Entity response when creating a resource, the JSON body sent in the test does not match the Pydantic schema that the route expects. Compare the request body in the test against the Pydantic model defined in src/schemas/ for that resource.
+
+If fixture data created in a test appears to persist into the next test, the db_session fixture may not be configured with the SAVEPOINT-based rollback pattern. Verify that the db_session fixture in conftest.py begins a savepoint at the start and rolls back to that savepoint after each test, not a top-level transaction that only commits at the end of the session.
+
+If the client fixture raises an error about the event loop being closed, the anyio backend must be set to asyncio consistently across all async test functions. Verify that the asyncio_mode configuration in pyproject.toml is set to auto, which removes the need for the pytest.mark.anyio decorator on every test function.
+
+## Related Tasks
+
+- S02/T01: Configure httpx AsyncClient for FastAPI Endpoint Testing — the client fixture this task depends on
+- S02/T02: Create pytest Test Data Fixtures — the animal, donor, adopter, and adoption application fixtures used in integration tests
+- S03/T01: Configure database test session with rollback isolation — the db_session fixture that this task's fixtures depend on
+
+## References
+
+- pytest integration test organization: docs.pytest.org/en/stable/reference/fixtures.html#conftest-py-sharing-fixtures-across-files
+- pytest custom markers: docs.pytest.org/en/stable/how-to/mark.html
+- pytest-anyio configuration: anyio.readthedocs.io/en/stable/testing.html
+- FastAPI testing guide: fastapi.tiangolo.com/tutorial/testing
