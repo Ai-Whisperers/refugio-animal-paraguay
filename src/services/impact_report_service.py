@@ -206,7 +206,7 @@ async def _get_in_kind_stats(
     )
     by_category = [
         InKindCategoryTotal(
-            category=row.category,
+            category=row.item_type,
             count=row.cnt,
             estimated_value_cents=row.value_cents,
         )
