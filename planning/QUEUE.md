@@ -95,10 +95,10 @@ Week 3-4:
 |---|-------|------|--------|--------|
 | 1 | WhatsApp Integration | EPIC-6 S02 | 8 | |
 | 2 | In-App Notifications | EPIC-6 S03 | 6 | DONE (PR #32) |
-| 3 | Notification Preferences | EPIC-6 S04 | 5 | DONE (PR #34) |
+| 3 | Notification Preferences | EPIC-6 S04 | 5 | PR #34 (conflicts) |
 | 4 | Adoption Notifications (status changes) | EPIC-2 S03 | 5 | DONE (PR #39) |
-| 5 | PDF Adoption Contracts | EPIC-2 S04 | 6 | |
-| 6 | Post-Adoption Follow-up | EPIC-2 S05 | 8 | |
+| 5 | PDF Adoption Contracts | EPIC-2 S04 | 6 | PR #43 (conflicts) |
+| 6 | Post-Adoption Follow-up | EPIC-2 S05 | 8 | PR #44 (conflicts) |
 | 7 | Tigo Money Integration (PYG) | EPIC-3 S03 | 8 | |
 | 8 | Sponsor Update Notifications | EPIC-14 S02 | 6 | |
 | 9 | Campaign Progress & Social Proof | EPIC-14 S04 | 5 | |
