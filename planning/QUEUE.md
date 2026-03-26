@@ -152,16 +152,51 @@ Week 3-4:
 
 ---
 
+## V6 — Reporting & Multi-Shelter (Weeks 25-32)
+
+| # | Story | Epic | Points |
+|---|-------|------|--------|
+| 1 | Financial Reporting Dashboard | EPIC-15 S01 | 8 |
+| 2 | EU Tax Compliance Exports | EPIC-15 S02 | 7 |
+| 3 | Donor Retention & Impact Reports | EPIC-15 S03 | 6 |
+| 4 | Operational KPI Dashboard | EPIC-15 S04 | 7 |
+| 5 | Multi-Shelter Location Management | EPIC-16 S01 | 8 |
+| 6 | Inter-Shelter Animal Transfers | EPIC-16 S02 | 8 |
+| 7 | Location-Specific Staff & Permissions | EPIC-16 S03 | 6 |
+| 8 | Consolidated Cross-Shelter Reporting | EPIC-16 S04 | 7 |
+
+---
+
+## V7 — Community, Mobile & API Platform (Weeks 33-42)
+
+| # | Story | Epic | Points |
+|---|-------|------|--------|
+| 1 | Success Stories Publishing | EPIC-17 S01 | 5 |
+| 2 | Social Media Integration | EPIC-17 S02 | 6 |
+| 3 | Adopter Community Forum | EPIC-17 S03 | 8 |
+| 4 | Community Events Management | EPIC-17 S04 | 5 |
+| 5 | Mobile App — Staff Field Operations | EPIC-18 S01 | 13 |
+| 6 | Mobile App — Volunteer Shift & Tasks | EPIC-18 S02 | 8 |
+| 7 | Mobile App — Push Notifications | EPIC-18 S03 | 5 |
+| 8 | Public REST API & Developer Docs | EPIC-19 S01 | 8 |
+| 9 | Government Animal Registration Integration | EPIC-19 S02 | 8 |
+| 10 | Webhook System for Partners | EPIC-19 S03 | 6 |
+| 11 | Tigo Money Payment Integration | EPIC-19 S04 | 8 |
+
+---
+
 ## Ticket ID Allocation
 
 | Range | Version | Purpose |
 |-------|---------|---------|
 | RAP-001 to RAP-010 | Pre-V1 | Backend foundation (done) |
-| RAP-011 to RAP-030 | V1 | MVP frontend + CI/CD |
-| RAP-031 to RAP-050 | V2 | Donations + EU compliance |
+| RAP-011 to RAP-033 | V1 | MVP frontend + CI/CD (done) |
+| RAP-034 to RAP-050 | V2 | Donations + EU compliance |
 | RAP-051 to RAP-070 | V3 | Communications + workflow |
 | RAP-071 to RAP-095 | V4 | Operations |
 | RAP-096 to RAP-120 | V5 | Analytics + scale |
+| RAP-121 to RAP-140 | V6 | Reporting + multi-shelter |
+| RAP-141 to RAP-170 | V7 | Community + mobile + API platform |
 
 ---
 
