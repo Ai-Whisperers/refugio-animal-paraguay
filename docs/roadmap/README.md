@@ -51,16 +51,24 @@ This table shows what's available to each user role at each version:
 | SEPA recurring donations | | x | x | x | x |
 | Donation dashboard | | x | x | x | x |
 | GDPR compliance | | x | x | x | x |
+| Audit trail | | x | x | x | x |
+| Animal sponsorship | | x | x | x | x |
+| Fundraising campaigns | | x | x | x | x |
+| In-kind donation tracking | | x | x | x | x |
 | Email notifications | | | x | x | x |
 | WhatsApp notifications | | | x | x | x |
 | Adoption contracts (PDF) | | | x | x | x |
+| Post-adoption follow-up | | | x | x | x |
 | Local PYG payments | | | x | x | x |
 | Multi-language (ES/EN) | | | x | x | x |
+| Impact report generator | | | x | x | x |
+| Fund allocation tracking | | | x | x | x |
 | Volunteer management | | | | x | x |
 | Medical records | | | | x | x |
 | Foster program | | | | x | x |
+| Outcome metrics | | | | x | x |
 | Admin analytics dashboard | | | | | x |
-| Funder impact reports | | | | | x |
+| Funder-specific dashboards | | | | | x |
 | Full-text search | | | | | x |
 | 2FA authentication | | | | | x |
 | E2E test suite | | | | | x |
@@ -83,6 +91,9 @@ This table shows what's available to each user role at each version:
 | EPIC-9: Infrastructure | 70% | 90% | 90% | 95% | **complete** |
 | EPIC-10: Auth & Accounts | 50% | 50% | 50% | 60% | **complete** |
 | EPIC-11: Public Portal | 0% | partial | partial | partial | **complete** |
+| EPIC-12: Foster Program | 0% | 0% | 0% | **complete** | complete |
+| EPIC-13: Impact & Compliance | 0% | partial | partial | partial | **complete** |
+| EPIC-14: Sponsorship & Campaigns | 0% | partial | **complete** | complete | complete |
 
 ---
 
@@ -95,9 +106,9 @@ This table shows what's available to each user role at each version:
 | V3 — Communications | 15-19 | 49-56 | 6-8 | 14-20 weeks |
 | V4 — Operations | 17-22 | 53-65 | 8-10 | 22-30 weeks |
 | V5 — Analytics | 20-24 | 64-77 | 9-13 | 31-43 weeks |
-| **Total** | **77-96** | **240-281** | **31-43** | — |
+| **Total** | **~96-118** | **~310-380** | **~33-47** | — |
 
-> Note: Weeks assume a single developer. With parallel work on frontend + backend, timelines compress significantly. V1-V3 are realistic as sequential sprints. V4 and V5 can overlap.
+> Note: Weeks assume a single developer. With parallel work on frontend + backend, timelines compress to ~60-70%. V1-V3 are realistic as sequential sprints. V4 and V5 can overlap. Totals updated to include EPIC-12 (Foster), EPIC-13 (Impact/Compliance), and EPIC-14 (Sponsorship/Campaigns).
 
 ---
 
@@ -122,6 +133,18 @@ This table shows what's available to each user role at each version:
 | weasyprint for PDFs | Python-native, HTML templates, no external service | V3 |
 | PostgreSQL tsvector over Elasticsearch | One less service to manage, sufficient for our scale | V5 |
 | Redis for caching + pub/sub | Already in Docker stack, dual-purpose | V5 |
+| Audit trail before donations | EU compliance requires accountability from day one | V2 |
+| Sponsorship as recurring donation extension | Reuse Stripe subscription, not separate system | V2 |
+| Foster as separate epic (EPIC-12) | Distinct lifecycle from adoption, own data models | V4 |
+
+---
+
+## Additional Documents
+
+| Document | Purpose |
+|----------|---------|
+| [Epic Analysis & Improvements](epic-analysis-and-improvements.md) | Gap analysis, data quality issues, industry comparison |
+| [Dependency Map & Priority Matrix](dependency-map.md) | Build order, parallel work streams, risk-weighted priorities |
 
 ---
 
