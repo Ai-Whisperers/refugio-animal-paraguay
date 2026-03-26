@@ -58,6 +58,27 @@ class Settings(BaseSettings):
             raise ValueError(f"app_env must be one of {allowed}, got: {value!r}")
         return value
 
+    # Auth
+    secret_key: str = Field(
+        default="dev-secret-key-change-in-production-must-be-32-chars-min",
+        description="JWT signing secret. Must be ≥32 chars in production.",
+    )
+    algorithm: str = Field(
+        default="HS256",
+        description="JWT signing algorithm.",
+    )
+    access_token_expire_minutes: int = Field(
+        default=30,
+        description="JWT access token lifetime in minutes.",
+    )
+
+    @field_validator("secret_key")
+    @classmethod
+    def validate_secret_key(cls, value: str) -> str:
+        if len(value) < 32:
+            raise ValueError("secret_key must be at least 32 characters")
+        return value
+
     @property
     def is_production(self) -> bool:
         """True when running in the production environment."""

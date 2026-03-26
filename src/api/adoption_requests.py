@@ -14,9 +14,11 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.auth.dependencies import require_staff
 from src.db.models.adopter import Adopter
 from src.db.models.adoption_request import AdoptionRequest, AdoptionRequestStatus
 from src.db.models.animal import Animal
+from src.db.models.user import User
 from src.db.session import get_db
 from src.schemas.adoption_request import (
     AdoptionRequestCreate,
@@ -90,6 +92,7 @@ async def get_adoption_request(
 async def create_adoption_request(
     payload: AdoptionRequestCreate,
     db: AsyncSession = Depends(get_db),
+    _: User = Depends(require_staff),
 ) -> AdoptionRequest:
     # Validate animal exists
     animal = await db.get(Animal, payload.animal_id)
@@ -125,6 +128,7 @@ async def update_adoption_request_status(
     request_id: UUID,
     payload: AdoptionRequestStatusUpdate,
     db: AsyncSession = Depends(get_db),
+    _: User = Depends(require_staff),
 ) -> AdoptionRequest:
     req = await db.get(AdoptionRequest, request_id)
     if req is None:

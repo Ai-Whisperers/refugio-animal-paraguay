@@ -15,7 +15,9 @@ from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.auth.dependencies import require_staff
 from src.db.models.animal import Animal, AnimalSpecies, AnimalStatus
+from src.db.models.user import User
 from src.db.session import get_db
 from src.schemas.animal import AnimalCreate, AnimalResponse, AnimalUpdate
 
@@ -60,6 +62,7 @@ async def get_animal(
 async def create_animal(
     payload: AnimalCreate,
     db: AsyncSession = Depends(get_db),
+    _: User = Depends(require_staff),
 ) -> Animal:
     animal = Animal(
         name=payload.name,
@@ -79,6 +82,7 @@ async def update_animal(
     animal_id: UUID,
     payload: AnimalUpdate,
     db: AsyncSession = Depends(get_db),
+    _: User = Depends(require_staff),
 ) -> Animal:
     animal = await db.get(Animal, animal_id)
     if animal is None:
@@ -105,6 +109,7 @@ async def update_animal(
 async def delete_animal(
     animal_id: UUID,
     db: AsyncSession = Depends(get_db),
+    _: User = Depends(require_staff),
 ) -> Response:
     animal = await db.get(Animal, animal_id)
     if animal is None:

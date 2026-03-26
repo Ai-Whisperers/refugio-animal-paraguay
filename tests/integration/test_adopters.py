@@ -4,26 +4,10 @@ Requires a live PostgreSQL instance (refugio_dev).
 Run: pytest -m integration tests/integration/test_adopters.py
 """
 
-from collections.abc import AsyncGenerator
 from uuid import uuid4
 
 import pytest
-import pytest_asyncio
-from httpx import ASGITransport, AsyncClient
-
-from src.app import app
-from src.config import Settings
-from src.db.session import init_engine
-
-
-@pytest_asyncio.fixture
-async def client() -> AsyncGenerator[AsyncClient, None]:
-    settings = Settings()
-    init_engine(settings)
-    async with AsyncClient(
-        transport=ASGITransport(app=app), base_url="http://test"
-    ) as ac:
-        yield ac
+from httpx import AsyncClient
 
 
 def _unique_email() -> str:

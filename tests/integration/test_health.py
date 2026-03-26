@@ -5,26 +5,12 @@ The happy-path test requires a running PostgreSQL instance (refugio_dev).
 Run only integration tests: pytest -m integration tests/integration/
 """
 
-from collections.abc import AsyncGenerator
-
 import pytest
-import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 
 from src.app import app
 from src.config import Settings
 from src.db.session import init_engine
-
-
-@pytest_asyncio.fixture
-async def client() -> AsyncGenerator[AsyncClient, None]:
-    """AsyncClient wired to the FastAPI app with a real DB engine."""
-    settings = Settings()
-    init_engine(settings)
-    async with AsyncClient(
-        transport=ASGITransport(app=app), base_url="http://test"
-    ) as ac:
-        yield ac
 
 
 @pytest.mark.asyncio

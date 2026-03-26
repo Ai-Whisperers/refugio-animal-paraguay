@@ -16,7 +16,9 @@ from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.auth.dependencies import require_staff
 from src.db.models.adopter import Adopter
+from src.db.models.user import User
 from src.db.session import get_db
 from src.schemas.adopter import AdopterCreate, AdopterResponse, AdopterUpdate
 
@@ -60,6 +62,7 @@ async def get_adopter(
 async def create_adopter(
     payload: AdopterCreate,
     db: AsyncSession = Depends(get_db),
+    _: User = Depends(require_staff),
 ) -> Adopter:
     adopter = Adopter(
         full_name=payload.full_name,
@@ -86,6 +89,7 @@ async def update_adopter(
     adopter_id: UUID,
     payload: AdopterUpdate,
     db: AsyncSession = Depends(get_db),
+    _: User = Depends(require_staff),
 ) -> Adopter:
     adopter = await db.get(Adopter, adopter_id)
     if adopter is None or adopter.deleted_at is not None:
@@ -106,6 +110,7 @@ async def update_adopter(
 async def delete_adopter(
     adopter_id: UUID,
     db: AsyncSession = Depends(get_db),
+    _: User = Depends(require_staff),
 ) -> Response:
     adopter = await db.get(Adopter, adopter_id)
     if adopter is None or adopter.deleted_at is not None:
