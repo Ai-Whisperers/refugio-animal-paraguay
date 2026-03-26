@@ -51,7 +51,7 @@ Stories are ordered by dependency and priority. Work top-to-bottom. Each story b
 | 7 | Adoption Application Form (public) | EPIC-11 S01 | 5 | DONE (PR #22) | Frontend |
 | 8 | Mobile-First Responsive Design | EPIC-11 S05 | 5 | DONE (PR #23) | Frontend |
 | 9 | Password Reset Flow | EPIC-10 S02 (partial) | 5 | DONE (PR #12) | Backend |
-| 10 | Contact & Inquiry Form | EPIC-11 S02 | 8 | READY | Frontend |
+| 10 | Contact & Inquiry Form | EPIC-11 S02 | 8 | DONE (PR #24) | Frontend |
 
 **V1 remaining**: ~65 points, 10 work items
 
