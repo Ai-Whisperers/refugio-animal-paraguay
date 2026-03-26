@@ -15,6 +15,7 @@ export const NAV = {
   home: "Inicio",
   animals: "Animales",
   about: "Nosotros",
+  stories: "Historias",
   contact: "Contacto",
   donate: "Donar",
 } as const;
@@ -28,6 +29,7 @@ export const FOOTER = {
   supportUs: "Apoyanos",
   aboutUs: "Nosotros",
   ourAnimals: "Nuestros Animales",
+  stories: "Historias de Exito",
   contact: "Contacto",
   donate: "Donar",
   volunteer: "Ser Voluntario",
@@ -404,6 +406,95 @@ export const FOSTER = {
   ],
   ctaTitle: "Queres ser familia de acogida?",
   ctaSubtitle: "Contactanos por WhatsApp y te contamos todo lo que necesitas saber.",
+  whatsappNumber: "+595 981 000 000",
+} as const;
+
+// --- Success Stories Page ---
+export const SUCCESS_STORIES = {
+  title: "Historias de Exito",
+  metaDescription:
+    "Conoce las historias de adopcion exitosas de Refugio Animal Paraguay. Cada animal merece un final feliz.",
+  heroTitle: "Historias que inspiran",
+  heroSubtitle:
+    "Detras de cada adopcion hay una historia de amor, paciencia y segundas oportunidades. Conoce a las familias que cambiaron la vida de un animal para siempre.",
+  storiesTitle: "Nuestras historias",
+  stories: [
+    {
+      animal: "Max",
+      species: "Perro",
+      adopter: "Maria y Juan",
+      date: "Marzo 2025",
+      summary:
+        "Max llego al refugio desnutrido y asustado. Despues de tres meses de rehabilitacion, encontro su hogar con Maria y Juan. Hoy es el rey de la casa y no para de dar amor.",
+      quote:
+        "Adoptamos a Max hace 6 meses y cambio nuestras vidas. Cada dia nos despierta con alegria y nos recuerda que el amor no tiene condiciones.",
+    },
+    {
+      animal: "Mia",
+      species: "Gata",
+      adopter: "Sofia",
+      date: "Enero 2025",
+      summary:
+        "Mia fue rescatada de una situacion de abandono. Era muy timida y no dejaba que nadie se acercara. Con paciencia y cuidado, poco a poco fue confiando hasta convertirse en la gata mas carinosa.",
+      quote:
+        "Mia era timida cuando llego, pero con amor encontro confianza y ahora es la mascota mas feliz del barrio. No imagino mi vida sin ella.",
+    },
+    {
+      animal: "Buddy",
+      species: "Perro",
+      adopter: "Los Martinez",
+      date: "Noviembre 2024",
+      summary:
+        "Buddy fue encontrado en la calle con una pata lastimada. Despues de su cirugia y recuperacion en el refugio, la familia Martinez le abrio las puertas de su hogar.",
+      quote:
+        "No podemos imaginar la vida sin Buddy. Gracias al refugio por hacernos una familia completa. Los chicos lo adoran.",
+    },
+    {
+      animal: "Luna",
+      species: "Gata",
+      adopter: "Carolina y Pedro",
+      date: "Septiembre 2024",
+      summary:
+        "Luna llego como una gatita bebe, rescatada junto a sus hermanos de un terreno baldio. Fue la primera en encontrar familia y hoy vive como una princesa.",
+      quote:
+        "Luna nos eligio a nosotros. Desde el primer dia se subio a nuestro regazo y no se quiso bajar. Es parte de la familia.",
+    },
+    {
+      animal: "Rocky",
+      species: "Perro",
+      adopter: "Don Alberto",
+      date: "Julio 2024",
+      summary:
+        "Rocky es un perro mayor que estuvo mucho tiempo en el refugio. Cuando Don Alberto vino buscando un companero tranquilo, fue amor a primera vista.",
+      quote:
+        "A mi edad, lo que necesitaba era un amigo fiel. Rocky me acompana en todo y me saca a caminar todos los dias. Me devolvio la alegria.",
+    },
+    {
+      animal: "Nina",
+      species: "Perra",
+      adopter: "Familia Gonzalez",
+      date: "Mayo 2024",
+      summary:
+        "Nina fue abandonada con sus cachorros. El refugio cuido de todos hasta que encontraron hogares. Nina fue la ultima en irse, pero valio la espera.",
+      quote:
+        "Nina es la perra mas agradecida del mundo. Cada vez que llegamos a casa nos recibe como si no nos hubiera visto en anos. Puro amor.",
+    },
+  ],
+  impactTitle: "El impacto de adoptar",
+  impactStats: [
+    { value: "80+", label: "Adopciones exitosas" },
+    { value: "95%", label: "Permanencia en hogares" },
+    { value: "150+", label: "Animales rescatados" },
+    { value: "100%", label: "Amor incondicional" },
+  ],
+  shareTitle: "Queres compartir tu historia?",
+  shareText:
+    "Si adoptaste un animal de nuestro refugio, nos encantaria conocer tu experiencia. Escribinos por WhatsApp y contanos como va todo.",
+  ctaTitle: "Vos tambien podes escribir una historia de exito",
+  ctaSubtitle:
+    "Hay muchos animales esperando su segunda oportunidad. Adopta, dona o se voluntario y cambia una vida para siempre.",
+  ctaAdopt: "Ver animales disponibles",
+  ctaDonate: "Hacer una donacion",
   whatsappNumber: "+595 981 000 000",
 } as const;
 

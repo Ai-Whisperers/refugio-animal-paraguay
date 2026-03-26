@@ -8,6 +8,7 @@ import { NAV } from "@/lib/strings";
 const NAV_LINKS = [
   { href: "/", label: NAV.home },
   { href: "/animals", label: NAV.animals },
+  { href: "/stories", label: NAV.stories },
   { href: "/about", label: NAV.about },
   { href: "/contact", label: NAV.contact },
   { href: "/donate", label: NAV.donate },

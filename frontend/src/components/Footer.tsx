@@ -5,6 +5,7 @@ const FOOTER_LINKS = {
   shelter: [
     { href: "/about", label: FOOTER.aboutUs },
     { href: "/animals", label: FOOTER.ourAnimals },
+    { href: "/stories", label: FOOTER.stories },
     { href: "/contact", label: FOOTER.contact },
   ],
   support: [
