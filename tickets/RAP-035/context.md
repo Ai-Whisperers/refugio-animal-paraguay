@@ -1,22 +1,27 @@
 # RAP-035 Context
 
-## STATUS: ACTIVE
+## STATUS: COMPLETED
 **Last updated**: 2026-03-26
 
 ## Current Focus
-Creating consent model, migration, and API endpoints.
+GDPR consent tracking delivered. PR #26 created.
 
 ## Technical State
-- User model exists with UUID id, email, role
-- Audit trail system available via event bus
-- Email notification system in place (needs consent check integration)
+- UserConsent model with 5 consent types, 2 statuses, 4 methods
+- Consent service: check, grant, revoke, summary (all idempotent)
+- 3 API endpoints: GET summary, GET details, PUT bulk update
+- All endpoints require staff auth
+- Alembic migration 009 for user_consents table
+- 9 unit tests + 8 integration tests
 
 ## Next Steps
-1. Create UserConsent model
-2. Create migration
-3. Build API endpoints
-4. Add consent validation service
-5. Write tests
+- None (completed)
 
 ## Blockers
 - None
+
+## Key Decisions Made
+- Used StrEnum for type safety on consent_type, status, method
+- Idempotent grant/revoke — re-granting active consent is no-op
+- Bulk update endpoint accepts list of consent+granted pairs
+- IP address and user agent captured for GDPR Article 7 compliance
