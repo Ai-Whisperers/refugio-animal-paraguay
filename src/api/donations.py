@@ -90,7 +90,7 @@ async def create_stripe_intent(
 
     if donation.currency not in _STRIPE_CURRENCY_MAP:
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=422,
             detail=f"Currency '{donation.currency}' is not supported by Stripe. Use cash or transfer for PYG.",
         )
 
