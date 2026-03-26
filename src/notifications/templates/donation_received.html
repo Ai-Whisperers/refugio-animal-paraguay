@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Thank You for Your Donation!</h2>
+<p>Dear {{ donor_name }},</p>
+
+<p>We have received your generous donation of <strong>{{ amount }} {{ currency }}</strong>.</p>
+
+{% if receipt_number %}
+<p><strong>Receipt number:</strong> {{ receipt_number }}</p>
+{% endif %}
+
+<p>Your support makes a real difference in the lives of animals at our shelter. Every contribution helps us provide food, medical care, and safe shelter for animals in need.</p>
+
+<p>On behalf of all the animals at Refugio Animal Paraguay, thank you for your kindness.</p>
+{% endblock %}

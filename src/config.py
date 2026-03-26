@@ -88,6 +88,40 @@ class Settings(BaseSettings):
         ),
     )
 
+    # Email / SMTP
+    smtp_enabled: bool = Field(
+        default=False,
+        description="Enable email sending. Disable in tests and local dev.",
+    )
+    smtp_host: str = Field(
+        default="localhost",
+        description="SMTP server hostname.",
+    )
+    smtp_port: int = Field(
+        default=587,
+        description="SMTP server port (587 for STARTTLS, 465 for TLS).",
+    )
+    smtp_username: str = Field(
+        default="",
+        description="SMTP authentication username.",
+    )
+    smtp_password: str = Field(
+        default="",
+        description="SMTP authentication password.",
+    )
+    smtp_use_tls: bool = Field(
+        default=True,
+        description="Use TLS for SMTP connection.",
+    )
+    email_from_address: str = Field(
+        default="noreply@refugioanimal.org",
+        description="Default sender email address.",
+    )
+    email_from_name: str = Field(
+        default="Refugio Animal Paraguay",
+        description="Default sender display name.",
+    )
+
     # Rate limiting
     rate_limit_enabled: bool = Field(
         default=True,
