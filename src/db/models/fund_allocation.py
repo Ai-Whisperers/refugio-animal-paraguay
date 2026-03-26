@@ -1,4 +1,8 @@
-"""SQLAlchemy ORM model for fund allocation (expense) tracking."""
+"""SQLAlchemy ORM model for fund allocation tracking.
+
+Tracks shelter expenses by category (medical, food, operations, admin,
+fundraising, other) for transparency reporting and EU compliance.
+"""
 
 import enum
 from datetime import datetime
@@ -11,7 +15,7 @@ from ..base import Base
 
 
 class FundCategory(enum.StrEnum):
-    """Fund allocation categories for transparency reporting."""
+    """Expense category for fund allocation transparency."""
 
     MEDICAL = "medical"
     FOOD = "food"
@@ -22,10 +26,11 @@ class FundCategory(enum.StrEnum):
 
 
 class FundAllocation(Base):
-    """An expense or fund allocation record categorised for donor transparency.
+    """Individual expense record categorized by fund type.
 
-    Tracks how donated funds are spent across shelter operations.
-    Amount stored as integer cents to match Donation model precision.
+    Each allocation represents a shelter expense tagged with a category
+    for transparency reporting, donor communications, and EU compliance.
+    Amount stored as integer cents to avoid float precision loss.
     """
 
     __tablename__ = "fund_allocations"
@@ -35,35 +40,34 @@ class FundAllocation(Base):
         primary_key=True,
         server_default=sa.func.gen_random_uuid(),
     )
+    # Fund category for transparency breakdown
     category: Mapped[str] = mapped_column(
         sa.String(20),
         nullable=False,
         index=True,
     )
-    amount_cents: Mapped[int] = mapped_column(
-        sa.Integer,
-        nullable=False,
-        comment="Expense amount in cents (same precision as donations)",
-    )
+    # Amount in smallest currency unit (cents for EUR/USD, guaranies for PYG)
+    amount_cents: Mapped[int] = mapped_column(sa.Integer, nullable=False)
     currency: Mapped[str] = mapped_column(
         sa.String(3),
         nullable=False,
         server_default="PYG",
     )
-    description: Mapped[str] = mapped_column(
-        sa.Text,
-        nullable=False,
-    )
+    # Description of the expense
+    description: Mapped[str] = mapped_column(sa.Text, nullable=False)
+    # Date the transaction occurred (may differ from created_at)
     transaction_date: Mapped[datetime] = mapped_column(
         sa.TIMESTAMP(timezone=True),
         nullable=False,
         index=True,
     )
+    # Staff member who recorded the allocation
     recorded_by_user_id: Mapped[UUID | None] = mapped_column(
         sa.UUID(as_uuid=True),
-        sa.ForeignKey("users.id", name="fk_fund_allocations_recorded_by"),
+        sa.ForeignKey("users.id"),
         nullable=True,
     )
+    # Receipt or invoice reference number
     receipt_reference: Mapped[str | None] = mapped_column(
         sa.String(100),
         nullable=True,
