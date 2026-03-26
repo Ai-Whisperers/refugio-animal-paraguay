@@ -84,7 +84,7 @@ Week 3-4:
 | 9 | Campaign Management | EPIC-14 S03 | 6 | BLOCKED on V1 frontend |
 | 10 | Donation Landing Page | EPIC-11 S04 | 13 | BLOCKED on V1 frontend |
 | 11 | Donation Dashboard (Staff) | EPIC-3 S04 | 6 | BLOCKED on #3, #4 |
-| 12 | Email Notification System | EPIC-6 S01 | 8 | BLOCKED on #1 |
+| 12 | Email Notification System | EPIC-6 S01 | 8 | DONE (PR #18) |
 | 13 | GDPR Data Export | EPIC-13 S02 | 6 | BLOCKED on #2, #5 |
 
 ---
