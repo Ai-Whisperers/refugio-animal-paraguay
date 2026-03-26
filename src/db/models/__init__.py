@@ -3,19 +3,22 @@
 from .adopter import Adopter
 from .adoption_request import AdoptionRequest, AdoptionRequestStatus
 from .animal import Animal, AnimalPhoto, AnimalSpecies, AnimalStatus
+from .audit_log import AuditAction, AuditLog
 from .donation import CurrencyCode, Donation, DonationStatus, Donor, PaymentMethod
 
 __all__ = [
+    "Adopter",
+    "AdoptionRequest",
+    "AdoptionRequestStatus",
     "Animal",
     "AnimalPhoto",
     "AnimalSpecies",
     "AnimalStatus",
-    "Adopter",
-    "AdoptionRequest",
-    "AdoptionRequestStatus",
-    "Donor",
-    "Donation",
+    "AuditAction",
+    "AuditLog",
     "CurrencyCode",
-    "PaymentMethod",
+    "Donation",
     "DonationStatus",
+    "Donor",
+    "PaymentMethod",
 ]
