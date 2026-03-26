@@ -78,7 +78,7 @@ Week 3-4:
 | 3 | Stripe Webhook Processing | EPIC-3 S01 (remaining) | 8 | BLOCKED on V1 |
 | 4 | SEPA Direct Debit | EPIC-3 S02 | 8 | BLOCKED on #3 |
 | 5 | GDPR Consent Tracking | EPIC-13 S07 | 5 | BLOCKED on #2 |
-| 6 | Cash Donation Recording | EPIC-3 S06 | 3 | READY |
+| 6 | Cash Donation Recording | EPIC-3 S06 | 3 | DONE (PR #16) |
 | 7 | In-Kind Donation Recording | EPIC-14 S05 | 5 | READY |
 | 8 | Sponsorship Tiers & Matching | EPIC-14 S01 | 8 | BLOCKED on #3 |
 | 9 | Campaign Management | EPIC-14 S03 | 6 | BLOCKED on V1 frontend |
