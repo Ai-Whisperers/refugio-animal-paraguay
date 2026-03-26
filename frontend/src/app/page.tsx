@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Home, Heart, Users, MapPin, Clock, Phone, Mail } Star } from "lucide-react";
+import { Home, Heart, Users, MapPin, Clock, Phone, Mail, Star } from "lucide-react";
 import { HOME } from "@/lib/strings";
 
 export default function HomePage() {

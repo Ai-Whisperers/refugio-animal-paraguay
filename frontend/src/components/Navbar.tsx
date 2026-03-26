@@ -1,5 +1,6 @@
-import { PawPrint } from "lucide-react";
 "use client";
+
+import { PawPrint } from "lucide-react";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
