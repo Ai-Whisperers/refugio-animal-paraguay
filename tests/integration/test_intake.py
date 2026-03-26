@@ -177,9 +177,7 @@ async def test_list_intakes_filter_by_quarantine(client: AsyncClient) -> None:
         "/animals/intake",
         json=make_intake_data(requires_quarantine=True, name="Quarantine1"),
     )
-    response = await client.get(
-        "/animals/intake", params={"requires_quarantine": True}
-    )
+    response = await client.get("/animals/intake", params={"requires_quarantine": True})
     assert response.status_code == 200
     body = response.json()
     for intake in body:
@@ -228,13 +226,13 @@ async def test_get_intake_not_found_returns_404(client: AsyncClient) -> None:
 
 @pytest.mark.asyncio
 @pytest.mark.integration
-async def test_create_intake_without_auth_returns_403(client: AsyncClient) -> None:
+async def test_create_intake_without_auth_returns_403() -> None:
     """Verify that unauthenticated requests are rejected."""
-    from httpx import ASGITransport, AsyncClient as _AC
-
+    from httpx import ASGITransport
+    from httpx import AsyncClient as UnauthAsyncClient
     from src.app import app
 
-    async with _AC(
+    async with UnauthAsyncClient(
         transport=ASGITransport(app=app),
         base_url="http://test",
     ) as unauthed:

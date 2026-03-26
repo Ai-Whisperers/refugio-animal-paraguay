@@ -1,14 +1,13 @@
 """Unit tests for src/schemas/intake.py and src/db/models/intake.py."""
 
 import logging
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from uuid import uuid4
 
 import pytest
 from pydantic import ValidationError
-
 from src.db.models.animal import AnimalSpecies
-from src.db.models.intake import IntakeRecord, IntakeSource, handle_quarantine_trigger
+from src.db.models.intake import IntakeSource, handle_quarantine_trigger
 from src.schemas.intake import IntakeCreate, IntakeResponse
 
 
@@ -57,7 +56,9 @@ class TestIntakeCreate:
         assert len(intake.photo_urls) == 1
 
     def test_surrender_source(self) -> None:
-        intake = IntakeCreate(name="Michi", source=IntakeSource.SURRENDER, species=AnimalSpecies.CAT)
+        intake = IntakeCreate(
+            name="Michi", source=IntakeSource.SURRENDER, species=AnimalSpecies.CAT
+        )
         assert intake.source == IntakeSource.SURRENDER
         assert intake.species == AnimalSpecies.CAT
 
@@ -125,7 +126,7 @@ class TestIntakeCreate:
 
 class TestIntakeResponse:
     def test_from_orm_attributes(self) -> None:
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         _animal_id = uuid4()
         _staff_id = uuid4()
         _intake_id = uuid4()
@@ -184,25 +185,34 @@ class TestIntakeResponse:
 
 class TestQuarantineTrigger:
     def test_quarantine_logs_when_required(self, caplog: pytest.LogCaptureFixture) -> None:
-        animal_id = uuid4()
-        intake_id = uuid4()
+        _animal_id = uuid4()
+        _intake_id = uuid4()
 
-        record = IntakeRecord.__new__(IntakeRecord)
-        record.id = intake_id
-        record.animal_id = animal_id
-        record.requires_quarantine = True
+        # Use a plain object to avoid SQLAlchemy instrumentation
+        record = type(
+            "_FakeIntakeRecord",
+            (),
+            {
+                "id": _intake_id,
+                "animal_id": _animal_id,
+                "requires_quarantine": True,
+            },
+        )()
 
         with caplog.at_level(logging.INFO):
-            handle_quarantine_trigger(record)
+            handle_quarantine_trigger(record)  # type: ignore[arg-type]
 
         assert "Quarantine flagged" in caplog.text
-        assert str(animal_id) in caplog.text
+        assert str(_animal_id) in caplog.text
 
     def test_no_log_when_quarantine_not_required(self, caplog: pytest.LogCaptureFixture) -> None:
-        record = IntakeRecord.__new__(IntakeRecord)
-        record.requires_quarantine = False
+        record = type(
+            "_FakeIntakeRecord",
+            (),
+            {"requires_quarantine": False},
+        )()
 
         with caplog.at_level(logging.INFO):
-            handle_quarantine_trigger(record)
+            handle_quarantine_trigger(record)  # type: ignore[arg-type]
 
         assert "Quarantine flagged" not in caplog.text
