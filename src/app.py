@@ -27,6 +27,7 @@ from src.api.donors import router as donors_router
 from src.api.health import router as health_router
 from src.api.in_kind_donations import router as in_kind_donations_router
 from src.api.public import router as public_router
+from src.api.public_contact import router as public_contact_router
 from src.audit.middleware import AuditMiddleware
 from src.config import Settings, get_settings
 from src.db.session import dispose_engine, init_engine
@@ -108,6 +109,7 @@ def create_app() -> FastAPI:
     application.include_router(admin_router)
     application.include_router(public_router)
     application.include_router(public_adoption_router)
+    application.include_router(public_contact_router)
 
     return application
 
