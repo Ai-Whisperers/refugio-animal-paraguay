@@ -13,6 +13,7 @@ Design decisions:
 
 import logging
 import re
+from uuid import UUID
 
 from fastapi import Request, Response
 from jose import JWTError, jwt
@@ -23,9 +24,10 @@ from src.db.models.audit_log import (
     HTTP_METHOD_TO_ACTION,
     PATH_TO_RESOURCE_TYPE,
     AuditAction,
+    AuditLog,
     ResourceType,
 )
-from src.events.base import DomainEvent, event_bus
+from src.db.session import get_session_factory
 
 logger = logging.getLogger(__name__)
 
@@ -142,26 +144,26 @@ class AuditMiddleware(BaseHTTPMiddleware):
         ip_address = request.client.host if request.client else None
         user_agent = request.headers.get("user-agent", "")[:500]
 
-        # Publish audit event (fire-and-forget via event bus)
+        # Write audit log entry directly to the database
         try:
-            audit_event = DomainEvent(
-                event_type=AUDIT_EVENT_TYPE,
-                payload={
-                    "user_id": user_id,
-                    "action": action.value,
-                    "resource_type": resource_type.value,
-                    "resource_id": resource_id,
-                    "ip_address": ip_address,
-                    "user_agent": user_agent,
-                    "http_method": method,
-                    "path": path,
-                    "status_code": response.status_code,
-                },
-                actor_id=user_id,
-            )
-            await event_bus.publish(audit_event)
+            session_factory = get_session_factory()
+            if session_factory is not None:
+                async with session_factory() as session:
+                    entry = AuditLog(
+                        user_id=UUID(user_id),
+                        action=action.value,
+                        resource_type=resource_type.value,
+                        resource_id=resource_id,
+                        ip_address=ip_address,
+                        user_agent=user_agent,
+                        http_method=method,
+                        path=path,
+                        status_code=response.status_code,
+                    )
+                    session.add(entry)
+                    await session.commit()
         except Exception:
             # Audit recording must never break the response
-            logger.exception("Failed to publish audit event for %s %s", method, path)
+            logger.exception("Failed to record audit entry for %s %s", method, path)
 
         return response
