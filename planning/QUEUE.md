@@ -85,7 +85,7 @@ Week 3-4:
 | 10 | Donation Landing Page | EPIC-11 S04 | 13 | READY |
 | 11 | Donation Dashboard (Staff) | EPIC-3 S04 | 6 | BLOCKED on #4 |
 | 12 | Email Notification System | EPIC-6 S01 | 8 | DONE (PR #18) |
-| 13 | GDPR Data Export | EPIC-13 S02 | 6 | PR #30 (conflicts) |
+| 13 | GDPR Data Export | EPIC-13 S02 | 6 | DONE (PR #48) |
 
 ---
 
@@ -102,12 +102,12 @@ Week 3-4:
 | 7 | Tigo Money Integration (PYG) | EPIC-3 S03 | 8 | |
 | 8 | Sponsor Update Notifications | EPIC-14 S02 | 6 | |
 | 9 | Campaign Progress & Social Proof | EPIC-14 S04 | 5 | |
-| 10 | Impact Report Generator | EPIC-13 S03 | 7 | |
-| 11 | Fund Allocation Tracking | EPIC-13 S04 | 6 | |
-| 12 | GDPR Data Deletion | EPIC-13 S06 | 5 | PR #31 (conflicts) |
+| 10 | Impact Report Generator | EPIC-13 S03 | 7 | PR #46 (conflicts) |
+| 11 | Fund Allocation Tracking | EPIC-13 S04 | 6 | DONE (PR #45) |
+| 12 | GDPR Data Deletion | EPIC-13 S06 | 5 | PR #31, #47 (conflicts) |
 | 13 | Success Stories Page | EPIC-11 S06 | 5 | |
-| 14 | About & Educational Pages | EPIC-11 S03 | 8 | |
-| 15 | Multi-Language (ES + EN) | EPIC-11 S03 | 5 | |
+| 14 | About & Educational Pages | EPIC-11 S03 | 8 | DONE (PR #36) |
+| 15 | Multi-Language (ES + EN) | EPIC-11 S03 | 5 | DONE (PR #35) |
 
 ---
 
@@ -211,19 +211,19 @@ Week 3-4:
 | # | Story | Ticket | Pts | Status | Depends On |
 |---|-------|--------|-----|--------|------------|
 | 1 | Design System Realignment | RAP-171 | 5 | DONE (PR #33) | — |
-| 2 | Spanish Translation & Warm Tone | RAP-172 | 5 | READY | RAP-171 (color classes) |
-| 3 | Missing Pages: About & Donate | RAP-173 | 5 | READY | RAP-171, RAP-172 (strings) |
-| 4 | Homepage Redesign with Trust Signals | RAP-175 | 5 | READY | RAP-171, RAP-172 |
-| 5 | WhatsApp + Accessibility (partial) | RAP-178 | 3 | READY | RAP-172 (Spanish strings) |
+| 2 | Spanish Translation & Warm Tone | RAP-172 | 5 | DONE (PR #35) | RAP-171 (color classes) |
+| 3 | Missing Pages: About & Donate | RAP-173 | 5 | DONE (PR #36) | RAP-171, RAP-172 (strings) |
+| 4 | Homepage Redesign with Trust Signals | RAP-175 | 5 | DONE (PR #38) | RAP-171, RAP-172 |
+| 5 | WhatsApp + Accessibility (partial) | RAP-178 | 3 | DONE (PR #42) | RAP-172 (Spanish strings) |
 
 ### Sprint UX-2: Polish + Flow Optimization (15 pts)
 
 | # | Story | Ticket | Pts | Status | Depends On |
 |---|-------|--------|-----|--------|------------|
-| 1 | Missing Pages: Volunteer & Foster | RAP-174 | 3 | READY | RAP-171, RAP-172 |
-| 2 | Animal Catalog UX Improvements | RAP-176 | 5 | READY | RAP-171, RAP-172 |
-| 3 | Animal Detail & Adoption Flow Overhaul | RAP-177 | 5 | READY | RAP-171, RAP-172, RAP-176 |
-| 4 | Accessibility Remainder (images, 404) | RAP-178 | 2 | READY | RAP-171 |
+| 1 | Missing Pages: Volunteer & Foster | RAP-174 | 3 | DONE (PR #37) | RAP-171, RAP-172 |
+| 2 | Animal Catalog UX Improvements | RAP-176 | 5 | DONE (PR #40) | RAP-171, RAP-172 |
+| 3 | Animal Detail & Adoption Flow Overhaul | RAP-177 | 5 | DONE (PR #41) | RAP-171, RAP-172, RAP-176 |
+| 4 | Accessibility Remainder (images, 404) | RAP-178 | 2 | DONE (PR #42) | RAP-171 |
 
 ---
 
