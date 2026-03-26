@@ -76,14 +76,14 @@ Week 3-4:
 | 1 | Event Bus Infrastructure | EPIC-9 S05 | 8 | DONE (PR #14) |
 | 2 | Audit Trail System | EPIC-13 S01 | 7 | DONE (PR #15) |
 | 3 | Stripe Webhook Processing | EPIC-3 S01 (remaining) | 8 | DONE (PR #25) |
-| 4 | SEPA Direct Debit | EPIC-3 S02 | 8 | PR #27 (conflicts) |
+| 4 | SEPA Direct Debit | EPIC-3 S02 | 8 | READY |
 | 5 | GDPR Consent Tracking | EPIC-13 S07 | 5 | DONE (PR #26) |
 | 6 | Cash Donation Recording | EPIC-3 S06 | 3 | DONE (PR #16) |
 | 7 | In-Kind Donation Recording | EPIC-14 S05 | 5 | DONE (PR #17) |
-| 8 | Sponsorship Tiers & Matching | EPIC-14 S01 | 8 | PR #28 (conflicts) |
-| 9 | Campaign Management | EPIC-14 S03 | 6 | PR #29 (conflicts) |
+| 8 | Sponsorship Tiers & Matching | EPIC-14 S01 | 8 | READY |
+| 9 | Campaign Management | EPIC-14 S03 | 6 | READY |
 | 10 | Donation Landing Page | EPIC-11 S04 | 13 | DONE (PR #51) |
-| 11 | Donation Dashboard (Staff) | EPIC-3 S04 | 6 | BLOCKED on #4 |
+| 11 | Donation Dashboard (Staff) | EPIC-3 S04 | 6 | READY |
 | 12 | Email Notification System | EPIC-6 S01 | 8 | DONE (PR #18) |
 | 13 | GDPR Data Export | EPIC-13 S02 | 6 | DONE (PR #48) |
 
@@ -93,15 +93,15 @@ Week 3-4:
 
 | # | Story | Epic | Points | Status |
 |---|-------|------|--------|--------|
-| 1 | WhatsApp Integration | EPIC-6 S02 | 8 | |
+| 1 | WhatsApp Integration | EPIC-6 S02 | 8 | READY |
 | 2 | In-App Notifications | EPIC-6 S03 | 6 | DONE (PR #32) |
 | 3 | Notification Preferences | EPIC-6 S04 | 5 | DONE (PR #34) |
 | 4 | Adoption Notifications (status changes) | EPIC-2 S03 | 5 | DONE (PR #39) |
 | 5 | PDF Adoption Contracts | EPIC-2 S04 | 6 | DONE (PR #43) |
 | 6 | Post-Adoption Follow-up | EPIC-2 S05 | 8 | DONE (PR #44) |
-| 7 | Tigo Money Integration (PYG) | EPIC-3 S03 | 8 | |
-| 8 | Sponsor Update Notifications | EPIC-14 S02 | 6 | |
-| 9 | Campaign Progress & Social Proof | EPIC-14 S04 | 5 | |
+| 7 | Tigo Money Integration (PYG) | EPIC-3 S03 | 8 | READY |
+| 8 | Sponsor Update Notifications | EPIC-14 S02 | 6 | READY |
+| 9 | Campaign Progress & Social Proof | EPIC-14 S04 | 5 | READY |
 | 10 | Impact Report Generator | EPIC-13 S03 | 7 | DONE (PR #50) |
 | 11 | Fund Allocation Tracking | EPIC-13 S04 | 6 | DONE (PR #45) |
 | 12 | GDPR Data Deletion | EPIC-13 S06 | 5 | DONE (PR #47) |
