@@ -49,7 +49,7 @@ export default function AboutPage() {
                 className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 text-center"
               >
                 <div className="w-16 h-16 rounded-full bg-primary-100 flex items-center justify-center text-2xl mx-auto mb-4">
-                  {"\u{1F9D1}"}
+                  {""}
                 </div>
                 <h3 className="font-semibold text-gray-900">{member.name}</h3>
                 <p className="text-sm text-gray-500 mt-1">{member.role}</p>
@@ -67,7 +67,7 @@ export default function AboutPage() {
           </h2>
           <div className="bg-gray-50 rounded-xl p-6 sm:p-8 border border-gray-100">
             <div className="flex items-start gap-4">
-              <span className="text-3xl">{"\u{1F4CD}"}</span>
+              <span className="text-3xl">{""}</span>
               <div className="space-y-2">
                 <p className="font-semibold text-gray-900">
                   {ABOUT.locationAddress}

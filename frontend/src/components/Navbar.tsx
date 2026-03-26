@@ -1,3 +1,4 @@
+import { PawPrint } from "lucide-react";
 "use client";
 
 import Link from "next/link";
@@ -65,9 +66,7 @@ export default function Navbar() {
               href="/"
               className="flex items-center space-x-2 min-h-[44px]"
             >
-              <span className="text-2xl" role="img" aria-label="Paw">
-                {"\u{1F43E}"}
-              </span>
+              <PawPrint className="h-7 w-7 text-primary-600" aria-hidden="true" />
               <span className="font-heading font-bold text-xl text-primary-700">
                 Refugio Animal
               </span>

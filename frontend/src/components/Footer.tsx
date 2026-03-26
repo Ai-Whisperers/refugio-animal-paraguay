@@ -1,3 +1,4 @@
+import { PawPrint } from "lucide-react";
 import Link from "next/link";
 import { FOOTER } from "@/lib/strings";
 
@@ -24,9 +25,7 @@ export default function Footer() {
           {/* Brand — full width on smallest screens */}
           <div className="col-span-2 sm:col-span-1">
             <div className="flex items-center space-x-2 mb-3">
-              <span className="text-2xl" role="img" aria-label="Paw">
-                {"\u{1F43E}"}
-              </span>
+              <PawPrint className="h-7 w-7 text-primary-600" aria-hidden="true" />
               <span className="font-heading font-bold text-lg text-primary-700">
                 {FOOTER.brand}
               </span>

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import DynamicIcon from "@/components/DynamicIcon";
 import { DONATE, SITE_TITLE } from "@/lib/strings";
 
 export const metadata: Metadata = {
@@ -34,7 +35,7 @@ export default function DonatePage() {
                 key={item.title}
                 className="bg-white rounded-xl p-6 shadow-sm border border-gray-100"
               >
-                <div className="text-3xl mb-3">{item.icon}</div>
+                <div className="mb-3 text-primary-600"><DynamicIcon name={item.icon} className="h-8 w-8" /></div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">
                   {item.title}
                 </h3>
@@ -60,7 +61,7 @@ export default function DonatePage() {
           {/* Bank Transfer (Paraguay) */}
           <div className="bg-white rounded-xl p-6 sm:p-8 shadow-sm border border-gray-100 mb-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-              <span>{"\u{1F3E6}"}</span> {DONATE.bankTransferTitle}
+              <span>{""}</span> {DONATE.bankTransferTitle}
             </h3>
             <div className="space-y-2">
               {DONATE.bankDetails.map((detail) => (
@@ -80,7 +81,7 @@ export default function DonatePage() {
           {/* EU Donors */}
           <div className="bg-white rounded-xl p-6 sm:p-8 shadow-sm border border-gray-100">
             <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
-              <span>{"\u{1F1EA}\u{1F1FA}"}</span> {DONATE.euTitle}
+              <span>{""}</span> {DONATE.euTitle}
             </h3>
             <p className="text-sm text-gray-600 mb-3">
               {DONATE.euDescription}
@@ -104,7 +105,7 @@ export default function DonatePage() {
                 key={item.title}
                 className="bg-white rounded-xl p-6 shadow-sm border border-gray-100"
               >
-                <div className="text-3xl mb-3">{item.icon}</div>
+                <div className="mb-3 text-primary-600"><DynamicIcon name={item.icon} className="h-8 w-8" /></div>
                 <h3 className="text-lg font-semibold text-gray-900 mb-2">
                   {item.title}
                 </h3>
@@ -130,7 +131,7 @@ export default function DonatePage() {
       {/* WhatsApp CTA */}
       <section className="py-10 sm:py-16 px-4 bg-white">
         <div className="max-w-3xl mx-auto text-center">
-          <p className="text-2xl mb-3">{"\u{1F4AC}"}</p>
+          <p className="text-2xl mb-3">{""}</p>
           <h2 className="text-xl font-heading font-bold text-gray-900 mb-2">
             {DONATE.whatsappCta}
           </h2>
@@ -140,14 +141,14 @@ export default function DonatePage() {
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors mt-3"
           >
-            {"\u{1F4F1}"} WhatsApp: {DONATE.whatsappNumber}
+            {""} WhatsApp: {DONATE.whatsappNumber}
           </a>
           <div className="mt-6">
             <Link
               href="/animals"
               className="text-primary-600 hover:text-primary-700 font-medium"
             >
-              {"\u{2190}"} Ver animales disponibles
+              {""} Ver animales disponibles
             </Link>
           </div>
         </div>
