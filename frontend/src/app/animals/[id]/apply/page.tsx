@@ -8,6 +8,7 @@ import type { Animal } from "@/types/api";
 import { getAnimalPublic, submitAdoptionApplication } from "@/lib/public-api";
 import { ApiClientError } from "@/lib/api";
 import { speciesEmoji } from "@/lib/animal-utils";
+import { ADOPTION_FORM, ANIMAL_DETAIL, COMMON } from "@/lib/strings";
 
 /** Validation errors per field. */
 interface FormErrors {
@@ -51,12 +52,12 @@ export default function AdoptionApplicationPage() {
       try {
         const data = await getAnimalPublic(params.id);
         if (data.status !== "available") {
-          setAnimalError("This animal is not currently available for adoption.");
+          setAnimalError(ADOPTION_FORM.animalNotAvailable);
         }
         setAnimal(data);
       } catch (err) {
         setAnimalError(
-          err instanceof Error ? err.message : "Failed to load animal"
+          err instanceof Error ? err.message : COMMON.error
         );
       } finally {
         setIsLoadingAnimal(false);
@@ -70,28 +71,27 @@ export default function AdoptionApplicationPage() {
     const newErrors: FormErrors = {};
 
     if (!fullName.trim()) {
-      newErrors.full_name = "Full name is required.";
+      newErrors.full_name = ADOPTION_FORM.nameRequired;
     } else if (fullName.trim().length > 255) {
-      newErrors.full_name = "Name must be 255 characters or fewer.";
+      newErrors.full_name = ADOPTION_FORM.nameTooLong;
     }
 
     if (!email.trim()) {
-      newErrors.email = "Email address is required.";
+      newErrors.email = ADOPTION_FORM.emailRequired;
     } else if (!EMAIL_REGEX.test(email.trim())) {
-      newErrors.email = "Please enter a valid email address.";
+      newErrors.email = ADOPTION_FORM.emailInvalid;
     }
 
     if (phone && phone.length > 50) {
-      newErrors.phone = "Phone number must be 50 characters or fewer.";
+      newErrors.phone = ADOPTION_FORM.phoneTooLong;
     }
 
     if (message && message.length > MAX_MESSAGE_LENGTH) {
-      newErrors.message = `Message must be ${MAX_MESSAGE_LENGTH} characters or fewer.`;
+      newErrors.message = ADOPTION_FORM.messageTooLong(MAX_MESSAGE_LENGTH);
     }
 
     if (!gdprConsent) {
-      newErrors.gdpr_consent =
-        "You must consent to data processing to submit this application.";
+      newErrors.gdpr_consent = ADOPTION_FORM.gdprRequired;
     }
 
     setErrors(newErrors);
@@ -119,7 +119,7 @@ export default function AdoptionApplicationPage() {
       if (err instanceof ApiClientError) {
         setSubmitError(err.detail);
       } else {
-        setSubmitError("An unexpected error occurred. Please try again.");
+        setSubmitError(ADOPTION_FORM.submitError);
       }
     } finally {
       setIsSubmitting(false);
@@ -131,7 +131,7 @@ export default function AdoptionApplicationPage() {
     return (
       <div className="max-w-2xl mx-auto px-4 py-16 text-center">
         <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-primary-600 border-r-transparent" />
-        <p className="mt-3 text-gray-500">Loading...</p>
+        <p className="mt-3 text-gray-500">{COMMON.loading}</p>
       </div>
     );
   }
@@ -140,13 +140,13 @@ export default function AdoptionApplicationPage() {
   if (animalError || !animal) {
     return (
       <div className="max-w-2xl mx-auto px-4 py-16 text-center">
-        <p className="text-5xl mb-4">🐾</p>
-        <p className="text-red-600 mb-4">{animalError ?? "Animal not found"}</p>
+        <p className="text-5xl mb-4">{COMMON.paw}</p>
+        <p className="text-red-600 mb-4">{animalError ?? ANIMAL_DETAIL.notFound}</p>
         <Link
           href="/animals"
           className="text-primary-600 hover:text-primary-700 font-medium"
         >
-          Browse Available Animals
+          {ANIMAL_DETAIL.backToAnimals}
         </Link>
       </div>
     );
@@ -157,28 +157,25 @@ export default function AdoptionApplicationPage() {
     return (
       <div className="max-w-2xl mx-auto px-4 py-16 text-center">
         <div className="bg-green-50 rounded-xl p-8 border border-green-200">
-          <p className="text-5xl mb-4">🎉</p>
+          <p className="text-5xl mb-4">{"\u{1F389}"}</p>
           <h1 className="text-2xl font-heading font-bold text-gray-900 mb-3">
-            Application Submitted!
+            {ADOPTION_FORM.successTitle}
           </h1>
           <p className="text-gray-600 mb-6">
-            Thank you for your interest in adopting{" "}
-            <strong>{animal.name}</strong>. We have received your application and
-            will review it shortly. You will receive an email confirmation at{" "}
-            <strong>{email}</strong>.
+            {ADOPTION_FORM.successMessage(animal.name, email)}
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link
               href={`/animals/${animal.id}`}
               className="px-6 py-2 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition-colors"
             >
-              Back to {animal.name}
+              {ADOPTION_FORM.backTo(animal.name)}
             </Link>
             <Link
               href="/animals"
               className="px-6 py-2 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors"
             >
-              Browse More Animals
+              {ADOPTION_FORM.browseMore}
             </Link>
           </div>
         </div>
@@ -192,7 +189,7 @@ export default function AdoptionApplicationPage() {
       {/* Breadcrumb */}
       <nav className="mb-6 text-sm text-gray-500">
         <Link href="/animals" className="hover:text-primary-600">
-          Animals
+          {ANIMAL_DETAIL.breadcrumbAnimals}
         </Link>
         <span className="mx-2">/</span>
         <Link
@@ -229,11 +226,10 @@ export default function AdoptionApplicationPage() {
 
       {/* Form Header */}
       <h1 className="text-2xl md:text-3xl font-heading font-bold text-gray-900 mb-2">
-        Adoption Application
+        {ADOPTION_FORM.title}
       </h1>
       <p className="text-gray-500 mb-8">
-        Fill in your details below to apply for adopting {animal.name}. We will
-        review your application and get back to you as soon as possible.
+        {ADOPTION_FORM.subtitle(animal.name)}
       </p>
 
       {/* Submission Error */}
@@ -251,7 +247,7 @@ export default function AdoptionApplicationPage() {
             htmlFor="full_name"
             className="block text-sm font-medium text-gray-700 mb-1"
           >
-            Full Name <span className="text-red-500">*</span>
+            {ADOPTION_FORM.fullName} <span className="text-red-500">{ADOPTION_FORM.required}</span>
           </label>
           <input
             id="full_name"
@@ -261,7 +257,7 @@ export default function AdoptionApplicationPage() {
             className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors ${
               errors.full_name ? "border-red-300" : "border-gray-300"
             }`}
-            placeholder="Maria Garcia"
+            placeholder={ADOPTION_FORM.fullNamePlaceholder}
             maxLength={255}
           />
           {errors.full_name && (
@@ -275,7 +271,7 @@ export default function AdoptionApplicationPage() {
             htmlFor="email"
             className="block text-sm font-medium text-gray-700 mb-1"
           >
-            Email Address <span className="text-red-500">*</span>
+            {ADOPTION_FORM.email} <span className="text-red-500">{ADOPTION_FORM.required}</span>
           </label>
           <input
             id="email"
@@ -285,7 +281,7 @@ export default function AdoptionApplicationPage() {
             className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors ${
               errors.email ? "border-red-300" : "border-gray-300"
             }`}
-            placeholder="maria@example.com"
+            placeholder={ADOPTION_FORM.emailPlaceholder}
           />
           {errors.email && (
             <p className="mt-1 text-sm text-red-600">{errors.email}</p>
@@ -298,8 +294,8 @@ export default function AdoptionApplicationPage() {
             htmlFor="phone"
             className="block text-sm font-medium text-gray-700 mb-1"
           >
-            Phone Number{" "}
-            <span className="text-gray-400 font-normal">(optional)</span>
+            {ADOPTION_FORM.phone}{" "}
+            <span className="text-gray-400 font-normal">{ADOPTION_FORM.phoneOptional}</span>
           </label>
           <input
             id="phone"
@@ -309,7 +305,7 @@ export default function AdoptionApplicationPage() {
             className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors ${
               errors.phone ? "border-red-300" : "border-gray-300"
             }`}
-            placeholder="+595 981 123 456"
+            placeholder={ADOPTION_FORM.phonePlaceholder}
             maxLength={50}
           />
           {errors.phone && (
@@ -323,8 +319,8 @@ export default function AdoptionApplicationPage() {
             htmlFor="message"
             className="block text-sm font-medium text-gray-700 mb-1"
           >
-            Message{" "}
-            <span className="text-gray-400 font-normal">(optional)</span>
+            {ADOPTION_FORM.message}{" "}
+            <span className="text-gray-400 font-normal">{ADOPTION_FORM.messageOptional}</span>
           </label>
           <textarea
             id="message"
@@ -334,7 +330,7 @@ export default function AdoptionApplicationPage() {
             className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-colors resize-y ${
               errors.message ? "border-red-300" : "border-gray-300"
             }`}
-            placeholder="Tell us about yourself and why you'd like to adopt this animal..."
+            placeholder={ADOPTION_FORM.messagePlaceholder}
             maxLength={MAX_MESSAGE_LENGTH}
           />
           <div className="flex justify-between mt-1">
@@ -366,14 +362,11 @@ export default function AdoptionApplicationPage() {
             />
             <div>
               <p className="text-sm text-gray-700">
-                <span className="font-medium">Data Processing Consent</span>{" "}
-                <span className="text-red-500">*</span>
+                <span className="font-medium">{ADOPTION_FORM.gdprTitle}</span>{" "}
+                <span className="text-red-500">{ADOPTION_FORM.required}</span>
               </p>
               <p className="text-xs text-gray-500 mt-1">
-                I consent to the processing of my personal data for the purpose
-                of this adoption application. My data will be used solely to
-                evaluate my application and will be handled in accordance with
-                applicable data protection regulations (GDPR).
+                {ADOPTION_FORM.gdprText}
               </p>
             </div>
           </label>
@@ -389,13 +382,13 @@ export default function AdoptionApplicationPage() {
             disabled={isSubmitting}
             className="flex-1 bg-primary-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
-            {isSubmitting ? "Submitting..." : "Submit Application"}
+            {isSubmitting ? ADOPTION_FORM.submitting : ADOPTION_FORM.submit}
           </button>
           <Link
             href={`/animals/${animal.id}`}
             className="px-6 py-3 bg-gray-100 text-gray-700 rounded-lg font-medium hover:bg-gray-200 transition-colors text-center"
           >
-            Cancel
+            {ADOPTION_FORM.cancel}
           </Link>
         </div>
       </form>

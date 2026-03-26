@@ -3,13 +3,14 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import { NAV } from "@/lib/strings";
 
 const NAV_LINKS = [
-  { href: "/", label: "Home" },
-  { href: "/animals", label: "Animals" },
-  { href: "/about", label: "About" },
-  { href: "/contact", label: "Contact" },
-  { href: "/donate", label: "Donate" },
+  { href: "/", label: NAV.home },
+  { href: "/animals", label: NAV.animals },
+  { href: "/about", label: NAV.about },
+  { href: "/contact", label: NAV.contact },
+  { href: "/donate", label: NAV.donate },
 ] as const;
 
 export default function Navbar() {
@@ -65,7 +66,7 @@ export default function Navbar() {
               className="flex items-center space-x-2 min-h-[44px]"
             >
               <span className="text-2xl" role="img" aria-label="Paw">
-                🐾
+                {"\u{1F43E}"}
               </span>
               <span className="font-heading font-bold text-xl text-primary-700">
                 Refugio Animal

@@ -1,15 +1,16 @@
 import Link from "next/link";
+import { FOOTER } from "@/lib/strings";
 
 const FOOTER_LINKS = {
   shelter: [
-    { href: "/about", label: "About Us" },
-    { href: "/animals", label: "Our Animals" },
-    { href: "/contact", label: "Contact" },
+    { href: "/about", label: FOOTER.aboutUs },
+    { href: "/animals", label: FOOTER.ourAnimals },
+    { href: "/contact", label: FOOTER.contact },
   ],
   support: [
-    { href: "/donate", label: "Donate" },
-    { href: "/volunteer", label: "Volunteer" },
-    { href: "/foster", label: "Foster" },
+    { href: "/donate", label: FOOTER.donate },
+    { href: "/volunteer", label: FOOTER.volunteer },
+    { href: "/foster", label: FOOTER.foster },
   ],
 } as const;
 
@@ -24,22 +25,21 @@ export default function Footer() {
           <div className="col-span-2 sm:col-span-1">
             <div className="flex items-center space-x-2 mb-3">
               <span className="text-2xl" role="img" aria-label="Paw">
-                🐾
+                {"\u{1F43E}"}
               </span>
               <span className="font-heading font-bold text-lg text-primary-700">
-                Refugio Animal Paraguay
+                {FOOTER.brand}
               </span>
             </div>
             <p className="text-gray-500 text-sm leading-relaxed">
-              Giving animals a second chance at life. Based in Paraguay,
-              supported by donors worldwide.
+              {FOOTER.tagline}
             </p>
           </div>
 
           {/* Shelter links */}
           <div>
             <h3 className="font-semibold text-gray-900 mb-3 text-sm uppercase tracking-wider">
-              Shelter
+              {FOOTER.shelter}
             </h3>
             <ul className="space-y-2">
               {FOOTER_LINKS.shelter.map((link) => (
@@ -58,7 +58,7 @@ export default function Footer() {
           {/* Support links */}
           <div>
             <h3 className="font-semibold text-gray-900 mb-3 text-sm uppercase tracking-wider">
-              Support Us
+              {FOOTER.supportUs}
             </h3>
             <ul className="space-y-2">
               {FOOTER_LINKS.support.map((link) => (
@@ -78,7 +78,7 @@ export default function Footer() {
         {/* Copyright */}
         <div className="mt-8 pt-6 border-t border-gray-200 text-center">
           <p className="text-gray-400 text-sm">
-            &copy; {CURRENT_YEAR} Refugio Animal Paraguay. All rights reserved.
+            {FOOTER.copyright(CURRENT_YEAR)}
           </p>
         </div>
       </div>
