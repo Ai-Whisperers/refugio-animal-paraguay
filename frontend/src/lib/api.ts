@@ -63,7 +63,7 @@ async function request<T>(
     let detail = "An unexpected error occurred";
     try {
       const errorBody = (await response.json()) as ApiError;
-      detail = errorBody.detail ?? detail;
+      detail = errorBody.message ?? errorBody.detail ?? detail;
     } catch {
       // Response body was not JSON
     }

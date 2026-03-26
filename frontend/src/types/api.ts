@@ -25,30 +25,75 @@ export type UserRole = "admin" | "staff" | "adopter";
 
 // --- Animals ---
 
+export type AnimalSpecies = "dog" | "cat" | "other";
+
+export type AnimalStatus =
+  | "intake"
+  | "quarantine"
+  | "available"
+  | "foster"
+  | "under_treatment"
+  | "adopted"
+  | "deceased";
+
+export interface AnimalPhoto {
+  id: string;
+  animal_id: string;
+  url: string;
+  caption: string | null;
+  display_order: number;
+  created_at: string;
+}
+
 export interface Animal {
-  id: number;
+  id: string;
   name: string;
-  species: string;
-  breed: string | null;
-  age_years: number | null;
-  age_months: number | null;
-  gender: string;
-  size: string;
+  species: AnimalSpecies;
   status: AnimalStatus;
+  birth_date: string | null;
   description: string | null;
-  intake_date: string;
-  photo_url: string | null;
+  primary_photo_url: string | null;
+  photos: AnimalPhoto[];
   created_at: string;
   updated_at: string;
 }
 
-export type AnimalStatus =
-  | "available"
-  | "adopted"
-  | "fostered"
-  | "medical_hold"
-  | "intake"
-  | "reserved";
+export interface AnimalCreate {
+  name: string;
+  species?: AnimalSpecies;
+  status?: AnimalStatus;
+  birth_date?: string | null;
+  description?: string | null;
+  primary_photo_url?: string | null;
+}
+
+export interface AnimalUpdate {
+  name?: string;
+  species?: AnimalSpecies;
+  status?: AnimalStatus;
+  birth_date?: string | null;
+  description?: string | null;
+  primary_photo_url?: string | null;
+}
+
+// --- Adoption Applications (Public) ---
+
+export interface PublicAdoptionApplicationCreate {
+  animal_id: string;
+  full_name: string;
+  email: string;
+  phone?: string;
+  message?: string;
+  gdpr_consent: boolean;
+}
+
+export interface PublicAdoptionApplicationResponse {
+  id: string;
+  animal_id: string;
+  status: string;
+  submitted_at: string;
+  message: string;
+}
 
 // --- Pagination ---
 
@@ -63,6 +108,8 @@ export interface PaginatedResponse<T> {
 // --- API Error ---
 
 export interface ApiError {
-  detail: string;
-  status_code: number;
+  detail?: string;
+  message?: string;
+  error_code?: string;
+  status_code?: number;
 }
