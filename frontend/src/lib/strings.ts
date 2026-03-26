@@ -227,6 +227,15 @@ export const CONTACT = {
   successMessage:
     "¡Gracias por escribirnos! Te respondemos lo antes posible.",
   sendAnother: "Enviar otro mensaje",
+  whatsappTitle: "Escribinos por WhatsApp",
+  whatsappSubtitle: "La forma mas rapida de contactarnos. Te respondemos en minutos.",
+  whatsappCta: "Abrir WhatsApp",
+  whatsappNumber: "+595 981 000 000",
+  locationLabel: "Ubicacion",
+  hoursLabel: "Horario",
+  emailLabel: "Email",
+  emailFormTitle: "Tambien podes escribirnos por email",
+  emailFormSubtitle: "Completa el formulario y te respondemos lo antes posible.",
 } as const;
 
 // --- Status Labels ---

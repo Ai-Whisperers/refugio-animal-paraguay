@@ -117,3 +117,12 @@ body {
     opacity: 1;
   }
 }
+
+/* WhatsApp FAB pulse animation */
+@keyframes pulse-once {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+.animate-pulse-once {
+  animation: pulse-once 2s ease-in-out 1;
+}
