@@ -68,6 +68,13 @@ class Donor(Base):
         nullable=False,
         server_default="EUR",
     )
+    # Whether this donor opts in to public listing on campaign social proof pages.
+    # Defaults to True (visible); donors can opt out via preference settings.
+    show_in_public: Mapped[bool] = mapped_column(
+        sa.Boolean,
+        nullable=False,
+        server_default=sa.text("true"),
+    )
     # Nullable: consent recorded when given; None = not yet obtained
     gdpr_consent_at: Mapped[datetime | None] = mapped_column(
         sa.TIMESTAMP(timezone=True),

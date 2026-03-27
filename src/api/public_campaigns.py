@@ -3,6 +3,7 @@
 Endpoints:
   GET /public/campaigns             — list active campaigns with progress
   GET /public/campaigns/{id}        — campaign detail with progress stats
+  GET /public/campaigns/{id}/social-proof — social proof metrics + recent donors
 """
 
 from datetime import UTC, datetime
@@ -18,7 +19,9 @@ from src.db.session import get_db
 from src.schemas.campaign import (
     CampaignListResponse,
     CampaignPublicResponse,
+    CampaignSocialProofResponse,
 )
+from src.services.campaign_social_proof_service import get_campaign_social_proof
 
 router = APIRouter(prefix="/public/campaigns", tags=["public-campaigns"])
 
@@ -185,3 +188,32 @@ async def get_campaign_detail(
     count = int(row[1])
 
     return _build_campaign_public_response(campaign, raised_cents, count)
+
+
+@router.get(
+    "/{campaign_id}/social-proof",
+    response_model=CampaignSocialProofResponse,
+    summary="Campaign social proof: recent donors + momentum metrics",
+)
+async def get_campaign_social_proof_endpoint(
+    campaign_id: UUID,
+    db: AsyncSession = Depends(get_db),
+) -> CampaignSocialProofResponse:
+    """Return social proof data for a campaign page.
+
+    Includes:
+    - Total raised and donor count
+    - Progress percentage (amount raised vs. goal)
+    - Momentum metrics: donations in the last 24 hours and 7 days
+    - Recent donors list (up to 10) with privacy-respecting display names
+
+    Donors with show_in_public=False are shown as "Anonymous".
+    Returns 404 if the campaign does not exist or is not active/completed.
+    """
+    result = await get_campaign_social_proof(db, campaign_id)
+    if result is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Campaign not found",
+        )
+    return result
