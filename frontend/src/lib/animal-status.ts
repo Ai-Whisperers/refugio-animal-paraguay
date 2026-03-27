@@ -50,7 +50,7 @@ export function getCommonTransitions(statuses: AnimalStatus[]): AnimalStatus[] {
   );
 
   const first = sets[0];
-  return [...first].filter((status) =>
+  return Array.from(first).filter((status) =>
     sets.every((set) => set.has(status))
   );
 }
