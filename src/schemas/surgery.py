@@ -85,6 +85,21 @@ class SurgeryListResponse(BaseModel):
     size: int
 
 
+class SurgeryWithAnimalResponse(SurgeryResponse):
+    """Surgery record enriched with animal name for list views."""
+
+    animal_name: str
+
+
+class SurgeryScheduleListResponse(BaseModel):
+    """Paginated list of surgeries with animal context for scheduling views."""
+
+    items: list[SurgeryWithAnimalResponse]
+    total: int
+    page: int
+    size: int
+
+
 # ---------------------------------------------------------------------------
 # PostOpCheck schemas
 # ---------------------------------------------------------------------------

@@ -10,11 +10,14 @@ pytestmark = [pytest.mark.asyncio(loop_scope="function"), pytest.mark.integratio
 
 
 async def _create_animal(client: AsyncClient) -> str:
-    resp = await client.post("/animals", json={
-        "name": f"Surgery-Dog-{uuid.uuid4().hex[:6]}",
-        "species": "dog",
-        "breed": "mixed",
-    })
+    resp = await client.post(
+        "/animals",
+        json={
+            "name": f"Surgery-Dog-{uuid.uuid4().hex[:6]}",
+            "species": "dog",
+            "breed": "mixed",
+        },
+    )
     assert resp.status_code == 201
     return resp.json()["id"]
 
@@ -41,11 +44,14 @@ class TestSurgeryCRUD:
 
     async def test_create_scheduled_surgery(self, client: AsyncClient) -> None:
         animal_id = await _create_animal(client)
-        resp = await client.post(f"/animals/{animal_id}/surgeries", json={
-            "surgery_type": "neuter",
-            "veterinarian_name": "Dr. Martinez",
-            "scheduled_date": date.today().isoformat(),
-        })
+        resp = await client.post(
+            f"/animals/{animal_id}/surgeries",
+            json={
+                "surgery_type": "neuter",
+                "veterinarian_name": "Dr. Martinez",
+                "scheduled_date": date.today().isoformat(),
+            },
+        )
         assert resp.status_code == 201
         body = resp.json()
         assert body["surgery_type"] == "neuter"
@@ -54,16 +60,19 @@ class TestSurgeryCRUD:
 
     async def test_create_completed_surgery(self, client: AsyncClient) -> None:
         animal_id = await _create_animal(client)
-        resp = await client.post(f"/animals/{animal_id}/surgeries", json={
-            "surgery_type": "spay",
-            "surgery_status": "completed",
-            "veterinarian_name": "Dr. Lopez",
-            "scheduled_date": date.today().isoformat(),
-            "performed_date": date.today().isoformat(),
-            "anesthesia_type": "general",
-            "outcome": "successful",
-            "weight_kg": 8.5,
-        })
+        resp = await client.post(
+            f"/animals/{animal_id}/surgeries",
+            json={
+                "surgery_type": "spay",
+                "surgery_status": "completed",
+                "veterinarian_name": "Dr. Lopez",
+                "scheduled_date": date.today().isoformat(),
+                "performed_date": date.today().isoformat(),
+                "anesthesia_type": "general",
+                "outcome": "successful",
+                "weight_kg": 8.5,
+            },
+        )
         assert resp.status_code == 201
         body = resp.json()
         assert body["surgery_status"] == "completed"
@@ -71,10 +80,13 @@ class TestSurgeryCRUD:
 
     async def test_create_surgery_nonexistent_animal_404(self, client: AsyncClient) -> None:
         fake_id = str(uuid.uuid4())
-        resp = await client.post(f"/animals/{fake_id}/surgeries", json={
-            "veterinarian_name": "Dr. A",
-            "scheduled_date": date.today().isoformat(),
-        })
+        resp = await client.post(
+            f"/animals/{fake_id}/surgeries",
+            json={
+                "veterinarian_name": "Dr. A",
+                "scheduled_date": date.today().isoformat(),
+            },
+        )
         assert resp.status_code == 404
 
     async def test_get_surgery_by_id(self, client: AsyncClient) -> None:
@@ -119,11 +131,14 @@ class TestSurgeryCRUD:
         animal_id = await _create_animal(client)
         surgery = await _create_surgery(client, animal_id)
 
-        resp = await client.patch(f"/surgeries/{surgery['id']}", json={
-            "surgery_status": "completed",
-            "outcome": "successful",
-            "performed_date": date.today().isoformat(),
-        })
+        resp = await client.patch(
+            f"/surgeries/{surgery['id']}",
+            json={
+                "surgery_status": "completed",
+                "outcome": "successful",
+                "performed_date": date.today().isoformat(),
+            },
+        )
         assert resp.status_code == 200
         body = resp.json()
         assert body["surgery_status"] == "completed"
@@ -153,9 +168,12 @@ class TestPostOpCheckCRUD:
         surgery = await _create_surgery(client, animal_id)
 
         scheduled = datetime.now(UTC).isoformat()
-        resp = await client.post(f"/surgeries/{surgery['id']}/post-op-checks", json={
-            "scheduled_time": scheduled,
-        })
+        resp = await client.post(
+            f"/surgeries/{surgery['id']}/post-op-checks",
+            json={
+                "scheduled_time": scheduled,
+            },
+        )
         assert resp.status_code == 201
         body = resp.json()
         assert body["check_status"] == "pending"
@@ -166,17 +184,20 @@ class TestPostOpCheckCRUD:
         surgery = await _create_surgery(client, animal_id)
 
         now = datetime.now(UTC).isoformat()
-        resp = await client.post(f"/surgeries/{surgery['id']}/post-op-checks", json={
-            "scheduled_time": now,
-            "check_status": "completed",
-            "completed_time": now,
-            "checked_by": "Dr. Martinez",
-            "temperature_celsius": 38.5,
-            "pain_level": 3,
-            "appetite": "normal",
-            "mobility": "limited",
-            "wound_condition": "clean",
-        })
+        resp = await client.post(
+            f"/surgeries/{surgery['id']}/post-op-checks",
+            json={
+                "scheduled_time": now,
+                "check_status": "completed",
+                "completed_time": now,
+                "checked_by": "Dr. Martinez",
+                "temperature_celsius": 38.5,
+                "pain_level": 3,
+                "appetite": "normal",
+                "mobility": "limited",
+                "wound_condition": "clean",
+            },
+        )
         assert resp.status_code == 201
         body = resp.json()
         assert body["check_status"] == "completed"
@@ -187,12 +208,18 @@ class TestPostOpCheckCRUD:
         surgery = await _create_surgery(client, animal_id)
 
         now = datetime.now(UTC).isoformat()
-        await client.post(f"/surgeries/{surgery['id']}/post-op-checks", json={
-            "scheduled_time": now,
-        })
-        await client.post(f"/surgeries/{surgery['id']}/post-op-checks", json={
-            "scheduled_time": now,
-        })
+        await client.post(
+            f"/surgeries/{surgery['id']}/post-op-checks",
+            json={
+                "scheduled_time": now,
+            },
+        )
+        await client.post(
+            f"/surgeries/{surgery['id']}/post-op-checks",
+            json={
+                "scheduled_time": now,
+            },
+        )
 
         resp = await client.get(f"/surgeries/{surgery['id']}/post-op-checks")
         assert resp.status_code == 200
@@ -225,12 +252,15 @@ class TestPostOpCheckCRUD:
         )
         check_id = create_resp.json()["id"]
 
-        resp = await client.patch(f"/post-op-checks/{check_id}", json={
-            "check_status": "completed",
-            "completed_time": now,
-            "checked_by": "Nurse Garcia",
-            "pain_level": 2,
-        })
+        resp = await client.patch(
+            f"/post-op-checks/{check_id}",
+            json={
+                "check_status": "completed",
+                "completed_time": now,
+                "checked_by": "Nurse Garcia",
+                "pain_level": 2,
+            },
+        )
         assert resp.status_code == 200
         body = resp.json()
         assert body["check_status"] == "completed"
@@ -256,7 +286,84 @@ class TestPostOpCheckCRUD:
     async def test_post_op_check_nonexistent_surgery_404(self, client: AsyncClient) -> None:
         fake_id = str(uuid.uuid4())
         now = datetime.now(UTC).isoformat()
-        resp = await client.post(f"/surgeries/{fake_id}/post-op-checks", json={
-            "scheduled_time": now,
-        })
+        resp = await client.post(
+            f"/surgeries/{fake_id}/post-op-checks",
+            json={
+                "scheduled_time": now,
+            },
+        )
         assert resp.status_code == 404
+
+
+# ---------------------------------------------------------------------------
+# Surgery schedule endpoint (GET /surgeries — all animals)
+# ---------------------------------------------------------------------------
+
+
+class TestSurgerySchedule:
+    """Tests for the global surgery schedule endpoint GET /surgeries."""
+
+    async def test_list_all_surgeries_returns_items_with_animal_name(
+        self, client: AsyncClient
+    ) -> None:
+        # Filter by a unique surgery type to isolate just the record we create.
+        # This avoids pagination issues when the test DB has many surgeries.
+        animal_id = await _create_animal(client)
+        await _create_surgery(client, animal_id, surgery_type="eye")
+
+        resp = await client.get("/surgeries?surgery_type=eye")
+        assert resp.status_code == 200
+        body = resp.json()
+        assert "items" in body
+        assert "total" in body
+        assert body["total"] >= 1
+        # All returned items must include animal_name (response structure check)
+        for item in body["items"]:
+            assert "animal_name" in item
+            assert isinstance(item["animal_name"], str)
+            assert item["surgery_type"] == "eye"
+
+    async def test_list_all_surgeries_filter_by_status(self, client: AsyncClient) -> None:
+        animal_id = await _create_animal(client)
+        await _create_surgery(client, animal_id, surgery_status="scheduled")
+        await _create_surgery(client, animal_id, surgery_status="completed", surgery_type="neuter")
+
+        resp = await client.get("/surgeries?surgery_status=completed")
+        assert resp.status_code == 200
+        body = resp.json()
+        for item in body["items"]:
+            assert item["surgery_status"] == "completed"
+
+    async def test_list_all_surgeries_filter_by_type(self, client: AsyncClient) -> None:
+        animal_id = await _create_animal(client)
+        await _create_surgery(client, animal_id, surgery_type="dental")
+        await _create_surgery(client, animal_id, surgery_type="emergency")
+
+        resp = await client.get("/surgeries?surgery_type=dental")
+        assert resp.status_code == 200
+        body = resp.json()
+        for item in body["items"]:
+            assert item["surgery_type"] == "dental"
+
+    async def test_list_all_surgeries_pagination(self, client: AsyncClient) -> None:
+        animal_id = await _create_animal(client)
+        for _ in range(3):
+            await _create_surgery(client, animal_id)
+
+        resp = await client.get("/surgeries?page=1&size=2")
+        assert resp.status_code == 200
+        body = resp.json()
+        assert body["page"] == 1
+        assert body["size"] == 2
+        assert len(body["items"]) <= 2
+
+    async def test_list_all_surgeries_empty_returns_valid_structure(
+        self, client: AsyncClient
+    ) -> None:
+        """Filtering for a non-existent type returns empty list not an error."""
+        resp = await client.get("/surgeries?surgery_type=biopsy&surgery_status=cancelled")
+        assert resp.status_code == 200
+        body = resp.json()
+        assert "items" in body
+        assert isinstance(body["items"], list)
+        assert "total" in body

@@ -3,12 +3,14 @@
 Provides CRUD for surgical procedure records and post-operative check-ins.
 
 Routes:
+    /surgeries                         -- All surgeries (schedule view)
     /animals/{animal_id}/surgeries     -- Surgery records for an animal
     /surgeries/{id}                    -- Direct surgery record access
     /surgeries/{id}/post-op-checks     -- Post-op monitoring checks
     /post-op-checks/{id}               -- Direct post-op check access
 """
 
+from datetime import date
 from typing import Any
 from uuid import UUID
 
@@ -28,7 +30,9 @@ from src.schemas.surgery import (
     SurgeryCreate,
     SurgeryListResponse,
     SurgeryResponse,
+    SurgeryScheduleListResponse,
     SurgeryUpdate,
+    SurgeryWithAnimalResponse,
 )
 
 _DEFAULT_PAGE_SIZE = 20
@@ -70,6 +74,65 @@ async def _get_post_op_check_or_404(check_id: UUID, db: AsyncSession) -> PostOpC
 
 
 # ---------------------------------------------------------------------------
+# Surgery schedule (all animals)
+# ---------------------------------------------------------------------------
+
+
+@surgery_router.get(
+    "/surgeries",
+    response_model=SurgeryScheduleListResponse,
+    summary="List all surgeries across all animals (schedule view)",
+)
+async def list_all_surgeries(
+    db: AsyncSession = Depends(get_db),
+    page: int = Query(1, ge=1),
+    size: int = Query(_DEFAULT_PAGE_SIZE, ge=1, le=_MAX_PAGE_SIZE),
+    surgery_status: str | None = Query(None, description="Filter by status"),
+    surgery_type: str | None = Query(None, description="Filter by type"),
+    date_from: date | None = Query(None, description="Filter: scheduled_date >= date_from"),
+    date_to: date | None = Query(None, description="Filter: scheduled_date <= date_to"),
+) -> dict[str, Any]:
+    """Return all surgeries with animal name for the scheduling calendar view."""
+    base_where = []
+    if surgery_status:
+        base_where.append(Surgery.surgery_status == surgery_status)
+    if surgery_type:
+        base_where.append(Surgery.surgery_type == surgery_type)
+    if date_from:
+        base_where.append(Surgery.scheduled_date >= date_from)
+    if date_to:
+        base_where.append(Surgery.scheduled_date <= date_to)
+
+    count_query = sa.select(sa.func.count()).select_from(Surgery)
+    if base_where:
+        count_query = count_query.where(*base_where)
+    total_result = await db.execute(count_query)
+    total = total_result.scalar() or 0
+
+    query = (
+        sa.select(Surgery, Animal.name.label("animal_name"))
+        .join(Animal, Surgery.animal_id == Animal.id)
+        .order_by(Surgery.scheduled_date.asc())
+        .offset((page - 1) * size)
+        .limit(size)
+    )
+    if base_where:
+        query = query.where(*base_where)
+
+    result = await db.execute(query)
+    rows = result.all()
+
+    items = [
+        SurgeryWithAnimalResponse(
+            **{c.key: getattr(row.Surgery, c.key) for c in Surgery.__table__.columns},
+            animal_name=row.animal_name,
+        )
+        for row in rows
+    ]
+    return {"items": items, "total": total, "page": page, "size": size}
+
+
+# ---------------------------------------------------------------------------
 # Surgery CRUD
 # ---------------------------------------------------------------------------
 
@@ -92,9 +155,7 @@ async def list_surgeries(
 
     query = sa.select(Surgery).where(Surgery.animal_id == animal_id)
     count_query = (
-        sa.select(sa.func.count())
-        .select_from(Surgery)
-        .where(Surgery.animal_id == animal_id)
+        sa.select(sa.func.count()).select_from(Surgery).where(Surgery.animal_id == animal_id)
     )
 
     if surgery_status:
@@ -107,9 +168,7 @@ async def list_surgeries(
     total_result = await db.execute(count_query)
     total = total_result.scalar() or 0
 
-    query = query.order_by(Surgery.scheduled_date.desc()).offset(
-        (page - 1) * size
-    ).limit(size)
+    query = query.order_by(Surgery.scheduled_date.desc()).offset((page - 1) * size).limit(size)
     result = await db.execute(query)
     items = list(result.scalars().all())
 

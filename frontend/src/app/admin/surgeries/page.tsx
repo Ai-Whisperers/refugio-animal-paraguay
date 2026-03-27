@@ -33,6 +33,9 @@ const LABEL_VIEW_RECOVERY = "Ver recuperacion";
 const LABEL_ALL_STATUSES = "Todos los estados";
 const LABEL_STATUS_FILTER = "Estado";
 const LABEL_VET = "Veterinario";
+const LABEL_TYPE = "Tipo";
+const LABEL_DATE = "Fecha";
+const LABEL_STATUS = "Estado";
 const LABEL_TOTAL = "Total";
 
 const STATUS_OPTIONS: { value: SurgeryStatus | ""; label: string }[] = [
@@ -45,10 +48,10 @@ const STATUS_OPTIONS: { value: SurgeryStatus | ""; label: string }[] = [
 ];
 
 const SURGERY_TYPE_LABELS: Record<string, string> = {
-  spay: "Castracion (hembra)",
-  neuter: "Castracion (macho)",
-  mass_removal: "Extirpacion de masa",
-  orthopedic: "Ortopedica",
+  spay: "Castración (hembra)",
+  neuter: "Castración (macho)",
+  mass_removal: "Extirpación de masa",
+  orthopedic: "Ortopédica",
   dental: "Dental",
   emergency: "Emergencia",
   biopsy: "Biopsia",

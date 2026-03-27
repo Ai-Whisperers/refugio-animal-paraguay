@@ -462,6 +462,89 @@ export interface VaccinationAlertSummary {
   total_upcoming: number;
 }
 
+// --- Surgeries ---
+
+export type SurgeryType =
+  | "spay"
+  | "neuter"
+  | "mass_removal"
+  | "orthopedic"
+  | "dental"
+  | "emergency"
+  | "biopsy"
+  | "eye"
+  | "other";
+
+export type SurgeryStatus =
+  | "scheduled"
+  | "in_progress"
+  | "completed"
+  | "cancelled"
+  | "complications";
+
+export type SurgeryOutcome =
+  | "successful"
+  | "complications"
+  | "incomplete"
+  | "failed";
+
+export interface Surgery {
+  id: string;
+  animal_id: string;
+  surgery_type: SurgeryType;
+  surgery_status: SurgeryStatus;
+  veterinarian_name: string;
+  scheduled_date: string;
+  performed_date: string | null;
+  anesthesia_type: string | null;
+  procedure_description: string | null;
+  outcome: SurgeryOutcome | null;
+  outcome_notes: string | null;
+  complications: string | null;
+  weight_kg: number | null;
+  recovery_notes: string | null;
+  follow_up_date: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SurgeryWithAnimal extends Surgery {
+  animal_name: string;
+}
+
+export interface SurgeryScheduleListResponse {
+  items: SurgeryWithAnimal[];
+  total: number;
+  page: number;
+  size: number;
+}
+
+// --- PostOpChecks ---
+
+export type PostOpStatus = "pending" | "completed" | "missed" | "concern";
+
+export interface PostOpCheck {
+  id: string;
+  surgery_id: string;
+  check_status: PostOpStatus;
+  scheduled_time: string;
+  completed_time: string | null;
+  checked_by: string | null;
+  temperature_celsius: number | null;
+  pain_level: number | null;
+  appetite: string | null;
+  mobility: string | null;
+  wound_condition: string | null;
+  notes: string | null;
+  concerns: string | null;
+  created_at: string;
+}
+
+export interface PostOpCheckListResponse {
+  items: PostOpCheck[];
+  total: number;
+}
+
 // --- API Error ---
 
 export interface ApiError {
