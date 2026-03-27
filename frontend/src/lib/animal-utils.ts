@@ -48,4 +48,3 @@ export function calculateAge(birthDate: string): string {
   return `${years}y ${remainingMonths}m`;
 }
 
-

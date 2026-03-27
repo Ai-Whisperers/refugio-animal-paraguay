@@ -121,3 +121,5 @@ dist/
 .Spotlight-V100
 .Trashes
 ehthumbs.db
+contracts/
+*.docx

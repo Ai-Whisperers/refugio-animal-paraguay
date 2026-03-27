@@ -1,7 +1,7 @@
 """SQLAlchemy ORM model for adoption requests."""
 
-import enum
 from datetime import datetime
+from enum import StrEnum
 from uuid import UUID
 
 import sqlalchemy as sa
@@ -10,7 +10,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from ..base import Base
 
 
-class AdoptionRequestStatus(str, enum.Enum):
+class AdoptionRequestStatus(StrEnum):
     """Status values — must match chk_adoption_requests_status CHECK constraint exactly."""
 
     PENDING = "pending"
@@ -53,6 +53,11 @@ class AdoptionRequest(Base):
         nullable=True,
     )
     notes: Mapped[str | None] = mapped_column(sa.Text, nullable=True)
+    contract_pdf_path: Mapped[str | None] = mapped_column(sa.Text, nullable=True)
+    contract_generated_at: Mapped[datetime | None] = mapped_column(
+        sa.TIMESTAMP(timezone=True),
+        nullable=True,
+    )
     created_at: Mapped[datetime] = mapped_column(
         sa.TIMESTAMP(timezone=True),
         nullable=False,

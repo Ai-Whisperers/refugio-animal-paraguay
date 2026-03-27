@@ -130,6 +130,28 @@ class Settings(BaseSettings):
         description="Stripe webhook signing secret (whsec_...). Required to verify webhook signatures.",
     )
 
+    # Tigo Money (local PYG payments)
+    tigo_money_enabled: bool = Field(
+        default=False,
+        description="Enable Tigo Money payment option. Requires tigo_merchant_id and tigo_api_key.",
+    )
+    tigo_merchant_id: str = Field(
+        default="",
+        description="Tigo Money merchant account identifier.",
+    )
+    tigo_api_key: str = Field(
+        default="",
+        description="Tigo Money API key for authenticating payment requests.",
+    )
+    tigo_webhook_secret: str = Field(
+        default="",
+        description="Secret used to verify Tigo Money webhook callback signatures.",
+    )
+    tigo_api_base_url: str = Field(
+        default="https://api.tigo.com.py/v1",
+        description="Tigo Money API base URL. Override for sandbox/staging environments.",
+    )
+
     # Rate limiting
     rate_limit_enabled: bool = Field(
         default=True,
@@ -142,6 +164,27 @@ class Settings(BaseSettings):
     rate_limit_general: str = Field(
         default="60/minute",
         description="Rate limit for general API endpoints (slowapi format).",
+    )
+
+    # WhatsApp / Twilio
+    whatsapp_enabled: bool = Field(
+        default=False,
+        description="Enable WhatsApp message delivery via Twilio. Disable in tests and local dev.",
+    )
+    twilio_account_sid: str = Field(
+        default="",
+        description="Twilio Account SID. Required when whatsapp_enabled=True.",
+    )
+    twilio_auth_token: str = Field(
+        default="",
+        description="Twilio Auth Token. Required when whatsapp_enabled=True.",
+    )
+    twilio_whatsapp_from: str = Field(
+        default="whatsapp:+14155238886",
+        description=(
+            "Twilio WhatsApp sender number in E.164 format with 'whatsapp:' prefix. "
+            "Use the Twilio sandbox number for development."
+        ),
     )
 
     @property

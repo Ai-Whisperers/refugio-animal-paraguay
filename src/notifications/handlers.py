@@ -89,10 +89,11 @@ class NotificationHandlers:
                             html_body=staff_html,
                         )
                     )
-        except Exception:
+        except Exception as exc:
             logger.exception(
-                "Failed to send adoption request notification for event_id=%s",
+                "Failed to send adoption request notification for event_id=%s: %s",
                 event.id,
+                exc,
             )
 
     async def on_adoption_status_changed(self, event: DomainEvent) -> None:
@@ -130,10 +131,11 @@ class NotificationHandlers:
             await self._email.send_email(
                 EmailMessage(to=adopter_email, subject=subject, html_body=html)
             )
-        except Exception:
+        except Exception as exc:
             logger.exception(
-                "Failed to send adoption status notification for event_id=%s",
+                "Failed to send adoption status notification for event_id=%s: %s",
                 event.id,
+                exc,
             )
 
     async def on_donation_received(self, event: DomainEvent) -> None:
@@ -176,10 +178,11 @@ class NotificationHandlers:
                     html_body=html,
                 )
             )
-        except Exception:
+        except Exception as exc:
             logger.exception(
-                "Failed to send donation notification for event_id=%s",
+                "Failed to send donation notification for event_id=%s: %s",
                 event.id,
+                exc,
             )
 
     @staticmethod
@@ -216,10 +219,11 @@ class NotificationHandlers:
                     adopter.full_name if adopter else None,
                     animal.name if animal else None,
                 )
-        except Exception:
+        except Exception as exc:
             logger.exception(
-                "DB lookup failed for adoption_request_id=%s",
+                "DB lookup failed for adoption_request_id=%s: %s",
                 adoption_request_id,
+                exc,
             )
             return None, None, None
 
@@ -253,10 +257,11 @@ class NotificationHandlers:
                     donation.currency,
                     getattr(donation, "receipt_number", None),
                 )
-        except Exception:
+        except Exception as exc:
             logger.exception(
-                "DB lookup failed for donation_id=%s",
+                "DB lookup failed for donation_id=%s: %s",
                 donation_id,
+                exc,
             )
             return None, None, None, None, None
 
@@ -272,6 +277,6 @@ class NotificationHandlers:
                     )
                 )
                 return [email for email in result.scalars().all() if email]
-        except Exception:
-            logger.exception("Failed to look up staff emails")
+        except Exception as exc:
+            logger.exception("Failed to look up staff emails: %s", exc)
             return []

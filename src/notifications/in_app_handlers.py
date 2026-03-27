@@ -51,10 +51,11 @@ class InAppNotificationHandlers:
                     "animal_name": animal_name,
                 },
             )
-        except Exception:
+        except Exception as exc:
             logger.exception(
-                "Failed to create in-app notification for adoption_request_created event_id=%s",
+                "Failed to create in-app notification for adoption_request_created event_id=%s: %s",
                 event.id,
+                exc,
             )
 
     async def on_adoption_status_changed(self, event: DomainEvent) -> None:
@@ -74,10 +75,11 @@ class InAppNotificationHandlers:
                     "new_status": new_status,
                 },
             )
-        except Exception:
+        except Exception as exc:
             logger.exception(
-                "Failed to create in-app notification for adoption_status_changed event_id=%s",
+                "Failed to create in-app notification for adoption_status_changed event_id=%s: %s",
                 event.id,
+                exc,
             )
 
     async def on_donation_received(self, event: DomainEvent) -> None:
@@ -99,10 +101,11 @@ class InAppNotificationHandlers:
                     "donor_name": donor_name,
                 },
             )
-        except Exception:
+        except Exception as exc:
             logger.exception(
-                "Failed to create in-app notification for donation_received event_id=%s",
+                "Failed to create in-app notification for donation_received event_id=%s: %s",
                 event.id,
+                exc,
             )
 
     async def on_animal_intake_completed(self, event: DomainEvent) -> None:
@@ -122,10 +125,11 @@ class InAppNotificationHandlers:
                     "species": species,
                 },
             )
-        except Exception:
+        except Exception as exc:
             logger.exception(
-                "Failed to create in-app notification for animal_intake_completed event_id=%s",
+                "Failed to create in-app notification for animal_intake_completed event_id=%s: %s",
                 event.id,
+                exc,
             )
 
     async def _notify_all_staff(

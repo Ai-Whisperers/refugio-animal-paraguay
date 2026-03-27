@@ -1,7 +1,8 @@
 # Development Queue — Refugio Animal Paraguay
 
-**Last updated**: 2026-03-26
-**Active version**: V1 (MVP)
+**Last updated**: 2026-03-27
+**Active version**: V3.1 Priority Sprint (stability before features)
+**Full roadmap**: [ROADMAP.md](ROADMAP.md) — 10 sprints, 50 epics, 250 stories
 **Tech stack**: Python 3.12, FastAPI, SQLAlchemy 2.x, PostgreSQL 16, Next.js 14
 
 ---
@@ -76,14 +77,14 @@ Week 3-4:
 | 1 | Event Bus Infrastructure | EPIC-9 S05 | 8 | DONE (PR #14) |
 | 2 | Audit Trail System | EPIC-13 S01 | 7 | DONE (PR #15) |
 | 3 | Stripe Webhook Processing | EPIC-3 S01 (remaining) | 8 | DONE (PR #25) |
-| 4 | SEPA Direct Debit | EPIC-3 S02 | 8 | PR #27 (conflicts) |
+| 4 | SEPA Direct Debit | EPIC-3 S02 | 8 | DONE (PR #53) |
 | 5 | GDPR Consent Tracking | EPIC-13 S07 | 5 | DONE (PR #26) |
 | 6 | Cash Donation Recording | EPIC-3 S06 | 3 | DONE (PR #16) |
 | 7 | In-Kind Donation Recording | EPIC-14 S05 | 5 | DONE (PR #17) |
-| 8 | Sponsorship Tiers & Matching | EPIC-14 S01 | 8 | PR #28 (conflicts) |
-| 9 | Campaign Management | EPIC-14 S03 | 6 | PR #29 (conflicts) |
-| 10 | Donation Landing Page | EPIC-11 S04 | 13 | READY |
-| 11 | Donation Dashboard (Staff) | EPIC-3 S04 | 6 | BLOCKED on #4 |
+| 8 | Sponsorship Tiers & Matching | EPIC-14 S01 | 8 | DONE (PR #54) |
+| 9 | Campaign Management | EPIC-14 S03 | 6 | DONE (PR #55) |
+| 10 | Donation Landing Page | EPIC-11 S04 | 13 | DONE (PR #51) |
+| 11 | Donation Dashboard (Staff) | EPIC-3 S04 | 6 | DONE (PR #56) |
 | 12 | Email Notification System | EPIC-6 S01 | 8 | DONE (PR #18) |
 | 13 | GDPR Data Export | EPIC-13 S02 | 6 | DONE (PR #48) |
 
@@ -93,95 +94,91 @@ Week 3-4:
 
 | # | Story | Epic | Points | Status |
 |---|-------|------|--------|--------|
-| 1 | WhatsApp Integration | EPIC-6 S02 | 8 | |
+| 1 | WhatsApp Integration | EPIC-6 S02 | 8 | DONE (PR #57) |
 | 2 | In-App Notifications | EPIC-6 S03 | 6 | DONE (PR #32) |
-| 3 | Notification Preferences | EPIC-6 S04 | 5 | PR #34 (conflicts) |
+| 3 | Notification Preferences | EPIC-6 S04 | 5 | DONE (PR #34) |
 | 4 | Adoption Notifications (status changes) | EPIC-2 S03 | 5 | DONE (PR #39) |
-| 5 | PDF Adoption Contracts | EPIC-2 S04 | 6 | PR #43 (conflicts) |
-| 6 | Post-Adoption Follow-up | EPIC-2 S05 | 8 | PR #44 (conflicts) |
-| 7 | Tigo Money Integration (PYG) | EPIC-3 S03 | 8 | |
-| 8 | Sponsor Update Notifications | EPIC-14 S02 | 6 | |
-| 9 | Campaign Progress & Social Proof | EPIC-14 S04 | 5 | |
-| 10 | Impact Report Generator | EPIC-13 S03 | 7 | PR #46 (conflicts) |
+| 5 | PDF Adoption Contracts | EPIC-2 S04 | 6 | DONE (PR #43) |
+| 6 | Post-Adoption Follow-up | EPIC-2 S05 | 8 | DONE (PR #44) |
+| 7 | Tigo Money Integration (PYG) | EPIC-3 S03 | 8 | DONE (PR #58) |
+| 8 | Sponsor Update Notifications | EPIC-14 S02 | 6 | DONE (PR #59) |
+| 9 | Campaign Progress & Social Proof | EPIC-14 S04 | 5 | DONE (PR #60) |
+| 10 | Impact Report Generator | EPIC-13 S03 | 7 | DONE (PR #50) |
 | 11 | Fund Allocation Tracking | EPIC-13 S04 | 6 | DONE (PR #45) |
-| 12 | GDPR Data Deletion | EPIC-13 S06 | 5 | PR #31, #47 (conflicts) |
-| 13 | Success Stories Page | EPIC-11 S06 | 5 | |
+| 12 | GDPR Data Deletion | EPIC-13 S06 | 5 | DONE (PR #47) |
+| 13 | Success Stories Page | EPIC-11 S06 | 5 | DONE (PR #52) |
 | 14 | About & Educational Pages | EPIC-11 S03 | 8 | DONE (PR #36) |
 | 15 | Multi-Language (ES + EN) | EPIC-11 S03 | 5 | DONE (PR #35) |
 
 ---
 
-## V4 — Operations (Weeks 13-18)
+## V4 Sprint 1 — Staff Operations Launch (EPIC-21, 18 pts) — COMPLETE
 
-| # | Story | Epic | Points |
-|---|-------|------|--------|
-| 1 | Medical Record Schema & API | EPIC-4 S01 | 8 |
-| 2 | Veterinary Notes & Documents | EPIC-4 S02 | 6 |
-| 3 | Medical Timeline & History | EPIC-4 S03 | 5 |
-| 4 | Vaccination & Medication Tracking | EPIC-4 S04 | 8 |
-| 5 | Volunteer Registration & Profiles | EPIC-5 S01 | 5 |
-| 6 | Volunteer Onboarding Checklist | EPIC-5 S05 | 5 |
-| 7 | Shift Scheduling System | EPIC-5 S02 | 8 |
-| 8 | Task Assignment & Tracking | EPIC-5 S03 | 6 |
-| 9 | Volunteer Recognition & Analytics | EPIC-5 S04 | 5 |
-| 10 | Foster Family Registration | EPIC-12 S01 | 5 |
-| 11 | Foster Placement & Matching | EPIC-12 S02 | 8 |
-| 12 | Foster Check-in & Monitoring | EPIC-12 S03 | 6 |
-| 13 | Foster-to-Adopt Pathway | EPIC-12 S04 | 6 |
-| 14 | Foster Supply & Cost Tracking | EPIC-12 S05 | 5 |
-| 15 | Outcome Metrics & Analytics | EPIC-13 S05 | 7 |
+| # | Story | Ticket | Pts | Status |
+|---|-------|--------|-----|--------|
+| 1 | Staff Login Page with JWT Auth | RAP-100 | 5 | DONE (PR #61) |
+| 2 | Password Reset with Email Token | RAP-101 | 3 | DONE (PR #62) |
+| 3 | Email Verification on Registration | RAP-102 | 3 | DONE |
+| 4 | Session Timeout & Forced Logout | RAP-103 | 3 | DONE |
+| 5 | Account Lockout After Failed Attempts | RAP-104 | 4 | DONE |
 
 ---
 
-## V5 — Analytics & Scale (Weeks 19-24)
+## V3.1 — Priority Sprint: Stability & Quality Gates (92 pts, 25 stories)
 
-| # | Story | Epic | Points |
-|---|-------|------|--------|
-| 1 | Admin Dashboard & Analytics | EPIC-7 S01 | 8 |
-| 2 | User & Role Management UI | EPIC-7 S02 | 6 |
-| 3 | Content & Settings Management | EPIC-7 S03 | 5 |
-| 4 | Reporting & Export | EPIC-7 S04 | 6 |
-| 5 | Admin Panel Localization | EPIC-7 S05 | 5 |
-| 6 | Advanced Search & Filters (tsvector) | EPIC-1 S05 | 8 |
-| 7 | Password Reset + Email Verification | EPIC-10 S02 (complete) | 5 |
-| 8 | Profile Management | EPIC-10 S03 | 5 |
-| 9 | E2E Testing (Playwright) | EPIC-8 S03 | 8 |
-| 10 | Performance & Security Testing | EPIC-8 S04 | 6 |
-| 11 | Production Deployment & TLS | EPIC-9 S03 | 8 |
-| 12 | Monitoring & Logging | EPIC-9 S04 | 6 |
+**Why now**: CI/CD deploys to production with ZERO tests. 14 bare `except Exception` blocks. Frontend has P0 bugs (/animals 404, no Stripe.js, no error boundaries). No structured logging, no monitoring, no staging environment. These must be fixed before adding more features.
 
----
+**Execute order**: P0 stories first (top-to-bottom within each priority tier). All P0 stories MUST complete before any P1 starts.
 
-## V6 — Reporting & Multi-Shelter (Weeks 25-32)
+### P0 — Critical (must fix immediately)
 
-| # | Story | Epic | Points |
-|---|-------|------|--------|
-| 1 | Financial Reporting Dashboard | EPIC-15 S01 | 8 |
-| 2 | EU Tax Compliance Exports | EPIC-15 S02 | 7 |
-| 3 | Donor Retention & Impact Reports | EPIC-15 S03 | 6 |
-| 4 | Operational KPI Dashboard | EPIC-15 S04 | 7 |
-| 5 | Multi-Shelter Location Management | EPIC-16 S01 | 8 |
-| 6 | Inter-Shelter Animal Transfers | EPIC-16 S02 | 8 |
-| 7 | Location-Specific Staff & Permissions | EPIC-16 S03 | 6 |
-| 8 | Consolidated Cross-Shelter Reporting | EPIC-16 S04 | 7 |
+| # | Story | Ticket | Epic | Pts | Status | Depends On |
+|---|-------|--------|------|-----|--------|------------|
+| 1 | Add test + lint pipeline to GitHub Actions | RAP-400 | EPIC-71 | 5 | DONE (PR #66) | — |
+| 2 | Add security scanning (bandit + pip-audit) | RAP-401 | EPIC-71 | 3 | DONE (PR #67) | RAP-400 |
+| 3 | Password reset tests (0% → 80%) | RAP-405 | EPIC-72 | 5 | BLOCKED | RAP-101 (PR #62 not merged) |
+| 4 | Adoption requests coverage (41% → 80%) | RAP-406 | EPIC-72 | 3 | DONE (PR #69) | — |
+| 5 | Replace bare except Exception handlers | RAP-410 | EPIC-73 | 3 | DONE (PR #70) | — |
+| 6 | Structured JSON logging (structlog) | RAP-415 | EPIC-74 | 5 | READY | — |
+| 7 | Sentry error tracking integration | RAP-416 | EPIC-74 | 3 | READY | RAP-415 |
+| 8 | Add error.tsx and loading.tsx boundaries | RAP-420 | EPIC-75 | 3 | READY | — |
+| 9 | Fix /animals page 404 rendering bug | RAP-421 | EPIC-75 | 3 | READY | — |
+| 10 | Integrate Stripe.js Elements into DonationForm | RAP-422 | EPIC-75 | 5 | READY | — |
 
----
+### P1 — High Priority (after all P0 complete)
 
-## V7 — Community, Mobile & API Platform (Weeks 33-42)
+| # | Story | Ticket | Epic | Pts | Status | Depends On |
+|---|-------|--------|------|-----|--------|------------|
+| 11 | Create staging environment with approval gate | RAP-402 | EPIC-71 | 5 | BLOCKED | RAP-400 |
+| 12 | Harden Docker production image | RAP-403 | EPIC-71 | 3 | DONE (PR #68) | — |
+| 13 | Notification handler exception tests | RAP-407 | EPIC-72 | 3 | READY | — |
+| 14 | Audit middleware tests | RAP-408 | EPIC-72 | 3 | READY | — |
+| 15 | Audit API input validation gaps | RAP-411 | EPIC-73 | 3 | READY | — |
+| 16 | Standardize error responses across routers | RAP-412 | EPIC-73 | 5 | READY | RAP-410 |
+| 17 | Database constraint error handling | RAP-413 | EPIC-73 | 3 | READY | RAP-412 |
+| 18 | Payment error handling (Stripe + Tigo) | RAP-414 | EPIC-73 | 3 | READY | RAP-412 |
+| 19 | Health check improvements | RAP-417 | EPIC-74 | 3 | READY | — |
+| 20 | Request/response logging middleware | RAP-418 | EPIC-74 | 3 | READY | RAP-415 |
+| 21 | Database backup automation | RAP-419 | EPIC-74 | 5 | READY | — |
+| 22 | Loading and error states on all pages | RAP-423 | EPIC-75 | 5 | READY | RAP-420 |
+| 23 | Centralized API error handling (frontend) | RAP-424 | EPIC-75 | 3 | READY | RAP-420 |
 
-| # | Story | Epic | Points |
-|---|-------|------|--------|
-| 1 | Success Stories Publishing | EPIC-17 S01 | 5 |
-| 2 | Social Media Integration | EPIC-17 S02 | 6 |
-| 3 | Adopter Community Forum | EPIC-17 S03 | 8 |
-| 4 | Community Events Management | EPIC-17 S04 | 5 |
-| 5 | Mobile App — Staff Field Operations | EPIC-18 S01 | 13 |
-| 6 | Mobile App — Volunteer Shift & Tasks | EPIC-18 S02 | 8 |
-| 7 | Mobile App — Push Notifications | EPIC-18 S03 | 5 |
-| 8 | Public REST API & Developer Docs | EPIC-19 S01 | 8 |
-| 9 | Government Animal Registration Integration | EPIC-19 S02 | 8 |
-| 10 | Webhook System for Partners | EPIC-19 S03 | 6 |
-| 11 | Tigo Money Payment Integration | EPIC-19 S04 | 8 |
+### P2 — Medium Priority (after all P1 complete)
+
+| # | Story | Ticket | Epic | Pts | Status | Depends On |
+|---|-------|--------|------|-----|--------|------------|
+| 24 | Coverage reporting and PR status checks | RAP-404 | EPIC-71 | 5 | BLOCKED | RAP-400 |
+| 25 | Frontend component tests (Vitest) | RAP-409 | EPIC-72 | 3 | READY | — |
+
+### Epics in this sprint
+
+| Epic | Theme | Stories | Points |
+|------|-------|---------|--------|
+| EPIC-71 | CI/CD Quality Gates | RAP-400 to RAP-404 | 21 |
+| EPIC-72 | Test Coverage Gaps | RAP-405 to RAP-409 | 18 |
+| EPIC-73 | Exception Handling & Validation | RAP-410 to RAP-414 | 16 |
+| EPIC-74 | Logging & Observability | RAP-415 to RAP-419 | 19 |
+| EPIC-75 | Frontend Stability | RAP-420 to RAP-424 | 18 |
 
 ---
 
@@ -193,11 +190,18 @@ Week 3-4:
 | RAP-011 to RAP-033 | V1 | MVP frontend + CI/CD (done) |
 | RAP-034 to RAP-050 | V2 | Donations + EU compliance |
 | RAP-051 to RAP-070 | V3 | Communications + workflow |
-| RAP-071 to RAP-095 | V4 | Operations |
-| RAP-096 to RAP-120 | V5 | Analytics + scale |
-| RAP-121 to RAP-140 | V6 | Reporting + multi-shelter |
-| RAP-141 to RAP-170 | V7 | Community + mobile + API platform |
-| RAP-171 to RAP-178 | UX | UX/UI overhaul (EPIC-20) |
+| RAP-071 to RAP-099 | V2/V3 | Remaining stories |
+| RAP-100 to RAP-124 | V4 | Sprint 1: Staff Operations Launch (done) |
+| RAP-400 to RAP-424 | V3.1 | Priority Sprint: Stability & Quality Gates |
+| RAP-125 to RAP-149 | V5 | Sprint 2: Veterinary & Medical Records |
+| RAP-150 to RAP-174 | V6 | Sprint 3: EU Payment Integration |
+| RAP-175 to RAP-199 | V7 | Sprint 4: Volunteer & Foster Programs |
+| RAP-200 to RAP-224 | V8 | Sprint 5: Notifications & Communications |
+| RAP-225 to RAP-249 | V9 | Sprint 6: GDPR, Security & Compliance |
+| RAP-250 to RAP-274 | V10 | Sprint 7: Analytics & Reporting |
+| RAP-275 to RAP-299 | V11 | Sprint 8: Public Experience & Content |
+| RAP-300 to RAP-324 | V12 | Sprint 9: Infrastructure & DevOps |
+| RAP-325 to RAP-349 | V13 | Sprint 10: Mobile, Scale & Future |
 
 ---
 
@@ -235,3 +239,26 @@ Week 3-4:
 4. **Update this file** when completing stories (move to Done)
 5. **Never start a BLOCKED item** — check dependencies first
 6. **Commit often** — small, focused commits with ticket IDs
+
+---
+
+## Future Sprints (V4 Sprint 2 through V13)
+
+Full details in [ROADMAP.md](ROADMAP.md). Each sprint has epic and story docs in `planning/epics/EPIC-NN-*/` and sprint docs in `planning/sprints/sprint-NN/`.
+
+**V4 Sprint 1 (EPIC-21) is COMPLETE.** V3.1 Priority Sprint runs next. V4 Sprint 2 resumes after V3.1.
+
+| Sprint | Version | Theme | Points | Epics |
+|--------|---------|-------|--------|-------|
+| — | V3.1 | **Priority: Stability & Quality Gates** | **92** | **EPIC 71-75** |
+| 1 | V4 | Staff Operations Launch (S1 done, S2+ pending) | 105 | EPIC 21-25 |
+| 2 | V5 | Veterinary & Medical Records | 105 | EPIC 26-30 |
+| 3 | V6 | EU Payment Integration | 112 | EPIC 31-35 |
+| 4 | V7 | Volunteer & Foster Programs | 99 | EPIC 36-40 |
+| 5 | V8 | Notifications & Communications | 102 | EPIC 41-45 |
+| 6 | V9 | GDPR, Security & Compliance | 87 | EPIC 46-50 |
+| 7 | V10 | Analytics & Reporting | 101 | EPIC 51-55 |
+| 8 | V11 | Public Experience & Content | 101 | EPIC 56-60 |
+| 9 | V12 | Infrastructure & DevOps | 104 | EPIC 61-65 |
+| 10 | V13 | Mobile, Scale & Future | 109 | EPIC 66-70 |
+

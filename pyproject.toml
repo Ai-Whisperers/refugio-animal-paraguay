@@ -23,7 +23,9 @@ dependencies = [
     "stripe>=8.0",
     "slowapi>=0.1.9",
     "aiosmtplib>=3.0",
-    "jinja2>=3.1",
+    "jinja2>=3.1.4",  # CVE-2024-22195, CVE-2024-34064 fixed in 3.1.4
+    "fpdf2>=2.7",
+    "twilio>=9.0",
 ]
 
 [project.optional-dependencies]
@@ -68,6 +70,7 @@ ignore = ["E501"]
 
 [tool.ruff.lint.per-file-ignores]
 "src/api/*.py" = ["B008"]  # FastAPI uses Query()/Depends() in function defaults by design
+"src/auth/*.py" = ["B008"]  # FastAPI uses Depends() in function defaults by design
 
 [tool.black]
 target-version = ["py312"]

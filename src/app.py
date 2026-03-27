@@ -17,19 +17,34 @@ from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 
 from src.api.admin import router as admin_router
+from src.api.admin_campaigns import router as admin_campaigns_router
 from src.api.adopters import router as adopters_router
 from src.api.adoption_requests import router as adoption_requests_router
+from src.api.animal_updates import router as animal_updates_router
 from src.api.animals import router as animals_router
 from src.api.auth import router as auth_router
+from src.api.email_verification import router as email_verification_router
+from src.api.password_reset import router as password_reset_router
+from src.api.sessions import router as sessions_router
 from src.api.consents import router as consents_router
 from src.api.donations import router as donations_router
 from src.api.donors import router as donors_router
+from src.api.follow_ups import router as follow_ups_router
+from src.api.fund_allocations import router as fund_allocations_router
+from src.api.gdpr import router as gdpr_router
+from src.api.gdpr_export import router as gdpr_export_router
 from src.api.health import router as health_router
+from src.api.impact_reports import router as impact_reports_router
 from src.api.in_kind_donations import router as in_kind_donations_router
+from src.api.notification_preferences import router as notification_preferences_router
 from src.api.notifications import router as notifications_router
 from src.api.public import router as public_router
 from src.api.public_adoption import router as public_adoption_router
+from src.api.public_campaigns import router as public_campaigns_router
 from src.api.public_contact import router as public_contact_router
+from src.api.sepa import router as sepa_router
+from src.api.sponsorships import router as sponsorships_router
+from src.api.tigo_money import router as tigo_money_router
 from src.api.webhooks import router as webhooks_router
 from src.audit.middleware import AuditMiddleware
 from src.config import Settings, get_settings
@@ -42,6 +57,8 @@ from src.notifications.handlers import NotificationHandlers
 from src.notifications.in_app_handlers import InAppNotificationHandlers
 from src.notifications.service import EmailService
 from src.notifications.templates import TemplateRenderer
+from src.notifications.whatsapp_handlers import WhatsAppHandlers
+from src.notifications.whatsapp_service import WhatsAppService
 
 
 @asynccontextmanager
@@ -64,6 +81,11 @@ async def lifespan(application: FastAPI) -> AsyncGenerator[None, None]:
     # Register in-app notification handlers on the event bus
     in_app_handlers = InAppNotificationHandlers()
     in_app_handlers.register(event_bus)
+
+    # Register WhatsApp notification handlers on the event bus
+    whatsapp_service = WhatsAppService(settings)
+    whatsapp_handlers = WhatsAppHandlers(whatsapp_service)
+    whatsapp_handlers.register(event_bus)
 
     yield
 
@@ -108,19 +130,34 @@ def create_app() -> FastAPI:
     # --- Routers ---
     application.include_router(health_router)
     application.include_router(auth_router)
+    application.include_router(password_reset_router)
+    application.include_router(email_verification_router)
+    application.include_router(sessions_router)
     application.include_router(animals_router)
     application.include_router(adopters_router)
     application.include_router(adoption_requests_router)
     application.include_router(donors_router)
     application.include_router(donations_router)
     application.include_router(in_kind_donations_router)
+    application.include_router(fund_allocations_router)
     application.include_router(admin_router)
     application.include_router(public_router)
     application.include_router(public_adoption_router)
+    application.include_router(public_campaigns_router)
     application.include_router(public_contact_router)
+    application.include_router(sepa_router)
+    application.include_router(tigo_money_router)
     application.include_router(webhooks_router)
+    application.include_router(admin_campaigns_router)
     application.include_router(consents_router)
     application.include_router(notifications_router)
+    application.include_router(gdpr_export_router)
+    application.include_router(notification_preferences_router)
+    application.include_router(follow_ups_router)
+    application.include_router(gdpr_router)
+    application.include_router(impact_reports_router)
+    application.include_router(sponsorships_router)
+    application.include_router(animal_updates_router)
 
     return application
 

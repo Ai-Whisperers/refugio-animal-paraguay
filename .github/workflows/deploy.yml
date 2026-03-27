@@ -1,0 +1,44 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  deploy:
+    name: Deploy to Production VPS
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          echo "${{ secrets.VPS_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+
+      - name: Deploy to VPS
+        run: |
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=yes \
+            ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} \
+            'cd /opt/refugio-animal-paraguay && \
+             git fetch origin develop && \
+             git reset --hard origin/develop && \
+             docker compose -f docker-compose.deploy.yml build && \
+             docker compose -f docker-compose.deploy.yml up -d'
+
+      - name: Health check
+        continue-on-error: true
+        run: |
+          sleep 15
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=yes \
+            ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} \
+            'cd /opt/refugio-animal-paraguay && \
+             docker compose -f docker-compose.deploy.yml ps --format "table {{.Name}}\t{{.Status}}" && \
+             curl -sf --max-time 10 http://localhost:8000/api/v1/animals?limit=1 > /dev/null && echo "API OK" || echo "API not responding yet (may still be starting)"'
+
+      - name: Cleanup SSH
+        if: always()
+        run: rm -rf ~/.ssh/deploy_key

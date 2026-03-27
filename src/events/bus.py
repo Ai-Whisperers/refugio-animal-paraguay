@@ -149,13 +149,14 @@ class EventBus:
             for handler in handlers:
                 try:
                     await handler(event)
-                except Exception:
+                except Exception as exc:
                     logger.exception(
-                        "Event handler %s failed for event %s (id=%s). "
+                        "Event handler %s failed for event %s (id=%s): %s. "
                         "Continuing to next handler.",
                         getattr(handler, "__qualname__", repr(handler)),
                         event_type_key,
                         event.id,
+                        exc,
                     )
 
             queue.task_done()

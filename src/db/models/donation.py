@@ -24,6 +24,15 @@ class PaymentMethod(enum.StrEnum):
     STRIPE = "stripe"
     CASH = "cash"
     TRANSFER = "transfer"
+    SEPA_DEBIT = "sepa_debit"
+    TIGO_MONEY = "tigo_money"
+
+
+class RecurringInterval(enum.StrEnum):
+    """Recurring donation intervals — must match chk_donations_recurring_interval."""
+
+    MONTH = "month"
+    YEAR = "year"
 
 
 class DonationStatus(enum.StrEnum):
@@ -58,6 +67,13 @@ class Donor(Base):
         sa.String(3),
         nullable=False,
         server_default="EUR",
+    )
+    # Whether this donor opts in to public listing on campaign social proof pages.
+    # Defaults to True (visible); donors can opt out via preference settings.
+    show_in_public: Mapped[bool] = mapped_column(
+        sa.Boolean,
+        nullable=False,
+        server_default=sa.text("true"),
     )
     # Nullable: consent recorded when given; None = not yet obtained
     gdpr_consent_at: Mapped[datetime | None] = mapped_column(
@@ -117,6 +133,35 @@ class Donation(Base):
         sa.String(255),
         nullable=True,
         index=True,
+    )
+    # Stripe subscription ID for recurring donations
+    stripe_subscription_id: Mapped[str | None] = mapped_column(
+        sa.String(255),
+        nullable=True,
+        index=True,
+    )
+    # Stripe customer ID — required for subscriptions and SEPA mandates
+    stripe_customer_id: Mapped[str | None] = mapped_column(
+        sa.String(255),
+        nullable=True,
+        index=True,
+    )
+    # Tigo Money transaction ID — populated when payment_method = tigo_money
+    tigo_transaction_id: Mapped[str | None] = mapped_column(
+        sa.String(255),
+        nullable=True,
+        index=True,
+    )
+    # Whether this donation is part of a recurring subscription
+    is_recurring: Mapped[bool] = mapped_column(
+        sa.Boolean,
+        nullable=False,
+        server_default=sa.text("false"),
+    )
+    # Recurring interval: 'month' or 'year' (null for one-time donations)
+    recurring_interval: Mapped[str | None] = mapped_column(
+        sa.String(20),
+        nullable=True,
     )
     status: Mapped[str] = mapped_column(
         sa.String(20),

@@ -1,7 +1,7 @@
 """SQLAlchemy ORM models for animals and animal photos."""
 
-import enum
 from datetime import date, datetime
+from enum import StrEnum
 from uuid import UUID
 
 import sqlalchemy as sa
@@ -10,7 +10,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from ..base import Base
 
 
-class AnimalSpecies(str, enum.Enum):
+class AnimalSpecies(StrEnum):
     """Species values — must match chk_animals_species CHECK constraint exactly."""
 
     DOG = "dog"
@@ -18,7 +18,7 @@ class AnimalSpecies(str, enum.Enum):
     OTHER = "other"
 
 
-class AnimalStatus(str, enum.Enum):
+class AnimalStatus(StrEnum):
     """Status values — must match chk_animals_status CHECK constraint exactly."""
 
     INTAKE = "intake"
@@ -30,7 +30,7 @@ class AnimalStatus(str, enum.Enum):
     DECEASED = "deceased"
 
 
-class AnimalSize(str, enum.Enum):
+class AnimalSize(StrEnum):
     """Size category — must match chk_animals_size CHECK constraint."""
 
     SMALL = "small"
@@ -39,7 +39,7 @@ class AnimalSize(str, enum.Enum):
     EXTRA_LARGE = "extra_large"
 
 
-class AnimalGender(str, enum.Enum):
+class AnimalGender(StrEnum):
     """Gender — must match chk_animals_gender CHECK constraint."""
 
     MALE = "male"

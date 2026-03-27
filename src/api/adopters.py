@@ -72,12 +72,12 @@ async def create_adopter(
     db.add(adopter)
     try:
         await db.flush()
-    except IntegrityError:
+    except IntegrityError as exc:
         await db.rollback()
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail="An adopter with this email already exists",
-        )
+        ) from exc
     await db.refresh(adopter)
     return adopter
 

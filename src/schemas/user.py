@@ -20,6 +20,7 @@ class UserResponse(BaseModel):
     email: str
     role: UserRole
     is_active: bool
+    email_verified: bool
 
 
 class TokenResponse(BaseModel):

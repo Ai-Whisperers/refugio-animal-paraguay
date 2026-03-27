@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useCallback, useEffect, useState, useMemo } from "react";
+import { useCallback, useEffect, useState, useMemo, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -50,30 +50,6 @@ const AGE_OPTIONS: AgeRange[] = [
 
 const PAGE_SIZE = 12;
 const SKELETON_COUNT = 8;
-
-export default function AnimalsPage() {
-  return (
-    <Suspense fallback={<AnimalsPageSkeleton />}>
-      <AnimalsPageContent />
-    </Suspense>
-  );
-}
-
-function AnimalsPageSkeleton() {
-  return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      <div className="text-center mb-10">
-        <div className="h-10 w-64 bg-gray-200 rounded-lg animate-pulse mx-auto mb-3" />
-        <div className="h-5 w-96 bg-gray-100 rounded animate-pulse mx-auto" />
-      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        {Array.from({ length: 8 }).map((_, i) => (
-          <AnimalCardSkeleton key={i} />
-        ))}
-      </div>
-    </div>
-  );
-}
 
 function AnimalsPageContent() {
   const router = useRouter();
@@ -417,5 +393,13 @@ function AnimalsPageContent() {
         </>
       )}
     </div>
+  );
+}
+
+export default function AnimalsPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-50 py-8 px-4"><div className="max-w-7xl mx-auto animate-pulse space-y-6"><div className="h-10 bg-gray-200 rounded w-1/3" /><div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">{[...Array(8)].map((_: unknown, i: number) => (<div key={i} className="bg-white rounded-xl overflow-hidden shadow-sm"><div className="aspect-[4/3] bg-gray-200" /><div className="p-4 space-y-3"><div className="h-5 bg-gray-200 rounded w-2/3" /><div className="h-4 bg-gray-200 rounded w-1/2" /></div></div>))}</div></div></div>}>
+      <AnimalsPageContent />
+    </Suspense>
   );
 }

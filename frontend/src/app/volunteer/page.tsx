@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import DynamicIcon from "@/components/DynamicIcon";
+import { Check, Phone } from "lucide-react";
 import { VOLUNTEER, SITE_TITLE } from "@/lib/strings";
 
 export const metadata: Metadata = {
@@ -57,9 +58,7 @@ export default function VolunteerPage() {
                 key={req}
                 className="flex items-start gap-3 bg-white rounded-lg p-4 border border-gray-100"
               >
-                <span className="text-primary-600 font-bold mt-0.5">
-                  {""}
-                </span>
+                <Check className="text-primary-600 h-5 w-5 flex-shrink-0 mt-0.5" />
                 <span className="text-gray-700">{req}</span>
               </li>
             ))}
@@ -128,7 +127,7 @@ export default function VolunteerPage() {
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors"
           >
-            {""} WhatsApp: {VOLUNTEER.whatsappNumber}
+            <Phone className="h-5 w-5" /> WhatsApp: {VOLUNTEER.whatsappNumber}
           </a>
         </div>
       </section>
