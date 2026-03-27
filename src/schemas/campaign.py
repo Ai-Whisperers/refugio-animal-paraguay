@@ -105,3 +105,57 @@ class CampaignListResponse(BaseModel):
     total: int
     page: int
     page_size: int
+
+
+# ---------------------------------------------------------------------------
+# Social proof schemas (RAP-076)
+# ---------------------------------------------------------------------------
+
+
+class RecentDonorEntry(BaseModel):
+    """A single donor entry shown on the campaign social proof panel.
+
+    If the donor opted out of public listing, display_name is "Anonymous"
+    and is_anonymous is True. The amount and timestamp are always shown.
+    """
+
+    display_name: str = Field(
+        ...,
+        description="Donor first name, or 'Anonymous' if opted out",
+    )
+    amount_cents: int = Field(..., description="Donation amount in smallest currency unit")
+    currency: CurrencyCode
+    donated_at: datetime = Field(..., description="When the donation was completed")
+    is_anonymous: bool = Field(
+        default=False,
+        description="True when the donor opted out of public listing",
+    )
+
+
+class CampaignSocialProofResponse(BaseModel):
+    """Social proof data for a campaign: donor counts, momentum, recent donors.
+
+    Powers the campaign progress bar and social proof widgets on the public
+    fundraising page — designed for high-frequency polling (cacheable).
+    """
+
+    campaign_id: UUID
+    donor_count: int = Field(..., description="Total number of unique donors")
+    total_raised_cents: int = Field(..., description="Sum of completed donations")
+    currency: CurrencyCode
+    progress_percentage: float = Field(
+        ...,
+        description="Percentage of goal raised (0.0-100.0+, capped at 100 if not overfunding)",
+    )
+    # Momentum metrics
+    donations_last_24_hours: int = Field(
+        ..., description="Number of completed donations in the past 24 hours"
+    )
+    donations_last_7_days: int = Field(
+        ..., description="Number of completed donations in the past 7 days"
+    )
+    # Recent donor list for social proof — up to 10 entries, newest first
+    recent_donors: list[RecentDonorEntry] = Field(
+        default_factory=list,
+        description="Last 10 completed donations, newest first",
+    )
