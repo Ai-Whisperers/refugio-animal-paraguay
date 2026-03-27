@@ -93,7 +93,7 @@ export default function DonatePage() {
             </p>
           </div>
 
-          {/* EU Donors */}
+          {/* EU Donors — SEPA Direct Debit */}
           <div className="bg-white rounded-xl p-6 sm:p-8 shadow-sm border border-gray-100">
             <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center gap-2">
               <span className="inline-flex items-center justify-center w-6 h-6 bg-blue-100 text-blue-700 font-bold text-sm rounded">EU</span> {DONATE.euTitle}
@@ -101,8 +101,18 @@ export default function DonatePage() {
             <p className="text-sm text-gray-600 mb-3">
               {DONATE.euDescription}
             </p>
-            <div className="bg-blue-50 border border-blue-100 rounded-lg p-4">
-              <p className="text-sm text-blue-700">{DONATE.euComingSoon}</p>
+            <div className="bg-blue-50 border border-blue-100 rounded-lg p-4 mb-4">
+              <p className="text-sm text-blue-700 mb-3">
+                Los donantes europeos pueden guardar su cuenta bancaria (IBAN)
+                para donaciones recurrentes via Débito Directo SEPA. Es gratis,
+                seguro y procesado a través de Stripe.
+              </p>
+              <Link
+                href="/donate/sepa-setup"
+                className="inline-block bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Configurar Débito SEPA
+              </Link>
             </div>
           </div>
         </div>
