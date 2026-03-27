@@ -9,6 +9,8 @@ import {
   RefreshCw,
   ArrowRightLeft,
   Calendar,
+  Info,
+  Stethoscope,
 } from "lucide-react";
 import { isAuthenticated } from "@/lib/auth";
 import { api, ApiClientError } from "@/lib/api";
@@ -26,6 +28,7 @@ const LABEL_NOT_FOUND = "Animal no encontrado";
 const LABEL_RETRY = "Reintentar";
 const LABEL_BACK = "Volver a la lista";
 const LABEL_EDIT = "Editar";
+const LABEL_VET_NOTES = "Notas Veterinarias";
 const LABEL_CHANGE_STATUS = "Cambiar Estado";
 const LABEL_TAB_INFO = "Informacion";
 const LABEL_TAB_MEDICAL = "Historial Medico";
@@ -211,6 +214,13 @@ export default function AnimalDetailPage() {
           >
             <ArrowRightLeft className="h-4 w-4" />
             {LABEL_CHANGE_STATUS}
+          </button>
+          <button
+            onClick={() => router.push(`/admin/animals/${animalId}/vet-notes`)}
+            className="flex items-center gap-1.5 rounded-lg border border-warm-border bg-white px-3 py-1.5 text-sm font-medium text-warm-text-secondary transition-colors hover:bg-warm-bg hover:text-warm-text-primary"
+          >
+            <Stethoscope className="h-4 w-4" />
+            {LABEL_VET_NOTES}
           </button>
           <button
             onClick={() => router.push(`/admin/animals/${animalId}/edit`)}
