@@ -27,7 +27,7 @@ export default function AdminLayout({
   return (
     <div className="flex min-h-screen bg-warm-bg">
       <AdminSidebar />
-      <main className="flex-1 overflow-auto p-6">
+      <main className="flex-1 overflow-auto px-4 pb-6 pt-16 md:p-6">
         <Breadcrumbs />
         {children}
       </main>

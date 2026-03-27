@@ -152,14 +152,14 @@ export default function AdminSidebar() {
   return (
     <>
       {/* Desktop sidebar */}
-      <aside className="hidden w-64 flex-shrink-0 border-r border-warm-border bg-warm-surface lg:block">
+      <aside className="hidden w-64 flex-shrink-0 border-r border-warm-border bg-warm-surface md:block">
         {sidebarContent}
       </aside>
 
       {/* Mobile hamburger button */}
       <button
         onClick={() => setIsMobileOpen(true)}
-        className="fixed left-4 top-4 z-40 rounded-lg border border-warm-border bg-warm-surface p-2 shadow-sm lg:hidden"
+        className="fixed left-4 top-4 z-40 rounded-lg border border-warm-border bg-warm-surface p-2 shadow-sm md:hidden"
         aria-label={LABEL_TOGGLE_MENU}
       >
         <Menu className="h-5 w-5 text-warm-text-primary" />
@@ -167,7 +167,7 @@ export default function AdminSidebar() {
 
       {/* Mobile overlay */}
       {isMobileOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden">
+        <div className="fixed inset-0 z-50 md:hidden">
           {/* Backdrop */}
           <div
             className="absolute inset-0 bg-black/30"
