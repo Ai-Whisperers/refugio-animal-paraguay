@@ -21,6 +21,8 @@ const SEGMENT_LABELS: Record<string, string> = {
   analytics: "Analiticas",
   new: "Nuevo",
   edit: "Editar",
+  medical: "Medico",
+  alerts: "Alertas",
 };
 
 const LABEL_DETAIL = "Detalle";
