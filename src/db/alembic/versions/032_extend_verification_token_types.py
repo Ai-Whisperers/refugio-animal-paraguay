@@ -15,12 +15,12 @@ depends_on = None
 
 def upgrade() -> None:
     op.drop_constraint(
-        "chk_verification_token_type",
+        "chk_verification_tokens_type",
         "verification_tokens",
         type_="check",
     )
     op.create_check_constraint(
-        "chk_verification_token_type",
+        "chk_verification_tokens_type",
         "verification_tokens",
         "token_type IN ('password_reset', 'email_verification', 'password_change', 'account_deletion')",
     )
@@ -28,12 +28,12 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     op.drop_constraint(
-        "chk_verification_token_type",
+        "chk_verification_tokens_type",
         "verification_tokens",
         type_="check",
     )
     op.create_check_constraint(
-        "chk_verification_token_type",
+        "chk_verification_tokens_type",
         "verification_tokens",
         "token_type IN ('password_reset', 'email_verification')",
     )

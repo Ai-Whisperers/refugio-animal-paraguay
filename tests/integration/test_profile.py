@@ -40,6 +40,7 @@ async def profile_client():
                 VALUES (:id, :email, :pwd, 'staff', true, true, 'Test Profile', '+595981000001')
                 ON CONFLICT (id) DO UPDATE SET
                     hashed_password = :pwd,
+                    role = 'staff',
                     is_active = true,
                     email_verified = true,
                     full_name = 'Test Profile',
@@ -58,6 +59,7 @@ async def profile_client():
                 VALUES (:id, :email, :pwd, 'staff', true, true, 'Donor User')
                 ON CONFLICT (id) DO UPDATE SET
                     hashed_password = :pwd,
+                    role = 'staff',
                     is_active = true,
                     email_verified = true,
                     full_name = 'Donor User'
