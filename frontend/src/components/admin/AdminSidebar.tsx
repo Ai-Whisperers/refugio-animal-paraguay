@@ -8,6 +8,7 @@ import {
   Heart,
   Users,
   DollarSign,
+  Megaphone,
   LogOut,
   Menu,
   X,
@@ -57,6 +58,11 @@ const NAV_ITEMS: NavItem[] = [
     label: "Donaciones",
     href: "/admin/donations",
     icon: DollarSign,
+  },
+  {
+    label: "Campanas",
+    href: "/admin/campaigns",
+    icon: Megaphone,
   },
   {
     label: "Cirugias",
