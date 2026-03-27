@@ -3,7 +3,7 @@ story: S1
 epic: EPIC-24
 ticket: RAP-115
 title: "Donor list with search and export"
-status: planned
+status: done
 points: 5
 priority: P0
 track: Frontend

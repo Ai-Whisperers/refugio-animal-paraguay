@@ -2,7 +2,7 @@
 epic: EPIC-24
 title: "Donor & Donation Management"
 sprint: 1
-status: planned
+status: done
 points: 22
 created: 2026-03-26T19:06:04
 version: V4
@@ -16,11 +16,11 @@ version: V4
 **Target users**: Shelter staff, administrators, finance
 
 ## Stories
-- [ ] [S1] Donor list with search and export (5 pts, P0, Frontend)
-- [ ] [S2] Donation history with filters (date, type, currency) (5 pts, P0, Frontend)
-- [ ] [S3] Individual donor profile with lifetime stats (5 pts, P1, Frontend)
-- [ ] [S4] Donation receipt PDF generation (5 pts, P1, Fullstack)
-- [ ] [S5] Missing GET /donors list endpoint (2 pts, P0, Backend)
+- [x] [S1] Donor list with search and export (5 pts, P0, Frontend)
+- [x] [S2] Donation history with filters (date, type, currency) (5 pts, P0, Frontend)
+- [x] [S3] Individual donor profile with lifetime stats (5 pts, P1, Frontend)
+- [x] [S4] Donation receipt PDF generation (5 pts, P1, Fullstack)
+- [x] [S5] Missing GET /donors list endpoint (2 pts, P0, Backend)
 
 ## Total Points
 22
