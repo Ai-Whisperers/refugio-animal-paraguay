@@ -15,6 +15,8 @@ class TokenType(StrEnum):
 
     PASSWORD_RESET = "password_reset"
     EMAIL_VERIFICATION = "email_verification"
+    PASSWORD_CHANGE = "password_change"
+    ACCOUNT_DELETION = "account_deletion"
 
 
 class VerificationToken(Base):

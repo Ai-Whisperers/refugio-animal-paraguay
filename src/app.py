@@ -42,6 +42,7 @@ from src.api.notification_preferences import router as notification_preferences_
 from src.api.notifications import router as notifications_router
 from src.api.password_reset import router as password_reset_router
 from src.api.prescriptions import router as prescriptions_router
+from src.api.profile import router as profile_router
 from src.api.public import router as public_router
 from src.api.public_adoption import router as public_adoption_router
 from src.api.public_campaigns import router as public_campaigns_router
@@ -207,6 +208,7 @@ def create_app() -> FastAPI:
     application.include_router(referral_router)
     application.include_router(appointments_router)
     application.include_router(prescriptions_router)
+    application.include_router(profile_router)
 
     return application
 
