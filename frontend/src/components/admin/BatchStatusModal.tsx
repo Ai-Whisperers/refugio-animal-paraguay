@@ -57,7 +57,7 @@ export default function BatchStatusModal({
   const [results, setResults] = useState<BatchResult[] | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const currentStatuses = [...new Set(animals.map((a) => a.status))];
+  const currentStatuses = Array.from(new Set(animals.map((a) => a.status)));
   const commonTransitions = getCommonTransitions(currentStatuses);
   const isTerminalTarget = selectedStatus !== null && VALID_TRANSITIONS[selectedStatus]?.length === 0;
 
