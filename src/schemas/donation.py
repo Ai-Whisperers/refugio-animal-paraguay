@@ -70,6 +70,13 @@ class DonorResponse(BaseModel):
     updated_at: datetime
 
 
+class DonorListResponse(DonorResponse):
+    """Donor record with donation summary stats for list views."""
+
+    total_donations: int = 0
+    total_donated_cents: int = 0
+
+
 class DonationCreate(BaseModel):
     """Fields for creating a donation record."""
 
