@@ -3,7 +3,7 @@ story: S5
 epic: EPIC-22
 ticket: RAP-109
 title: "Animal detail view with full history"
-status: planned
+status: done
 points: 5
 priority: P1
 track: Frontend
