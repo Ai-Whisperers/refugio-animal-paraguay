@@ -3,7 +3,7 @@ story: S1
 epic: EPIC-22
 ticket: RAP-105
 title: "Animal list with search, sort, pagination"
-status: planned
+status: done
 points: 5
 priority: P0
 track: Frontend

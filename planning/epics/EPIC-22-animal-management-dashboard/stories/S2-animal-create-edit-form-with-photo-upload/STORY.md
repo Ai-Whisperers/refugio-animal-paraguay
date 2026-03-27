@@ -3,7 +3,7 @@ story: S2
 epic: EPIC-22
 ticket: RAP-106
 title: "Animal create/edit form with photo upload"
-status: planned
+status: done
 points: 8
 priority: P0
 track: Frontend
