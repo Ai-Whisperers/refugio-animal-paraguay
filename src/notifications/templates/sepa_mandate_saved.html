@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Your SEPA Direct Debit Mandate Is Active</h2>
+<p>Dear {{ donor_name }},</p>
+
+<p>Thank you for setting up a SEPA Direct Debit mandate with Refugio Animal Paraguay. Your bank account has been verified and your mandate is now active.</p>
+
+<p><strong>What this means:</strong></p>
+<ul>
+  <li>Your IBAN has been securely stored with our payment provider (Stripe).</li>
+  <li>We can now collect donations directly from your account as authorised.</li>
+  <li>You will receive a notification each time a payment is processed.</li>
+</ul>
+
+<p>If you did not authorise this mandate, or if you wish to cancel it at any time, please contact us immediately at <a href="mailto:{{ support_email }}">{{ support_email }}</a>.</p>
+
+<p>Thank you for your continued support of our animals.</p>
+{% endblock %}

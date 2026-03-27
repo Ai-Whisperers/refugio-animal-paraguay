@@ -22,6 +22,7 @@ from src.api.adopters import router as adopters_router
 from src.api.adoption_requests import router as adoption_requests_router
 from src.api.animal_updates import router as animal_updates_router
 from src.api.animals import router as animals_router
+from src.api.appointments import router as appointments_router
 from src.api.auth import router as auth_router
 from src.api.consents import router as consents_router
 from src.api.diagnoses import diagnosis_router, treatment_router
@@ -40,6 +41,7 @@ from src.api.medications import router as medications_router
 from src.api.notification_preferences import router as notification_preferences_router
 from src.api.notifications import router as notifications_router
 from src.api.password_reset import router as password_reset_router
+from src.api.prescriptions import router as prescriptions_router
 from src.api.public import router as public_router
 from src.api.public_adoption import router as public_adoption_router
 from src.api.public_campaigns import router as public_campaigns_router
@@ -50,10 +52,8 @@ from src.api.sponsorships import router as sponsorships_router
 from src.api.surgeries import surgery_router
 from src.api.tigo_money import router as tigo_money_router
 from src.api.vaccinations import vaccination_router, vaccine_type_router
+from src.api.vet_referrals import referral_router
 from src.api.vet_visits import router as vet_visits_router
-from src.api.vet_referrals import referral_router  # noqa: E402,F401
-from src.api.appointments import router as appointments_router
-from src.api.prescriptions import router as prescriptions_router
 from src.api.webhooks import router as webhooks_router
 from src.audit.middleware import AuditMiddleware
 from src.config import Settings, get_settings
@@ -71,6 +71,7 @@ from src.notifications.templates import TemplateRenderer
 from src.notifications.whatsapp_handlers import WhatsAppHandlers
 from src.notifications.whatsapp_service import WhatsAppService
 from src.sentry_config import configure_sentry
+from src.services.sepa_notification_service import SepaNotificationService
 
 
 @asynccontextmanager
@@ -98,6 +99,9 @@ async def lifespan(application: FastAPI) -> AsyncGenerator[None, None]:
     whatsapp_service = WhatsAppService(settings)
     whatsapp_handlers = WhatsAppHandlers(whatsapp_service)
     whatsapp_handlers.register(event_bus)
+
+    # Attach SEPA notification service for webhook handlers
+    application.state.sepa_notifier = SepaNotificationService(email_service, renderer)
 
     yield
 

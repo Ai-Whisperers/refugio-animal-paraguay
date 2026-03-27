@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Your Donation Is Being Processed</h2>
+<p>Dear {{ donor_name }},</p>
+
+<p>We have received your SEPA Direct Debit donation of <strong>{{ amount }} {{ currency }}</strong> and the payment has been submitted to your bank.</p>
+
+<p><strong>What happens next:</strong></p>
+<ul>
+  <li>SEPA Direct Debit transfers typically take <strong>1&ndash;3 business days</strong> to settle.</li>
+  <li>You will receive a confirmation email once the funds have been received.</li>
+  <li>The debit will appear on your bank statement as &ldquo;Refugio Animal Paraguay&rdquo;.</li>
+</ul>
+
+<p>Your generosity directly supports the animals in our shelter &mdash; providing food, medical care, and a safe environment while they wait for their forever home.</p>
+
+<p>If you have any questions, please contact us at <a href="mailto:{{ support_email }}">{{ support_email }}</a>.</p>
+
+<p>Thank you for your support!</p>
+{% endblock %}

@@ -28,6 +28,7 @@ from src.db.session import get_db
 from src.events.bus import EventBus
 from src.events.domain_events import create_donation_received
 from src.schemas.error import PAYMENT_RESPONSES
+from src.services.sepa_notification_service import SepaNotificationService
 
 logger = logging.getLogger(__name__)
 
@@ -320,6 +321,7 @@ async def _handle_subscription_deleted(
 async def _handle_payment_intent_processing(
     db: AsyncSession,
     payment_intent_id: str,
+    sepa_notifier: "SepaNotificationService | None" = None,
 ) -> str:
     """Handle payment_intent.processing: SEPA payment accepted by bank, awaiting settlement.
 
@@ -342,11 +344,16 @@ async def _handle_payment_intent_processing(
         payment_intent_id,
         donation.id,
     )
+
+    if sepa_notifier is not None:
+        await sepa_notifier.notify_payment_processing(donation.id)
+
     return "processing"
 
 
 async def _handle_setup_intent_succeeded(
     data_object: Any,
+    sepa_notifier: "SepaNotificationService | None" = None,
 ) -> str:
     """Handle setup_intent.succeeded: SEPA mandate saved successfully.
 
@@ -367,11 +374,16 @@ async def _handle_setup_intent_succeeded(
         payment_method_id,
         donor_id,
     )
+
+    if sepa_notifier is not None and donor_id:
+        await sepa_notifier.notify_mandate_saved(donor_id)
+
     return "mandate_saved"
 
 
 async def _handle_setup_intent_failed(
     data_object: Any,
+    sepa_notifier: "SepaNotificationService | None" = None,
 ) -> str:
     """Handle setup_intent.setup_failed: SEPA mandate setup failed.
 
@@ -391,6 +403,10 @@ async def _handle_setup_intent_failed(
         error_code,
         donor_id,
     )
+
+    if sepa_notifier is not None and donor_id:
+        await sepa_notifier.notify_payment_failed(donor_id=donor_id)
+
     return "mandate_failed"
 
 
@@ -502,8 +518,11 @@ async def stripe_webhook(
     # Stripe StripeObject supports [] but not .get() in v15
     data_obj: Any = event["data"]["object"]
 
-    # Get event bus from app state for domain event publishing
+    # Get event bus and SEPA notifier from app state
     event_bus: EventBus | None = getattr(request.app.state, "event_bus", None)
+    sepa_notifier: SepaNotificationService | None = getattr(
+        request.app.state, "sepa_notifier", None
+    )
 
     # Route to handler — subscription/invoice events use data_obj directly
     if event_type == EVENT_INVOICE_PAYMENT_SUCCEEDED:
@@ -518,10 +537,10 @@ async def stripe_webhook(
 
     # SEPA-specific events that don't need a payment intent ID
     if event_type == EVENT_SETUP_INTENT_SUCCEEDED:
-        result = await _handle_setup_intent_succeeded(data_obj)
+        result = await _handle_setup_intent_succeeded(data_obj, sepa_notifier)
         return {"status": "processed", "event_type": event_type, "result": result}
     if event_type == EVENT_SETUP_INTENT_FAILED:
-        result = await _handle_setup_intent_failed(data_obj)
+        result = await _handle_setup_intent_failed(data_obj, sepa_notifier)
         return {"status": "processed", "event_type": event_type, "result": result}
     if event_type == EVENT_MANDATE_UPDATED:
         result = await _handle_mandate_updated(data_obj)
@@ -541,7 +560,7 @@ async def stripe_webhook(
     elif event_type == EVENT_PAYMENT_INTENT_FAILED:
         result = await _handle_payment_failed(db, payment_intent_id)
     elif event_type == EVENT_PAYMENT_INTENT_PROCESSING:
-        result = await _handle_payment_intent_processing(db, payment_intent_id)
+        result = await _handle_payment_intent_processing(db, payment_intent_id, sepa_notifier)
     elif event_type == EVENT_CHARGE_REFUNDED:
         result = await _handle_charge_refunded(db, payment_intent_id)
     else:
