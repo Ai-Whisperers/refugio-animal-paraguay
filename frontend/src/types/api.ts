@@ -256,6 +256,29 @@ export interface DonorResponse {
   updated_at: string;
 }
 
+// --- Audit Logs ---
+
+export interface AuditLogEntry {
+  id: string;
+  user_id: string;
+  action: string;
+  resource_type: string;
+  resource_id: string | null;
+  timestamp: string;
+  ip_address: string | null;
+  user_agent: string | null;
+  old_values: Record<string, unknown> | null;
+  new_values: Record<string, unknown> | null;
+  request_id: string | null;
+}
+
+export interface AuditLogListResponse {
+  items: AuditLogEntry[];
+  total: number;
+  page: number;
+  page_size: number;
+}
+
 // --- API Error ---
 
 export interface ApiError {
