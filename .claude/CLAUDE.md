@@ -13,10 +13,18 @@
 **Phase 0 — Foundation**: Documentation, planning, framework setup. **COMPLETED.**
 **Phase 1 — Data Layer**: PostgreSQL schema, Alembic migrations, seed data. **COMPLETED** (RAP-001, RAP-002).
 **Phase 2 — API Scaffold**: FastAPI routes, auth, basic CRUD. **COMPLETED** (RAP-003 through RAP-010).
+**Phase 3 — Feature Expansion**: Notifications, campaigns, sponsorships, GDPR, frontend. **COMPLETED** (RAP-021 through RAP-076).
 
-**Phase 3 — Feature Expansion (next)**: Medical records, volunteer management, notifications, frontend.
+**Next**: V4+ stories (medical records, volunteer management, admin dashboard, lost & found).
 
-**Current state**: 30 source files, 204 tests (96 unit + 108 integration, 80.42% coverage), full CRUD APIs (animals, adopters, adoption requests, donors, donations), JWT auth with roles, animal photo gallery, Stripe donations, Docker containerization with auto-migrations, CI/CD workflows (GitHub Actions). 4 Alembic migrations applied.
+**Current state (2026-03-27)**:
+- **135 Python source files** in `src/` (27 API routers, 21 DB models, 12 services, event bus, middleware)
+- **30 TypeScript/TSX files** in `frontend/src/` (Next.js 14 App Router, 12 pages, 12 components)
+- **987 tests** (627 unit + 360 integration), ~80% coverage
+- **22 Alembic migrations** (001 through 019, including 008b, 012a, 012b, 012c)
+- **60+ API endpoints** across 27 routers (animals, adopters, adoptions, donors, donations, campaigns, sponsorships, GDPR, notifications, follow-ups, contact, webhooks, admin, public)
+- **Deployed** to VPS at sunstein.cloud/petShelter with auto-deploy on push to develop
+- **CI/CD**: GitHub Actions deploy workflow (`.github/workflows/deploy.yml`)
 
 ---
 
@@ -210,11 +218,12 @@ Activates deeper reasoning. Use for architecture, data model design, and complex
 | Backend | Python 3.12 + FastAPI | Async-first, Pydantic v2 schemas |
 | Database | PostgreSQL 16 | SQLAlchemy 2.x ORM, Alembic migrations |
 | Auth | JWT (HTTP Bearer) | fastapi-users or custom; roles: staff, admin, adopter |
-| Payments | Stripe (EUR/SEPA) | EU/NL donors; PYG cash handling TBD |
-| Frontend | TBD | Not yet started |
-| Hosting | TBD | EU-West region preferred (donor latency); Paraguay secondary |
-| CI/CD | GitHub Actions | Pipeline definition TBD in Phase 2 |
-| Email | TBD | Transactional email for notifications |
+| Payments | Stripe + Tigo Money | EUR/SEPA for EU donors; Tigo Money for PYG local payments |
+| Frontend | Next.js 14 + Tailwind | App Router, TypeScript, SWR, react-hook-form, zod |
+| Hosting | Hostinger VPS | Docker Compose + Traefik v3, sunstein.cloud/petShelter |
+| CI/CD | GitHub Actions | Auto-deploy on push to develop (`.github/workflows/deploy.yml`) |
+| Email | SMTP (aiosmtplib) | Transactional email for notifications |
+| WhatsApp | Twilio | WhatsApp Business API for notifications |
 
 ---
 
