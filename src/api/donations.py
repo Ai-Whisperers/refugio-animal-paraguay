@@ -8,6 +8,7 @@ Endpoints:
   GET  /donations/export             — CSV export of donation history (staff only)
   GET  /donations                    — paginated list with filters (staff only)
   GET  /donations/{id}               — single donation (staff only)
+  GET  /donations/{id}/receipt       — PDF receipt for a single donation (staff only)
 """
 
 import csv
@@ -445,6 +446,64 @@ async def list_donations(
     stmt = stmt.order_by(Donation.created_at.desc()).limit(limit).offset(offset)  # type: ignore[union-attr]
     result = await db.execute(stmt)
     return list(result.scalars().all())
+
+
+@router.get("/{donation_id}/receipt")
+async def get_donation_receipt(
+    donation_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    _: User = Depends(require_staff),
+) -> StreamingResponse:
+    """Generate and return a PDF receipt for a single donation. Staff only."""
+    from src.services.donation_receipt_service import (
+        DonationReceiptGenerator,
+        ReceiptData,
+    )
+
+    donation = await db.get(Donation, donation_id)
+    if donation is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Donation not found",
+        )
+
+    # Load donor info if available
+    donor_name: str | None = None
+    donor_email: str | None = None
+    donor_country: str | None = None
+    if donation.donor_id is not None:
+        donor = await db.get(Donor, donation.donor_id)
+        if donor is not None:
+            donor_name = donor.full_name
+            donor_email = donor.email
+            donor_country = donor.country
+
+    receipt_data = ReceiptData(
+        donation_id=donation.id,
+        amount_cents=donation.amount_cents,
+        currency=donation.currency,
+        payment_method=donation.payment_method,
+        status=donation.status,
+        receipt_number=donation.receipt_number,
+        fund_category=donation.fund_category,
+        is_recurring=donation.is_recurring,
+        recurring_interval=donation.recurring_interval,
+        notes=donation.notes,
+        donation_date=donation.created_at,
+        donor_name=donor_name,
+        donor_email=donor_email,
+        donor_country=donor_country,
+    )
+
+    generator = DonationReceiptGenerator()
+    pdf_bytes = generator.generate_bytes(receipt_data)
+
+    filename = f"recibo-donacion-{str(donation_id)[:8]}.pdf"
+    return StreamingResponse(
+        iter([pdf_bytes]),
+        media_type="application/pdf",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
 
 
 @router.get("/{donation_id}", response_model=DonationResponse)
