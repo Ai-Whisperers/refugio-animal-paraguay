@@ -170,3 +170,45 @@ class VaccinationListResponse(BaseModel):
     total: int
     page: int
     size: int
+
+
+# ---------------------------------------------------------------------------
+# Bulk vaccination schemas
+# ---------------------------------------------------------------------------
+
+
+class BulkVaccinationCreate(BaseModel):
+    """Create the same vaccination record for multiple animals at once.
+
+    Used during intake processing when a batch of animals all receive
+    the same vaccine on the same day.
+    """
+
+    animal_ids: list[UUID] = Field(..., min_length=1, max_length=100)
+    vaccine_type_id: UUID
+    scheduled_date: date
+    administered_date: date | None = None
+    administered_by: str | None = Field(None, max_length=255)
+    batch_number: str | None = Field(None, max_length=100)
+    vaccination_status: str = Field("scheduled", max_length=50)
+    dose_number: int = Field(1, ge=1)
+    next_due_date: date | None = None
+    notes: str | None = None
+
+
+class BulkVaccinationResultItem(BaseModel):
+    """Result for a single animal in a bulk vaccination operation."""
+
+    animal_id: UUID
+    vaccination_id: UUID | None = None
+    success: bool
+    error: str | None = None
+
+
+class BulkVaccinationResponse(BaseModel):
+    """Summary of a bulk vaccination operation."""
+
+    total_requested: int
+    total_created: int
+    total_failed: int
+    results: list[BulkVaccinationResultItem]
