@@ -3,7 +3,7 @@ story: S4
 epic: EPIC-25
 ticket: RAP-123
 title: "Admin dashboard homepage with KPI cards"
-status: planned
+status: done
 points: 5
 priority: P1
 track: Frontend
