@@ -3,7 +3,7 @@ story: S1
 epic: EPIC-28
 ticket: RAP-135
 title: "Animal medical timeline view"
-status: planned
+status: done
 points: 5
 priority: P0
 track: Frontend

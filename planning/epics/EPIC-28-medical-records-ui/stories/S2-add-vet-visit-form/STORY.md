@@ -3,7 +3,7 @@ story: S2
 epic: EPIC-28
 ticket: RAP-136
 title: "Add vet visit form"
-status: planned
+status: done
 points: 5
 priority: P0
 track: Frontend
