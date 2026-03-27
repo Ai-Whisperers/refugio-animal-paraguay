@@ -4,6 +4,7 @@ import DynamicIcon from "@/components/DynamicIcon";
 import { Building2, MessageCircle, Phone, ArrowLeft } from "lucide-react";
 import { DONATE, SITE_TITLE } from "@/lib/strings";
 import CampaignListSection from "./CampaignListSection";
+import FeaturedCampaignBanner from "@/components/campaigns/FeaturedCampaignBanner";
 
 export const metadata: Metadata = {
   title: `${DONATE.title} | ${SITE_TITLE}`,
@@ -22,6 +23,13 @@ export default function DonatePage() {
           <p className="text-base sm:text-lg md:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
             {DONATE.heroSubtitle}
           </p>
+        </div>
+      </section>
+
+      {/* Featured Campaign */}
+      <section className="py-8 sm:py-12 px-4 bg-white">
+        <div className="max-w-6xl mx-auto">
+          <FeaturedCampaignBanner />
         </div>
       </section>
 

@@ -188,8 +188,11 @@ export interface CampaignPublic {
   currency: CurrencyCode;
   fund_category: FundCategory;
   status: CampaignStatus;
+  featured: boolean;
   image_url: string | null;
+  photo_urls: string[];
   deadline: string | null;
+  days_remaining: number | null;
   min_donation_cents: number | null;
   max_donation_cents: number | null;
   allow_overfunding: boolean;
@@ -203,6 +206,26 @@ export interface CampaignListResponse {
   total: number;
   page: number;
   page_size: number;
+}
+
+/** Social proof data for a campaign (from GET /public/campaigns/{id}/social-proof). */
+export interface RecentDonorEntry {
+  display_name: string;
+  amount_cents: number;
+  currency: CurrencyCode;
+  donated_at: string;
+  is_anonymous: boolean;
+}
+
+export interface CampaignSocialProof {
+  campaign_id: string;
+  donor_count: number;
+  total_raised_cents: number;
+  currency: CurrencyCode;
+  progress_percentage: number;
+  donations_last_24_hours: number;
+  donations_last_7_days: number;
+  recent_donors: RecentDonorEntry[];
 }
 
 export interface DonationCreateRequest {
