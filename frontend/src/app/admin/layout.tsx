@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import AdminSidebar from "@/components/admin/AdminSidebar";
+import Breadcrumbs from "@/components/admin/Breadcrumbs";
 
 /**
  * Admin layout with sidebar navigation for staff/admin pages.
@@ -26,7 +27,10 @@ export default function AdminLayout({
   return (
     <div className="flex min-h-screen bg-warm-bg">
       <AdminSidebar />
-      <main className="flex-1 overflow-auto">{children}</main>
+      <main className="flex-1 overflow-auto p-6">
+        <Breadcrumbs />
+        {children}
+      </main>
     </div>
   );
 }
