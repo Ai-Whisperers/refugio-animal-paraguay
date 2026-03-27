@@ -152,7 +152,7 @@ Week 3-4:
 | 11 | Create staging environment with approval gate | RAP-402 | EPIC-71 | 5 | BLOCKED | RAP-400 |
 | 12 | Harden Docker production image | RAP-403 | EPIC-71 | 3 | DONE (PR #68) | — |
 | 13 | Notification handler exception tests | RAP-407 | EPIC-72 | 3 | DONE (PR #71) | — |
-| 14 | Audit middleware tests | RAP-408 | EPIC-72 | 3 | READY | — |
+| 14 | Audit middleware tests | RAP-408 | EPIC-72 | 3 | DONE (PR #72) | — |
 | 15 | Audit API input validation gaps | RAP-411 | EPIC-73 | 3 | READY | — |
 | 16 | Standardize error responses across routers | RAP-412 | EPIC-73 | 5 | READY | RAP-410 |
 | 17 | Database constraint error handling | RAP-413 | EPIC-73 | 3 | READY | RAP-412 |
