@@ -136,7 +136,7 @@ Week 3-4:
 |---|-------|--------|------|-----|--------|------------|
 | 1 | Add test + lint pipeline to GitHub Actions | RAP-400 | EPIC-71 | 5 | DONE (PR #66) | — |
 | 2 | Add security scanning (bandit + pip-audit) | RAP-401 | EPIC-71 | 3 | DONE (PR #67) | RAP-400 |
-| 3 | Password reset tests (0% → 80%) | RAP-405 | EPIC-72 | 5 | BLOCKED | RAP-101 (PR #62 not merged) |
+| 3 | Password reset tests (0% → 80%) | RAP-405 | EPIC-72 | 5 | DONE (PR #91) | RAP-101 (PR #62 merged) |
 | 4 | Adoption requests coverage (41% → 80%) | RAP-406 | EPIC-72 | 3 | DONE (PR #69) | — |
 | 5 | Replace bare except Exception handlers | RAP-410 | EPIC-73 | 3 | DONE (PR #70) | — |
 | 6 | Structured JSON logging (structlog) | RAP-415 | EPIC-74 | 5 | DONE (PR #74) | — |
