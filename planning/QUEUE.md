@@ -152,13 +152,13 @@ Week 3-4:
 | 11 | Create staging environment with approval gate | RAP-402 | EPIC-71 | 5 | READY | RAP-400 ✓ |
 | 12 | Harden Docker production image | RAP-403 | EPIC-71 | 3 | DONE (PR #68) | — |
 | 13 | Notification handler exception tests | RAP-407 | EPIC-72 | 3 | PR OPEN (#71) | — |
-| 14 | Audit middleware tests | RAP-408 | EPIC-72 | 3 | PR OPEN (#72) | — |
-| 15 | Audit API input validation gaps | RAP-411 | EPIC-73 | 3 | PR OPEN (#73) | — |
+| 14 | Audit middleware tests | RAP-408 | EPIC-72 | 3 | DONE (PR #72) | — |
+| 15 | Audit API input validation gaps | RAP-411 | EPIC-73 | 3 | DONE (PR #73) | — |
 | 16 | Standardize error responses across routers | RAP-412 | EPIC-73 | 5 | DONE (PR #79) | RAP-410 |
 | 17 | Database constraint error handling | RAP-413 | EPIC-73 | 3 | DONE (PR #80) | RAP-412 |
 | 18 | Payment error handling (Stripe + Tigo) | RAP-414 | EPIC-73 | 3 | DONE (PR #81) | RAP-412 |
 | 19 | Health check improvements | RAP-417 | EPIC-74 | 3 | DONE (PR #82) | — |
-| 20 | Request/response logging middleware | RAP-418 | EPIC-74 | 3 | READY | RAP-415 |
+| 20 | Request/response logging middleware | RAP-418 | EPIC-74 | 3 | DONE (PR #83) | RAP-415 |
 | 21 | Database backup automation | RAP-419 | EPIC-74 | 5 | READY | — |
 | 22 | Loading and error states on all pages | RAP-423 | EPIC-75 | 5 | READY | RAP-420 |
 | 23 | Centralized API error handling (frontend) | RAP-424 | EPIC-75 | 3 | READY | RAP-420 |
