@@ -5,7 +5,6 @@ from unittest.mock import AsyncMock, MagicMock
 from uuid import UUID
 
 import pytest
-
 from src.services.account_lockout_service import (
     MAX_FAILED_ATTEMPTS,
     is_account_locked,

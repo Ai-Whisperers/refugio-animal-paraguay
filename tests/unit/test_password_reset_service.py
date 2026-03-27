@@ -5,11 +5,9 @@ from datetime import UTC, datetime, timedelta
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-
 from src.db.models.user import User
 from src.db.models.verification_token import TokenType, VerificationToken
 from src.services.password_reset_service import (
-    PASSWORD_RESET_TOKEN_EXPIRY_HOURS,
     create_password_reset_token,
     reset_password,
     validate_reset_token,
