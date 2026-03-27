@@ -15,8 +15,9 @@ from src.db.models.donation import Donor
 from src.db.models.user import User
 from src.db.session import get_db
 from src.schemas.donation import DonorCreate, DonorResponse
+from src.schemas.error import RESOURCE_RESPONSES
 
-router = APIRouter(prefix="/donors", tags=["donors"])
+router = APIRouter(prefix="/donors", tags=["donors"], responses=RESOURCE_RESPONSES)
 
 
 @router.post("", response_model=DonorResponse, status_code=status.HTTP_201_CREATED)

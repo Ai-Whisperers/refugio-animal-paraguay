@@ -33,9 +33,10 @@ from src.schemas.adoption_request import (
     AdoptionRequestStatusUpdate,
     ContractGeneratedResponse,
 )
+from src.schemas.error import RESOURCE_RESPONSES
 from src.services.contract_service import ContractData, ContractPDFGenerator
 
-router = APIRouter(prefix="/adoption-requests", tags=["adoption-requests"])
+router = APIRouter(prefix="/adoption-requests", tags=["adoption-requests"], responses=RESOURCE_RESPONSES)
 
 _DEFAULT_LIMIT = 20
 _MAX_LIMIT = 100

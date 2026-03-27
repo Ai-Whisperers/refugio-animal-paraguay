@@ -30,13 +30,14 @@ from src.schemas.animal_update import (
     SponsorUpdatePreferenceResponse,
     SponsorUpdatePreferenceUpdate,
 )
+from src.schemas.error import RESOURCE_RESPONSES
 from src.services.sponsor_update_service import (
     get_or_create_preference,
     publish_animal_update,
 )
 
 logger = logging.getLogger(__name__)
-router = APIRouter(tags=["animal-updates"])
+router = APIRouter(tags=["animal-updates"], responses=RESOURCE_RESPONSES)
 
 
 def _get_email_service(settings: Settings = Depends(get_settings)) -> EmailService:

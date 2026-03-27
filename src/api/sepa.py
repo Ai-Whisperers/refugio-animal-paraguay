@@ -30,10 +30,11 @@ from src.schemas.donation import (
     SubscriptionCreate,
     SubscriptionResponse,
 )
+from src.schemas.error import PAYMENT_RESPONSES
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/donations", tags=["donations", "sepa"])
+router = APIRouter(prefix="/donations", tags=["donations", "sepa"], responses=PAYMENT_RESPONSES)
 
 
 def _get_stripe_key() -> str:

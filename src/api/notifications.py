@@ -21,6 +21,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.auth.dependencies import require_admin, require_staff
 from src.db.models.user import User
 from src.db.session import get_db
+from src.schemas.error import RESOURCE_RESPONSES
 from src.schemas.notification import (
     MarkAllReadResponse,
     NotificationCreateRequest,
@@ -39,7 +40,7 @@ from src.services.notification_service import (
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/notifications", tags=["notifications"])
+router = APIRouter(prefix="/notifications", tags=["notifications"], responses=RESOURCE_RESPONSES)
 
 
 @router.get("", response_model=NotificationListResponse)

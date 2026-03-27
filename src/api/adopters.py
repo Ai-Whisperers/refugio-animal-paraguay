@@ -21,8 +21,9 @@ from src.db.models.adopter import Adopter
 from src.db.models.user import User
 from src.db.session import get_db
 from src.schemas.adopter import AdopterCreate, AdopterResponse, AdopterUpdate
+from src.schemas.error import RESOURCE_RESPONSES
 
-router = APIRouter(prefix="/adopters", tags=["adopters"])
+router = APIRouter(prefix="/adopters", tags=["adopters"], responses=RESOURCE_RESPONSES)
 
 _DEFAULT_LIMIT = 20
 _MAX_LIMIT = 100

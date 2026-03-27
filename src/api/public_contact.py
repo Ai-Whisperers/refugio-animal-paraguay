@@ -22,10 +22,11 @@ from src.schemas.contact import (
     ContactFormCreate,
     ContactSubmissionResponse,
 )
+from src.schemas.error import COMMON_RESPONSES
 
 PUBLIC_CONTACT_RATE_LIMIT = "10/hour"
 
-router = APIRouter(prefix="/public", tags=["public"])
+router = APIRouter(prefix="/public", tags=["public"], responses=COMMON_RESPONSES)
 
 
 def _get_client_ip(request: Request) -> str | None:

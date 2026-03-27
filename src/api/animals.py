@@ -35,8 +35,9 @@ from src.schemas.animal import (
     PhotoCreate,
     PhotoResponse,
 )
+from src.schemas.error import RESOURCE_RESPONSES
 
-router = APIRouter(prefix="/animals", tags=["animals"])
+router = APIRouter(prefix="/animals", tags=["animals"], responses=RESOURCE_RESPONSES)
 
 _DEFAULT_LIMIT = 20
 _MAX_LIMIT = 100

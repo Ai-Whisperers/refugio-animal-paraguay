@@ -10,10 +10,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.auth.dependencies import require_staff
 from src.db.models.user import User
 from src.db.session import get_db
+from src.schemas.error import AUTHENTICATED_RESPONSES
 from src.schemas.impact_report import ImpactReportRequest, ImpactReportResponse
 from src.services import impact_report_service
 
-router = APIRouter(prefix="/impact-reports", tags=["impact-reports"])
+router = APIRouter(prefix="/impact-reports", tags=["impact-reports"], responses=AUTHENTICATED_RESPONSES)
 
 
 @router.post("/generate", response_model=ImpactReportResponse)

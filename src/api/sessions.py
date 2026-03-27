@@ -18,6 +18,7 @@ from src.auth.dependencies import require_admin
 from src.db.models.user import User
 from src.db.session import get_db
 from src.middleware.rate_limiter import AUTH_RATE_LIMIT, limiter
+from src.schemas.error import AUTHENTICATED_RESPONSES
 from src.services.session_service import (
     list_active_sessions,
     revoke_all_user_sessions,
@@ -26,7 +27,7 @@ from src.services.session_service import (
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/auth/sessions", tags=["auth"])
+router = APIRouter(prefix="/auth/sessions", tags=["auth"], responses=AUTHENTICATED_RESPONSES)
 
 
 class SessionResponse(BaseModel):

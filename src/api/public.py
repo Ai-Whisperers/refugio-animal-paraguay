@@ -26,6 +26,7 @@ from src.db.models.animal import (
     AnimalStatus,
 )
 from src.db.session import get_db
+from src.schemas.error import COMMON_RESPONSES, ErrorResponse
 from src.schemas.public import (
     PaginatedAnimalResponse,
     PaginationMeta,
@@ -33,7 +34,11 @@ from src.schemas.public import (
     PublicAnimalListItem,
 )
 
-router = APIRouter(prefix="/public/animals", tags=["public"])
+router = APIRouter(
+    prefix="/public/animals",
+    tags=["public"],
+    responses={**COMMON_RESPONSES, 404: {"description": "Animal not found", "model": ErrorResponse}},
+)
 
 DEFAULT_PAGE_SIZE = 20
 MAX_PAGE_SIZE = 100

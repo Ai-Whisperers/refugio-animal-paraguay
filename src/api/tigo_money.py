@@ -20,6 +20,7 @@ from src.db.models.donation import Donation, DonationStatus, Donor, PaymentMetho
 from src.db.session import get_db
 from src.events.bus import EventBus
 from src.events.types import DomainEvent, EventType
+from src.schemas.error import PAYMENT_RESPONSES
 from src.schemas.tigo_money import (
     TigoCallbackRequest,
     TigoPaymentInitRequest,
@@ -33,7 +34,7 @@ from src.services.tigo_money_service import (
 )
 
 logger = logging.getLogger(__name__)
-router = APIRouter(prefix="/tigo-money", tags=["tigo-money"])
+router = APIRouter(prefix="/tigo-money", tags=["tigo-money"], responses=PAYMENT_RESPONSES)
 
 
 def _get_tigo_service(settings: Settings = Depends(get_settings)) -> TigoMoneyService:

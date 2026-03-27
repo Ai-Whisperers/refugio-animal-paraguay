@@ -16,6 +16,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.auth.dependencies import require_staff
 from src.db.models.user import User
 from src.db.session import get_db
+from src.schemas.error import AUTHENTICATED_RESPONSES
 from src.schemas.notification_preference import (
     PreferenceBulkUpdate,
     PreferenceListResponse,
@@ -28,7 +29,7 @@ from src.services.notification_preference_service import (
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/notification-preferences", tags=["notification-preferences"])
+router = APIRouter(prefix="/notification-preferences", tags=["notification-preferences"], responses=AUTHENTICATED_RESPONSES)
 
 
 @router.get("", response_model=PreferenceListResponse)

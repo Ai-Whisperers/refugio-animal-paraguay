@@ -18,6 +18,7 @@ from src.auth.dependencies import require_staff
 from src.db.models.fund_allocation import FundAllocation
 from src.db.models.user import User
 from src.db.session import get_db
+from src.schemas.error import RESOURCE_RESPONSES
 from src.schemas.fund_allocation import (
     FundAllocationCreate,
     FundAllocationResponse,
@@ -28,7 +29,7 @@ from src.services.fund_allocation_service import (
     get_allocation_breakdown,
 )
 
-router = APIRouter(prefix="/fund-allocations", tags=["fund-allocations"])
+router = APIRouter(prefix="/fund-allocations", tags=["fund-allocations"], responses=RESOURCE_RESPONSES)
 
 _DEFAULT_LIMIT = 20
 _MAX_LIMIT = 100
