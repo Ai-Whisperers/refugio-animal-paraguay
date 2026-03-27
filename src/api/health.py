@@ -29,6 +29,6 @@ async def health_check(
     try:
         await db.execute(_DB_PING_QUERY)
         return {"status": "ok", "db": "connected"}
-    except Exception:
+    except Exception:  # degrade gracefully on any DB error; exception logged upstream
         response.status_code = 503
         return {"status": "degraded", "db": "unreachable"}
