@@ -13,9 +13,13 @@ import {
   RefreshCw,
   Plus,
   Pencil,
+  ArrowRightLeft,
+  X,
 } from "lucide-react";
 import { isAuthenticated } from "@/lib/auth";
 import { api, ApiClientError } from "@/lib/api";
+import { STATUS_LABELS, STATUS_COLORS } from "@/lib/animal-status";
+import BatchStatusModal from "@/components/admin/BatchStatusModal";
 import type { AnimalStatus, AnimalSpecies } from "@/types/api";
 
 // --- Labels (Spanish) ---
@@ -42,29 +46,11 @@ const LABEL_NEXT = "Siguiente";
 const LABEL_ADD_ANIMAL = "Nuevo Animal";
 const LABEL_ACTIONS = "Acciones";
 const LABEL_EDIT = "Editar";
+const LABEL_BATCH_STATUS = "Cambiar Estado";
+const LABEL_SELECTED = "seleccionados";
+const LABEL_CLEAR_SELECTION = "Limpiar seleccion";
 
 const PAGE_SIZE = 20;
-
-// --- Status/Species display maps ---
-const STATUS_LABELS: Record<AnimalStatus, string> = {
-  intake: "Ingreso",
-  quarantine: "Cuarentena",
-  available: "Disponible",
-  foster: "Acogida",
-  under_treatment: "En tratamiento",
-  adopted: "Adoptado",
-  deceased: "Fallecido",
-};
-
-const STATUS_COLORS: Record<AnimalStatus, string> = {
-  intake: "bg-yellow-100 text-yellow-800",
-  quarantine: "bg-orange-100 text-orange-800",
-  available: "bg-green-100 text-green-800",
-  foster: "bg-blue-100 text-blue-800",
-  under_treatment: "bg-red-100 text-red-800",
-  adopted: "bg-purple-100 text-purple-800",
-  deceased: "bg-gray-100 text-gray-500",
-};
 
 const SPECIES_LABELS: Record<AnimalSpecies, string> = {
   dog: "Perro",
@@ -108,6 +94,10 @@ export default function AdminAnimalsPage() {
 
   // --- Pagination state ---
   const [currentPage, setCurrentPage] = useState(1);
+
+  // --- Selection state ---
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [showBatchModal, setShowBatchModal] = useState(false);
 
   // --- Auth check ---
   useEffect(() => {
@@ -200,6 +190,40 @@ export default function AdminAnimalsPage() {
     (currentPage - 1) * PAGE_SIZE,
     currentPage * PAGE_SIZE
   );
+
+  // --- Selection handlers ---
+  const allPageSelected = paginatedAnimals.length > 0 && paginatedAnimals.every((a) => selectedIds.has(a.id));
+  const somePageSelected = paginatedAnimals.some((a) => selectedIds.has(a.id));
+
+  function handleToggleAll() {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (allPageSelected) {
+        paginatedAnimals.forEach((a) => next.delete(a.id));
+      } else {
+        paginatedAnimals.forEach((a) => next.add(a.id));
+      }
+      return next;
+    });
+  }
+
+  function handleToggleOne(id: string) {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  }
+
+  function handleClearSelection() {
+    setSelectedIds(new Set());
+  }
+
+  const selectedAnimals = animals.filter((a) => selectedIds.has(a.id));
 
   // --- Sort handler ---
   function handleSort(field: SortField) {
@@ -380,6 +404,29 @@ export default function AdminAnimalsPage() {
           </div>
         )}
 
+        {/* Batch action toolbar */}
+        {selectedIds.size > 0 && (
+          <div className="mb-4 flex items-center gap-3 rounded-lg border border-primary-200 bg-primary-50 px-4 py-2.5">
+            <span className="text-sm font-medium text-primary-800">
+              {selectedIds.size} {LABEL_SELECTED}
+            </span>
+            <button
+              onClick={() => setShowBatchModal(true)}
+              className="flex items-center gap-1.5 rounded-lg bg-primary-600 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-primary-700"
+            >
+              <ArrowRightLeft className="h-3.5 w-3.5" />
+              {LABEL_BATCH_STATUS}
+            </button>
+            <button
+              onClick={handleClearSelection}
+              className="flex items-center gap-1 rounded-lg px-2 py-1 text-sm text-primary-700 transition-colors hover:bg-primary-100"
+            >
+              <X className="h-3.5 w-3.5" />
+              {LABEL_CLEAR_SELECTION}
+            </button>
+          </div>
+        )}
+
         {/* Animals table */}
         {!isLoading && !error && filteredAndSorted.length > 0 && (
           <>
@@ -388,6 +435,18 @@ export default function AdminAnimalsPage() {
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="border-b border-warm-border bg-warm-bg">
+                      <th className="w-10 px-3 py-3">
+                        <input
+                          type="checkbox"
+                          checked={allPageSelected}
+                          ref={(el) => {
+                            if (el) el.indeterminate = somePageSelected && !allPageSelected;
+                          }}
+                          onChange={handleToggleAll}
+                          className="h-4 w-4 rounded border-warm-border text-primary-600 focus:ring-primary-500"
+                          aria-label="Seleccionar todos"
+                        />
+                      </th>
                       <th
                         className="group cursor-pointer px-4 py-3 text-left font-medium text-warm-text-secondary"
                         onClick={() => handleSort("name")}
@@ -428,8 +487,17 @@ export default function AdminAnimalsPage() {
                     {paginatedAnimals.map((animal) => (
                       <tr
                         key={animal.id}
-                        className="border-b border-warm-border last:border-b-0 transition-colors hover:bg-warm-bg"
+                        className={`border-b border-warm-border last:border-b-0 transition-colors hover:bg-warm-bg ${selectedIds.has(animal.id) ? "bg-primary-50/50" : ""}`}
                       >
+                        <td className="w-10 px-3 py-3">
+                          <input
+                            type="checkbox"
+                            checked={selectedIds.has(animal.id)}
+                            onChange={() => handleToggleOne(animal.id)}
+                            className="h-4 w-4 rounded border-warm-border text-primary-600 focus:ring-primary-500"
+                            aria-label={`Seleccionar ${animal.name}`}
+                          />
+                        </td>
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-3">
                             {animal.primary_photo_url ? (
@@ -519,6 +587,28 @@ export default function AdminAnimalsPage() {
           </>
         )}
       </div>
+
+      {/* Batch status modal */}
+      {showBatchModal && selectedAnimals.length > 0 && (
+        <BatchStatusModal
+          animals={selectedAnimals.map((a) => ({
+            id: a.id,
+            name: a.name,
+            status: a.status,
+          }))}
+          onClose={() => setShowBatchModal(false)}
+          onBatchCompleted={(updatedIds, newStatus) => {
+            setAnimals((prev) =>
+              prev.map((a) =>
+                updatedIds.includes(a.id)
+                  ? { ...a, status: newStatus }
+                  : a
+              )
+            );
+            setSelectedIds(new Set());
+          }}
+        />
+      )}
     </div>
   );
 }
