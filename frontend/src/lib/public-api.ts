@@ -55,7 +55,7 @@ export async function apiFetch<T = unknown>(
         ...options.headers,
       },
     });
-  } catch (networkError) {
+  } catch {
     throw new Error(
       `Network error — unable to reach ${endpoint}. Please check your connection.`
     );

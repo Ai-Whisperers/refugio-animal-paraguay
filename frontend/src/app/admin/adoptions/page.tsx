@@ -4,7 +4,6 @@ import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import {
   Heart,
-  Search,
   ArrowLeft,
   RefreshCw,
   ChevronLeft,
@@ -13,7 +12,6 @@ import {
   CheckCircle,
   XCircle,
   Ban,
-  Filter,
   BarChart3,
 } from "lucide-react";
 import { isAuthenticated } from "@/lib/auth";
@@ -30,6 +28,7 @@ const LABEL_RETRY = "Reintentar";
 const LABEL_BACK = "Volver al panel";
 const LABEL_ANALYTICS = "Analiticas";
 const LABEL_SHOWING = "Mostrando";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const LABEL_OF = "de";
 const LABEL_PREVIOUS = "Anterior";
 const LABEL_NEXT = "Siguiente";
@@ -124,6 +123,7 @@ export default function AdminAdoptionsPage() {
   // --- Filter state ---
   const [activeTab, setActiveTab] = useState<AdoptionRequestStatus | "all">("all");
   const [page, setPage] = useState(0);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [totalCount, setTotalCount] = useState(0);
 
   useEffect(() => {

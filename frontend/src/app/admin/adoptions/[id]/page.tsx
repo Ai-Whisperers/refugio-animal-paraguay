@@ -33,6 +33,7 @@ const LABEL_BACK = "Volver a solicitudes";
 const LABEL_ADOPTER_SECTION = "Informacion del Adoptante";
 const LABEL_ANIMAL_SECTION = "Animal Solicitado";
 const LABEL_REQUEST_SECTION = "Detalles de la Solicitud";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const LABEL_STATUS = "Estado";
 const LABEL_SUBMITTED = "Fecha de solicitud";
 const LABEL_DECIDED = "Fecha de decision";
@@ -40,6 +41,7 @@ const LABEL_NOTES = "Notas";
 const LABEL_NO_NOTES = "Sin notas";
 const LABEL_CONTRACT = "Contrato";
 const LABEL_CONTRACT_GENERATED = "Contrato generado";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const LABEL_NO_CONTRACT = "Sin contrato";
 const LABEL_ADOPTER_DELETED = "Adoptante eliminado (datos eliminados por GDPR)";
 const LABEL_ANIMAL_DELETED = "Animal eliminado del sistema";
@@ -167,7 +169,7 @@ export default function AdoptionDetailPage() {
     }
   }, [isChecking, fetchData]);
 
-  async function handleStatusChange(status: AdoptionRequestStatus, notes: string) {
+  async function handleStatusChange(status: AdoptionRequestStatus, _notes: string) {
     await api.patch<AdoptionRequestResponse>(
       `/adoption-requests/${requestId}/status`,
       { status }
