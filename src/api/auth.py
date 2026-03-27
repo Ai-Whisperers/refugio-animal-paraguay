@@ -7,7 +7,7 @@ Endpoints:
 """
 
 import logging
-from datetime import timedelta
+from datetime import UTC, datetime, timedelta
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordRequestForm
@@ -23,6 +23,7 @@ from src.db.session import get_db
 from src.middleware.rate_limiter import AUTH_RATE_LIMIT, limiter
 from src.schemas.user import TokenResponse, UserCreate, UserResponse
 from src.services.email_verification_service import create_email_verification_token
+from src.services.session_service import create_session
 
 logger = logging.getLogger(__name__)
 
@@ -58,11 +59,25 @@ async def login(
             detail="Email not verified. Check your inbox for the verification link.",
         )
 
+    expires_delta = timedelta(minutes=settings.access_token_expire_minutes)
+    token_expires_at = datetime.now(UTC) + expires_delta
+
+    # Create a tracked session for timeout and forced-logout support
+    jti = await create_session(
+        db,
+        user_id=str(user.id),
+        token_expires_at=token_expires_at,
+        ip_address=request.client.host if request.client else None,
+        user_agent=request.headers.get("user-agent"),
+    )
+    await db.commit()
+
     token = create_access_token(
         data={"sub": str(user.id)},
         secret_key=settings.secret_key,
         algorithm=settings.algorithm,
-        expires_delta=timedelta(minutes=settings.access_token_expire_minutes),
+        expires_delta=expires_delta,
+        jti=jti,
     )
     return TokenResponse(access_token=token)
 
