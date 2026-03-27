@@ -41,6 +41,7 @@ from src.api.medications import router as medications_router
 from src.api.notification_preferences import router as notification_preferences_router
 from src.api.notifications import router as notifications_router
 from src.api.password_reset import router as password_reset_router
+from src.api.phone_verification import router as phone_verification_router
 from src.api.prescriptions import router as prescriptions_router
 from src.api.profile import router as profile_router
 from src.api.public import router as public_router
@@ -169,6 +170,7 @@ def create_app() -> FastAPI:
     application.include_router(auth_router)
     application.include_router(password_reset_router)
     application.include_router(email_verification_router)
+    application.include_router(phone_verification_router)
     application.include_router(sessions_router)
     application.include_router(animals_router)
     application.include_router(adopters_router)

@@ -325,7 +325,7 @@ Week 3-4:
 | 3 | Unified personal dashboard | RAP-502 | 8 | IN REVIEW (PR #154) | Fullstack |
 | 4 | Profile management page | RAP-503 | 5 | IN REVIEW (PR #155) | Fullstack |
 | 5 | Social login (Google OAuth) | RAP-504 | 5 | READY | Fullstack |
-| 6 | WhatsApp-based phone verification | RAP-505 | 5 | READY | Backend |
+| 6 | WhatsApp-based phone verification | RAP-505 | 5 | IN REVIEW (PR #156) | Backend |
 | 7 | Role self-assignment | RAP-506 | 4 | READY | Fullstack |
 
 ### EPIC-77: Veterinary Voucher & Direct Clinic Donation (50 pts)
