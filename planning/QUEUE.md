@@ -1,7 +1,7 @@
 # Development Queue — Refugio Animal Paraguay
 
 **Last updated**: 2026-03-27
-**Active version**: V6 Sprint 3 EPIC-33 in progress | New epics EPIC-76 to EPIC-93 queued
+**Active version**: V6 Sprint 3 EPIC-33 COMPLETE | New epics EPIC-76 to EPIC-93 queued
 **Full roadmap**: [ROADMAP.md](ROADMAP.md) — 16 sprints, 68 epics, ~395 stories
 **Tech stack**: Python 3.12, FastAPI, SQLAlchemy 2.x, PostgreSQL 16, Next.js 14
 
@@ -170,9 +170,9 @@ Week 3-4:
 |---|-------|--------|-----|--------|-------|
 | 1 | Sponsorship tier model and API | RAP-160 | 5 | DONE (pre-existing, EPIC-14 S01 PR #54) | Backend |
 | 2 | Campaign creation and management | RAP-161 | 5 | DONE (PR #148) | Fullstack |
-| 3 | Campaign progress tracking and widgets | RAP-162 | 5 | READY | Frontend |
-| 4 | Sponsor dashboard with animal updates | RAP-163 | 5 | READY | Frontend |
-| 5 | Social proof widgets (recent donors, progress bars) | RAP-164 | 3 | READY | Frontend |
+| 3 | Campaign progress tracking and widgets | RAP-162 | 5 | DONE (PR #149) | Frontend |
+| 4 | Sponsor dashboard with animal updates | RAP-163 | 5 | DONE (PR #150) | Frontend |
+| 5 | Social proof widgets (recent donors, progress bars) | RAP-164 | 3 | DONE (PR #151) | Frontend |
 
 ---
 
