@@ -11,14 +11,20 @@ import {
   LogOut,
   Menu,
   X,
+  Settings,
+  Shield,
 } from "lucide-react";
 import { useState } from "react";
-import { clearAccessToken } from "@/lib/auth";
+import { clearAccessToken, getCurrentUserRole } from "@/lib/auth";
+import { hasRoleAccess } from "@/lib/role-access";
+import type { UserRole } from "@/types/api";
 
 interface NavItem {
   label: string;
   href: string;
   icon: React.ComponentType<{ className?: string }>;
+  /** If set, only users with this role (or higher) can see this item. */
+  requiredRole?: UserRole;
 }
 
 const NAV_ITEMS: NavItem[] = [
@@ -47,6 +53,18 @@ const NAV_ITEMS: NavItem[] = [
     href: "/admin/donations",
     icon: DollarSign,
   },
+  {
+    label: "Usuarios",
+    href: "/admin/users",
+    icon: Shield,
+    requiredRole: "admin",
+  },
+  {
+    label: "Configuracion",
+    href: "/admin/settings",
+    icon: Settings,
+    requiredRole: "admin",
+  },
 ];
 
 const LABEL_SHELTER_NAME = "Refugio Animal";
@@ -65,6 +83,8 @@ export default function AdminSidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const userRole = getCurrentUserRole();
+  const visibleItems = NAV_ITEMS.filter((item) => hasRoleAccess(userRole, item.requiredRole));
 
   function handleLogout() {
     clearAccessToken();
@@ -91,7 +111,7 @@ export default function AdminSidebar() {
 
       {/* Navigation */}
       <nav className="flex-1 space-y-1 px-3 py-4" aria-label="Admin navigation">
-        {NAV_ITEMS.map((item) => {
+        {visibleItems.map((item) => {
           const active = isActive(pathname, item.href);
           const Icon = item.icon;
           return (
