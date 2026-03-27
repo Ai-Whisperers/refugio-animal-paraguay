@@ -3,7 +3,7 @@ story: S3
 epic: EPIC-29
 ticket: RAP-142
 title: "Surgery scheduling interface"
-status: planned
+status: done
 points: 5
 priority: P1
 track: Frontend
