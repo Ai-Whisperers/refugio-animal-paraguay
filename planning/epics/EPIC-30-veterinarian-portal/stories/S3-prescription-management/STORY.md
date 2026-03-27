@@ -3,7 +3,7 @@ story: S3
 epic: EPIC-30
 ticket: RAP-147
 title: "Prescription management"
-status: planned
+status: done
 points: 5
 priority: P1
 track: Fullstack
