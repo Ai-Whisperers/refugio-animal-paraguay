@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Verifica tu Email</h2>
+<p>Hola {{ user_email }},</p>
+<p>Tu cuenta ha sido creada en Refugio Animal Paraguay. Para activarla, haz clic en el siguiente enlace:</p>
+<p><a href="{{ verification_url }}" class="btn">Verificar Email</a></p>
+<p>Este enlace es valido por 24 horas. Si no solicitaste esta cuenta, puedes ignorar este mensaje.</p>
+<p>Si el boton no funciona, copia y pega este enlace en tu navegador:</p>
+<p style="word-break: break-all; font-size: 13px; color: #666;">{{ verification_url }}</p>
+{% endblock %}
