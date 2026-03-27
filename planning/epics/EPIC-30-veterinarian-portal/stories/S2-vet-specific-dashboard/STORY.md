@@ -3,7 +3,7 @@ story: S2
 epic: EPIC-30
 ticket: RAP-146
 title: "Vet-specific dashboard"
-status: planned
+status: done
 points: 5
 priority: P1
 track: Frontend
