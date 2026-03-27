@@ -12,6 +12,7 @@ import {
 } from "@/lib/campaign-utils";
 import DynamicIcon from "@/components/DynamicIcon";
 import DonationForm from "@/components/DonationForm";
+import { SocialProofPanel } from "@/components/campaigns";
 import { DONATE } from "@/lib/strings";
 
 interface CampaignDetailClientProps {
@@ -203,9 +204,9 @@ export default function CampaignDetailClient({ campaignId }: CampaignDetailClien
           )}
         </div>
 
-        {/* Right Column — Donation Form */}
+        {/* Right Column — Donation Form + Social Proof */}
         <div className="lg:col-span-1">
-          <div className="sticky top-4">
+          <div className="sticky top-4 space-y-6">
             {isCompleted && !campaign.allow_overfunding ? (
               <div className="bg-green-50 rounded-xl p-6 text-center">
                 <div className="inline-flex items-center justify-center mb-2"><PartyPopper className="h-8 w-8 text-green-600" /></div>
@@ -222,6 +223,9 @@ export default function CampaignDetailClient({ campaignId }: CampaignDetailClien
                 onSuccess={handleDonationSuccess}
               />
             )}
+
+            {/* Social proof — recent donors and momentum */}
+            <SocialProofPanel campaignId={campaignId} />
           </div>
         </div>
       </div>

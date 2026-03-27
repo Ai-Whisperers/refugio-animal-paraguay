@@ -197,7 +197,13 @@ export default function DonatePage() {
           >
             <Phone className="h-5 w-5" /> WhatsApp: {DONATE.whatsappNumber}
           </a>
-          <div className="mt-6">
+          <div className="mt-6 flex flex-col items-center gap-2">
+            <Link
+              href="/donate/manage"
+              className="text-primary-600 hover:text-primary-700 font-medium text-sm"
+            >
+              Gestionar mi suscripcion mensual
+            </Link>
             <Link
               href="/animals"
               className="text-primary-600 hover:text-primary-700 font-medium inline-flex items-center gap-1"
