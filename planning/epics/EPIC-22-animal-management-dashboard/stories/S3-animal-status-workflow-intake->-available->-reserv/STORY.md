@@ -3,7 +3,7 @@ story: S3
 epic: EPIC-22
 ticket: RAP-107
 title: "Animal status workflow (intake > available > reserved > adopted)"
-status: planned
+status: done
 points: 5
 priority: P0
 track: Frontend
