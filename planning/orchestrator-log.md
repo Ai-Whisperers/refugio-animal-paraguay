@@ -273,3 +273,11 @@
 - **Sprint 1**: EPIC-21 5/5, EPIC-22 5/5, EPIC-23 5/5, EPIC-24 5/5, EPIC-25 5/5 — all 25 stories DONE
 - **Sprint 2**: EPIC-26 5/5, EPIC-27 2/5 (S1+S2 done, S3-S5 planned)
 - **Actions**: Merged 12 PRs, rebased 5 conflict chains, closed 1 superseded PR, updated 5 tickets COMPLETED, updated 2 story statuses, cleaned 12 branches
+
+### [2026-03-27 23:00] Worker Run — EPIC-28 P0+P1 Stories Complete
+- **Epic**: EPIC-28 — Medical Records UI
+- **Stories completed**: RAP-135, RAP-136, RAP-137
+- **PRs created**: #128 (RAP-135+136 combined), #129 (RAP-137)
+- **Duration**: ~60m total
+- **Quality**: TypeScript clean, 1047 unit tests passing, ruff import-sort auto-fixed across src/tests
+- **Notes**: Combined RAP-135 (medical timeline) and RAP-136 (vet visit form) into single PR as they are tightly coupled P0 stories. RAP-137 vaccination dashboard consumed pre-existing `/vaccination-alerts` endpoint directly. Sidebar updated with Vacunaciones link.
