@@ -17,7 +17,7 @@ class TestUserRoleEnum:
 
     def test_all_roles(self) -> None:
         roles = {r.value for r in UserRole}
-        assert roles == {"staff", "admin", "vet"}
+        assert roles == {"staff", "admin", "vet", "adopter", "donor", "volunteer", "foster"}
 
     def test_vet_role_string_value(self) -> None:
         assert str(UserRole.VET) == "vet"
