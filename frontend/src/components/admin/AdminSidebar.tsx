@@ -13,6 +13,7 @@ import {
   X,
   Settings,
   Shield,
+  Syringe,
 } from "lucide-react";
 import { useState } from "react";
 import { clearAccessToken, getCurrentUserRole } from "@/lib/auth";
@@ -52,6 +53,11 @@ const NAV_ITEMS: NavItem[] = [
     label: "Donaciones",
     href: "/admin/donations",
     icon: DollarSign,
+  },
+  {
+    label: "Alertas Medicas",
+    href: "/admin/medical/alerts",
+    icon: Syringe,
   },
   {
     label: "Usuarios",
