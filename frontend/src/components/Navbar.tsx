@@ -1,11 +1,9 @@
 "use client";
 
 import { PawPrint } from "lucide-react";
-
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import { PawPrint } from "lucide-react";
 import { NAV } from "@/lib/strings";
 
 const NAV_LINKS = [

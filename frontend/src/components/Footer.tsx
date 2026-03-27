@@ -1,6 +1,5 @@
 import { PawPrint } from "lucide-react";
 import Link from "next/link";
-import { PawPrint } from "lucide-react";
 import { FOOTER } from "@/lib/strings";
 
 const FOOTER_LINKS = {
