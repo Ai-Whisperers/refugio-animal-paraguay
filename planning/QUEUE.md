@@ -82,7 +82,7 @@ Week 3-4:
 | 6 | Cash Donation Recording | EPIC-3 S06 | 3 | DONE (PR #16) |
 | 7 | In-Kind Donation Recording | EPIC-14 S05 | 5 | DONE (PR #17) |
 | 8 | Sponsorship Tiers & Matching | EPIC-14 S01 | 8 | DONE (PR #54) |
-| 9 | Campaign Management | EPIC-14 S03 | 6 | READY |
+| 9 | Campaign Management | EPIC-14 S03 | 6 | DONE (PR #55) |
 | 10 | Donation Landing Page | EPIC-11 S04 | 13 | DONE (PR #51) |
 | 11 | Donation Dashboard (Staff) | EPIC-3 S04 | 6 | READY |
 | 12 | Email Notification System | EPIC-6 S01 | 8 | DONE (PR #18) |
