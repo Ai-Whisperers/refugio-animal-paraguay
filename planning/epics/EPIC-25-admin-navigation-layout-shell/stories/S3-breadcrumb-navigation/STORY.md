@@ -3,7 +3,7 @@ story: S3
 epic: EPIC-25
 ticket: RAP-122
 title: "Breadcrumb navigation"
-status: planned
+status: done
 points: 2
 priority: P1
 track: Frontend

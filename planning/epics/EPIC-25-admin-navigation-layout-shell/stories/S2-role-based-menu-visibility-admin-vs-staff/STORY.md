@@ -3,7 +3,7 @@ story: S2
 epic: EPIC-25
 ticket: RAP-121
 title: "Role-based menu visibility (admin vs staff)"
-status: planned
+status: done
 points: 3
 priority: P0
 track: Frontend
