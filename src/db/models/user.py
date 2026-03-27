@@ -1,4 +1,4 @@
-"""SQLAlchemy ORM model for users (staff and admin accounts)."""
+"""SQLAlchemy ORM model for users (staff, admin, and public accounts)."""
 
 from datetime import datetime
 from enum import StrEnum
@@ -16,10 +16,20 @@ class UserRole(StrEnum):
     STAFF = "staff"
     ADMIN = "admin"
     VET = "vet"
+    ADOPTER = "adopter"
+    DONOR = "donor"
+    VOLUNTEER = "volunteer"
+    FOSTER = "foster"
+
+
+# Roles available for public self-registration
+PUBLIC_REGISTRATION_ROLES = frozenset(
+    {UserRole.ADOPTER, UserRole.DONOR, UserRole.VOLUNTEER, UserRole.FOSTER}
+)
 
 
 class User(Base):
-    """Staff/admin user account with hashed password and role."""
+    """User account with hashed password and role (staff, admin, or public)."""
 
     __tablename__ = "users"
 
@@ -28,7 +38,9 @@ class User(Base):
         primary_key=True,
         server_default=sa.func.gen_random_uuid(),
     )
+    full_name: Mapped[str | None] = mapped_column(sa.String(100), nullable=True)
     email: Mapped[str] = mapped_column(sa.String(255), nullable=False, unique=True)
+    phone: Mapped[str | None] = mapped_column(sa.String(20), nullable=True, unique=True)
     hashed_password: Mapped[str] = mapped_column(sa.String(255), nullable=False)
     role: Mapped[str] = mapped_column(
         sa.String(50),
