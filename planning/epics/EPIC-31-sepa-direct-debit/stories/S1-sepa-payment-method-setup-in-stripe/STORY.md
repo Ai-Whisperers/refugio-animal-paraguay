@@ -3,7 +3,7 @@ story: S1
 epic: EPIC-31
 ticket: RAP-150
 title: "SEPA payment method setup in Stripe"
-status: planned
+status: done
 points: 5
 priority: P0
 track: Backend

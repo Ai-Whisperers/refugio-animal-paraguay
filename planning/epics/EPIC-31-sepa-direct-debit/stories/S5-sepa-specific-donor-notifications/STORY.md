@@ -3,7 +3,7 @@ story: S5
 epic: EPIC-31
 ticket: RAP-154
 title: "SEPA-specific donor notifications"
-status: planned
+status: done
 points: 3
 priority: P1
 track: Backend

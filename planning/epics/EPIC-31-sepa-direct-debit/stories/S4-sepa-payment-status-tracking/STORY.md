@@ -3,7 +3,7 @@ story: S4
 epic: EPIC-31
 ticket: RAP-153
 title: "SEPA payment status tracking"
-status: planned
+status: done
 points: 3
 priority: P1
 track: Backend

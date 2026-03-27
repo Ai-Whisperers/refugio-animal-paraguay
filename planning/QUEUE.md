@@ -1,7 +1,7 @@
 # Development Queue — Refugio Animal Paraguay
 
 **Last updated**: 2026-03-27
-**Active version**: V3.1 Priority Sprint (stability before features)
+**Active version**: V6 Sprint 3 EPIC-31 complete — V6 Sprint 3 EPIC-32+ next
 **Full roadmap**: [ROADMAP.md](ROADMAP.md) — 10 sprints, 50 epics, 250 stories
 **Tech stack**: Python 3.12, FastAPI, SQLAlchemy 2.x, PostgreSQL 16, Next.js 14
 
@@ -133,6 +133,18 @@ Week 3-4:
 | 3 | Approve/reject workflow with mandatory notes | RAP-112 | 5 | DONE (PR #99) |
 | 4 | Automated email on status change (bilingual) | RAP-113 | 5 | DONE (PR #100) |
 | 5 | Adoption request analytics (time to decision) | RAP-114 | 3 | DONE (PR #101) |
+
+---
+
+## V6 Sprint 3 — EU Payment Integration: EPIC-31 SEPA (25 pts) — COMPLETE
+
+| # | Story | Ticket | Pts | Status |
+|---|-------|--------|-----|--------|
+| 1 | SEPA SetupIntent endpoint + saved payment methods list | RAP-150 | 5 | DONE (PR #138) |
+| 2 | SEPA mandate creation flow (Next.js multi-step frontend) | RAP-151 | 8 | DONE (PR #139) |
+| 3 | SEPA webhook handling (processing, mandate, setup events) | RAP-152 | 5 | DONE (PR #140) |
+| 4 | SEPA payment status tracking endpoint | RAP-153 | 4 | DONE (PR #141) |
+| 5 | SEPA-specific donor notifications service | RAP-154 | 3 | DONE (PR #142) |
 
 ---
 

@@ -3,7 +3,7 @@ story: S3
 epic: EPIC-31
 ticket: RAP-152
 title: "SEPA webhook handling (succeeded, failed)"
-status: planned
+status: done
 points: 5
 priority: P0
 track: Backend

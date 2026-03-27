@@ -324,3 +324,17 @@
 - **Tickets**: 7 orphaned ACTIVE tickets closed (RAP-135/138/139/142/143/144/146 + RAP-146/142 second pass).
 - **Branch cleanup**: 4 remote feature branches deleted, 2 local merged branches pruned, remote refs pruned.
 - **Actions taken**: Merged 4 PRs, rebased 2 conflicting branches (kept both prescriptions+appointments routers; kept Activity icon + recovery button in surgery page), updated 7 ticket statuses to COMPLETED.
+
+### [2026-03-27] Worker Run — EPIC-31 (SEPA Direct Debit) Complete
+- **Epic**: EPIC-31 — SEPA Direct Debit Integration
+- **Stories completed**: RAP-150, RAP-151, RAP-152, RAP-153, RAP-154
+- **PRs created**: #138 (RAP-150), #139 (RAP-151), #140 (RAP-152), #141 (RAP-153), #142 (RAP-154)
+- **Duration**: ~120m total (context continued from previous session)
+- **Quality**: ruff clean, pyright 0 errors, 15 unit tests + 7 integration tests added (all passing)
+- **Notes**: RAP-150 adds SEPA SetupIntent + saved payment methods listing endpoints.
+  RAP-151 adds multi-step Next.js mandate creation page with IbanElement + mandate auth text.
+  RAP-152 adds SEPA-specific webhook handlers (payment_intent.processing, setup_intent.succeeded,
+  setup_intent.setup_failed, mandate.updated). RAP-153 adds sepa-status endpoint for live status.
+  RAP-154 adds SepaNotificationService with 3 email templates (mandate_saved, payment_processing,
+  payment_failed) hooked into webhook handlers via app.state.sepa_notifier. RAP-154 rebased on
+  RAP-152 to avoid duplicate SEPA handler code. EPIC-31 is now fully complete.

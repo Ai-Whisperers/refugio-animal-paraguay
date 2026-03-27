@@ -3,7 +3,7 @@ story: S2
 epic: EPIC-31
 ticket: RAP-151
 title: "SEPA mandate creation flow"
-status: planned
+status: done
 points: 5
 priority: P0
 track: Fullstack
