@@ -2,6 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { PawPrint, Eye, EyeOff, AlertCircle, Loader2 } from "lucide-react";
 import { setAccessToken } from "@/lib/auth";
 
@@ -179,6 +180,16 @@ export default function AdminLoginPage() {
               LABEL_LOGIN
             )}
           </button>
+
+          {/* Forgot password link */}
+          <div className="text-center">
+            <Link
+              href="/admin/forgot-password"
+              className="text-sm font-medium text-primary-600 hover:text-primary-700"
+            >
+              Olvidaste tu contrasena?
+            </Link>
+          </div>
         </form>
       </div>
     </div>
