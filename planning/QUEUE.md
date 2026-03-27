@@ -154,7 +154,7 @@ Week 3-4:
 | 13 | Notification handler exception tests | RAP-407 | EPIC-72 | 3 | PR OPEN (#71) | — |
 | 14 | Audit middleware tests | RAP-408 | EPIC-72 | 3 | PR OPEN (#72) | — |
 | 15 | Audit API input validation gaps | RAP-411 | EPIC-73 | 3 | PR OPEN (#73) | — |
-| 16 | Standardize error responses across routers | RAP-412 | EPIC-73 | 5 | READY | RAP-410 |
+| 16 | Standardize error responses across routers | RAP-412 | EPIC-73 | 5 | DONE (PR #79) | RAP-410 |
 | 17 | Database constraint error handling | RAP-413 | EPIC-73 | 3 | READY | RAP-412 |
 | 18 | Payment error handling (Stripe + Tigo) | RAP-414 | EPIC-73 | 3 | READY | RAP-412 |
 | 19 | Health check improvements | RAP-417 | EPIC-74 | 3 | READY | — |
