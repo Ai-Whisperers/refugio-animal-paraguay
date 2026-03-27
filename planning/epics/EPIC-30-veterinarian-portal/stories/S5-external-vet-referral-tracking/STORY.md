@@ -3,7 +3,7 @@ story: S5
 epic: EPIC-30
 ticket: RAP-149
 title: "External vet referral tracking"
-status: planned
+status: done
 points: 3
 priority: P2
 track: Backend

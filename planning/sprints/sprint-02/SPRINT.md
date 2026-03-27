@@ -21,7 +21,7 @@ Weeks 3-4 (2-week sprint)
 ## Epics
 - [x] EPIC-26
 - [x] EPIC-27
-- [ ] EPIC-28
+- [x] EPIC-28
 - [ ] EPIC-29
 - [ ] EPIC-30
 
