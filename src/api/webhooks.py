@@ -28,6 +28,7 @@ from src.db.session import get_db
 from src.events.bus import EventBus
 from src.events.domain_events import create_donation_received
 from src.schemas.error import PAYMENT_RESPONSES
+from src.services import subscription_service
 from src.services.sepa_notification_service import SepaNotificationService
 
 logger = logging.getLogger(__name__)
@@ -42,6 +43,7 @@ EVENT_CHARGE_REFUNDED = "charge.refunded"
 EVENT_INVOICE_PAYMENT_SUCCEEDED = "invoice.payment_succeeded"
 EVENT_INVOICE_PAYMENT_FAILED = "invoice.payment_failed"
 EVENT_SUBSCRIPTION_DELETED = "customer.subscription.deleted"
+EVENT_SUBSCRIPTION_UPDATED = "customer.subscription.updated"
 
 # SEPA-specific events
 EVENT_SETUP_INTENT_SUCCEEDED = "setup_intent.succeeded"
@@ -57,6 +59,7 @@ HANDLED_EVENT_TYPES = frozenset(
         EVENT_INVOICE_PAYMENT_SUCCEEDED,
         EVENT_INVOICE_PAYMENT_FAILED,
         EVENT_SUBSCRIPTION_DELETED,
+        EVENT_SUBSCRIPTION_UPDATED,
         EVENT_SETUP_INTENT_SUCCEEDED,
         EVENT_SETUP_INTENT_FAILED,
         EVENT_MANDATE_UPDATED,
@@ -273,12 +276,45 @@ async def _handle_invoice_payment_failed(
     donation.status = DonationStatus.FAILED.value
     await db.flush()
 
+    # Record failure on the Subscription record for dunning tracking
+    error_message = data_object.get("last_finalization_error", {})
+    error_msg_str = (
+        str(error_message.get("message", "Payment failed")) if error_message else "Payment failed"
+    )
+    await subscription_service.record_payment_failure(db, subscription_id, error_msg_str)
+
     logger.info(
         "Subscription donation %s marked failed (subscription: %s)",
         donation.id,
         subscription_id,
     )
     return "failed"
+
+
+async def _handle_subscription_updated(
+    db: AsyncSession,
+    data_object: Any,
+) -> str:
+    """Handle customer.subscription.updated: sync subscription status changes."""
+    subscription_id = data_object.get("id")
+    if not subscription_id:
+        return "no_subscription_id"
+
+    new_status = data_object.get("status", "")
+    current_period_start = data_object.get("current_period_start")
+    current_period_end = data_object.get("current_period_end")
+    cancel_at_period_end = data_object.get("cancel_at_period_end")
+
+    result = await subscription_service.handle_subscription_updated(
+        db=db,
+        stripe_subscription_id=subscription_id,
+        new_status=new_status,
+        current_period_start=current_period_start,
+        current_period_end=current_period_end,
+        cancel_at_period_end=cancel_at_period_end,
+    )
+
+    return result
 
 
 async def _handle_subscription_deleted(
@@ -306,9 +342,16 @@ async def _handle_subscription_deleted(
         )
         return "donation_not_found"
 
-    # Mark as no longer recurring
+    # Mark donation as no longer recurring
     donation.is_recurring = False
     await db.flush()
+
+    # Update the Subscription record
+    await subscription_service.handle_subscription_updated(
+        db=db,
+        stripe_subscription_id=subscription_id,
+        new_status="canceled",
+    )
 
     logger.info(
         "Subscription %s cancelled, donation %s updated",
@@ -533,6 +576,9 @@ async def stripe_webhook(
         return {"status": "processed", "event_type": event_type, "result": result}
     if event_type == EVENT_SUBSCRIPTION_DELETED:
         result = await _handle_subscription_deleted(db, data_obj)
+        return {"status": "processed", "event_type": event_type, "result": result}
+    if event_type == EVENT_SUBSCRIPTION_UPDATED:
+        result = await _handle_subscription_updated(db, data_obj)
         return {"status": "processed", "event_type": event_type, "result": result}
 
     # SEPA-specific events that don't need a payment intent ID
