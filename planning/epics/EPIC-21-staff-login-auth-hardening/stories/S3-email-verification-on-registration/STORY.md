@@ -3,7 +3,7 @@ story: S3
 epic: EPIC-21
 ticket: RAP-102
 title: "Email verification on registration"
-status: planned
+status: done
 points: 3
 priority: P1
 track: Backend
