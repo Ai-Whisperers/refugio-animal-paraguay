@@ -176,6 +176,10 @@ async def update_adoption_request_status(
     req.decided_at = datetime.now(UTC)
     req.updated_at = datetime.now(UTC)
 
+    # Store decision notes if provided
+    if payload.notes is not None:
+        req.notes = payload.notes
+
     # Side-effect: approved request marks animal as adopted
     if new_status == AdoptionRequestStatus.APPROVED:
         animal = await db.get(Animal, req.animal_id)
@@ -193,6 +197,7 @@ async def update_adoption_request_status(
             old_status=old_status_value,
             new_status=new_status.value,
             actor_id=current_user.id,
+            notes=payload.notes,
         )
         await event_bus.publish(event)
 

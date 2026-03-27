@@ -123,6 +123,7 @@ class TestAdoptionStatusChangedHandler:
                 "animal_name": "Luna",
                 "old_status": "pending",
                 "new_status": "rejected",
+                "staff_notes": None,
             },
         )
 

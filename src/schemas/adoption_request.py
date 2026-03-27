@@ -20,6 +20,7 @@ class AdoptionRequestStatusUpdate(BaseModel):
     """Payload for the PATCH …/status endpoint — changes workflow state."""
 
     status: AdoptionRequestStatus
+    notes: str | None = None
 
 
 class AdoptionRequestResponse(BaseModel):
