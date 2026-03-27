@@ -3,7 +3,7 @@ story: S4
 epic: EPIC-29
 ticket: RAP-143
 title: "Recovery status timeline"
-status: planned
+status: done
 points: 3
 priority: P1
 track: Frontend
