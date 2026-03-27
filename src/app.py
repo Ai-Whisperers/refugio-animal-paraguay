@@ -72,6 +72,7 @@ from src.notifications.templates import TemplateRenderer
 from src.notifications.whatsapp_handlers import WhatsAppHandlers
 from src.notifications.whatsapp_service import WhatsAppService
 from src.sentry_config import configure_sentry
+from src.services.dunning_service import DunningService
 from src.services.sepa_notification_service import SepaNotificationService
 
 
@@ -103,6 +104,9 @@ async def lifespan(application: FastAPI) -> AsyncGenerator[None, None]:
 
     # Attach SEPA notification service for webhook handlers
     application.state.sepa_notifier = SepaNotificationService(email_service, renderer)
+
+    # Attach dunning service for recurring payment failure notifications
+    application.state.dunning_service = DunningService(email_service, renderer)
 
     yield
 

@@ -253,6 +253,9 @@ class TestRecordPaymentFailure:
         subscription = MagicMock()
         subscription.stripe_subscription_id = "sub_test123"
         subscription.failed_payment_count = 0
+        subscription.id = uuid4()
+        subscription.donor_id = uuid4()
+        subscription.notes = None
 
         db = AsyncMock()
         mock_result = MagicMock()
@@ -265,7 +268,8 @@ class TestRecordPaymentFailure:
             error_message="Card declined",
         )
 
-        assert result == "payment_failure_recorded"
+        assert result["action"] == "payment_failure_recorded"
+        assert result["failed_count"] == 1
         assert subscription.failed_payment_count == 1
         assert subscription.last_payment_error == "Card declined"
         assert subscription.status == SubscriptionStatus.PAST_DUE.value
@@ -282,7 +286,65 @@ class TestRecordPaymentFailure:
             stripe_subscription_id="sub_unknown",
         )
 
-        assert result == "subscription_not_found"
+        assert result["action"] == "subscription_not_found"
+
+    @pytest.mark.asyncio
+    async def test_auto_cancels_after_max_failures(self) -> None:
+        """After MAX_FAILED_PAYMENT_ATTEMPTS, subscription should auto-cancel."""
+        subscription = MagicMock()
+        subscription.stripe_subscription_id = "sub_test123"
+        subscription.failed_payment_count = 2  # Will become 3 (MAX)
+        subscription.id = uuid4()
+        subscription.donor_id = uuid4()
+        subscription.notes = ""
+        subscription.canceled_at = None
+
+        db = AsyncMock()
+        mock_result = MagicMock()
+        mock_result.scalar_one_or_none.return_value = subscription
+        db.execute.return_value = mock_result
+
+        with (
+            patch.dict("os.environ", {"STRIPE_SECRET_KEY": "sk_test_fake"}),
+            patch("src.services.subscription_service.stripe") as mock_stripe,
+        ):
+            mock_stripe.Subscription.cancel = MagicMock()
+
+            result = await record_payment_failure(
+                db=db,
+                stripe_subscription_id="sub_test123",
+                error_message="Card declined again",
+            )
+
+        assert result["action"] == "subscription_cancelled"
+        assert subscription.status == SubscriptionStatus.CANCELED.value
+        assert subscription.canceled_at is not None
+        assert "Auto-cancelled" in (subscription.notes or "")
+        mock_stripe.Subscription.cancel.assert_called_once_with("sub_test123")
+
+    @pytest.mark.asyncio
+    async def test_does_not_cancel_before_max_failures(self) -> None:
+        """Before MAX_FAILED_PAYMENT_ATTEMPTS, subscription stays past_due."""
+        subscription = MagicMock()
+        subscription.stripe_subscription_id = "sub_test123"
+        subscription.failed_payment_count = 1  # Will become 2 (not max)
+        subscription.id = uuid4()
+        subscription.donor_id = uuid4()
+        subscription.notes = None
+
+        db = AsyncMock()
+        mock_result = MagicMock()
+        mock_result.scalar_one_or_none.return_value = subscription
+        db.execute.return_value = mock_result
+
+        result = await record_payment_failure(
+            db=db,
+            stripe_subscription_id="sub_test123",
+            error_message="Insufficient funds",
+        )
+
+        assert result["action"] == "payment_failure_recorded"
+        assert subscription.status == SubscriptionStatus.PAST_DUE.value
 
 
 class TestPauseSubscription:

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Second Notice: Payment Still Failing</h2>
+<p>Dear {{ donor_name }},</p>
+
+<p>This is a follow-up regarding your recurring donation of <strong>{{ amount }} {{ currency }}</strong> ({{ interval_label }}). Unfortunately, our second attempt to process the payment was also unsuccessful.</p>
+
+<p><strong>Attempt {{ attempt_number }} of {{ max_attempts }}.</strong></p>
+
+<p><strong>Please update your payment method:</strong></p>
+<p>To keep your recurring donation active, please take one of the following steps:</p>
+<ul>
+  <li>Ensure your card or bank account has sufficient funds.</li>
+  <li>Update your payment method if your card has expired or changed.</li>
+  <li>Contact your bank to authorize the charge.</li>
+</ul>
+
+<p><strong>What happens if the payment continues to fail?</strong></p>
+<p>After {{ max_attempts }} failed attempts, your recurring donation will be automatically cancelled. We do not want to lose your support, so please take action soon.</p>
+
+<p>If you need assistance, please contact us at <a href="mailto:{{ support_email }}">{{ support_email }}</a>. We are happy to help you resolve this.</p>
+
+<p>Thank you for being a valued supporter of Refugio Animal Paraguay.</p>
+{% endblock %}
