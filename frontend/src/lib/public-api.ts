@@ -21,6 +21,7 @@ import type {
   PaginatedAnimalListResponse,
   PublicAdoptionApplicationCreate,
   PublicAdoptionApplicationResponse,
+  StripeIntentResponse,
 } from "@/types/api";
 
 const NO_AUTH = { requiresAuth: false } as const;
@@ -141,4 +142,19 @@ export async function createDonor(
   data: DonorCreateRequest
 ): Promise<DonorResponse> {
   return api.post<DonorResponse>("/donors", data, NO_AUTH);
+}
+
+/**
+ * Create a Stripe PaymentIntent for an existing pending donation.
+ * Returns a client_secret to pass to Stripe.js confirmPayment().
+ * POST /donations/{donationId}/stripe-intent (no auth required — public campaign flow)
+ */
+export async function createStripeIntent(
+  donationId: string
+): Promise<StripeIntentResponse> {
+  return api.post<StripeIntentResponse>(
+    `/donations/${donationId}/stripe-intent`,
+    {},
+    NO_AUTH
+  );
 }

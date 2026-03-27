@@ -2,15 +2,41 @@
 
 import { useState } from "react";
 import type { CampaignPublic, CurrencyCode } from "@/types/api";
-import { createDonation, createDonor } from "@/lib/public-api";
+import {
+  createDonation,
+  createDonor,
+  createStripeIntent,
+} from "@/lib/public-api";
 import { formatCurrency, getSuggestedAmounts } from "@/lib/campaign-utils";
+import StripePaymentStep from "@/components/StripePaymentStep";
 
 interface DonationFormProps {
   campaign: CampaignPublic;
   onSuccess: (donationId: string) => void;
 }
 
-type FormStep = "amount" | "details" | "submitting" | "error";
+/**
+ * Multi-step donation form.
+ *
+ * Steps:
+ *   amount     — currency picker, amount presets, custom input, payment method toggle
+ *   details    — donor name / email (or anonymous), GDPR consent
+ *   payment    — Stripe Elements card/SEPA (only when paymentMethod === "stripe")
+ *   submitting — spinner shown while creating donation record or bank-transfer submit
+ *   error      — shown after a recoverable error, allows the user to retry
+ *
+ * For "transfer" payments the flow skips the "payment" step and calls
+ * createDonation directly, then invokes onSuccess.
+ *
+ * For "stripe" payments:
+ *   1. createDonor (if not anonymous) → get donorId
+ *   2. createDonation → get donationId
+ *   3. createStripeIntent(donationId) → get clientSecret
+ *   4. Render StripePaymentStep — Stripe.js handles card collection & confirmation
+ *   5. On stripe confirmation → onSuccess(donationId)
+ */
+
+type FormStep = "amount" | "details" | "payment" | "submitting" | "error";
 
 export default function DonationForm({ campaign, onSuccess }: DonationFormProps) {
   const [step, setStep] = useState<FormStep>("amount");
@@ -25,7 +51,12 @@ export default function DonationForm({ campaign, onSuccess }: DonationFormProps)
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [gdprConsent, setGdprConsent] = useState(false);
 
+  // Stripe-specific state — set after createStripeIntent resolves
+  const [stripeClientSecret, setStripeClientSecret] = useState<string>("");
+  const [pendingDonationId, setPendingDonationId] = useState<string>("");
+
   const suggestedAmounts = getSuggestedAmounts(selectedCurrency);
+  // PYG is a zero-decimal currency — amounts are in whole Guaraníes
   const divisor = selectedCurrency === "PYG" ? 1 : 100;
 
   function handleAmountSelect(cents: number) {
@@ -61,22 +92,34 @@ export default function DonationForm({ campaign, onSuccess }: DonationFormProps)
     setStep("details");
   }
 
-  async function handleSubmit() {
+  /**
+   * Resolve donor ID — creates a donor record if the user is not anonymous.
+   * Returns null for anonymous donations.
+   */
+  async function resolveDonorId(): Promise<string | null> {
+    if (isAnonymous || !fullName || !email) return null;
+    const donor = await createDonor({
+      full_name: fullName,
+      email,
+      currency_preference: selectedCurrency,
+      gdpr_consent_at: gdprConsent ? new Date().toISOString() : undefined,
+    });
+    return donor.id;
+  }
+
+  /**
+   * Handle "details" step continue.
+   *
+   * For transfer payments: creates donor + donation record and calls onSuccess.
+   * For stripe payments: creates donor + donation + PaymentIntent, then shows
+   *   the Stripe Elements payment step.
+   */
+  async function handleDetailsSubmit() {
     setStep("submitting");
     setErrorMessage("");
 
     try {
-      let donorId: string | null = null;
-
-      if (!isAnonymous && fullName && email) {
-        const donor = await createDonor({
-          full_name: fullName,
-          email,
-          currency_preference: selectedCurrency,
-          gdpr_consent_at: gdprConsent ? new Date().toISOString() : undefined,
-        });
-        donorId = donor.id;
-      }
+      const donorId = await resolveDonorId();
 
       const donation = await createDonation({
         donor_id: donorId,
@@ -86,7 +129,17 @@ export default function DonationForm({ campaign, onSuccess }: DonationFormProps)
         payment_method: paymentMethod,
       });
 
-      onSuccess(donation.id);
+      if (paymentMethod === "transfer") {
+        // Bank transfer: record created, donor will follow up manually
+        onSuccess(donation.id);
+        return;
+      }
+
+      // Stripe path: fetch client_secret and move to payment step
+      const intent = await createStripeIntent(donation.id);
+      setPendingDonationId(donation.id);
+      setStripeClientSecret(intent.client_secret);
+      setStep("payment");
     } catch (err) {
       setStep("error");
       setErrorMessage(
@@ -94,6 +147,10 @@ export default function DonationForm({ campaign, onSuccess }: DonationFormProps)
       );
     }
   }
+
+  // ---------------------------------------------------------------------------
+  // Render — step machine
+  // ---------------------------------------------------------------------------
 
   if (step === "amount") {
     return (
@@ -254,17 +311,39 @@ export default function DonationForm({ campaign, onSuccess }: DonationFormProps)
             Volver
           </button>
           <button
-            onClick={handleSubmit}
+            onClick={handleDetailsSubmit}
             disabled={!isAnonymous && (!fullName || !email)}
             className="flex-1 py-3 bg-primary-600 text-white rounded-lg font-semibold hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Donar {formatCurrency(amountCents, selectedCurrency)}
+            {paymentMethod === "stripe"
+              ? "Ir a pago"
+              : `Donar ${formatCurrency(amountCents, selectedCurrency)}`}
           </button>
         </div>
       </div>
     );
   }
 
+  if (step === "payment" && stripeClientSecret) {
+    // Stripe Elements — card / SEPA / iDEAL / etc.
+    const returnUrl =
+      typeof window !== "undefined"
+        ? `${window.location.origin}/donate/confirmation?donation_id=${pendingDonationId}`
+        : `/donate/confirmation?donation_id=${pendingDonationId}`;
+
+    return (
+      <StripePaymentStep
+        clientSecret={stripeClientSecret}
+        amountLabel={formatCurrency(amountCents, selectedCurrency)}
+        returnUrl={returnUrl}
+        onBack={() => { setStep("details"); setErrorMessage(""); }}
+        onError={(msg) => { setStep("error"); setErrorMessage(msg); }}
+        onSuccess={() => onSuccess(pendingDonationId)}
+      />
+    );
+  }
+
+  // "submitting" and fallback (payment step before client secret is ready)
   return (
     <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 text-center">
       <div className="animate-spin w-8 h-8 border-4 border-primary-200 border-t-primary-600 rounded-full mx-auto mb-4" />
