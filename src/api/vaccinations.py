@@ -35,6 +35,9 @@ from src.services.vaccination_certificate_service import (
     generate_vaccination_certificate,
 )
 from src.schemas.vaccination import (
+    BulkVaccinationCreate,
+    BulkVaccinationResponse,
+    BulkVaccinationResultItem,
     VaccinationCreate,
     VaccinationListResponse,
     VaccinationResponse,
@@ -560,3 +563,80 @@ async def generate_certificate(
         media_type="application/pdf",
         filename=f"vaccination_certificate_{animal.name}.pdf",
     )
+
+# ---------------------------------------------------------------------------
+# Bulk vaccination endpoints
+# ---------------------------------------------------------------------------
+
+
+@vaccination_router.post(
+    "/vaccinations/bulk",
+    response_model=BulkVaccinationResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Record vaccinations for multiple animals at once (intake batch)",
+)
+async def create_bulk_vaccinations(
+    body: BulkVaccinationCreate,
+    db: AsyncSession = Depends(get_db),
+) -> dict[str, Any]:
+    # Validate vaccine type exists
+    await _get_vaccine_type_or_404(body.vaccine_type_id, db)
+
+    results: list[dict[str, Any]] = []
+    created_count = 0
+    failed_count = 0
+
+    for animal_id in body.animal_ids:
+        try:
+            # Validate animal exists
+            animal_query = sa.select(Animal).where(Animal.id == animal_id)
+            animal_result = await db.execute(animal_query)
+            animal = animal_result.scalar_one_or_none()
+            if animal is None:
+                results.append({
+                    "animal_id": animal_id,
+                    "vaccination_id": None,
+                    "success": False,
+                    "error": f"Animal {animal_id} not found",
+                })
+                failed_count += 1
+                continue
+
+            vacc = Vaccination(
+                animal_id=animal_id,
+                vaccine_type_id=body.vaccine_type_id,
+                scheduled_date=body.scheduled_date,
+                administered_date=body.administered_date,
+                administered_by=body.administered_by,
+                batch_number=body.batch_number,
+                vaccination_status=body.vaccination_status,
+                dose_number=body.dose_number,
+                next_due_date=body.next_due_date,
+                notes=body.notes,
+            )
+            db.add(vacc)
+            await db.flush()
+            results.append({
+                "animal_id": animal_id,
+                "vaccination_id": vacc.id,
+                "success": True,
+                "error": None,
+            })
+            created_count += 1
+        except Exception as exc:
+            results.append({
+                "animal_id": animal_id,
+                "vaccination_id": None,
+                "success": False,
+                "error": str(exc),
+            })
+            failed_count += 1
+
+    await db.commit()
+
+    return {
+        "total_requested": len(body.animal_ids),
+        "total_created": created_count,
+        "total_failed": failed_count,
+        "results": results,
+    }
