@@ -13,6 +13,7 @@ import {
   RefreshCw,
   Plus,
   Pencil,
+  Eye,
   ArrowRightLeft,
   X,
 } from "lucide-react";
@@ -45,6 +46,7 @@ const LABEL_PREVIOUS = "Anterior";
 const LABEL_NEXT = "Siguiente";
 const LABEL_ADD_ANIMAL = "Nuevo Animal";
 const LABEL_ACTIONS = "Acciones";
+const LABEL_VIEW = "Ver";
 const LABEL_EDIT = "Editar";
 const LABEL_BATCH_STATUS = "Cambiar Estado";
 const LABEL_SELECTED = "seleccionados";
@@ -511,9 +513,12 @@ export default function AdminAnimalsPage() {
                                 <PawPrint className="h-4 w-4 text-primary-500" />
                               </div>
                             )}
-                            <span className="font-medium text-warm-text-primary">
+                            <button
+                              onClick={() => router.push(`/admin/animals/${animal.id}`)}
+                              className="font-medium text-warm-text-primary hover:text-primary-600 hover:underline"
+                            >
                               {animal.name}
-                            </span>
+                            </button>
                           </div>
                         </td>
                         <td className="px-4 py-3 text-warm-text-secondary">
@@ -533,15 +538,26 @@ export default function AdminAnimalsPage() {
                           {formatDate(animal.created_at)}
                         </td>
                         <td className="px-4 py-3 text-right">
-                          <button
-                            onClick={() =>
-                              router.push(`/admin/animals/${animal.id}/edit`)
-                            }
-                            className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-primary-600 transition-colors hover:bg-primary-50"
-                          >
-                            <Pencil className="h-3 w-3" />
-                            {LABEL_EDIT}
-                          </button>
+                          <div className="flex items-center justify-end gap-1">
+                            <button
+                              onClick={() =>
+                                router.push(`/admin/animals/${animal.id}`)
+                              }
+                              className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-warm-text-secondary transition-colors hover:bg-warm-bg hover:text-warm-text-primary"
+                            >
+                              <Eye className="h-3 w-3" />
+                              {LABEL_VIEW}
+                            </button>
+                            <button
+                              onClick={() =>
+                                router.push(`/admin/animals/${animal.id}/edit`)
+                              }
+                              className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-primary-600 transition-colors hover:bg-primary-50"
+                            >
+                              <Pencil className="h-3 w-3" />
+                              {LABEL_EDIT}
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}
