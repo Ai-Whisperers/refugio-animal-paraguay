@@ -3,7 +3,7 @@ story: S2
 epic: EPIC-21
 ticket: RAP-101
 title: "Password reset with email token"
-status: planned
+status: done
 points: 5
 priority: P0
 track: Fullstack
