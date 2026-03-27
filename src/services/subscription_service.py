@@ -331,33 +331,74 @@ async def record_payment_failure(
     db: AsyncSession,
     stripe_subscription_id: str,
     error_message: str | None = None,
-) -> str:
+) -> dict:
     """Record a payment failure for a subscription.
 
     Increments the failed_payment_count and stores the error message.
-    Returns the result action taken.
+    If the count reaches MAX_FAILED_PAYMENT_ATTEMPTS, cancels the
+    subscription on Stripe and locally.
+
+    Returns a dict with:
+      - action: "payment_failure_recorded", "subscription_cancelled", or
+                "subscription_not_found"
+      - subscription_id: local UUID (if found)
+      - failed_count: updated count (if found)
+      - donor_id: UUID of the donor (if found)
     """
-    stmt = select(Subscription).where(Subscription.stripe_subscription_id == stripe_subscription_id)
+    stmt = select(Subscription).where(
+        Subscription.stripe_subscription_id == stripe_subscription_id
+    )
     result = await db.execute(stmt)
     subscription = result.scalar_one_or_none()
 
     if subscription is None:
-        return "subscription_not_found"
+        return {"action": "subscription_not_found"}
 
     subscription.failed_payment_count += 1
     subscription.last_payment_error = error_message
     subscription.status = SubscriptionStatus.PAST_DUE.value
 
+    action = "payment_failure_recorded"
+
+    # Auto-cancel after max failures
+    if subscription.failed_payment_count >= MAX_FAILED_PAYMENT_ATTEMPTS:
+        try:
+            stripe.api_key = _get_stripe_key()
+            stripe.Subscription.cancel(stripe_subscription_id)
+        except Exception as cancel_exc:
+            logger.error(
+                "Failed to cancel Stripe subscription %s after %d failures: %s",
+                stripe_subscription_id,
+                subscription.failed_payment_count,
+                cancel_exc,
+            )
+        subscription.status = SubscriptionStatus.CANCELED.value
+        subscription.canceled_at = datetime.now(UTC)
+        existing_notes = subscription.notes or ""
+        subscription.notes = (
+            existing_notes
+            + f"\n[Auto-cancelled]: Exceeded {MAX_FAILED_PAYMENT_ATTEMPTS} "
+            f"failed payment attempts"
+        )
+        action = "subscription_cancelled"
+
     await db.flush()
 
     logger.warning(
-        "Subscription %s payment failed (attempt %d): %s",
+        "Subscription %s payment failed (attempt %d/%d): %s — action: %s",
         stripe_subscription_id,
         subscription.failed_payment_count,
+        MAX_FAILED_PAYMENT_ATTEMPTS,
         error_message,
+        action,
     )
 
-    return "payment_failure_recorded"
+    return {
+        "action": action,
+        "subscription_id": str(subscription.id),
+        "failed_count": subscription.failed_payment_count,
+        "donor_id": str(subscription.donor_id),
+    }
 
 
 async def get_subscription_stats(

@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Your Recurring Donation Has Been Cancelled</h2>
+<p>Dear {{ donor_name }},</p>
+
+<p>After {{ max_attempts }} unsuccessful payment attempts, we have had to cancel your recurring donation of <strong>{{ amount }} {{ currency }}</strong> ({{ interval_label }}).</p>
+
+<p>We understand that payment issues can happen for many reasons, and we truly appreciate the support you have already provided to the animals at Refugio Animal Paraguay.</p>
+
+<p><strong>Want to restart your donation?</strong></p>
+<p>You can set up a new recurring donation at any time by visiting our website. We would love to have you back as a regular supporter.</p>
+
+<p>If this cancellation was unexpected or you would like help resolving the payment issue, please do not hesitate to contact us at <a href="mailto:{{ support_email }}">{{ support_email }}</a>.</p>
+
+<p>Thank you for everything you have done for the animals. Every contribution, past and present, has made a difference.</p>
+{% endblock %}

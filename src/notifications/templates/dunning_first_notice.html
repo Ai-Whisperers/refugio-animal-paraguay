@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Payment Issue With Your Recurring Donation</h2>
+<p>Dear {{ donor_name }},</p>
+
+<p>We were unable to process your recurring donation of <strong>{{ amount }} {{ currency }}</strong> ({{ interval_label }}).</p>
+
+<p><strong>What happened:</strong></p>
+<p>{{ error_message | default("Your payment method was declined by your bank or card issuer.") }}</p>
+
+<p><strong>What happens next:</strong></p>
+<p>We will automatically retry the payment in a few days. In the meantime, you may want to:</p>
+<ul>
+  <li>Check that your card or bank account has sufficient funds.</li>
+  <li>Verify that your card has not expired.</li>
+  <li>Contact your bank if the issue persists.</li>
+</ul>
+
+<p>No action is required from you at this time &mdash; we will try again automatically. If the payment continues to fail, we will reach out with further options.</p>
+
+<p>Thank you for your continued support of the animals at Refugio Animal Paraguay. Your generosity makes a real difference in their lives.</p>
+
+<p>If you have any questions, please contact us at <a href="mailto:{{ support_email }}">{{ support_email }}</a>.</p>
+{% endblock %}

@@ -29,6 +29,7 @@ from src.events.bus import EventBus
 from src.events.domain_events import create_donation_received
 from src.schemas.error import PAYMENT_RESPONSES
 from src.services import subscription_service
+from src.services.dunning_service import DunningService
 from src.services.sepa_notification_service import SepaNotificationService
 
 logger = logging.getLogger(__name__)
@@ -248,6 +249,7 @@ async def _handle_invoice_payment_succeeded(
 async def _handle_invoice_payment_failed(
     db: AsyncSession,
     data_object: Any,
+    dunning: "DunningService | None" = None,
 ) -> str:
     """Handle invoice.payment_failed: mark subscription donation as failed."""
     subscription_id = data_object.get("subscription")
@@ -281,12 +283,38 @@ async def _handle_invoice_payment_failed(
     error_msg_str = (
         str(error_message.get("message", "Payment failed")) if error_message else "Payment failed"
     )
-    await subscription_service.record_payment_failure(db, subscription_id, error_msg_str)
+    failure_result = await subscription_service.record_payment_failure(
+        db, subscription_id, error_msg_str
+    )
+
+    # Send dunning email based on failure count
+    if failure_result.get("subscription_id"):
+        try:
+            if dunning:
+                await dunning.send_dunning_email(
+                    subscription_id=failure_result["subscription_id"],
+                    failed_count=failure_result["failed_count"],
+                    error_message=error_msg_str,
+                )
+            else:
+                logger.warning(
+                    "Dunning service not configured — skipping dunning email "
+                    "for subscription %s",
+                    subscription_id,
+                )
+        except Exception as dunning_exc:
+            # Dunning is fire-and-forget — never block webhook processing
+            logger.exception(
+                "Failed to send dunning email for subscription %s: %s",
+                subscription_id,
+                dunning_exc,
+            )
 
     logger.info(
-        "Subscription donation %s marked failed (subscription: %s)",
+        "Subscription donation %s marked failed (subscription: %s, action: %s)",
         donation.id,
         subscription_id,
+        failure_result.get("action", "unknown"),
     )
     return "failed"
 
@@ -572,7 +600,10 @@ async def stripe_webhook(
         result = await _handle_invoice_payment_succeeded(db, data_obj, event_bus)
         return {"status": "processed", "event_type": event_type, "result": result}
     if event_type == EVENT_INVOICE_PAYMENT_FAILED:
-        result = await _handle_invoice_payment_failed(db, data_obj)
+        dunning_svc: DunningService | None = getattr(
+            request.app.state, "dunning_service", None
+        )
+        result = await _handle_invoice_payment_failed(db, data_obj, dunning=dunning_svc)
         return {"status": "processed", "event_type": event_type, "result": result}
     if event_type == EVENT_SUBSCRIPTION_DELETED:
         result = await _handle_subscription_deleted(db, data_obj)

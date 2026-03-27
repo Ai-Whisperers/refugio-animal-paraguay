@@ -37,6 +37,10 @@ class EventType(enum.StrEnum):
     VOLUNTEER_SHIFT_CREATED = "volunteer.shift_created"
     VOLUNTEER_SHIFT_COMPLETED = "volunteer.shift_completed"
 
+    # Subscription domain
+    SUBSCRIPTION_PAYMENT_FAILED = "subscription.payment_failed"
+    SUBSCRIPTION_CANCELLED_DUNNING = "subscription.cancelled_dunning"
+
     # Animal domain
     ANIMAL_INTAKE_COMPLETED = "animal.intake_completed"
     ANIMAL_STATUS_CHANGED = "animal.status_changed"
