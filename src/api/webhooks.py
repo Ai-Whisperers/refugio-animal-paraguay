@@ -6,6 +6,12 @@ the appropriate handler based on event type.
 
 Endpoints:
   POST /webhooks/stripe  -- receive Stripe webhook events
+
+SEPA-specific events handled:
+  payment_intent.processing          -- SEPA payment accepted by bank (async processing)
+  setup_intent.succeeded             -- SEPA mandate saved successfully
+  setup_intent.setup_failed          -- SEPA mandate setup failed
+  mandate.updated                    -- SEPA mandate status changed
 """
 
 import logging
@@ -30,19 +36,29 @@ router = APIRouter(prefix="/webhooks", tags=["webhooks"], responses=PAYMENT_RESP
 # Stripe event types we handle
 EVENT_PAYMENT_INTENT_SUCCEEDED = "payment_intent.succeeded"
 EVENT_PAYMENT_INTENT_FAILED = "payment_intent.payment_failed"
+EVENT_PAYMENT_INTENT_PROCESSING = "payment_intent.processing"
 EVENT_CHARGE_REFUNDED = "charge.refunded"
 EVENT_INVOICE_PAYMENT_SUCCEEDED = "invoice.payment_succeeded"
 EVENT_INVOICE_PAYMENT_FAILED = "invoice.payment_failed"
 EVENT_SUBSCRIPTION_DELETED = "customer.subscription.deleted"
 
+# SEPA-specific events
+EVENT_SETUP_INTENT_SUCCEEDED = "setup_intent.succeeded"
+EVENT_SETUP_INTENT_FAILED = "setup_intent.setup_failed"
+EVENT_MANDATE_UPDATED = "mandate.updated"
+
 HANDLED_EVENT_TYPES = frozenset(
     {
         EVENT_PAYMENT_INTENT_SUCCEEDED,
         EVENT_PAYMENT_INTENT_FAILED,
+        EVENT_PAYMENT_INTENT_PROCESSING,
         EVENT_CHARGE_REFUNDED,
         EVENT_INVOICE_PAYMENT_SUCCEEDED,
         EVENT_INVOICE_PAYMENT_FAILED,
         EVENT_SUBSCRIPTION_DELETED,
+        EVENT_SETUP_INTENT_SUCCEEDED,
+        EVENT_SETUP_INTENT_FAILED,
+        EVENT_MANDATE_UPDATED,
     }
 )
 
@@ -301,6 +317,117 @@ async def _handle_subscription_deleted(
     return "cancelled"
 
 
+async def _handle_payment_intent_processing(
+    db: AsyncSession,
+    payment_intent_id: str,
+) -> str:
+    """Handle payment_intent.processing: SEPA payment accepted by bank, awaiting settlement.
+
+    SEPA Direct Debit payments are asynchronous — the bank accepts the debit instruction
+    but settlement takes 1-3 business days. This event fires when Stripe has submitted
+    the debit to the banking network. The donation stays in 'pending' status until
+    payment_intent.succeeded confirms the funds have settled.
+    """
+    donation = await _find_donation_by_payment_intent(db, payment_intent_id)
+    if donation is None:
+        logger.warning(
+            "Webhook payment_intent.processing: no donation found for intent %s",
+            payment_intent_id,
+        )
+        return "donation_not_found"
+
+    # Donation remains pending — SEPA settlement is async (1-3 business days)
+    logger.info(
+        "SEPA payment %s processing for donation %s (awaiting bank settlement)",
+        payment_intent_id,
+        donation.id,
+    )
+    return "processing"
+
+
+async def _handle_setup_intent_succeeded(
+    data_object: Any,
+) -> str:
+    """Handle setup_intent.succeeded: SEPA mandate saved successfully.
+
+    The donor's IBAN has been verified and a SEPA mandate has been created.
+    The payment method can now be used for future off-session charges.
+    We log the event for audit trail; no donation record is created here
+    (mandates are stored in Stripe, charges happen via separate PaymentIntents).
+    """
+    setup_intent_id = data_object.get("id")
+    customer_id = data_object.get("customer")
+    payment_method_id = data_object.get("payment_method")
+    donor_id = data_object.get("metadata", {}).get("donor_id")
+
+    logger.info(
+        "SEPA mandate saved: setup_intent=%s customer=%s payment_method=%s donor_id=%s",
+        setup_intent_id,
+        customer_id,
+        payment_method_id,
+        donor_id,
+    )
+    return "mandate_saved"
+
+
+async def _handle_setup_intent_failed(
+    data_object: Any,
+) -> str:
+    """Handle setup_intent.setup_failed: SEPA mandate setup failed.
+
+    The bank rejected the IBAN or the setup could not be completed.
+    Logged for audit trail; the donor must retry with a valid account.
+    """
+    setup_intent_id = data_object.get("id")
+    customer_id = data_object.get("customer")
+    last_error = data_object.get("last_setup_error", {})
+    error_code = last_error.get("code") if last_error else None
+    donor_id = data_object.get("metadata", {}).get("donor_id")
+
+    logger.warning(
+        "SEPA mandate setup failed: setup_intent=%s customer=%s error=%s donor_id=%s",
+        setup_intent_id,
+        customer_id,
+        error_code,
+        donor_id,
+    )
+    return "mandate_failed"
+
+
+async def _handle_mandate_updated(
+    data_object: Any,
+) -> str:
+    """Handle mandate.updated: SEPA mandate status changed.
+
+    Mandates can become inactive if the bank cancels them (e.g. account closed,
+    donor revoked authorization). We log the new status for monitoring.
+    SEPA mandate_id is stored in Stripe; this event signals when we should
+    stop attempting charges against this payment method.
+    """
+    mandate_id = data_object.get("id")
+    mandate_status = data_object.get("status")
+    payment_method_id = data_object.get("payment_method")
+
+    logger.info(
+        "SEPA mandate updated: mandate=%s status=%s payment_method=%s",
+        mandate_id,
+        mandate_status,
+        payment_method_id,
+    )
+
+    # Active → inactive transition: log at warning for ops visibility
+    if mandate_status == "inactive":
+        logger.warning(
+            "SEPA mandate %s became inactive (payment_method: %s) — "
+            "recurring charges will fail until mandate is re-authorized",
+            mandate_id,
+            payment_method_id,
+        )
+        return "mandate_inactive"
+
+    return f"mandate_{mandate_status}"
+
+
 def _extract_payment_intent_id_from_object(data_object: Any, event_type: str) -> str | None:
     """Extract the payment intent ID from a Stripe event's data.object.
 
@@ -308,7 +435,11 @@ def _extract_payment_intent_id_from_object(data_object: Any, event_type: str) ->
     For charge events, the payment_intent is a field on the charge object.
     data_object is a Stripe StripeObject which supports both [] and .get() access.
     """
-    if event_type in (EVENT_PAYMENT_INTENT_SUCCEEDED, EVENT_PAYMENT_INTENT_FAILED):
+    if event_type in (
+        EVENT_PAYMENT_INTENT_SUCCEEDED,
+        EVENT_PAYMENT_INTENT_FAILED,
+        EVENT_PAYMENT_INTENT_PROCESSING,
+    ):
         return data_object.get("id")
     if event_type == EVENT_CHARGE_REFUNDED:
         return data_object.get("payment_intent")
@@ -385,6 +516,17 @@ async def stripe_webhook(
         result = await _handle_subscription_deleted(db, data_obj)
         return {"status": "processed", "event_type": event_type, "result": result}
 
+    # SEPA-specific events that don't need a payment intent ID
+    if event_type == EVENT_SETUP_INTENT_SUCCEEDED:
+        result = await _handle_setup_intent_succeeded(data_obj)
+        return {"status": "processed", "event_type": event_type, "result": result}
+    if event_type == EVENT_SETUP_INTENT_FAILED:
+        result = await _handle_setup_intent_failed(data_obj)
+        return {"status": "processed", "event_type": event_type, "result": result}
+    if event_type == EVENT_MANDATE_UPDATED:
+        result = await _handle_mandate_updated(data_obj)
+        return {"status": "processed", "event_type": event_type, "result": result}
+
     # Payment intent events require extraction of payment_intent_id
     payment_intent_id = _extract_payment_intent_id_from_object(data_obj, event_type)
     if not payment_intent_id:
@@ -398,6 +540,8 @@ async def stripe_webhook(
         result = await _handle_payment_succeeded(db, payment_intent_id, event_bus)
     elif event_type == EVENT_PAYMENT_INTENT_FAILED:
         result = await _handle_payment_failed(db, payment_intent_id)
+    elif event_type == EVENT_PAYMENT_INTENT_PROCESSING:
+        result = await _handle_payment_intent_processing(db, payment_intent_id)
     elif event_type == EVENT_CHARGE_REFUNDED:
         result = await _handle_charge_refunded(db, payment_intent_id)
     else:
