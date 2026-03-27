@@ -1,10 +1,12 @@
 """SEPA Direct Debit and recurring subscription endpoints.
 
 Endpoints:
-  POST /donations/{id}/sepa-intent        -- create SEPA PaymentIntent for a pending donation
-  POST /donations/sepa                    -- create donation + SEPA PaymentIntent in one step
-  POST /donations/subscribe               -- create recurring donation subscription
-  DELETE /donations/subscriptions/{sub_id} -- cancel a recurring subscription
+  POST /donations/{id}/sepa-intent                  -- create SEPA PaymentIntent for a pending donation
+  POST /donations/sepa                              -- create donation + SEPA PaymentIntent in one step
+  POST /donations/sepa/setup-intent                 -- create SEPA SetupIntent (save mandate for future charges)
+  GET  /donations/sepa/payment-methods/{customer_id} -- list saved SEPA payment methods
+  POST /donations/subscribe                         -- create recurring donation subscription
+  DELETE /donations/subscriptions/{sub_id}          -- cancel a recurring subscription
 """
 
 import logging
@@ -26,6 +28,10 @@ from src.db.session import get_db
 from src.schemas.donation import (
     SepaIntentCreate,
     SepaIntentResponse,
+    SepaPaymentMethodItem,
+    SepaPaymentMethodsResponse,
+    SepaSetupIntentCreate,
+    SepaSetupIntentResponse,
     SubscriptionCancelResponse,
     SubscriptionCreate,
     SubscriptionResponse,
@@ -350,4 +356,122 @@ async def cancel_subscription(
     return SubscriptionCancelResponse(
         stripe_subscription_id=subscription_id,
         status=cancelled_sub.status,
+    )
+
+
+@router.post(
+    "/sepa/setup-intent",
+    response_model=SepaSetupIntentResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+async def create_sepa_setup_intent(
+    payload: SepaSetupIntentCreate,
+    db: AsyncSession = Depends(get_db),
+) -> SepaSetupIntentResponse:
+    """Create a SEPA Direct Debit SetupIntent to save a donor's bank account as a mandate.
+
+    Use this endpoint before charging when you want to save the IBAN for future use.
+    The returned client_secret is used on the frontend to confirm the SetupIntent with
+    Stripe Elements (IbanElement or PaymentElement). Stripe will create a mandate after
+    the donor confirms their IBAN.
+    """
+    donor = await db.get(Donor, payload.donor_id)
+    if donor is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Donor not found",
+        )
+
+    stripe.api_key = _get_stripe_key()
+
+    customer_id = await _get_or_create_stripe_customer(donor)
+
+    # SetupIntent with usage=off_session so the mandate allows future charges
+    # without the donor being present (automated recurring donations)
+    setup_intent = stripe.SetupIntent.create(
+        customer=customer_id,
+        payment_method_types=["sepa_debit"],
+        usage="off_session",
+        metadata={
+            "donor_id": str(payload.donor_id),
+        },
+    )
+
+    if setup_intent.client_secret is None:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail="Stripe did not return a client secret",
+        )
+
+    logger.info(
+        "Created SEPA SetupIntent %s for donor %s (customer %s)",
+        setup_intent.id,
+        payload.donor_id,
+        customer_id,
+    )
+
+    return SepaSetupIntentResponse(
+        stripe_setup_intent_id=setup_intent.id,
+        client_secret=setup_intent.client_secret,
+        stripe_customer_id=customer_id,
+        donor_id=payload.donor_id,
+    )
+
+
+@router.get(
+    "/sepa/payment-methods/{customer_id}",
+    response_model=SepaPaymentMethodsResponse,
+)
+async def list_sepa_payment_methods(
+    customer_id: str,
+) -> SepaPaymentMethodsResponse:
+    """List saved SEPA Direct Debit payment methods for a Stripe customer.
+
+    Returns the stored bank accounts (SEPA mandates) associated with the customer.
+    Each item includes the last 4 digits of the IBAN, bank name, and mandate status.
+    """
+    stripe.api_key = _get_stripe_key()
+
+    try:
+        payment_methods = stripe.PaymentMethod.list(
+            customer=customer_id,
+            type="sepa_debit",
+        )
+    except stripe.InvalidRequestError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Stripe customer not found: {customer_id}",
+        ) from exc
+
+    items: list[SepaPaymentMethodItem] = []
+    for pm in payment_methods.data:
+        sepa_debit = getattr(pm, "sepa_debit", None)
+        if sepa_debit is None:
+            continue
+
+        # Retrieve mandate details if available
+        mandate_id: str | None = None
+        mandate_status: str | None = None
+        if pm.get("mandate"):
+            mandate_id = pm["mandate"]
+            try:
+                mandate = stripe.Mandate.retrieve(mandate_id)
+                mandate_status = mandate.status
+            except stripe.StripeError:
+                mandate_status = "unknown"
+
+        items.append(
+            SepaPaymentMethodItem(
+                payment_method_id=pm.id,
+                bank_name=sepa_debit.get("bank_name"),
+                last4=sepa_debit.get("last4"),
+                country=sepa_debit.get("country"),
+                mandate_id=mandate_id,
+                mandate_status=mandate_status,
+            )
+        )
+
+    return SepaPaymentMethodsResponse(
+        stripe_customer_id=customer_id,
+        payment_methods=items,
     )
