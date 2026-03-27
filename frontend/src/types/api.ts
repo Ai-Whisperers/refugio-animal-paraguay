@@ -21,7 +21,7 @@ export interface TokenPayload {
   exp: number;
 }
 
-export type UserRole = "admin" | "staff" | "adopter";
+export type UserRole = "admin" | "staff" | "vet" | "adopter" | "donor" | "volunteer" | "foster";
 
 // --- Animals ---
 
@@ -608,6 +608,38 @@ export interface SubscriptionDetailResponse {
   notes: string | null;
   created_at: string;
   updated_at: string;
+}
+
+// --- Portal Profile ---
+
+export interface ProfileResponse {
+  id: string;
+  full_name: string | null;
+  email: string;
+  phone: string | null;
+  role: string;
+  is_active: boolean;
+  email_verified: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ProfileUpdate {
+  full_name?: string;
+  phone?: string;
+}
+
+export interface PasswordChangeRequest {
+  current_password: string;
+  new_password: string;
+}
+
+export interface SimplePreferences {
+  email_adoption: boolean;
+  email_donations: boolean;
+  email_volunteer: boolean;
+  whatsapp_enabled: boolean;
+  inapp_enabled: boolean;
 }
 
 // --- API Error ---
