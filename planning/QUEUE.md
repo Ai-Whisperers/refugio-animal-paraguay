@@ -139,7 +139,7 @@ Week 3-4:
 | 3 | Password reset tests (0% → 80%) | RAP-405 | EPIC-72 | 5 | BLOCKED | RAP-101 (PR #62 not merged) |
 | 4 | Adoption requests coverage (41% → 80%) | RAP-406 | EPIC-72 | 3 | DONE (PR #69) | — |
 | 5 | Replace bare except Exception handlers | RAP-410 | EPIC-73 | 3 | DONE (PR #70) | — |
-| 6 | Structured JSON logging (structlog) | RAP-415 | EPIC-74 | 5 | READY | — |
+| 6 | Structured JSON logging (structlog) | RAP-415 | EPIC-74 | 5 | DONE (PR #74) | — |
 | 7 | Sentry error tracking integration | RAP-416 | EPIC-74 | 3 | READY | RAP-415 |
 | 8 | Add error.tsx and loading.tsx boundaries | RAP-420 | EPIC-75 | 3 | READY | — |
 | 9 | Fix /animals page 404 rendering bug | RAP-421 | EPIC-75 | 3 | READY | — |
