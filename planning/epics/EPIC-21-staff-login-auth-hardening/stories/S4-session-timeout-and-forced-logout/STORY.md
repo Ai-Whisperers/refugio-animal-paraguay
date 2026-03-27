@@ -3,7 +3,7 @@ story: S4
 epic: EPIC-21
 ticket: RAP-103
 title: "Session timeout and forced logout"
-status: planned
+status: done
 points: 3
 priority: P1
 track: Backend
