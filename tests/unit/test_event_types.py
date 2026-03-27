@@ -38,8 +38,12 @@ class TestEventType:
     def test_event_type_is_string_enum(self) -> None:
         assert isinstance(EventType.ADOPTION_STATUS_CHANGED, str)
 
+    def test_subscription_domain_events_exist(self) -> None:
+        assert EventType.SUBSCRIPTION_PAYMENT_FAILED == "subscription.payment_failed"
+        assert EventType.SUBSCRIPTION_CANCELLED_DUNNING == "subscription.cancelled_dunning"
+
     def test_event_type_count(self) -> None:
-        assert len(EventType) == 10
+        assert len(EventType) == 12
 
 
 class TestDomainEvent:
