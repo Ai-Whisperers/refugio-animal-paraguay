@@ -50,6 +50,7 @@ from src.audit.middleware import AuditMiddleware
 from src.config import Settings, get_settings
 from src.db.session import dispose_engine, init_engine
 from src.events.bus import EventBus
+from src.logging_config import configure_logging
 from src.middleware.error_handler import register_exception_handlers
 from src.middleware.rate_limiter import configure_limiter, limiter
 from src.middleware.request_id import RequestIDMiddleware
@@ -96,6 +97,9 @@ async def lifespan(application: FastAPI) -> AsyncGenerator[None, None]:
 def create_app() -> FastAPI:
     """Create and configure the FastAPI application."""
     settings = get_settings()
+
+    # Configure structured logging before any logger is used.
+    configure_logging(is_dev=settings.app_env == "development")
 
     application = FastAPI(
         title=settings.app_name,
