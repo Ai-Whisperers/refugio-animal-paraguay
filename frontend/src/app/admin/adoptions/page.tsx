@@ -14,6 +14,7 @@ import {
   XCircle,
   Ban,
   Filter,
+  BarChart3,
 } from "lucide-react";
 import { isAuthenticated } from "@/lib/auth";
 import { api, ApiClientError } from "@/lib/api";
@@ -27,6 +28,7 @@ const LABEL_EMPTY = "No hay solicitudes de adopcion";
 const LABEL_EMPTY_FILTERED = "No hay solicitudes con este estado";
 const LABEL_RETRY = "Reintentar";
 const LABEL_BACK = "Volver al panel";
+const LABEL_ANALYTICS = "Analiticas";
 const LABEL_SHOWING = "Mostrando";
 const LABEL_OF = "de";
 const LABEL_PREVIOUS = "Anterior";
@@ -230,14 +232,23 @@ export default function AdminAdoptionsPage() {
               {LABEL_PAGE_TITLE}
             </h1>
           </div>
-          <button
-            onClick={fetchRequests}
-            disabled={isLoading}
-            className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm text-warm-text-secondary transition-colors hover:bg-warm-bg hover:text-warm-text-primary disabled:opacity-50"
-            aria-label={LABEL_RETRY}
-          >
-            <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => router.push("/admin/adoptions/analytics")}
+              className="flex items-center gap-1.5 rounded-lg border border-warm-border px-3 py-1.5 text-sm text-warm-text-secondary transition-colors hover:bg-warm-bg hover:text-warm-text-primary"
+            >
+              <BarChart3 className="h-4 w-4" />
+              {LABEL_ANALYTICS}
+            </button>
+            <button
+              onClick={fetchRequests}
+              disabled={isLoading}
+              className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm text-warm-text-secondary transition-colors hover:bg-warm-bg hover:text-warm-text-primary disabled:opacity-50"
+              aria-label={LABEL_RETRY}
+            >
+              <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
+            </button>
+          </div>
         </div>
       </header>
 
