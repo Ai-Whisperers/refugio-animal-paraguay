@@ -264,3 +264,91 @@ export async function createSubscription(
 ): Promise<SubscriptionDetailResponse> {
   return api.post<SubscriptionDetailResponse>("/subscriptions", data, NO_AUTH);
 }
+
+/**
+ * Fetch subscriptions for a specific donor.
+ * GET /subscriptions/donor/{donorId}
+ */
+export async function getDonorSubscriptions(
+  donorId: string
+): Promise<SubscriptionDetailResponse[]> {
+  return api.get<SubscriptionDetailResponse[]>(
+    `/subscriptions/donor/${donorId}`,
+    NO_AUTH
+  );
+}
+
+/**
+ * Fetch a single subscription by ID.
+ * GET /subscriptions/{subscriptionId}
+ */
+export async function getSubscription(
+  subscriptionId: string
+): Promise<SubscriptionDetailResponse> {
+  return api.get<SubscriptionDetailResponse>(
+    `/subscriptions/${subscriptionId}`,
+    NO_AUTH
+  );
+}
+
+/**
+ * Pause an active subscription.
+ * POST /subscriptions/{subscriptionId}/pause
+ */
+export async function pauseSubscription(
+  subscriptionId: string
+): Promise<SubscriptionDetailResponse> {
+  return api.post<SubscriptionDetailResponse>(
+    `/subscriptions/${subscriptionId}/pause`,
+    {},
+    NO_AUTH
+  );
+}
+
+/**
+ * Resume a paused subscription.
+ * POST /subscriptions/{subscriptionId}/resume
+ */
+export async function resumeSubscription(
+  subscriptionId: string
+): Promise<SubscriptionDetailResponse> {
+  return api.post<SubscriptionDetailResponse>(
+    `/subscriptions/${subscriptionId}/resume`,
+    {},
+    NO_AUTH
+  );
+}
+
+/**
+ * Cancel a subscription.
+ * POST /subscriptions/{subscriptionId}/cancel
+ */
+export async function cancelSubscription(
+  subscriptionId: string,
+  cancelImmediately: boolean = false,
+  reason?: string
+): Promise<SubscriptionDetailResponse> {
+  return api.post<SubscriptionDetailResponse>(
+    `/subscriptions/${subscriptionId}/cancel`,
+    {
+      cancel_immediately: cancelImmediately,
+      reason: reason ?? null,
+    },
+    NO_AUTH
+  );
+}
+
+/**
+ * Update a subscription (amount, notes).
+ * PATCH /subscriptions/{subscriptionId}
+ */
+export async function updateSubscription(
+  subscriptionId: string,
+  data: { amount_cents?: number; notes?: string | null }
+): Promise<SubscriptionDetailResponse> {
+  return api.patch<SubscriptionDetailResponse>(
+    `/subscriptions/${subscriptionId}`,
+    data,
+    NO_AUTH
+  );
+}
