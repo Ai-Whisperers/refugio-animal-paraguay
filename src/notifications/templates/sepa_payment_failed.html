@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Action Required: Your SEPA Donation Could Not Be Processed</h2>
+<p>Dear {{ donor_name }},</p>
+
+{% if amount and currency %}
+<p>Unfortunately, we were unable to collect your SEPA Direct Debit donation of <strong>{{ amount }} {{ currency }}</strong>.</p>
+{% else %}
+<p>Unfortunately, we were unable to set up your SEPA Direct Debit mandate.</p>
+{% endif %}
+
+<p><strong>Common reasons for SEPA payment failures:</strong></p>
+<ul>
+  <li>Insufficient funds in your account at the time of collection.</li>
+  <li>The bank account number (IBAN) is incorrect or closed.</li>
+  <li>Your bank blocked the debit instruction.</li>
+</ul>
+
+<p><strong>What to do next:</strong></p>
+<p>Please contact us at <a href="mailto:{{ support_email }}">{{ support_email }}</a> so we can help you complete your donation. You are also welcome to try again using a different payment method on our website.</p>
+
+<p>We understand that banking issues can arise unexpectedly, and we appreciate your intention to support our animals. Every contribution makes a real difference.</p>
+{% endblock %}
