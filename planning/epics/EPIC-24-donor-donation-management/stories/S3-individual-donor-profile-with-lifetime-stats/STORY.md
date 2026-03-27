@@ -3,7 +3,7 @@ story: S3
 epic: EPIC-24
 ticket: RAP-117
 title: "Individual donor profile with lifetime stats"
-status: planned
+status: done
 points: 5
 priority: P1
 track: Frontend
