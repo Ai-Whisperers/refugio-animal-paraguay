@@ -3,7 +3,7 @@ story: S5
 epic: EPIC-23
 ticket: RAP-114
 title: "Adoption request analytics (time to decision)"
-status: planned
+status: done
 points: 3
 priority: P2
 track: Frontend

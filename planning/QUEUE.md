@@ -124,6 +124,18 @@ Week 3-4:
 
 ---
 
+## V4 Sprint 1.5 — EPIC-23: Adoption Request Queue (21 pts) — COMPLETE
+
+| # | Story | Ticket | Pts | Status |
+|---|-------|--------|-----|--------|
+| 1 | Adoption request list page with status filters | RAP-110 | 5 | DONE (PR #97) |
+| 2 | Application detail view with adopter info | RAP-111 | 3 | DONE (PR #98) |
+| 3 | Approve/reject workflow with mandatory notes | RAP-112 | 5 | DONE (PR #99) |
+| 4 | Automated email on status change (bilingual) | RAP-113 | 5 | DONE (PR #100) |
+| 5 | Adoption request analytics (time to decision) | RAP-114 | 3 | DONE (PR #101) |
+
+---
+
 ## V3.1 — Priority Sprint: Stability & Quality Gates (92 pts, 25 stories)
 
 **Why now**: CI/CD deploys to production with ZERO tests. 14 bare `except Exception` blocks. Frontend has P0 bugs (/animals 404, no Stripe.js, no error boundaries). No structured logging, no monitoring, no staging environment. These must be fixed before adding more features.

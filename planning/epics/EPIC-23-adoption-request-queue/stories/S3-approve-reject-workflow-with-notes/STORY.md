@@ -3,7 +3,7 @@ story: S3
 epic: EPIC-23
 ticket: RAP-112
 title: "Approve/reject workflow with notes"
-status: planned
+status: done
 points: 5
 priority: P0
 track: Frontend

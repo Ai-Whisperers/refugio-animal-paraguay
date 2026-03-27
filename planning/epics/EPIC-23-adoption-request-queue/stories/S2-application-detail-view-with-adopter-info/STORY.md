@@ -3,7 +3,7 @@ story: S2
 epic: EPIC-23
 ticket: RAP-111
 title: "Application detail view with adopter info"
-status: planned
+status: done
 points: 5
 priority: P0
 track: Frontend
