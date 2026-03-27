@@ -5,6 +5,7 @@ Endpoints:
   POST /donations/sepa                              -- create donation + SEPA PaymentIntent in one step
   POST /donations/sepa/setup-intent                 -- create SEPA SetupIntent (save mandate for future charges)
   GET  /donations/sepa/payment-methods/{customer_id} -- list saved SEPA payment methods
+  GET  /donations/{id}/sepa-status                  -- get detailed SEPA payment status (local + Stripe)
   POST /donations/subscribe                         -- create recurring donation subscription
   DELETE /donations/subscriptions/{sub_id}          -- cancel a recurring subscription
 """
@@ -30,6 +31,7 @@ from src.schemas.donation import (
     SepaIntentResponse,
     SepaPaymentMethodItem,
     SepaPaymentMethodsResponse,
+    SepaPaymentStatus,
     SepaSetupIntentCreate,
     SepaSetupIntentResponse,
     SubscriptionCancelResponse,
@@ -474,4 +476,65 @@ async def list_sepa_payment_methods(
     return SepaPaymentMethodsResponse(
         stripe_customer_id=customer_id,
         payment_methods=items,
+    )
+
+
+@router.get(
+    "/{donation_id}/sepa-status",
+    response_model=SepaPaymentStatus,
+)
+async def get_sepa_payment_status(
+    donation_id: UUID,
+    db: AsyncSession = Depends(get_db),
+) -> SepaPaymentStatus:
+    """Get detailed SEPA payment status for a donation.
+
+    Returns the local donation status combined with live Stripe PaymentIntent status.
+    Useful for polling during the 1-3 business day SEPA settlement window.
+
+    Stripe statuses for SEPA:
+      requires_payment_method → mandate not yet confirmed
+      requires_action         → 3DS or bank verification pending
+      processing              → debit submitted to banking network
+      succeeded               → funds settled
+      canceled                → payment canceled
+    """
+    donation = await db.get(Donation, donation_id)
+    if donation is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Donation not found",
+        )
+
+    is_sepa = donation.payment_method == PaymentMethod.SEPA_DEBIT.value
+    stripe_status: str | None = None
+    is_processing = False
+
+    # Fetch live status from Stripe if we have a PaymentIntent ID
+    if donation.stripe_payment_intent_id:
+        stripe.api_key = _get_stripe_key()
+        try:
+            intent = stripe.PaymentIntent.retrieve(donation.stripe_payment_intent_id)
+            stripe_status = intent.status
+            is_processing = stripe_status == "processing"
+        except stripe.StripeError as exc:
+            logger.warning(
+                "Could not fetch Stripe status for donation %s (intent %s): %s",
+                donation_id,
+                donation.stripe_payment_intent_id,
+                exc,
+            )
+            # Non-fatal: return local status without Stripe enrichment
+
+    return SepaPaymentStatus(
+        donation_id=donation_id,
+        local_status=donation.status,
+        stripe_payment_intent_id=donation.stripe_payment_intent_id,
+        stripe_status=stripe_status,
+        is_sepa=is_sepa,
+        is_processing=is_processing,
+        payment_method=donation.payment_method,
+        amount_cents=donation.amount_cents,
+        currency=donation.currency,
+        stripe_customer_id=donation.stripe_customer_id,
     )
