@@ -52,6 +52,7 @@ from src.db.session import dispose_engine, init_engine
 from src.events.bus import EventBus
 from src.logging_config import configure_logging
 from src.middleware.error_handler import register_exception_handlers
+from src.middleware.logging_middleware import RequestLoggingMiddleware
 from src.middleware.rate_limiter import configure_limiter, limiter
 from src.middleware.request_id import RequestIDMiddleware
 from src.notifications.handlers import NotificationHandlers
@@ -110,6 +111,9 @@ def create_app() -> FastAPI:
 
     # --- Request ID middleware (must be outermost to cover all responses) ---
     application.add_middleware(RequestIDMiddleware)
+
+    # --- Request/response logging (after RequestID so request_id is available) ---
+    application.add_middleware(RequestLoggingMiddleware)
 
     # --- Audit trail middleware (after auth, records successful write ops) ---
     application.add_middleware(AuditMiddleware)
