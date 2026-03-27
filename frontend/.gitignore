@@ -37,3 +37,4 @@ next-env.d.ts
 
 # Override root .gitignore Python patterns that conflict with Next.js conventions
 !src/lib/
+!tests/lib/
