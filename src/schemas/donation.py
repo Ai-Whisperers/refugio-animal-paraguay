@@ -8,6 +8,43 @@ from pydantic import BaseModel, ConfigDict, EmailStr, Field
 from src.db.models.donation import CurrencyCode, DonationStatus, PaymentMethod, RecurringInterval
 
 
+class CurrencyBreakdown(BaseModel):
+    """Aggregated totals for a single currency."""
+
+    currency: str
+    count: int
+    total_amount_cents: int
+
+
+class StatusBreakdown(BaseModel):
+    """Count of donations per status."""
+
+    status: str
+    count: int
+
+
+class PaymentMethodBreakdown(BaseModel):
+    """Count and total per payment method."""
+
+    payment_method: str
+    count: int
+    total_amount_cents: int
+
+
+class DonationStatsResponse(BaseModel):
+    """Aggregated donation statistics for the staff dashboard.
+
+    All totals are scoped to the optional date range supplied in query params.
+    """
+
+    total_donations: int
+    by_currency: list[CurrencyBreakdown]
+    by_status: list[StatusBreakdown]
+    by_payment_method: list[PaymentMethodBreakdown]
+    date_from: datetime | None = None
+    date_to: datetime | None = None
+
+
 class DonorCreate(BaseModel):
     """Fields for creating a donor profile."""
 
