@@ -28,6 +28,7 @@ from src.db.models.vaccination import (
 )
 from src.db.session import get_db
 from src.schemas.error import RESOURCE_RESPONSES
+from src.services.vaccination_alert_service import VaccinationAlertSummary, get_vaccination_alerts
 from src.schemas.vaccination import (
     VaccinationCreate,
     VaccinationListResponse,
