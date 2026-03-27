@@ -4,6 +4,7 @@ Registers handlers for:
   - RequestValidationError (Pydantic validation failures -> 422)
   - HTTPException (FastAPI explicit errors -> various status codes)
   - RateLimitExceeded (slowapi rate limit -> 429)
+  - IntegrityError (DB constraint violations -> 409 / 400)
   - Unhandled exceptions (catch-all -> 500)
 
 All handlers return the standard ErrorResponse format.
@@ -16,14 +17,41 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from slowapi.errors import RateLimitExceeded
+from sqlalchemy.exc import IntegrityError
 
 from src.schemas.error import (
+    ERROR_CONFLICT,
     ERROR_INTERNAL,
     ERROR_RATE_LIMITED,
     ERROR_VALIDATION,
     STATUS_TO_ERROR_CODE,
     ErrorResponse,
 )
+
+# ---------------------------------------------------------------------------
+# Constraint name → human-readable message registry
+#
+# Maps PostgreSQL constraint names to user-facing messages returned in 409
+# responses. Add entries here as new unique/FK constraints are created.
+# ---------------------------------------------------------------------------
+_CONSTRAINT_MESSAGES: dict[str, str] = {
+    # Users
+    "uq_users_email": "A user with this email already exists",
+    # Adopters
+    "uq_adopters_email": "An adopter with this email already exists",
+    # Donors
+    "uq_donors_email": "A donor with this email already exists",
+    # Verification tokens
+    "uq_verification_tokens_token": "Verification token conflict — please request a new token",
+    # Sessions
+    "uq_active_sessions_jti": "Session conflict — please log in again",
+    # Consents
+    "uq_user_consent_type": "Consent record already exists for this user and consent type",
+    # Campaigns
+    "uq_campaigns_slug": "A campaign with this slug already exists",
+    # Animal updates (idempotency key)
+    "uq_animal_updates_idempotency_key": "Duplicate animal update — this update has already been recorded",
+}
 
 logger = logging.getLogger(__name__)
 
@@ -119,6 +147,71 @@ async def rate_limit_handler(
     )
 
 
+def _extract_constraint_name(exc: IntegrityError) -> str | None:
+    """Extract the constraint name from a SQLAlchemy IntegrityError.
+
+    Works with both psycopg2 and asyncpg driver errors. Returns None if
+    the constraint name cannot be determined.
+    """
+    orig = getattr(exc, "orig", None)
+    if orig is None:
+        return None
+
+    # psycopg2: pgerror contains constraint name in 'DETAIL' or 'constraint "..."'
+    pgerror: str = getattr(orig, "pgerror", "") or ""
+    if "constraint" in pgerror.lower():
+        import re
+        match = re.search(r'constraint "([^"]+)"', pgerror)
+        if match:
+            return match.group(1)
+
+    # asyncpg: ConstraintViolationError has a constraint_name attribute
+    constraint_name = getattr(orig, "constraint_name", None)
+    if constraint_name:
+        return constraint_name
+
+    # Fallback: diag attribute (psycopg2 diagnostics)
+    diag = getattr(orig, "diag", None)
+    if diag is not None:
+        return getattr(diag, "constraint_name", None)
+
+    return None
+
+
+async def integrity_error_handler(
+    request: Request,
+    exc: IntegrityError,
+) -> JSONResponse:
+    """Handle SQLAlchemy IntegrityError (unique / FK / check constraint violations).
+
+    Returns 409 CONFLICT for unique and foreign-key violations.
+    Uses the constraint name registry to provide meaningful messages;
+    falls back to a generic message when the constraint is unknown.
+    """
+    request_id = _get_request_id(request)
+
+    # Log the full error internally for debugging
+    logger.warning(
+        "Database constraint violation: %s",
+        type(exc.orig).__name__ if exc.orig else str(exc),
+        extra={"request_id": request_id},
+    )
+
+    constraint_name = _extract_constraint_name(exc)
+    message = (
+        _CONSTRAINT_MESSAGES.get(constraint_name, "A resource conflict occurred")
+        if constraint_name
+        else "A resource conflict occurred"
+    )
+
+    return _build_error_response(
+        status_code=409,
+        error_code=ERROR_CONFLICT,
+        message=message,
+        request_id=request_id,
+    )
+
+
 async def unhandled_exception_handler(
     request: Request,
     exc: Exception,
@@ -139,4 +232,6 @@ def register_exception_handlers(app: FastAPI) -> None:
     app.add_exception_handler(RequestValidationError, validation_exception_handler)  # type: ignore[arg-type]
     app.add_exception_handler(HTTPException, http_exception_handler)  # type: ignore[arg-type]
     app.add_exception_handler(RateLimitExceeded, rate_limit_handler)  # type: ignore[arg-type]
+    # IntegrityError must be registered before the generic Exception handler
+    app.add_exception_handler(IntegrityError, integrity_error_handler)  # type: ignore[arg-type]
     app.add_exception_handler(Exception, unhandled_exception_handler)  # type: ignore[arg-type]
