@@ -132,3 +132,10 @@ class Animal(Base):
         back_populates="animal",
         lazy="select",
     )
+
+    # Back-reference from Vaccination.animal
+    vaccinations: Mapped[list["Vaccination"]] = relationship(  # type: ignore[name-defined]  # noqa: F821
+        "Vaccination",
+        back_populates="animal",
+        lazy="select",
+    )
