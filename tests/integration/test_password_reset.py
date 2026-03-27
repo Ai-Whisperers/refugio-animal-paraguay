@@ -33,9 +33,7 @@ async def reset_client():
     settings = Settings()
     engine = init_engine(settings)
 
-    session_factory = async_sessionmaker(
-        bind=engine, class_=AsyncSession, expire_on_commit=False
-    )
+    session_factory = async_sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
     async with session_factory() as session:
         await session.execute(
             text("""
@@ -206,18 +204,14 @@ class TestPasswordResetValidate:
             assert row is not None
             token_value = row[0]
 
-        response = await reset_client.get(
-            f"/auth/password-reset/validate?token={token_value}"
-        )
+        response = await reset_client.get(f"/auth/password-reset/validate?token={token_value}")
         assert response.status_code == 200
         assert response.json()["valid"] is True
 
     @pytest.mark.asyncio()
     async def test_validate_invalid_token(self, reset_client):
         """Should return valid=false for an invalid token."""
-        response = await reset_client.get(
-            "/auth/password-reset/validate?token=nonexistent-token"
-        )
+        response = await reset_client.get("/auth/password-reset/validate?token=nonexistent-token")
         assert response.status_code == 200
         assert response.json()["valid"] is False
 
@@ -303,9 +297,7 @@ class TestPasswordResetTokenReuse:
         )
 
         # Validate should return false
-        response = await reset_client.get(
-            f"/auth/password-reset/validate?token={token_value}"
-        )
+        response = await reset_client.get(f"/auth/password-reset/validate?token={token_value}")
         assert response.status_code == 200
         assert response.json()["valid"] is False
 
@@ -461,9 +453,7 @@ class TestPasswordResetExpiredToken:
             await session.commit()
 
         # Validate should return false
-        response = await reset_client.get(
-            f"/auth/password-reset/validate?token={token_value}"
-        )
+        response = await reset_client.get(f"/auth/password-reset/validate?token={token_value}")
         assert response.status_code == 200
         assert response.json()["valid"] is False
 
@@ -507,8 +497,6 @@ class TestPasswordResetNewTokenInvalidatesOld:
         )
 
         # First token should now be invalid
-        response = await reset_client.get(
-            f"/auth/password-reset/validate?token={first_token}"
-        )
+        response = await reset_client.get(f"/auth/password-reset/validate?token={first_token}")
         assert response.status_code == 200
         assert response.json()["valid"] is False

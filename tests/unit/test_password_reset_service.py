@@ -16,7 +16,6 @@ from src.db.models.user import User
 from src.db.models.verification_token import TokenType, VerificationToken
 from src.services.password_reset_service import (
     PASSWORD_RESET_TOKEN_EXPIRY_HOURS,
-    TOKEN_BYTE_LENGTH,
     create_password_reset_token,
     reset_password,
     validate_reset_token,
@@ -230,9 +229,7 @@ class TestResetPassword:
         assert success is False
 
     @pytest.mark.asyncio()
-    async def test_hash_password_called_with_new_password(
-        self, mock_db, sample_user, sample_token
-    ):
+    async def test_hash_password_called_with_new_password(self, mock_db, sample_user, sample_token):
         """Should call hash_password with the exact new password value."""
         sample_token.user_id = sample_user.id
         mock_result = MagicMock()
@@ -249,9 +246,7 @@ class TestResetPassword:
             mock_hash.assert_called_once_with(new_pwd)
 
     @pytest.mark.asyncio()
-    async def test_token_marked_used_after_reset(
-        self, mock_db, sample_user, sample_token
-    ):
+    async def test_token_marked_used_after_reset(self, mock_db, sample_user, sample_token):
         """Token used_at should be set to a datetime after successful reset."""
         sample_token.user_id = sample_user.id
         sample_token.used_at = None
