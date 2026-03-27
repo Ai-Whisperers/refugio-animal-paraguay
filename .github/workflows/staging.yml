@@ -1,0 +1,52 @@
+name: Deploy to Staging
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  deploy-staging:
+    name: Deploy to Staging (sunstein.cloud/petShelter-staging)
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # GitHub Environment — configure protection rules in repo settings if desired.
+    # Staging intentionally has no required reviewers (auto-deploy on develop push).
+    environment:
+      name: staging
+      url: https://sunstein.cloud/petShelter-staging
+
+    steps:
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          echo "${{ secrets.VPS_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+
+      - name: Deploy to staging on VPS
+        run: |
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=yes \
+            ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} \
+            'set -e
+             cd /opt/refugio-animal-paraguay
+             git fetch origin develop
+             git checkout develop
+             git reset --hard origin/develop
+             docker compose -f docker-compose.staging.yml build
+             docker compose -f docker-compose.staging.yml up -d'
+
+      - name: Staging health check
+        run: |
+          sleep 20
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=yes \
+            ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} \
+            'docker compose -f /opt/refugio-animal-paraguay/docker-compose.staging.yml \
+               ps --format "table {{.Name}}\t{{.Status}}" && \
+             curl -sf --max-time 15 https://sunstein.cloud/petShelter-staging/api/health \
+               && echo "Staging API healthy" \
+               || echo "Staging API not yet responding (may still be starting)"'
+
+      - name: Cleanup SSH
+        if: always()
+        run: rm -rf ~/.ssh/deploy_key
