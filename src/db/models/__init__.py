@@ -62,7 +62,6 @@ from .surgery import (
 )
 from .vaccination import Vaccination, VaccinationSchedule, VaccinationStatus, VaccineType
 from .verification_token import TokenType, VerificationToken
-
 __all__ = [
     "BRONZE_AMOUNT_CENTS",
     "GOLD_AMOUNT_CENTS",
