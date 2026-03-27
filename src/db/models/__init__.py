@@ -37,7 +37,6 @@ from .sponsorship import (
     SponsorshipTierLevel,
 )
 from .subscription import Subscription, SubscriptionInterval, SubscriptionStatus
-from .user import User, UserRole
 from .surgery import (
     AnesthesiaType,
     PostOpCheck,
@@ -47,6 +46,7 @@ from .surgery import (
     SurgeryStatus,
     SurgeryType,
 )
+from .user import User, UserRole
 from .user_consent import ConsentMethod, ConsentStatus, ConsentType, UserConsent
 from .vaccination import Vaccination, VaccinationSchedule, VaccinationStatus, VaccineType
 from .verification_token import TokenType, VerificationToken
