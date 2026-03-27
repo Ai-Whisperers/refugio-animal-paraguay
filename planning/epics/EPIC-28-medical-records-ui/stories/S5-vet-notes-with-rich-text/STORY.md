@@ -3,7 +3,7 @@ story: S5
 epic: EPIC-28
 ticket: RAP-139
 title: "Vet notes with rich text"
-status: planned
+status: done
 points: 3
 priority: P2
 track: Frontend

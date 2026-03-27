@@ -2,7 +2,7 @@
 epic: EPIC-28
 title: "Medical Records UI"
 sprint: 2
-status: planned
+status: done
 points: 21
 created: 2026-03-26T19:06:04
 version: V5

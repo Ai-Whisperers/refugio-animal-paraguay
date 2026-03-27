@@ -281,3 +281,15 @@
 - **Duration**: ~60m total
 - **Quality**: TypeScript clean, 1047 unit tests passing, ruff import-sort auto-fixed across src/tests
 - **Notes**: Combined RAP-135 (medical timeline) and RAP-136 (vet visit form) into single PR as they are tightly coupled P0 stories. RAP-137 vaccination dashboard consumed pre-existing `/vaccination-alerts` endpoint directly. Sidebar updated with Vacunaciones link.
+
+### [2026-03-27] Worker Run — EPIC-28 P1+P2 Complete
+- **Epic**: EPIC-28 — Medical Records UI (ALL 5 stories now done)
+- **Stories completed**: RAP-138 (Medical alerts panel), RAP-139 (Vet notes rich text)
+- **PRs created**: #130 (RAP-138), #131 (RAP-139)
+- **Duration**: ~75m total
+- **Quality**: TypeScript only (no Python changed), 1047 unit tests passing, ruff clean
+- **Notes**: Fixed stale stash corruption in src/db/models/__init__.py and src/app.py
+  (RAP-149 WIP had been partially stash-applied leaving broken vet_referral imports).
+  RAP-138: New /admin/medical/alerts page fetching vaccination alerts by severity.
+  RAP-139: New RichTextEditor component + /admin/animals/{id}/vet-notes page with
+  expandable per-visit rich text notes editor. EPIC-28 is now fully complete.
