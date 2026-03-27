@@ -148,3 +148,19 @@
 - **Tickets**: All completed tickets have COMPLETED status. No orphans. current.md empty.
 - **Branches**: 4 remote feature branches (RAP-100 to RAP-103) match open PRs. No stale branches. 1 prunable worktree.
 - **Actions taken**: Log entry only — deferred PR merges due to active worker.
+
+### [2026-03-27 autonomous-worker] EPIC-21 Completion Run
+- **Session type**: Autonomous worker (scheduled, multi-story continuation)
+- **Epic completed**: EPIC-21 Staff Login & Auth Hardening (5/5 stories, 18 points)
+- **Stories completed this session**:
+  - S5 (RAP-104) — Account Lockout After Failed Attempts: 15-min lockout after 5 consecutive failures, HTTP 423 response, auto-reset on success. PR #65.
+- **Stories completed in prior sessions** (S1-S4):
+  - S1 (RAP-100) — Staff Login Page with JWT Auth Flow: PR #61
+  - S2 (RAP-101) — Password Reset with Email Token: PR #62
+  - S3 (RAP-102) — Email Verification on Registration: PR #63
+  - S4 (RAP-103) — Session Timeout and Forced Logout: PR #64
+- **Quality gates**: All 50 auth-related tests passing (11 unit + 4 integration for S5, plus 35 existing auth tests — zero regressions).
+- **Migrations**: 023 (add failed_login_attempts + locked_until to users).
+- **Queue state**: EPIC-21 marked DONE. All 5 stories marked DONE.
+- **Branches**: feature/RAP-104-account-lockout-failed-attempts pushed; PR #65 open against develop.
+- **PRs open**: #61-#65 (EPIC-21 S1-S5) — all chained, ready for sequential merge.
