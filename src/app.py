@@ -42,6 +42,7 @@ from src.api.notification_preferences import router as notification_preferences_
 from src.api.notifications import router as notifications_router
 from src.api.password_reset import router as password_reset_router
 from src.api.phone_verification import router as phone_verification_router
+from src.api.portal import router as portal_router
 from src.api.prescriptions import router as prescriptions_router
 from src.api.profile import router as profile_router
 from src.api.public import router as public_router
@@ -186,6 +187,7 @@ def create_app() -> FastAPI:
     application.include_router(public_campaigns_router)
     application.include_router(public_contact_router)
     application.include_router(public_register_router)
+    application.include_router(portal_router)
     application.include_router(sepa_router)
     application.include_router(subscriptions_router)
     application.include_router(tigo_money_router)
