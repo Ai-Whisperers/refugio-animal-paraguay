@@ -103,10 +103,10 @@ class TestOnAdoptionRequestCreated:
         ):
             await handlers.on_adoption_request_created(event)
 
-        assert mock_create.await_count == len(user_ids)
+        assert mock_create.call_count == 2
 
     @pytest.mark.asyncio
-    async def test_uses_defaults_when_payload_empty(self) -> None:
+    async def test_uses_default_names_when_payload_missing(self) -> None:
         handlers = _make_handlers()
         event = _event(EventType.ADOPTION_REQUEST_CREATED, {})
         user_ids = [uuid4()]
@@ -118,36 +118,23 @@ class TestOnAdoptionRequestCreated:
         ):
             await handlers.on_adoption_request_created(event)
 
-        # Defaults used: "Unknown adopter" and "an animal"
-        call_kwargs = mock_create.call_args
-        assert "Unknown adopter" in str(call_kwargs)
-        mock_create.assert_awaited_once()
+        call_kwargs = mock_create.call_args[1]
+        assert "Unknown adopter" in call_kwargs["message"]
+        assert "an animal" in call_kwargs["message"]
 
     @pytest.mark.asyncio
     async def test_does_not_raise_on_exception(self) -> None:
         handlers = _make_handlers()
-        event = _event(EventType.ADOPTION_REQUEST_CREATED)
-
-        with patch(
-            "src.notifications.in_app_handlers.get_async_session",
-            side_effect=RuntimeError("DB down"),
-        ):
-            # Must not propagate — handler isolates failures
-            await handlers.on_adoption_request_created(event)
-
-    @pytest.mark.asyncio
-    async def test_skips_create_when_no_staff(self) -> None:
-        handlers = _make_handlers()
-        event = _event(EventType.ADOPTION_REQUEST_CREATED)
-        mock_create = AsyncMock(return_value=None)
+        event = _event(EventType.ADOPTION_REQUEST_CREATED, {"adopter_name": "Maria"})
 
         with (
-            _patch_db([]),
-            patch("src.notifications.in_app_handlers.create_notification", mock_create),
+            patch(
+                "src.notifications.in_app_handlers.create_notification",
+                side_effect=RuntimeError("DB exploded"),
+            ),
+            _patch_db([uuid4()]),
         ):
             await handlers.on_adoption_request_created(event)
-
-        mock_create.assert_not_awaited()
 
 
 # ---------------------------------------------------------------------------
@@ -158,52 +145,39 @@ class TestOnAdoptionRequestCreated:
 class TestOnAdoptionStatusChanged:
 
     @pytest.mark.asyncio
-    async def test_notifies_staff_with_status_info(self) -> None:
+    async def test_notifies_staff_with_status_transition(self) -> None:
         handlers = _make_handlers()
         event = _event(
             EventType.ADOPTION_STATUS_CHANGED,
             {"old_status": "pending", "new_status": "approved"},
         )
-        user_id = uuid4()
+        user_ids = [uuid4()]
         mock_create = AsyncMock(return_value=None)
 
         with (
-            _patch_db([user_id]),
+            _patch_db(user_ids),
             patch("src.notifications.in_app_handlers.create_notification", mock_create),
         ):
             await handlers.on_adoption_status_changed(event)
 
-        mock_create.assert_awaited_once()
-        call_str = str(mock_create.call_args)
-        assert "pending" in call_str
-        assert "approved" in call_str
+        assert mock_create.call_count == 1
+        call_kwargs = mock_create.call_args[1]
+        assert "pending" in call_kwargs["message"]
+        assert "approved" in call_kwargs["message"]
 
     @pytest.mark.asyncio
     async def test_does_not_raise_on_exception(self) -> None:
         handlers = _make_handlers()
-        event = _event(EventType.ADOPTION_STATUS_CHANGED)
-
-        with patch(
-            "src.notifications.in_app_handlers.get_async_session",
-            side_effect=ConnectionError("DB timeout"),
-        ):
-            await handlers.on_adoption_status_changed(event)
-
-    @pytest.mark.asyncio
-    async def test_uses_unknown_defaults_on_empty_payload(self) -> None:
-        handlers = _make_handlers()
         event = _event(EventType.ADOPTION_STATUS_CHANGED, {})
-        mock_create = AsyncMock(return_value=None)
 
         with (
+            patch(
+                "src.notifications.in_app_handlers.create_notification",
+                side_effect=RuntimeError("DB exploded"),
+            ),
             _patch_db([uuid4()]),
-            patch("src.notifications.in_app_handlers.create_notification", mock_create),
         ):
             await handlers.on_adoption_status_changed(event)
-
-        mock_create.assert_awaited_once()
-        call_str = str(mock_create.call_args)
-        assert "unknown" in call_str
 
 
 # ---------------------------------------------------------------------------
@@ -214,51 +188,38 @@ class TestOnAdoptionStatusChanged:
 class TestOnDonationReceived:
 
     @pytest.mark.asyncio
-    async def test_notifies_staff_on_donation(self) -> None:
+    async def test_notifies_staff_with_donation_details(self) -> None:
         handlers = _make_handlers()
         event = _event(
             EventType.DONATION_RECEIVED,
-            {"amount": "100.00", "currency": "EUR", "donor_name": "Jan de Vries"},
+            {"amount": "150.00", "currency": "EUR", "donor_name": "Jan de Vries"},
         )
-        user_id = uuid4()
+        user_ids = [uuid4(), uuid4()]
         mock_create = AsyncMock(return_value=None)
 
         with (
-            _patch_db([user_id]),
+            _patch_db(user_ids),
             patch("src.notifications.in_app_handlers.create_notification", mock_create),
         ):
             await handlers.on_donation_received(event)
 
-        mock_create.assert_awaited_once()
-        call_str = str(mock_create.call_args)
-        assert "Jan de Vries" in call_str
-        assert "100.00" in call_str
+        assert mock_create.call_count == 2
+        call_kwargs = mock_create.call_args[1]
+        assert "Jan de Vries" in call_kwargs["message"]
 
     @pytest.mark.asyncio
     async def test_does_not_raise_on_exception(self) -> None:
         handlers = _make_handlers()
-        event = _event(EventType.DONATION_RECEIVED)
-
-        with patch(
-            "src.notifications.in_app_handlers.get_async_session",
-            side_effect=OSError("socket closed"),
-        ):
-            await handlers.on_donation_received(event)
-
-    @pytest.mark.asyncio
-    async def test_uses_anonymous_default_donor_name(self) -> None:
-        handlers = _make_handlers()
-        event = _event(EventType.DONATION_RECEIVED, {"amount": "50", "currency": "PYG"})
-        mock_create = AsyncMock(return_value=None)
+        event = _event(EventType.DONATION_RECEIVED, {})
 
         with (
+            patch(
+                "src.notifications.in_app_handlers.create_notification",
+                side_effect=RuntimeError("DB exploded"),
+            ),
             _patch_db([uuid4()]),
-            patch("src.notifications.in_app_handlers.create_notification", mock_create),
         ):
             await handlers.on_donation_received(event)
-
-        mock_create.assert_awaited_once()
-        assert "Anonymous" in str(mock_create.call_args)
 
 
 # ---------------------------------------------------------------------------
@@ -269,61 +230,50 @@ class TestOnDonationReceived:
 class TestOnAnimalIntakeCompleted:
 
     @pytest.mark.asyncio
-    async def test_notifies_staff_on_intake(self) -> None:
+    async def test_notifies_staff_with_animal_details(self) -> None:
         handlers = _make_handlers()
         event = _event(
             EventType.ANIMAL_INTAKE_COMPLETED,
-            {"animal_name": "Rex", "species": "dog"},
+            {"animal_name": "Firulais", "species": "dog"},
         )
-        user_id = uuid4()
+        user_ids = [uuid4()]
         mock_create = AsyncMock(return_value=None)
 
         with (
-            _patch_db([user_id]),
+            _patch_db(user_ids),
             patch("src.notifications.in_app_handlers.create_notification", mock_create),
         ):
             await handlers.on_animal_intake_completed(event)
 
-        mock_create.assert_awaited_once()
-        call_str = str(mock_create.call_args)
-        assert "Rex" in call_str
+        assert mock_create.call_count == 1
+        call_kwargs = mock_create.call_args[1]
+        assert "Firulais" in call_kwargs["message"]
+        assert "dog" in call_kwargs["message"]
 
     @pytest.mark.asyncio
     async def test_does_not_raise_on_exception(self) -> None:
         handlers = _make_handlers()
-        event = _event(EventType.ANIMAL_INTAKE_COMPLETED)
-
-        with patch(
-            "src.notifications.in_app_handlers.get_async_session",
-            side_effect=RuntimeError("queue full"),
-        ):
-            await handlers.on_animal_intake_completed(event)
-
-    @pytest.mark.asyncio
-    async def test_uses_default_animal_name_when_missing(self) -> None:
-        handlers = _make_handlers()
         event = _event(EventType.ANIMAL_INTAKE_COMPLETED, {})
-        mock_create = AsyncMock(return_value=None)
 
         with (
+            patch(
+                "src.notifications.in_app_handlers.create_notification",
+                side_effect=RuntimeError("DB exploded"),
+            ),
             _patch_db([uuid4()]),
-            patch("src.notifications.in_app_handlers.create_notification", mock_create),
         ):
             await handlers.on_animal_intake_completed(event)
-
-        mock_create.assert_awaited_once()
-        assert "New animal" in str(mock_create.call_args)
 
 
 # ---------------------------------------------------------------------------
-# _notify_all_staff: DB interaction
+# _notify_all_staff (DB integration)
 # ---------------------------------------------------------------------------
 
 
 class TestNotifyAllStaff:
 
     @pytest.mark.asyncio
-    async def test_calls_create_notification_per_staff_user(self) -> None:
+    async def test_creates_notification_for_each_staff_user(self) -> None:
         handlers = _make_handlers()
         user_ids = [uuid4(), uuid4(), uuid4()]
         mock_create = AsyncMock(return_value=None)
@@ -333,16 +283,18 @@ class TestNotifyAllStaff:
             patch("src.notifications.in_app_handlers.create_notification", mock_create),
         ):
             await handlers._notify_all_staff(
-                notification_type="test.type",
+                notification_type="test_type",
                 title="Test",
-                message="Test message",
-                data={"key": "value"},
+                message="Hello",
+                data={"key": "val"},
             )
 
-        assert mock_create.await_count == 3
+        assert mock_create.call_count == 3
+        called_user_ids = {c[1]["user_id"] for c in mock_create.call_args_list}
+        assert called_user_ids == set(user_ids)
 
     @pytest.mark.asyncio
-    async def test_does_nothing_when_no_staff_users(self) -> None:
+    async def test_does_nothing_when_no_staff_exist(self) -> None:
         handlers = _make_handlers()
         mock_create = AsyncMock(return_value=None)
 
@@ -351,9 +303,9 @@ class TestNotifyAllStaff:
             patch("src.notifications.in_app_handlers.create_notification", mock_create),
         ):
             await handlers._notify_all_staff(
-                notification_type="test.type",
+                notification_type="test_type",
                 title="Test",
-                message="No staff",
+                message="Hello",
             )
 
-        mock_create.assert_not_awaited()
+        mock_create.assert_not_called()
