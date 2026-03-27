@@ -2,7 +2,7 @@
 epic: EPIC-22
 title: "Animal Management Dashboard"
 sprint: 1
-status: planned
+status: done
 points: 26
 created: 2026-03-26T19:06:04
 version: V4
@@ -16,11 +16,11 @@ version: V4
 **Target users**: Shelter staff, administrators
 
 ## Stories
-- [ ] [S1] Animal list with search, sort, pagination (5 pts, P0, Frontend)
-- [ ] [S2] Animal create/edit form with photo upload (8 pts, P0, Frontend)
-- [ ] [S3] Animal status workflow (intake > available > reserved > adopted) (5 pts, P0, Frontend)
-- [ ] [S4] Batch status updates and bulk actions (3 pts, P1, Frontend)
-- [ ] [S5] Animal detail view with full history (5 pts, P1, Frontend)
+- [x] [S1] Animal list with search, sort, pagination (5 pts, P0, Frontend)
+- [x] [S2] Animal create/edit form with photo upload (8 pts, P0, Frontend)
+- [x] [S3] Animal status workflow (intake > available > reserved > adopted) (5 pts, P0, Frontend)
+- [x] [S4] Batch status updates and bulk actions (3 pts, P1, Frontend)
+- [x] [S5] Animal detail view with full history (5 pts, P1, Frontend)
 
 ## Total Points
 26
