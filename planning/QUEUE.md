@@ -167,7 +167,7 @@ Week 3-4:
 
 | # | Story | Ticket | Epic | Pts | Status | Depends On |
 |---|-------|--------|------|-----|--------|------------|
-| 24 | Coverage reporting and PR status checks | RAP-404 | EPIC-71 | 5 | READY | RAP-400 ✓ |
+| 24 | Coverage reporting and PR status checks | RAP-404 | EPIC-71 | 5 | DONE (PR #88) | RAP-400 ✓ |
 | 25 | Frontend component tests (Vitest) | RAP-409 | EPIC-72 | 3 | DONE (PR #87) | — |
 
 ### Epics in this sprint
