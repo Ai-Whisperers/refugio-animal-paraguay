@@ -3,7 +3,7 @@ story: S1
 epic: EPIC-25
 ticket: RAP-120
 title: "Admin layout shell with sidebar navigation"
-status: planned
+status: done
 points: 5
 priority: P0
 track: Frontend
