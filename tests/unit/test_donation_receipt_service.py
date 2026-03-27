@@ -210,9 +210,7 @@ class TestDonationReceiptGenerator:
             result = generator.generate_bytes(data)
             assert result[:5] == b"%PDF-", f"Failed for category {category}"
 
-    def test_receipt_with_notes(
-        self, generator: DonationReceiptGenerator
-    ) -> None:
+    def test_receipt_with_notes(self, generator: DonationReceiptGenerator) -> None:
         data = ReceiptData(
             donation_id=uuid4(),
             amount_cents=5000,
@@ -233,9 +231,7 @@ class TestDonationReceiptGenerator:
         assert isinstance(result, bytes)
         assert len(result) > 0
 
-    def test_receipt_yearly_recurring(
-        self, generator: DonationReceiptGenerator
-    ) -> None:
+    def test_receipt_yearly_recurring(self, generator: DonationReceiptGenerator) -> None:
         data = ReceiptData(
             donation_id=uuid4(),
             amount_cents=12000,

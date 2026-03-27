@@ -64,7 +64,11 @@ async def request_password_reset(
 
     if token is not None:
         # Build reset URL using the first allowed origin as the frontend base
-        frontend_base = settings.allowed_origins_list[0] if settings.allowed_origins_list else "http://localhost:3000"
+        frontend_base = (
+            settings.allowed_origins_list[0]
+            if settings.allowed_origins_list
+            else "http://localhost:3000"
+        )
         reset_url = f"{frontend_base}/admin/reset-password?token={token}"
 
         try:

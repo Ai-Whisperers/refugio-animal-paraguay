@@ -19,6 +19,7 @@ from src.services.sepa_notification_service import SepaNotificationService
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 def _make_service() -> tuple[SepaNotificationService, MagicMock, MagicMock]:
     """Construct a SepaNotificationService with mocked dependencies."""
     email_service = MagicMock(spec=EmailService)
@@ -69,6 +70,7 @@ def _mock_lookup_donation_and_donor(donor_or_none, donation_or_none):
 # ---------------------------------------------------------------------------
 # notify_mandate_saved
 # ---------------------------------------------------------------------------
+
 
 class TestNotifyMandateSaved:
     """Tests for SepaNotificationService.notify_mandate_saved."""
@@ -130,6 +132,7 @@ class TestNotifyMandateSaved:
 # notify_payment_processing
 # ---------------------------------------------------------------------------
 
+
 class TestNotifyPaymentProcessing:
     """Tests for SepaNotificationService.notify_payment_processing."""
 
@@ -189,6 +192,7 @@ class TestNotifyPaymentProcessing:
 # ---------------------------------------------------------------------------
 # notify_payment_failed
 # ---------------------------------------------------------------------------
+
 
 class TestNotifyPaymentFailed:
     """Tests for SepaNotificationService.notify_payment_failed."""
@@ -258,6 +262,7 @@ class TestNotifyPaymentFailed:
 # ---------------------------------------------------------------------------
 # Template rendering: correct context keys
 # ---------------------------------------------------------------------------
+
 
 class TestTemplateContextKeys:
     """Verify render() is called with the expected template name and keys."""

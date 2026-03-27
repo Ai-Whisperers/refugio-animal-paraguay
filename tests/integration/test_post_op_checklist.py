@@ -10,11 +10,14 @@ pytestmark = [pytest.mark.asyncio(loop_scope="function"), pytest.mark.integratio
 
 
 async def _create_animal(client: AsyncClient) -> str:
-    resp = await client.post("/animals", json={
-        "name": f"Checklist-Dog-{uuid.uuid4().hex[:6]}",
-        "species": "dog",
-        "breed": "mixed",
-    })
+    resp = await client.post(
+        "/animals",
+        json={
+            "name": f"Checklist-Dog-{uuid.uuid4().hex[:6]}",
+            "species": "dog",
+            "breed": "mixed",
+        },
+    )
     assert resp.status_code == 201
     return resp.json()["id"]
 
@@ -24,13 +27,16 @@ async def _create_surgery(
     animal_id: str,
     surgery_type: str = "spay",
 ) -> dict:
-    resp = await client.post(f"/animals/{animal_id}/surgeries", json={
-        "surgery_type": surgery_type,
-        "surgery_status": "completed",
-        "veterinarian_name": "Dr. Martinez",
-        "scheduled_date": date.today().isoformat(),
-        "performed_date": date.today().isoformat(),
-    })
+    resp = await client.post(
+        f"/animals/{animal_id}/surgeries",
+        json={
+            "surgery_type": surgery_type,
+            "surgery_status": "completed",
+            "veterinarian_name": "Dr. Martinez",
+            "scheduled_date": date.today().isoformat(),
+            "performed_date": date.today().isoformat(),
+        },
+    )
     assert resp.status_code == 201
     return resp.json()
 

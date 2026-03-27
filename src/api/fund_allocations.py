@@ -29,7 +29,9 @@ from src.services.fund_allocation_service import (
     get_allocation_breakdown,
 )
 
-router = APIRouter(prefix="/fund-allocations", tags=["fund-allocations"], responses=RESOURCE_RESPONSES)
+router = APIRouter(
+    prefix="/fund-allocations", tags=["fund-allocations"], responses=RESOURCE_RESPONSES
+)
 
 _DEFAULT_LIMIT = 20
 _MAX_LIMIT = 100

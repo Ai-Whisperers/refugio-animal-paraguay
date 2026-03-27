@@ -57,9 +57,7 @@ def _build_verification_url(token: str) -> str:
     return f"{FRONTEND_BASE_URL}/admin/verify-email?token={token}"
 
 
-async def _send_verification_email(
-    email: str, token: str, settings: Settings
-) -> None:
+async def _send_verification_email(email: str, token: str, settings: Settings) -> None:
     """Send a verification email with the token link."""
     verification_url = _build_verification_url(token)
 
@@ -112,9 +110,7 @@ async def resend_verification_email(
 
     Always returns success to not leak whether the email exists.
     """
-    result = await db.execute(
-        select(User).where(User.email == str(payload.email))
-    )
+    result = await db.execute(select(User).where(User.email == str(payload.email)))
     user = result.scalar_one_or_none()
 
     if user is not None and user.is_active and not user.email_verified:

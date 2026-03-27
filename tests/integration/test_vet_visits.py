@@ -123,9 +123,7 @@ async def test_list_vet_visits_pagination(client: AsyncClient) -> None:
     for _ in range(3):
         await _create_visit(client, animal_id)
 
-    response = await client.get(
-        f"/animals/{animal_id}/vet-visits?page=1&page_size=2"
-    )
+    response = await client.get(f"/animals/{animal_id}/vet-visits?page=1&page_size=2")
     assert response.status_code == 200
     body = response.json()
     assert len(body["items"]) == 2

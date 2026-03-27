@@ -96,7 +96,6 @@ async def login(
     # Successful login — reset any failed-attempt counter
     await reset_failed_attempts(db, user)
 
-
     expires_delta = timedelta(minutes=settings.access_token_expire_minutes)
     token_expires_at = datetime.now(UTC) + expires_delta
 
@@ -157,9 +156,7 @@ async def create_user(
         if token:
             await _send_verification_email(str(user.email), token, settings)
     except Exception:
-        logger.warning(
-            "Failed to send verification email for user_id=%s", user.id
-        )
+        logger.warning("Failed to send verification email for user_id=%s", user.id)
 
     return user
 

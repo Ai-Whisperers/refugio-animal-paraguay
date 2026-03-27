@@ -14,13 +14,17 @@ pytestmark = [pytest.mark.asyncio(loop_scope="function"), pytest.mark.integratio
 # Helpers
 # ---------------------------------------------------------------------------
 
+
 async def _create_animal(client: AsyncClient) -> str:
     """Create a test animal and return its ID."""
-    resp = await client.post("/animals", json={
-        "name": "Firulais Test",
-        "species": "dog",
-        "breed": "mixed",
-    })
+    resp = await client.post(
+        "/animals",
+        json={
+            "name": "Firulais Test",
+            "species": "dog",
+            "breed": "mixed",
+        },
+    )
     assert resp.status_code == 201
     return resp.json()["id"]
 
@@ -28,6 +32,7 @@ async def _create_animal(client: AsyncClient) -> str:
 async def _create_vaccine_type(client: AsyncClient, **overrides: object) -> dict:
     """Create a vaccine type and return full response."""
     import uuid
+
     data = {
         "name": f"Rabies-{uuid.uuid4().hex[:6]}",
         "description": "Anti-rabies vaccine",
@@ -87,9 +92,7 @@ class TestVaccineTypeCRUD:
         assert resp.status_code == 404
 
     async def test_get_nonexistent_returns_404(self, client: AsyncClient) -> None:
-        resp = await client.get(
-            "/vaccine-types/00000000-0000-0000-0000-000000000099"
-        )
+        resp = await client.get("/vaccine-types/00000000-0000-0000-0000-000000000099")
         assert resp.status_code == 404
 
 
@@ -247,9 +250,7 @@ class TestVaccinationRecordCRUD:
         assert body["vaccination_status"] == "administered"
         assert body["administered_by"] == "Dr. Lopez"
 
-    async def test_list_vaccinations_with_status_filter(
-        self, client: AsyncClient
-    ) -> None:
+    async def test_list_vaccinations_with_status_filter(self, client: AsyncClient) -> None:
         animal_id = await _create_animal(client)
         vt = await _create_vaccine_type(client)
 
@@ -316,9 +317,7 @@ class TestVaccinationRecordCRUD:
         resp = await client.get(f"/vaccinations/{vacc_id}")
         assert resp.status_code == 404
 
-    async def test_create_vaccination_nonexistent_animal_404(
-        self, client: AsyncClient
-    ) -> None:
+    async def test_create_vaccination_nonexistent_animal_404(self, client: AsyncClient) -> None:
         vt = await _create_vaccine_type(client)
         resp = await client.post(
             "/animals/00000000-0000-0000-0000-000000000099/vaccinations",

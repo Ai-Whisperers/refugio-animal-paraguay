@@ -148,7 +148,9 @@ class TestVaccinationCertificatePDF:
 class TestGenerateVaccinationCertificate:
     """Tests for generate_vaccination_certificate function."""
 
-    def test_generates_pdf_with_vaccinations(self, sample_certificate_data, tmp_path, monkeypatch) -> None:
+    def test_generates_pdf_with_vaccinations(
+        self, sample_certificate_data, tmp_path, monkeypatch
+    ) -> None:
         monkeypatch.setattr(
             "src.services.vaccination_certificate_service.CERTIFICATE_STORAGE_DIR",
             tmp_path,
@@ -219,7 +221,9 @@ class TestGenerateVaccinationCertificate:
         assert storage_dir.exists()
         assert filepath.exists()
 
-    def test_filename_contains_animal_id(self, sample_certificate_data, tmp_path, monkeypatch) -> None:
+    def test_filename_contains_animal_id(
+        self, sample_certificate_data, tmp_path, monkeypatch
+    ) -> None:
         monkeypatch.setattr(
             "src.services.vaccination_certificate_service.CERTIFICATE_STORAGE_DIR",
             tmp_path,

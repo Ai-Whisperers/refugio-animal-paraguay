@@ -119,9 +119,7 @@ class TestCheckMigrations:
         mock_result.scalar.return_value = "some_version"
         db.execute = AsyncMock(return_value=mock_result)
 
-        with (
-            patch("alembic.config.Config", side_effect=Exception("no alembic.ini")),
-        ):
+        with (patch("alembic.config.Config", side_effect=Exception("no alembic.ini")),):
             result = await _check_migrations(db)
 
         assert result["status"] == "ok"
@@ -157,7 +155,10 @@ class TestCheckStripe:
         settings = MagicMock()
         settings.stripe_secret_key = "sk_test_bad"
 
-        with patch("src.api.health.stripe.Balance.retrieve", side_effect=stripe.AuthenticationError("bad key")):
+        with patch(
+            "src.api.health.stripe.Balance.retrieve",
+            side_effect=stripe.AuthenticationError("bad key"),
+        ):
             result = await _check_stripe(settings)
 
         assert result["status"] == "error"
@@ -168,7 +169,10 @@ class TestCheckStripe:
         settings = MagicMock()
         settings.stripe_secret_key = "sk_test_ok"
 
-        with patch("src.api.health.stripe.Balance.retrieve", side_effect=stripe.APIConnectionError("network")):
+        with patch(
+            "src.api.health.stripe.Balance.retrieve",
+            side_effect=stripe.APIConnectionError("network"),
+        ):
             result = await _check_stripe(settings)
 
         assert result["status"] == "error"

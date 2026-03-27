@@ -110,9 +110,7 @@ class SepaNotificationService:
                     html_body=html,
                 )
             )
-            logger.info(
-                "sepa_notify: payment_processing email sent for donation %s", donation_id
-            )
+            logger.info("sepa_notify: payment_processing email sent for donation %s", donation_id)
         except Exception as exc:
             logger.exception(
                 "sepa_notify: failed to send payment_processing email for donation %s: %s",
@@ -206,9 +204,7 @@ class SepaNotificationService:
         """Fetch a Donation and its associated Donor in one session."""
         try:
             async with get_async_session() as session:
-                result = await session.execute(
-                    select(Donation).where(Donation.id == donation_id)
-                )
+                result = await session.execute(select(Donation).where(Donation.id == donation_id))
                 donation = result.scalar_one_or_none()
                 if donation is None:
                     return None, None
@@ -222,7 +218,5 @@ class SepaNotificationService:
                 donor = donor_result.scalar_one_or_none()
                 return donor, donation
         except Exception as exc:
-            logger.exception(
-                "sepa_notify: DB lookup failed for donation %s: %s", donation_id, exc
-            )
+            logger.exception("sepa_notify: DB lookup failed for donation %s: %s", donation_id, exc)
             return None, None

@@ -27,7 +27,10 @@ from src.services.campaign_social_proof_service import get_campaign_social_proof
 router = APIRouter(
     prefix="/public/campaigns",
     tags=["public-campaigns"],
-    responses={**COMMON_RESPONSES, 404: {"description": "Campaign not found", "model": ErrorResponse}},
+    responses={
+        **COMMON_RESPONSES,
+        404: {"description": "Campaign not found", "model": ErrorResponse},
+    },
 )
 
 DEFAULT_PAGE_SIZE = 12

@@ -25,6 +25,5 @@ def upgrade() -> None:
 def downgrade() -> None:
     op.execute("ALTER TABLE users DROP CONSTRAINT IF EXISTS chk_users_role")
     op.execute(
-        "ALTER TABLE users ADD CONSTRAINT chk_users_role "
-        "CHECK (role IN ('staff', 'admin'))"
+        "ALTER TABLE users ADD CONSTRAINT chk_users_role " "CHECK (role IN ('staff', 'admin'))"
     )

@@ -53,30 +53,16 @@ class VetReferral(Base):
     )
 
     # External vet details
-    external_vet_name: Mapped[str] = mapped_column(
-        sa.String(255), nullable=False
-    )
-    external_vet_clinic: Mapped[str | None] = mapped_column(
-        sa.String(255), nullable=True
-    )
-    external_vet_phone: Mapped[str | None] = mapped_column(
-        sa.String(50), nullable=True
-    )
-    external_vet_email: Mapped[str | None] = mapped_column(
-        sa.String(255), nullable=True
-    )
+    external_vet_name: Mapped[str] = mapped_column(sa.String(255), nullable=False)
+    external_vet_clinic: Mapped[str | None] = mapped_column(sa.String(255), nullable=True)
+    external_vet_phone: Mapped[str | None] = mapped_column(sa.String(50), nullable=True)
+    external_vet_email: Mapped[str | None] = mapped_column(sa.String(255), nullable=True)
 
     # Referral details
     reason: Mapped[str] = mapped_column(sa.Text, nullable=False)
-    specialty: Mapped[str | None] = mapped_column(
-        sa.String(100), nullable=True
-    )
-    urgency: Mapped[str] = mapped_column(
-        sa.String(20), nullable=False, server_default="medium"
-    )
-    status: Mapped[str] = mapped_column(
-        sa.String(20), nullable=False, server_default="pending"
-    )
+    specialty: Mapped[str | None] = mapped_column(sa.String(100), nullable=True)
+    urgency: Mapped[str] = mapped_column(sa.String(20), nullable=False, server_default="medium")
+    status: Mapped[str] = mapped_column(sa.String(20), nullable=False, server_default="pending")
 
     # Scheduling
     appointment_date: Mapped[datetime | None] = mapped_column(
@@ -92,12 +78,8 @@ class VetReferral(Base):
     follow_up_date: Mapped[datetime | None] = mapped_column(
         sa.TIMESTAMP(timezone=True), nullable=True
     )
-    estimated_cost: Mapped[float | None] = mapped_column(
-        sa.Numeric(10, 2), nullable=True
-    )
-    actual_cost: Mapped[float | None] = mapped_column(
-        sa.Numeric(10, 2), nullable=True
-    )
+    estimated_cost: Mapped[float | None] = mapped_column(sa.Numeric(10, 2), nullable=True)
+    actual_cost: Mapped[float | None] = mapped_column(sa.Numeric(10, 2), nullable=True)
 
     # Timestamps
     created_at: Mapped[datetime] = mapped_column(

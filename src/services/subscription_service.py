@@ -345,9 +345,7 @@ async def record_payment_failure(
       - failed_count: updated count (if found)
       - donor_id: UUID of the donor (if found)
     """
-    stmt = select(Subscription).where(
-        Subscription.stripe_subscription_id == stripe_subscription_id
-    )
+    stmt = select(Subscription).where(Subscription.stripe_subscription_id == stripe_subscription_id)
     result = await db.execute(stmt)
     subscription = result.scalar_one_or_none()
 
@@ -376,8 +374,7 @@ async def record_payment_failure(
         subscription.canceled_at = datetime.now(UTC)
         existing_notes = subscription.notes or ""
         subscription.notes = (
-            existing_notes
-            + f"\n[Auto-cancelled]: Exceeded {MAX_FAILED_PAYMENT_ATTEMPTS} "
+            existing_notes + f"\n[Auto-cancelled]: Exceeded {MAX_FAILED_PAYMENT_ATTEMPTS} "
             f"failed payment attempts"
         )
         action = "subscription_cancelled"

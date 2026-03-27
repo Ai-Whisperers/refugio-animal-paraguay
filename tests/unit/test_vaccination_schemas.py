@@ -50,7 +50,10 @@ class TestVaccineTypeCreate:
     def test_empty_name_rejected(self) -> None:
         with pytest.raises(ValidationError) as exc_info:
             VaccineTypeCreate(name="")
-        assert "min_length" in str(exc_info.value).lower() or "string_too_short" in str(exc_info.value).lower()
+        assert (
+            "min_length" in str(exc_info.value).lower()
+            or "string_too_short" in str(exc_info.value).lower()
+        )
 
     def test_name_too_long(self) -> None:
         with pytest.raises(ValidationError):

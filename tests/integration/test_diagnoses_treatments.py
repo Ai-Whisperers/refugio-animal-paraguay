@@ -275,7 +275,7 @@ async def test_delete_diagnosis_cascades_treatments(client: AsyncClient) -> None
     visit_id = await _create_visit(client, animal_id)
     diagnosis = await _create_diagnosis(client, visit_id)
     treatment = await _create_treatment(client, diagnosis["id"])
-    treatment_id = treatment["id"]
+    assert treatment["id"]  # confirms treatment was created before cascade delete
 
     # Delete the parent diagnosis
     resp = await client.delete(f"/diagnoses/{diagnosis['id']}")

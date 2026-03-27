@@ -88,9 +88,7 @@ class DunningService:
             "final_notice_sent", or "dunning_skipped".
         """
         try:
-            donor, subscription = await self._lookup_subscription_and_donor(
-                subscription_id
-            )
+            donor, subscription = await self._lookup_subscription_and_donor(subscription_id)
             if donor is None or subscription is None:
                 logger.warning(
                     "dunning: could not resolve donor/subscription for %s, skipping",
@@ -98,9 +96,7 @@ class DunningService:
                 )
                 return "dunning_skipped"
 
-            amount_display = _format_amount(
-                subscription.amount_cents, subscription.currency
-            )
+            amount_display = _format_amount(subscription.amount_cents, subscription.currency)
             interval_label = _format_interval_label(subscription.interval)
 
             base_context = {
@@ -129,9 +125,7 @@ class DunningService:
             )
             return "dunning_error"
 
-    async def _send_first_notice(
-        self, to_email: str, context: dict
-    ) -> str:
+    async def _send_first_notice(self, to_email: str, context: dict) -> str:
         """Send first payment failure notification."""
         html = self._renderer.render(TEMPLATE_FIRST_NOTICE, context)
         await self._email.send_email(
@@ -144,9 +138,7 @@ class DunningService:
         logger.info("dunning: first notice sent to %s", to_email)
         return "first_notice_sent"
 
-    async def _send_second_notice(
-        self, to_email: str, context: dict
-    ) -> str:
+    async def _send_second_notice(self, to_email: str, context: dict) -> str:
         """Send second payment failure notification."""
         html = self._renderer.render(TEMPLATE_SECOND_NOTICE, context)
         await self._email.send_email(
@@ -159,9 +151,7 @@ class DunningService:
         logger.info("dunning: second notice sent to %s", to_email)
         return "second_notice_sent"
 
-    async def _send_final_notice(
-        self, to_email: str, context: dict
-    ) -> str:
+    async def _send_final_notice(self, to_email: str, context: dict) -> str:
         """Send final cancellation notification."""
         html = self._renderer.render(TEMPLATE_FINAL_NOTICE, context)
         await self._email.send_email(
@@ -186,9 +176,7 @@ class DunningService:
                 else subscription_id
             )
             async with get_async_session() as session:
-                result = await session.execute(
-                    select(Subscription).where(Subscription.id == uid)
-                )
+                result = await session.execute(select(Subscription).where(Subscription.id == uid))
                 subscription = result.scalar_one_or_none()
                 if subscription is None:
                     return None, None

@@ -10,21 +10,27 @@ pytestmark = [pytest.mark.asyncio(loop_scope="function"), pytest.mark.integratio
 
 
 async def _create_animal(client: AsyncClient) -> str:
-    resp = await client.post("/animals", json={
-        "name": f"Cert-Dog-{uuid.uuid4().hex[:6]}",
-        "species": "dog",
-        "breed": "Labrador",
-    })
+    resp = await client.post(
+        "/animals",
+        json={
+            "name": f"Cert-Dog-{uuid.uuid4().hex[:6]}",
+            "species": "dog",
+            "breed": "Labrador",
+        },
+    )
     assert resp.status_code == 201
     return resp.json()["id"]
 
 
 async def _create_vaccine_type(client: AsyncClient) -> dict:
-    resp = await client.post("/vaccine-types", json={
-        "name": f"Cert-Vaccine-{uuid.uuid4().hex[:6]}",
-        "target_species": "all",
-        "is_required": True,
-    })
+    resp = await client.post(
+        "/vaccine-types",
+        json={
+            "name": f"Cert-Vaccine-{uuid.uuid4().hex[:6]}",
+            "target_species": "all",
+            "is_required": True,
+        },
+    )
     assert resp.status_code == 201
     return resp.json()
 

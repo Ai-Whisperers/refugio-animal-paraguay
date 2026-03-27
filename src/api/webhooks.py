@@ -600,9 +600,7 @@ async def stripe_webhook(
         result = await _handle_invoice_payment_succeeded(db, data_obj, event_bus)
         return {"status": "processed", "event_type": event_type, "result": result}
     if event_type == EVENT_INVOICE_PAYMENT_FAILED:
-        dunning_svc: DunningService | None = getattr(
-            request.app.state, "dunning_service", None
-        )
+        dunning_svc: DunningService | None = getattr(request.app.state, "dunning_service", None)
         result = await _handle_invoice_payment_failed(db, data_obj, dunning=dunning_svc)
         return {"status": "processed", "event_type": event_type, "result": result}
     if event_type == EVENT_SUBSCRIPTION_DELETED:

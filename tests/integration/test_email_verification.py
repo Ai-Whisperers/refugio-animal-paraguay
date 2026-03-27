@@ -27,9 +27,7 @@ async def verify_client():
     settings = Settings()
     engine = init_engine(settings)
 
-    session_factory = async_sessionmaker(
-        bind=engine, class_=AsyncSession, expire_on_commit=False
-    )
+    session_factory = async_sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
     async with session_factory() as session:
         # Create an unverified test user
         await session.execute(
@@ -98,9 +96,7 @@ async def _create_verification_token(user_id: str) -> str:
     """Create a verification token directly in the DB."""
     settings = Settings()
     engine = init_engine(settings)
-    session_factory = async_sessionmaker(
-        bind=engine, class_=AsyncSession, expire_on_commit=False
-    )
+    session_factory = async_sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
     async with session_factory() as session:
         from src.services.email_verification_service import (
             create_email_verification_token,

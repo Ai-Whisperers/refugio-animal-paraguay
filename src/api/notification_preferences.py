@@ -29,7 +29,11 @@ from src.services.notification_preference_service import (
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/notification-preferences", tags=["notification-preferences"], responses=AUTHENTICATED_RESPONSES)
+router = APIRouter(
+    prefix="/notification-preferences",
+    tags=["notification-preferences"],
+    responses=AUTHENTICATED_RESPONSES,
+)
 
 
 @router.get("", response_model=PreferenceListResponse)

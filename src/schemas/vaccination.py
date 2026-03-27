@@ -12,6 +12,7 @@ from pydantic import BaseModel, ConfigDict, Field
 # VaccineType schemas
 # ---------------------------------------------------------------------------
 
+
 class VaccineTypeCreate(BaseModel):
     """Create a new vaccine type in the catalog."""
 
@@ -58,6 +59,7 @@ class VaccineTypeListResponse(BaseModel):
 # ---------------------------------------------------------------------------
 # VaccinationSchedule schemas
 # ---------------------------------------------------------------------------
+
 
 class VaccinationScheduleCreate(BaseModel):
     """Create a vaccination schedule template."""
@@ -113,6 +115,7 @@ class VaccinationScheduleListResponse(BaseModel):
 # ---------------------------------------------------------------------------
 # Vaccination schemas
 # ---------------------------------------------------------------------------
+
 
 class VaccinationCreate(BaseModel):
     """Create a vaccination record for an animal."""

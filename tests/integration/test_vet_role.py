@@ -26,9 +26,7 @@ async def vet_client() -> AsyncGenerator[AsyncClient, None]:
     settings = Settings()
     engine = init_engine(settings)
 
-    session_factory = async_sessionmaker(
-        bind=engine, class_=AsyncSession, expire_on_commit=False
-    )
+    session_factory = async_sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
     async with session_factory() as session:
         await session.execute(
             text("""
@@ -65,6 +63,7 @@ class TestVetUserCreation:
     async def test_admin_can_create_vet_user(self) -> None:
         """The vet role is accepted by the UserCreate schema."""
         from src.schemas.user import UserCreate
+
         user_data = UserCreate(
             email="newvet@refugio.example.com",
             password="SecurePass123!",
@@ -93,11 +92,14 @@ class TestVetRoleAccess:
 
     async def test_vet_cannot_create_users(self, vet_client: AsyncClient) -> None:
         """Vets should NOT be able to create users (admin-only)."""
-        resp = await vet_client.post("/auth/users", json={
-            "email": "another@example.com",
-            "password": "SomePass123!",
-            "role": "staff",
-        })
+        resp = await vet_client.post(
+            "/auth/users",
+            json={
+                "email": "another@example.com",
+                "password": "SomePass123!",
+                "role": "staff",
+            },
+        )
         assert resp.status_code == 403
 
 
@@ -107,6 +109,7 @@ class TestVetRoleEnum:
     async def test_vet_role_stored_in_db(self) -> None:
         """Verify vet role value matches the DB CHECK constraint."""
         from src.db.models.user import UserRole
+
         assert UserRole.VET.value == "vet"
         # Ensure vet is distinct from other roles
         assert UserRole.VET != UserRole.STAFF

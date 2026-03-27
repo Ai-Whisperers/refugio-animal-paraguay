@@ -34,12 +34,8 @@ class VerificationToken(Base):
     )
     token: Mapped[str] = mapped_column(sa.String(255), nullable=False, unique=True)
     token_type: Mapped[str] = mapped_column(sa.String(50), nullable=False)
-    expires_at: Mapped[datetime] = mapped_column(
-        sa.TIMESTAMP(timezone=True), nullable=False
-    )
-    used_at: Mapped[datetime | None] = mapped_column(
-        sa.TIMESTAMP(timezone=True), nullable=True
-    )
+    expires_at: Mapped[datetime] = mapped_column(sa.TIMESTAMP(timezone=True), nullable=False)
+    used_at: Mapped[datetime | None] = mapped_column(sa.TIMESTAMP(timezone=True), nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         sa.TIMESTAMP(timezone=True),
         nullable=False,

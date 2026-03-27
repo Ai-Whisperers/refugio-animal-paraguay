@@ -23,7 +23,12 @@ def upgrade() -> None:
             primary_key=True,
             server_default=sa.func.gen_random_uuid(),
         ),
-        sa.Column("user_id", sa.UUID(as_uuid=True), sa.ForeignKey("users.id", ondelete="CASCADE"), nullable=False),
+        sa.Column(
+            "user_id",
+            sa.UUID(as_uuid=True),
+            sa.ForeignKey("users.id", ondelete="CASCADE"),
+            nullable=False,
+        ),
         sa.Column("token", sa.String(255), nullable=False, unique=True),
         sa.Column(
             "token_type",

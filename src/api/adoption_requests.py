@@ -39,7 +39,9 @@ from src.schemas.adoption_request import (
 from src.schemas.error import RESOURCE_RESPONSES
 from src.services.contract_service import ContractData, ContractPDFGenerator
 
-router = APIRouter(prefix="/adoption-requests", tags=["adoption-requests"], responses=RESOURCE_RESPONSES)
+router = APIRouter(
+    prefix="/adoption-requests", tags=["adoption-requests"], responses=RESOURCE_RESPONSES
+)
 
 _DEFAULT_LIMIT = 20
 _MAX_LIMIT = 100
@@ -136,18 +138,14 @@ async def get_adoption_analytics(
     # Requests in last 7 days
     week_ago = now - timedelta(days=_DAYS_7)
     last_7_result = await db.execute(
-        select(func.count(AdoptionRequest.id)).where(
-            AdoptionRequest.submitted_at >= week_ago
-        )
+        select(func.count(AdoptionRequest.id)).where(AdoptionRequest.submitted_at >= week_ago)
     )
     requests_last_7_days = last_7_result.scalar() or 0
 
     # Requests in last 30 days
     month_ago = now - timedelta(days=_DAYS_30)
     last_30_result = await db.execute(
-        select(func.count(AdoptionRequest.id)).where(
-            AdoptionRequest.submitted_at >= month_ago
-        )
+        select(func.count(AdoptionRequest.id)).where(AdoptionRequest.submitted_at >= month_ago)
     )
     requests_last_30_days = last_30_result.scalar() or 0
 

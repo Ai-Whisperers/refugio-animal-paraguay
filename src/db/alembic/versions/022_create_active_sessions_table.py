@@ -16,11 +16,25 @@ depends_on = None
 def upgrade() -> None:
     op.create_table(
         "active_sessions",
-        sa.Column("id", sa.UUID(as_uuid=True), primary_key=True, server_default=sa.func.gen_random_uuid()),
-        sa.Column("user_id", sa.UUID(as_uuid=True), sa.ForeignKey("users.id", ondelete="CASCADE"), nullable=False),
+        sa.Column(
+            "id", sa.UUID(as_uuid=True), primary_key=True, server_default=sa.func.gen_random_uuid()
+        ),
+        sa.Column(
+            "user_id",
+            sa.UUID(as_uuid=True),
+            sa.ForeignKey("users.id", ondelete="CASCADE"),
+            nullable=False,
+        ),
         sa.Column("jti", sa.String(64), nullable=False, unique=True),
-        sa.Column("created_at", sa.TIMESTAMP(timezone=True), nullable=False, server_default=sa.func.now()),
-        sa.Column("last_activity", sa.TIMESTAMP(timezone=True), nullable=False, server_default=sa.func.now()),
+        sa.Column(
+            "created_at", sa.TIMESTAMP(timezone=True), nullable=False, server_default=sa.func.now()
+        ),
+        sa.Column(
+            "last_activity",
+            sa.TIMESTAMP(timezone=True),
+            nullable=False,
+            server_default=sa.func.now(),
+        ),
         sa.Column("expires_at", sa.TIMESTAMP(timezone=True), nullable=False),
         sa.Column("revoked_at", sa.TIMESTAMP(timezone=True), nullable=True),
         sa.Column("ip_address", sa.String(45), nullable=True),

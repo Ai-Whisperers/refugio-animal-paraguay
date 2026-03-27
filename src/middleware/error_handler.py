@@ -186,6 +186,7 @@ def _extract_constraint_name(exc: IntegrityError) -> str | None:
     pgerror: str = getattr(orig, "pgerror", "") or ""
     if "constraint" in pgerror.lower():
         import re
+
         match = re.search(r'constraint "([^"]+)"', pgerror)
         if match:
             return match.group(1)

@@ -5,7 +5,7 @@ Endpoints:
   POST /appointments  — create a new scheduled vet visit (appointment)
 """
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -40,7 +40,7 @@ def _base_query(
     include_past: bool,
 ):
     """Return a base SELECT joining vet_visits to animals for appointment rows."""
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
 
     q = (
         select(
@@ -87,9 +87,7 @@ async def list_appointments(
 
     offset = (page - 1) * page_size
     rows = (
-        await db.execute(
-            base.order_by(VetVisit.visit_date.asc()).offset(offset).limit(page_size)
-        )
+        await db.execute(base.order_by(VetVisit.visit_date.asc()).offset(offset).limit(page_size))
     ).all()
 
     items = [AppointmentRow.model_validate(dict(r._mapping)) for r in rows]

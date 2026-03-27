@@ -68,9 +68,7 @@ async def get_active_sessions(
     _: User = Depends(require_admin),
 ) -> SessionListResponse:
     """List active sessions. Optionally filter by user_id. Admin only."""
-    sessions = await list_active_sessions(
-        db, user_id=str(user_id) if user_id else None
-    )
+    sessions = await list_active_sessions(db, user_id=str(user_id) if user_id else None)
     return SessionListResponse(
         sessions=[SessionResponse.model_validate(s) for s in sessions],
         count=len(sessions),

@@ -14,7 +14,9 @@ from src.schemas.error import AUTHENTICATED_RESPONSES
 from src.schemas.impact_report import ImpactReportRequest, ImpactReportResponse
 from src.services import impact_report_service
 
-router = APIRouter(prefix="/impact-reports", tags=["impact-reports"], responses=AUTHENTICATED_RESPONSES)
+router = APIRouter(
+    prefix="/impact-reports", tags=["impact-reports"], responses=AUTHENTICATED_RESPONSES
+)
 
 
 @router.post("/generate", response_model=ImpactReportResponse)

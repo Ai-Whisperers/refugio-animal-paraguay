@@ -28,9 +28,7 @@ async def session_client():
     settings = Settings()
     engine = init_engine(settings)
 
-    session_factory = async_sessionmaker(
-        bind=engine, class_=AsyncSession, expire_on_commit=False
-    )
+    session_factory = async_sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
     async with session_factory() as session:
         await session.execute(
             text("""
@@ -107,9 +105,7 @@ class TestSessionCreation:
         assert response.status_code == 200
         data = response.json()
         assert data["count"] >= 1
-        assert any(
-            s["user_id"] == str(_ADMIN_USER_ID) for s in data["sessions"]
-        )
+        assert any(s["user_id"] == str(_ADMIN_USER_ID) for s in data["sessions"])
 
 
 @pytest.mark.integration()

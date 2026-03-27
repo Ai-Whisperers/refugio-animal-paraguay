@@ -27,9 +27,7 @@ class TestAdoptionAnalyticsResponse:
             approval_rate_percent=75.0,
             requests_last_7_days=10,
             requests_last_30_days=30,
-            status_breakdown=StatusBreakdown(
-                pending=20, approved=50, rejected=20, cancelled=10
-            ),
+            status_breakdown=StatusBreakdown(pending=20, approved=50, rejected=20, cancelled=10),
         )
         assert response.total_requests == 100
         assert response.avg_time_to_decision_hours == 24.5

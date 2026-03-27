@@ -108,9 +108,7 @@ class VaccinationSchedule(Base):
     )
 
     # Relationships
-    vaccine_type: Mapped["VaccineType"] = relationship(
-        "VaccineType", back_populates="schedules"
-    )
+    vaccine_type: Mapped["VaccineType"] = relationship("VaccineType", back_populates="schedules")
 
 
 class Vaccination(Base):
@@ -161,6 +159,4 @@ class Vaccination(Base):
 
     # Relationships
     animal: Mapped["Animal"] = relationship("Animal", back_populates="vaccinations")  # type: ignore[name-defined]  # noqa: F821
-    vaccine_type: Mapped["VaccineType"] = relationship(
-        "VaccineType", back_populates="vaccinations"
-    )
+    vaccine_type: Mapped["VaccineType"] = relationship("VaccineType", back_populates="vaccinations")

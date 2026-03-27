@@ -4,7 +4,6 @@ import uuid
 
 import pytest
 from pydantic import ValidationError
-
 from src.db.models.vet_referral import ReferralStatus, ReferralUrgency
 from src.schemas.vet_referral import VetReferralCreate, VetReferralUpdate
 

@@ -10,22 +10,30 @@ pytestmark = [pytest.mark.asyncio(loop_scope="function"), pytest.mark.integratio
 
 async def _create_animal(client: AsyncClient) -> str:
     import uuid
-    resp = await client.post("/animals", json={
-        "name": f"Alert-Dog-{uuid.uuid4().hex[:6]}",
-        "species": "dog",
-        "breed": "mixed",
-    })
+
+    resp = await client.post(
+        "/animals",
+        json={
+            "name": f"Alert-Dog-{uuid.uuid4().hex[:6]}",
+            "species": "dog",
+            "breed": "mixed",
+        },
+    )
     assert resp.status_code == 201
     return resp.json()["id"]
 
 
 async def _create_vaccine_type(client: AsyncClient) -> dict:
     import uuid
-    resp = await client.post("/vaccine-types", json={
-        "name": f"Alert-Vaccine-{uuid.uuid4().hex[:6]}",
-        "target_species": "all",
-        "is_required": True,
-    })
+
+    resp = await client.post(
+        "/vaccine-types",
+        json={
+            "name": f"Alert-Vaccine-{uuid.uuid4().hex[:6]}",
+            "target_species": "all",
+            "is_required": True,
+        },
+    )
     assert resp.status_code == 201
     return resp.json()
 
@@ -61,9 +69,8 @@ class TestVaccinationAlerts:
         body = resp.json()
         assert body["total_overdue"] >= 1
 
-        # Find our specific alert
-        overdue_ids = [a["vaccination_id"] for a in body["overdue"]]
-        vacc_id = resp.json()  # we need the vaccination ID
+        # Verify overdue alerts contain vaccination IDs
+        assert all("vaccination_id" in a for a in body["overdue"])
         # Check the animal-scoped endpoint
         resp = await client.get(
             f"/animals/{animal_id}/vaccination-alerts",
@@ -149,12 +156,6 @@ class TestVaccinationAlerts:
         assert resp.status_code == 200
         body = resp.json()
         # Should not include administered vaccinations
-        all_alert_ids = (
-            [a["vaccination_id"] for a in body["overdue"]]
-            + [a["vaccination_id"] for a in body["due_today"]]
-            + [a["vaccination_id"] for a in body["upcoming"]]
-        )
-        # The administered vaccination should not be in the alerts
         assert body["total_overdue"] + body["total_due_today"] + body["total_upcoming"] >= 0
 
     async def test_custom_window_days(self, client: AsyncClient) -> None:
@@ -189,7 +190,5 @@ class TestVaccinationAlerts:
         assert resp.json()["total_upcoming"] >= 1
 
     async def test_nonexistent_animal_returns_404(self, client: AsyncClient) -> None:
-        resp = await client.get(
-            "/animals/00000000-0000-0000-0000-000000000099/vaccination-alerts"
-        )
+        resp = await client.get("/animals/00000000-0000-0000-0000-000000000099/vaccination-alerts")
         assert resp.status_code == 404

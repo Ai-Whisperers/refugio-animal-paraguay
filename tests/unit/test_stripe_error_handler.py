@@ -252,6 +252,6 @@ class TestPaymentErrorConstants:
     def test_all_known_decline_codes_have_specific_messages(self) -> None:
         """Known decline codes must not use the generic fallback message."""
         for code, message in _CARD_DECLINE_MESSAGES.items():
-            assert message != _CARD_DECLINED_GENERIC, (
-                f"Decline code '{code}' uses generic fallback message"
-            )
+            assert (
+                message != _CARD_DECLINED_GENERIC
+            ), f"Decline code '{code}' uses generic fallback message"

@@ -133,14 +133,17 @@ async def generate_post_op_checklist(
     if base_time is None:
         ref_date = surgery.performed_date or surgery.scheduled_date
         base_time = datetime(
-            ref_date.year, ref_date.month, ref_date.day,
-            8, 0, 0, tzinfo=UTC,
+            ref_date.year,
+            ref_date.month,
+            ref_date.day,
+            8,
+            0,
+            0,
+            tzinfo=UTC,
         )
 
     # Get the check intervals for this surgery type
-    intervals = STANDARD_CHECK_INTERVALS.get(
-        surgery.surgery_type, DEFAULT_CHECK_INTERVALS
-    )
+    intervals = STANDARD_CHECK_INTERVALS.get(surgery.surgery_type, DEFAULT_CHECK_INTERVALS)
 
     check_ids: list[UUID] = []
     for hours_offset, notes in intervals:

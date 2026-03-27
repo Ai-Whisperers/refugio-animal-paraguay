@@ -9,7 +9,6 @@ import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
-
 from src.app import app
 from src.auth.utils import create_access_token, hash_password
 from src.config import Settings
@@ -27,9 +26,7 @@ async def vet_medical_client() -> AsyncGenerator[AsyncClient, None]:
     settings = Settings()
     engine = init_engine(settings)
 
-    session_factory = async_sessionmaker(
-        bind=engine, class_=AsyncSession, expire_on_commit=False
-    )
+    session_factory = async_sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
     async with session_factory() as session:
         await session.execute(
             text("""
@@ -63,12 +60,15 @@ async def vet_medical_client() -> AsyncGenerator[AsyncClient, None]:
 @pytest_asyncio.fixture
 async def sample_animal_id(client: AsyncClient) -> uuid.UUID:
     """Create a test animal and return its ID."""
-    resp = await client.post("/animals", json={
-        "name": "Referral Test Dog",
-        "species": "dog",
-        "breed": "mixed",
-        "status": "intake",
-    })
+    resp = await client.post(
+        "/animals",
+        json={
+            "name": "Referral Test Dog",
+            "species": "dog",
+            "breed": "mixed",
+            "status": "intake",
+        },
+    )
     assert resp.status_code == 201
     return uuid.UUID(resp.json()["id"])
 
@@ -80,14 +80,17 @@ class TestCreateReferral:
         self, client: AsyncClient, sample_animal_id: uuid.UUID
     ) -> None:
         """Staff can create a referral."""
-        resp = await client.post("/vet-referrals", json={
-            "animal_id": str(sample_animal_id),
-            "external_vet_name": "Dr. Rodriguez",
-            "external_vet_clinic": "Clinica Asuncion",
-            "reason": "Orthopedic specialist consultation",
-            "specialty": "Orthopedics",
-            "urgency": "high",
-        })
+        resp = await client.post(
+            "/vet-referrals",
+            json={
+                "animal_id": str(sample_animal_id),
+                "external_vet_name": "Dr. Rodriguez",
+                "external_vet_clinic": "Clinica Asuncion",
+                "reason": "Orthopedic specialist consultation",
+                "specialty": "Orthopedics",
+                "urgency": "high",
+            },
+        )
         assert resp.status_code == 201
         body = resp.json()
         assert body["external_vet_name"] == "Dr. Rodriguez"
@@ -99,24 +102,28 @@ class TestCreateReferral:
         self, vet_medical_client: AsyncClient, sample_animal_id: uuid.UUID
     ) -> None:
         """Vet (medical staff) can create a referral."""
-        resp = await vet_medical_client.post("/vet-referrals", json={
-            "animal_id": str(sample_animal_id),
-            "external_vet_name": "Dr. Specialist",
-            "reason": "Cardiac evaluation",
-        })
+        resp = await vet_medical_client.post(
+            "/vet-referrals",
+            json={
+                "animal_id": str(sample_animal_id),
+                "external_vet_name": "Dr. Specialist",
+                "reason": "Cardiac evaluation",
+            },
+        )
         assert resp.status_code == 201
         assert resp.json()["referred_by_id"] == str(_TEST_VET_ID)
 
-    async def test_create_referral_nonexistent_animal(
-        self, client: AsyncClient
-    ) -> None:
+    async def test_create_referral_nonexistent_animal(self, client: AsyncClient) -> None:
         """Creating a referral for a non-existent animal returns 404."""
         fake_id = str(uuid.uuid4())
-        resp = await client.post("/vet-referrals", json={
-            "animal_id": fake_id,
-            "external_vet_name": "Dr. Test",
-            "reason": "Checkup",
-        })
+        resp = await client.post(
+            "/vet-referrals",
+            json={
+                "animal_id": fake_id,
+                "external_vet_name": "Dr. Test",
+                "reason": "Checkup",
+            },
+        )
         assert resp.status_code == 404
 
 
@@ -138,15 +145,16 @@ class TestListReferrals:
         """List returns created referrals."""
         # Create two referrals
         for name in ["Dr. A", "Dr. B"]:
-            await client.post("/vet-referrals", json={
-                "animal_id": str(sample_animal_id),
-                "external_vet_name": name,
-                "reason": "Evaluation",
-            })
+            await client.post(
+                "/vet-referrals",
+                json={
+                    "animal_id": str(sample_animal_id),
+                    "external_vet_name": name,
+                    "reason": "Evaluation",
+                },
+            )
 
-        resp = await client.get(
-            f"/vet-referrals?animal_id={sample_animal_id}"
-        )
+        resp = await client.get(f"/vet-referrals?animal_id={sample_animal_id}")
         assert resp.status_code == 200
         body = resp.json()
         assert body["total"] >= 2
@@ -166,12 +174,15 @@ class TestGetReferral:
         self, client: AsyncClient, sample_animal_id: uuid.UUID
     ) -> None:
         """Retrieve a single referral by ID."""
-        create_resp = await client.post("/vet-referrals", json={
-            "animal_id": str(sample_animal_id),
-            "external_vet_name": "Dr. Garcia",
-            "reason": "Eye examination",
-            "specialty": "Ophthalmology",
-        })
+        create_resp = await client.post(
+            "/vet-referrals",
+            json={
+                "animal_id": str(sample_animal_id),
+                "external_vet_name": "Dr. Garcia",
+                "reason": "Eye examination",
+                "specialty": "Ophthalmology",
+            },
+        )
         referral_id = create_resp.json()["id"]
 
         resp = await client.get(f"/vet-referrals/{referral_id}")
@@ -191,18 +202,24 @@ class TestUpdateReferral:
         self, client: AsyncClient, sample_animal_id: uuid.UUID
     ) -> None:
         """Update referral status and add diagnosis."""
-        create_resp = await client.post("/vet-referrals", json={
-            "animal_id": str(sample_animal_id),
-            "external_vet_name": "Dr. Lopez",
-            "reason": "Dental procedure",
-        })
+        create_resp = await client.post(
+            "/vet-referrals",
+            json={
+                "animal_id": str(sample_animal_id),
+                "external_vet_name": "Dr. Lopez",
+                "reason": "Dental procedure",
+            },
+        )
         referral_id = create_resp.json()["id"]
 
-        resp = await client.patch(f"/vet-referrals/{referral_id}", json={
-            "status": "completed",
-            "diagnosis": "Dental calculus removed",
-            "actual_cost": 75000.00,
-        })
+        resp = await client.patch(
+            f"/vet-referrals/{referral_id}",
+            json={
+                "status": "completed",
+                "diagnosis": "Dental calculus removed",
+                "actual_cost": 75000.00,
+            },
+        )
         assert resp.status_code == 200
         body = resp.json()
         assert body["status"] == "completed"
@@ -213,15 +230,16 @@ class TestUpdateReferral:
 class TestCancelReferral:
     """Tests for DELETE /vet-referrals/{id}."""
 
-    async def test_cancel_referral(
-        self, client: AsyncClient, sample_animal_id: uuid.UUID
-    ) -> None:
+    async def test_cancel_referral(self, client: AsyncClient, sample_animal_id: uuid.UUID) -> None:
         """Cancelling sets status to cancelled."""
-        create_resp = await client.post("/vet-referrals", json={
-            "animal_id": str(sample_animal_id),
-            "external_vet_name": "Dr. Cancel",
-            "reason": "No longer needed",
-        })
+        create_resp = await client.post(
+            "/vet-referrals",
+            json={
+                "animal_id": str(sample_animal_id),
+                "external_vet_name": "Dr. Cancel",
+                "reason": "No longer needed",
+            },
+        )
         referral_id = create_resp.json()["id"]
 
         resp = await client.delete(f"/vet-referrals/{referral_id}")

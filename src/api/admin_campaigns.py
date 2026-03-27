@@ -24,7 +24,9 @@ from src.schemas.campaign import (
 )
 from src.schemas.error import RESOURCE_RESPONSES
 
-router = APIRouter(prefix="/admin/campaigns", tags=["admin-campaigns"], responses=RESOURCE_RESPONSES)
+router = APIRouter(
+    prefix="/admin/campaigns", tags=["admin-campaigns"], responses=RESOURCE_RESPONSES
+)
 
 
 @router.post("", response_model=CampaignResponse, status_code=status.HTTP_201_CREATED)

@@ -89,7 +89,9 @@ async def list_prescriptions(
 
     offset = (page - 1) * page_size
     rows = (
-        await db.execute(base.order_by(Medication.created_at.desc()).offset(offset).limit(page_size))
+        await db.execute(
+            base.order_by(Medication.created_at.desc()).offset(offset).limit(page_size)
+        )
     ).all()
 
     items = [PrescriptionRow.model_validate(dict(r._mapping)) for r in rows]

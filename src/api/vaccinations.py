@@ -86,12 +86,8 @@ async def _get_animal_or_404(animal_id: UUID, db: AsyncSession) -> Animal:
     return animal
 
 
-async def _get_vaccine_type_or_404(
-    vaccine_type_id: UUID, db: AsyncSession
-) -> VaccineType:
-    result = await db.execute(
-        sa.select(VaccineType).where(VaccineType.id == vaccine_type_id)
-    )
+async def _get_vaccine_type_or_404(vaccine_type_id: UUID, db: AsyncSession) -> VaccineType:
+    result = await db.execute(sa.select(VaccineType).where(VaccineType.id == vaccine_type_id))
     vt = result.scalar_one_or_none()
     if vt is None:
         raise HTTPException(
@@ -101,9 +97,7 @@ async def _get_vaccine_type_or_404(
     return vt
 
 
-async def _get_vaccination_or_404(
-    vaccination_id: UUID, db: AsyncSession
-) -> Vaccination:
+async def _get_vaccination_or_404(vaccination_id: UUID, db: AsyncSession) -> Vaccination:
     result = await db.execute(
         sa.select(Vaccination)
         .options(selectinload(Vaccination.vaccine_type))
@@ -118,9 +112,7 @@ async def _get_vaccination_or_404(
     return vacc
 
 
-async def _get_schedule_or_404(
-    schedule_id: UUID, db: AsyncSession
-) -> VaccinationSchedule:
+async def _get_schedule_or_404(schedule_id: UUID, db: AsyncSession) -> VaccinationSchedule:
     result = await db.execute(
         sa.select(VaccinationSchedule).where(VaccinationSchedule.id == schedule_id)
     )
@@ -271,9 +263,9 @@ async def list_schedules(
     total_result = await db.execute(count_query)
     total = total_result.scalar() or 0
 
-    query = query.order_by(
-        VaccinationSchedule.dose_number.asc()
-    ).offset((page - 1) * size).limit(size)
+    query = (
+        query.order_by(VaccinationSchedule.dose_number.asc()).offset((page - 1) * size).limit(size)
+    )
     result = await db.execute(query)
     items = list(result.scalars().all())
 
@@ -383,16 +375,12 @@ async def list_vaccinations(
 
     if vaccination_status:
         query = query.where(Vaccination.vaccination_status == vaccination_status)
-        count_query = count_query.where(
-            Vaccination.vaccination_status == vaccination_status
-        )
+        count_query = count_query.where(Vaccination.vaccination_status == vaccination_status)
 
     total_result = await db.execute(count_query)
     total = total_result.scalar() or 0
 
-    query = query.order_by(
-        Vaccination.scheduled_date.desc()
-    ).offset((page - 1) * size).limit(size)
+    query = query.order_by(Vaccination.scheduled_date.desc()).offset((page - 1) * size).limit(size)
     result = await db.execute(query)
     items = list(result.scalars().unique().all())
 
@@ -563,6 +551,7 @@ async def generate_certificate(
         filename=f"vaccination_certificate_{animal.name}.pdf",
     )
 
+
 # ---------------------------------------------------------------------------
 # Bulk vaccination endpoints
 # ---------------------------------------------------------------------------
@@ -592,12 +581,14 @@ async def create_bulk_vaccinations(
             animal_result = await db.execute(animal_query)
             animal = animal_result.scalar_one_or_none()
             if animal is None:
-                results.append({
-                    "animal_id": animal_id,
-                    "vaccination_id": None,
-                    "success": False,
-                    "error": f"Animal {animal_id} not found",
-                })
+                results.append(
+                    {
+                        "animal_id": animal_id,
+                        "vaccination_id": None,
+                        "success": False,
+                        "error": f"Animal {animal_id} not found",
+                    }
+                )
                 failed_count += 1
                 continue
 
@@ -615,20 +606,24 @@ async def create_bulk_vaccinations(
             )
             db.add(vacc)
             await db.flush()
-            results.append({
-                "animal_id": animal_id,
-                "vaccination_id": vacc.id,
-                "success": True,
-                "error": None,
-            })
+            results.append(
+                {
+                    "animal_id": animal_id,
+                    "vaccination_id": vacc.id,
+                    "success": True,
+                    "error": None,
+                }
+            )
             created_count += 1
         except Exception as exc:
-            results.append({
-                "animal_id": animal_id,
-                "vaccination_id": None,
-                "success": False,
-                "error": str(exc),
-            })
+            results.append(
+                {
+                    "animal_id": animal_id,
+                    "vaccination_id": None,
+                    "success": False,
+                    "error": str(exc),
+                }
+            )
             failed_count += 1
 
     await db.commit()

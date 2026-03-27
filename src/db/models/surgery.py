@@ -95,17 +95,13 @@ class Surgery(Base):
     veterinarian_name: Mapped[str] = mapped_column(sa.String(255), nullable=False)
     scheduled_date: Mapped[date] = mapped_column(sa.Date, nullable=False)
     performed_date: Mapped[date | None] = mapped_column(sa.Date, nullable=True)
-    anesthesia_type: Mapped[str | None] = mapped_column(
-        sa.String(50), nullable=True
-    )
+    anesthesia_type: Mapped[str | None] = mapped_column(sa.String(50), nullable=True)
     anesthesia_notes: Mapped[str | None] = mapped_column(sa.Text, nullable=True)
     procedure_description: Mapped[str | None] = mapped_column(sa.Text, nullable=True)
     outcome: Mapped[str | None] = mapped_column(sa.String(50), nullable=True)
     outcome_notes: Mapped[str | None] = mapped_column(sa.Text, nullable=True)
     complications: Mapped[str | None] = mapped_column(sa.Text, nullable=True)
-    weight_kg: Mapped[float | None] = mapped_column(
-        sa.Numeric(6, 2), nullable=True
-    )
+    weight_kg: Mapped[float | None] = mapped_column(sa.Numeric(6, 2), nullable=True)
     recovery_notes: Mapped[str | None] = mapped_column(sa.Text, nullable=True)
     follow_up_date: Mapped[date | None] = mapped_column(sa.Date, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
@@ -162,12 +158,8 @@ class PostOpCheck(Base):
         nullable=True,
     )
     checked_by: Mapped[str | None] = mapped_column(sa.String(255), nullable=True)
-    temperature_celsius: Mapped[float | None] = mapped_column(
-        sa.Numeric(4, 1), nullable=True
-    )
-    pain_level: Mapped[int | None] = mapped_column(
-        sa.SmallInteger, nullable=True
-    )
+    temperature_celsius: Mapped[float | None] = mapped_column(sa.Numeric(4, 1), nullable=True)
+    pain_level: Mapped[int | None] = mapped_column(sa.SmallInteger, nullable=True)
     appetite: Mapped[str | None] = mapped_column(sa.String(50), nullable=True)
     mobility: Mapped[str | None] = mapped_column(sa.String(50), nullable=True)
     wound_condition: Mapped[str | None] = mapped_column(sa.String(100), nullable=True)
@@ -179,6 +171,4 @@ class PostOpCheck(Base):
         server_default=sa.func.now(),
     )
 
-    surgery: Mapped["Surgery"] = relationship(
-        "Surgery", back_populates="post_op_checks"
-    )
+    surgery: Mapped["Surgery"] = relationship("Surgery", back_populates="post_op_checks")

@@ -61,9 +61,7 @@ class TestCreateEmailVerificationToken:
         mock_existing.scalars.return_value.all.return_value = []
         mock_db.execute.return_value = mock_existing
 
-        token = await create_email_verification_token(
-            mock_db, str(sample_user.id)
-        )
+        token = await create_email_verification_token(mock_db, str(sample_user.id))
 
         assert token is not None
         assert len(token) > 0
@@ -75,9 +73,7 @@ class TestCreateEmailVerificationToken:
         """Should return None when user does not exist."""
         mock_db.get.return_value = None
 
-        token = await create_email_verification_token(
-            mock_db, str(uuid.uuid4())
-        )
+        token = await create_email_verification_token(mock_db, str(uuid.uuid4()))
 
         assert token is None
         mock_db.add.assert_not_called()
@@ -134,9 +130,7 @@ class TestVerifyEmail:
         self, mock_db, sample_user, sample_verification_token
     ):
         """Should return False when token is expired."""
-        sample_verification_token.expires_at = datetime.now(UTC) - timedelta(
-            hours=1
-        )
+        sample_verification_token.expires_at = datetime.now(UTC) - timedelta(hours=1)
         sample_verification_token.user_id = sample_user.id
         mock_result = MagicMock()
         mock_result.scalar_one_or_none.return_value = sample_verification_token

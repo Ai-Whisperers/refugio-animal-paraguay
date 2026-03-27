@@ -1,11 +1,10 @@
 """Unit tests for appointment schemas."""
 
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 import pytest
 from pydantic import ValidationError
-
 from src.db.models.medical import VisitStatus, VisitType
 from src.schemas.appointments import (
     AppointmentCreate,
@@ -24,11 +23,11 @@ def _make_row(**kwargs) -> dict:
         "veterinarian_name": "Dr. Sanchez",
         "visit_type": VisitType.CHECKUP,
         "visit_status": VisitStatus.SCHEDULED,
-        "visit_date": datetime(2026, 4, 15, 10, 0, tzinfo=timezone.utc),
+        "visit_date": datetime(2026, 4, 15, 10, 0, tzinfo=UTC),
         "reason": None,
         "notes": None,
-        "created_at": datetime(2026, 3, 27, tzinfo=timezone.utc),
-        "updated_at": datetime(2026, 3, 27, tzinfo=timezone.utc),
+        "created_at": datetime(2026, 3, 27, tzinfo=UTC),
+        "updated_at": datetime(2026, 3, 27, tzinfo=UTC),
     }
     defaults.update(kwargs)
     return defaults
@@ -68,7 +67,7 @@ class TestAppointmentCreate:
         data = AppointmentCreate(
             animal_id=uuid.uuid4(),
             veterinarian_name="Dr. Lopez",
-            visit_date=datetime(2026, 5, 1, 9, 0, tzinfo=timezone.utc),
+            visit_date=datetime(2026, 5, 1, 9, 0, tzinfo=UTC),
         )
         assert data.visit_type == VisitType.CHECKUP
         assert data.reason is None
@@ -78,7 +77,7 @@ class TestAppointmentCreate:
             animal_id=uuid.uuid4(),
             veterinarian_name="Dr. Martinez",
             visit_type=VisitType.VACCINATION,
-            visit_date=datetime(2026, 5, 10, 14, 0, tzinfo=timezone.utc),
+            visit_date=datetime(2026, 5, 10, 14, 0, tzinfo=UTC),
             reason="Vacuna anual antirrabica",
         )
         assert data.visit_type == VisitType.VACCINATION
@@ -89,7 +88,7 @@ class TestAppointmentCreate:
             AppointmentCreate(
                 animal_id=uuid.uuid4(),
                 veterinarian_name="",
-                visit_date=datetime(2026, 5, 1, tzinfo=timezone.utc),
+                visit_date=datetime(2026, 5, 1, tzinfo=UTC),
             )
 
     def test_vet_name_too_long(self) -> None:
@@ -97,7 +96,7 @@ class TestAppointmentCreate:
             AppointmentCreate(
                 animal_id=uuid.uuid4(),
                 veterinarian_name="A" * 256,
-                visit_date=datetime(2026, 5, 1, tzinfo=timezone.utc),
+                visit_date=datetime(2026, 5, 1, tzinfo=UTC),
             )
 
 

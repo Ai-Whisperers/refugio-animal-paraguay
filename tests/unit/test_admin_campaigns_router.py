@@ -8,22 +8,20 @@ Tests the campaign CRUD endpoints for staff/admin users including:
 - Error handling for not found / validation
 """
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from unittest.mock import MagicMock
 from uuid import uuid4
 
 import pytest
-
 from src.db.models.campaign import Campaign, CampaignStatus, FundCategory
 from src.db.models.donation import CurrencyCode
 from src.schemas.campaign import CampaignCreate, CampaignResponse, CampaignUpdate
-
 
 # --- Fixtures ---
 
 CAMPAIGN_ID = uuid4()
 USER_ID = uuid4()
-NOW = datetime.now(tz=timezone.utc)
+NOW = datetime.now(tz=UTC)
 
 
 def _make_campaign(**overrides) -> MagicMock:
@@ -95,7 +93,7 @@ class TestCampaignCreateSchema:
         assert payload.max_donation_cents == 50000
 
     def test_title_min_length(self) -> None:
-        with pytest.raises(Exception):
+        with pytest.raises(ValueError):
             CampaignCreate(
                 title="",
                 description="desc",
@@ -103,7 +101,7 @@ class TestCampaignCreateSchema:
             )
 
     def test_target_amount_must_be_positive(self) -> None:
-        with pytest.raises(Exception):
+        with pytest.raises(ValueError):
             CampaignCreate(
                 title="Valid Title",
                 description="desc",
@@ -111,7 +109,7 @@ class TestCampaignCreateSchema:
             )
 
     def test_negative_target_amount_rejected(self) -> None:
-        with pytest.raises(Exception):
+        with pytest.raises(ValueError):
             CampaignCreate(
                 title="Valid Title",
                 description="desc",
@@ -167,7 +165,7 @@ class TestCampaignResponseSchema:
         assert response.status.value == "active"
 
     def test_serialize_with_deadline(self) -> None:
-        deadline = datetime(2026, 12, 31, tzinfo=timezone.utc)
+        deadline = datetime(2026, 12, 31, tzinfo=UTC)
         campaign = _make_campaign(deadline=deadline)
         response = CampaignResponse.model_validate(campaign, from_attributes=True)
         assert response.deadline == deadline

@@ -48,9 +48,7 @@ async def _get_animal_or_404(animal_id: UUID, db: AsyncSession) -> Animal:
     return animal
 
 
-async def _get_visit_or_404(
-    visit_id: UUID, animal_id: UUID, db: AsyncSession
-) -> VetVisit:
+async def _get_visit_or_404(visit_id: UUID, animal_id: UUID, db: AsyncSession) -> VetVisit:
     """Fetch a vet visit by ID and animal, or raise 404."""
     visit = await db.get(VetVisit, visit_id)
     if visit is None or visit.animal_id != animal_id:
@@ -80,11 +78,7 @@ async def list_vet_visits(
 
     # Fetch page
     offset = (page - 1) * page_size
-    visits_query = (
-        base_query.order_by(VetVisit.visit_date.desc())
-        .offset(offset)
-        .limit(page_size)
-    )
+    visits_query = base_query.order_by(VetVisit.visit_date.desc()).offset(offset).limit(page_size)
     result = await db.execute(visits_query)
     visits = list(result.scalars().all())
 

@@ -67,19 +67,26 @@ class TestExtractUserId:
     def test_returns_none_when_jwt_decode_fails(self) -> None:
         request = _make_request(headers={"Authorization": "Bearer invalid.token.here"})
         # decode_access_token will raise JWTError — _extract_user_id must catch it
-        with patch("src.middleware.logging_middleware.decode_access_token", side_effect=Exception("bad")):
+        with patch(
+            "src.middleware.logging_middleware.decode_access_token", side_effect=Exception("bad")
+        ):
             result = _extract_user_id(request)
         assert result is None
 
     def test_returns_sub_from_valid_token(self) -> None:
         request = _make_request(headers={"Authorization": "Bearer valid.token"})
-        with patch("src.middleware.logging_middleware.decode_access_token", return_value={"sub": "user-uuid-42"}):
+        with patch(
+            "src.middleware.logging_middleware.decode_access_token",
+            return_value={"sub": "user-uuid-42"},
+        ):
             result = _extract_user_id(request)
         assert result == "user-uuid-42"
 
     def test_returns_none_when_sub_missing(self) -> None:
         request = _make_request(headers={"Authorization": "Bearer valid.token"})
-        with patch("src.middleware.logging_middleware.decode_access_token", return_value={"role": "staff"}):
+        with patch(
+            "src.middleware.logging_middleware.decode_access_token", return_value={"role": "staff"}
+        ):
             result = _extract_user_id(request)
         assert result is None
 

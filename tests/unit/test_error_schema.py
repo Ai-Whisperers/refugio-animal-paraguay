@@ -169,7 +169,12 @@ class TestOpenApiResponseDicts:
         assert 404 in PAYMENT_RESPONSES
 
     def test_all_response_dicts_contain_description(self) -> None:
-        for responses in [COMMON_RESPONSES, AUTHENTICATED_RESPONSES, RESOURCE_RESPONSES, PAYMENT_RESPONSES]:
+        for responses in [
+            COMMON_RESPONSES,
+            AUTHENTICATED_RESPONSES,
+            RESOURCE_RESPONSES,
+            PAYMENT_RESPONSES,
+        ]:
             for _status_code, response_dict in responses.items():
                 assert "description" in response_dict
 

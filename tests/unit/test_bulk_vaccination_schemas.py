@@ -106,9 +106,7 @@ class TestBulkVaccinationResponse:
 
     def test_all_success(self) -> None:
         results = [
-            BulkVaccinationResultItem(
-                animal_id=uuid4(), vaccination_id=uuid4(), success=True
-            )
+            BulkVaccinationResultItem(animal_id=uuid4(), vaccination_id=uuid4(), success=True)
             for _ in range(3)
         ]
         resp = BulkVaccinationResponse(
@@ -123,9 +121,7 @@ class TestBulkVaccinationResponse:
 
     def test_partial_failure(self) -> None:
         results = [
-            BulkVaccinationResultItem(
-                animal_id=uuid4(), vaccination_id=uuid4(), success=True
-            ),
+            BulkVaccinationResultItem(animal_id=uuid4(), vaccination_id=uuid4(), success=True),
             BulkVaccinationResultItem(
                 animal_id=uuid4(), vaccination_id=None, success=False, error="Not found"
             ),

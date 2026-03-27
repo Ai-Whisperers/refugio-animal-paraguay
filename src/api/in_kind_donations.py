@@ -24,7 +24,9 @@ from src.schemas.in_kind_donation import (
     InKindDonationResponse,
 )
 
-router = APIRouter(prefix="/in-kind-donations", tags=["in-kind-donations"], responses=RESOURCE_RESPONSES)
+router = APIRouter(
+    prefix="/in-kind-donations", tags=["in-kind-donations"], responses=RESOURCE_RESPONSES
+)
 
 
 @router.post("", response_model=InKindDonationResponse, status_code=status.HTTP_201_CREATED)

@@ -37,9 +37,7 @@ _DEFAULT_LIMIT = 20
 _MAX_LIMIT = 100
 
 
-async def _get_animal_or_404(
-    animal_id: UUID, db: AsyncSession
-) -> Animal:
+async def _get_animal_or_404(animal_id: UUID, db: AsyncSession) -> Animal:
     """Fetch animal by ID or raise 404."""
     animal = await db.get(Animal, animal_id)
     if animal is None:
@@ -50,9 +48,7 @@ async def _get_animal_or_404(
     return animal
 
 
-async def _get_referral_or_404(
-    referral_id: UUID, db: AsyncSession
-) -> VetReferral:
+async def _get_referral_or_404(referral_id: UUID, db: AsyncSession) -> VetReferral:
     """Fetch referral by ID or raise 404."""
     referral = await db.get(VetReferral, referral_id)
     if referral is None:
@@ -104,9 +100,7 @@ async def get_referral(
     return await _get_referral_or_404(referral_id, db)
 
 
-@referral_router.post(
-    "", response_model=VetReferralResponse, status_code=status.HTTP_201_CREATED
-)
+@referral_router.post("", response_model=VetReferralResponse, status_code=status.HTTP_201_CREATED)
 async def create_referral(
     body: VetReferralCreate,
     db: AsyncSession = Depends(get_db),
@@ -159,9 +153,7 @@ async def update_referral(
     return referral
 
 
-@referral_router.delete(
-    "/{referral_id}", status_code=status.HTTP_204_NO_CONTENT
-)
+@referral_router.delete("/{referral_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def cancel_referral(
     referral_id: UUID,
     db: AsyncSession = Depends(get_db),

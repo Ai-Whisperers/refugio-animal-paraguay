@@ -279,7 +279,9 @@ class TestIntegrityErrorHandler:
 
         generic = "A resource conflict occurred"
         for constraint_name, message in _CONSTRAINT_MESSAGES.items():
-            assert message != generic, f"Constraint '{constraint_name}' uses generic fallback message"
+            assert (
+                message != generic
+            ), f"Constraint '{constraint_name}' uses generic fallback message"
             assert len(message) > 10  # non-trivial message
 
 

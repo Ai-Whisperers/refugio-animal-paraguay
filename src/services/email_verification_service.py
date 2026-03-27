@@ -20,9 +20,7 @@ EMAIL_VERIFICATION_TOKEN_EXPIRY_HOURS = 24
 TOKEN_BYTE_LENGTH = 32
 
 
-async def create_email_verification_token(
-    db: AsyncSession, user_id: str
-) -> str | None:
+async def create_email_verification_token(db: AsyncSession, user_id: str) -> str | None:
     """Create an email verification token for a user.
 
     Invalidates any existing unused verification tokens for this user.
@@ -49,8 +47,7 @@ async def create_email_verification_token(
         user_id=user_id,
         token=token_value,
         token_type=TokenType.EMAIL_VERIFICATION.value,
-        expires_at=datetime.now(UTC)
-        + timedelta(hours=EMAIL_VERIFICATION_TOKEN_EXPIRY_HOURS),
+        expires_at=datetime.now(UTC) + timedelta(hours=EMAIL_VERIFICATION_TOKEN_EXPIRY_HOURS),
     )
     db.add(verification_token)
     await db.flush()

@@ -25,9 +25,7 @@ async def lockout_client():
     settings = Settings()
     engine = init_engine(settings)
 
-    session_factory = async_sessionmaker(
-        bind=engine, class_=AsyncSession, expire_on_commit=False
-    )
+    session_factory = async_sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
     async with session_factory() as session:
         await session.execute(
             text("""

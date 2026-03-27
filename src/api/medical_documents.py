@@ -42,9 +42,7 @@ async def _get_visit_or_404(visit_id: UUID, db: AsyncSession) -> VetVisit:
     return visit
 
 
-async def _get_document_or_404(
-    document_id: UUID, db: AsyncSession
-) -> MedicalDocument:
+async def _get_document_or_404(document_id: UUID, db: AsyncSession) -> MedicalDocument:
     """Fetch a medical document by ID or raise 404."""
     doc = await db.get(MedicalDocument, document_id)
     if doc is None:

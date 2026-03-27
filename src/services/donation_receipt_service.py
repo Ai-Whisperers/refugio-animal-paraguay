@@ -90,9 +90,7 @@ class DonationReceiptGenerator:
 
         # --- Header / Shelter Info ---
         pdf.set_font("Helvetica", "B", 18)
-        pdf.cell(
-            0, 12, "RECIBO DE DONACION", align="C", new_x="LMARGIN", new_y="NEXT"
-        )
+        pdf.cell(0, 12, "RECIBO DE DONACION", align="C", new_x="LMARGIN", new_y="NEXT")
         pdf.set_font("Helvetica", "", 11)
         pdf.set_text_color(100, 100, 100)
         pdf.cell(0, 7, SHELTER_NAME, align="C", new_x="LMARGIN", new_y="NEXT")
@@ -105,7 +103,9 @@ class DonationReceiptGenerator:
 
         # --- Receipt number and date ---
         self._section_title(pdf, "Informacion del Recibo")
-        self._info_row(pdf, "No. de Recibo:", data.receipt_number or str(data.donation_id)[:12].upper())
+        self._info_row(
+            pdf, "No. de Recibo:", data.receipt_number or str(data.donation_id)[:12].upper()
+        )
         self._info_row(
             pdf,
             "Fecha de Donacion:",

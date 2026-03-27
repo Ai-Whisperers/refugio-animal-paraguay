@@ -1,9 +1,7 @@
 """Unit tests for prescription schemas."""
 
 import uuid
-from datetime import date, datetime, timezone
-
-import pytest
+from datetime import UTC, date, datetime
 
 from src.db.models.medical import MedicationFrequency, MedicationStatus
 from src.schemas.prescriptions import PrescriptionListResponse, PrescriptionRow
@@ -22,8 +20,8 @@ def _make_row(**kwargs) -> dict:
         "end_date": None,
         "medication_status": MedicationStatus.ACTIVE,
         "notes": None,
-        "created_at": datetime(2026, 3, 1, tzinfo=timezone.utc),
-        "updated_at": datetime(2026, 3, 1, tzinfo=timezone.utc),
+        "created_at": datetime(2026, 3, 1, tzinfo=UTC),
+        "updated_at": datetime(2026, 3, 1, tzinfo=UTC),
         "animal_id": uuid.uuid4(),
         "animal_name": "Luna",
         "animal_species": "dog",
@@ -42,9 +40,7 @@ class TestPrescriptionRow:
         assert row.medication_status == MedicationStatus.ACTIVE
 
     def test_with_end_date(self) -> None:
-        row = PrescriptionRow.model_validate(
-            _make_row(end_date=date(2026, 4, 1))
-        )
+        row = PrescriptionRow.model_validate(_make_row(end_date=date(2026, 4, 1)))
         assert row.end_date == date(2026, 4, 1)
 
     def test_completed_status(self) -> None:
@@ -73,9 +69,7 @@ class TestPrescriptionRow:
         assert row.notes is None
 
     def test_notes_populated(self) -> None:
-        row = PrescriptionRow.model_validate(
-            _make_row(notes="Administrar con comida")
-        )
+        row = PrescriptionRow.model_validate(_make_row(notes="Administrar con comida"))
         assert row.notes == "Administrar con comida"
 
 

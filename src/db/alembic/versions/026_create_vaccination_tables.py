@@ -136,12 +136,8 @@ def upgrade() -> None:
 
     # Indexes for vaccinations
     op.create_index("ix_vaccinations_animal_id", "vaccinations", ["animal_id"])
-    op.create_index(
-        "ix_vaccinations_vaccine_type_id", "vaccinations", ["vaccine_type_id"]
-    )
-    op.create_index(
-        "ix_vaccinations_scheduled_date", "vaccinations", ["scheduled_date"]
-    )
+    op.create_index("ix_vaccinations_vaccine_type_id", "vaccinations", ["vaccine_type_id"])
+    op.create_index("ix_vaccinations_scheduled_date", "vaccinations", ["scheduled_date"])
 
 
 def downgrade() -> None:

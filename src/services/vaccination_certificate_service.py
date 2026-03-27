@@ -17,9 +17,7 @@ from fpdf import FPDF
 logger = logging.getLogger(__name__)
 
 # Directory for generated certificates
-CERTIFICATE_STORAGE_DIR = Path(
-    os.environ.get("CERTIFICATE_STORAGE_DIR", "certificates")
-)
+CERTIFICATE_STORAGE_DIR = Path(os.environ.get("CERTIFICATE_STORAGE_DIR", "certificates"))
 
 SHELTER_NAME = "Refugio Animal Paraguay"
 SHELTER_ADDRESS = "Asuncion, Paraguay"
@@ -59,16 +57,22 @@ class VaccinationCertificatePDF(FPDF):
         self.cell(0, 10, SHELTER_NAME, new_x="LMARGIN", new_y="NEXT", align="C")
         self.set_font("Helvetica", "", 9)
         self.cell(
-            0, 5,
+            0,
+            5,
             f"{SHELTER_ADDRESS} | {SHELTER_PHONE} | {SHELTER_EMAIL}",
-            new_x="LMARGIN", new_y="NEXT", align="C",
+            new_x="LMARGIN",
+            new_y="NEXT",
+            align="C",
         )
         self.ln(3)
         self.set_font("Helvetica", "B", 14)
         self.cell(
-            0, 10,
+            0,
+            10,
             "CERTIFICADO DE VACUNACION / VACCINATION CERTIFICATE",
-            new_x="LMARGIN", new_y="NEXT", align="C",
+            new_x="LMARGIN",
+            new_y="NEXT",
+            align="C",
         )
         self.ln(5)
         # Divider line
@@ -81,14 +85,20 @@ class VaccinationCertificatePDF(FPDF):
         self.set_y(-25)
         self.set_font("Helvetica", "I", 8)
         self.cell(
-            0, 5,
+            0,
+            5,
             f"Generado el / Generated on: {datetime.now(UTC).strftime('%Y-%m-%d %H:%M UTC')}",
-            new_x="LMARGIN", new_y="NEXT", align="C",
+            new_x="LMARGIN",
+            new_y="NEXT",
+            align="C",
         )
         self.cell(
-            0, 5,
+            0,
+            5,
             f"Pagina / Page {self.page_no()}/{{nb}}",
-            new_x="LMARGIN", new_y="NEXT", align="C",
+            new_x="LMARGIN",
+            new_y="NEXT",
+            align="C",
         )
 
 
@@ -114,7 +124,9 @@ def generate_vaccination_certificate(data: CertificateData) -> Path:
     pdf.set_font("Helvetica", "", 10)
 
     breed_text = data.animal_breed or "Mestizo / Mixed"
-    birth_text = data.animal_birth_date.isoformat() if data.animal_birth_date else "Desconocido / Unknown"
+    birth_text = (
+        data.animal_birth_date.isoformat() if data.animal_birth_date else "Desconocido / Unknown"
+    )
 
     info_lines = [
         f"Nombre / Name: {data.animal_name}",
@@ -135,9 +147,11 @@ def generate_vaccination_certificate(data: CertificateData) -> Path:
     if not data.vaccinations:
         pdf.set_font("Helvetica", "I", 10)
         pdf.cell(
-            0, 8,
+            0,
+            8,
             "No hay vacunas administradas / No vaccines administered",
-            new_x="LMARGIN", new_y="NEXT",
+            new_x="LMARGIN",
+            new_y="NEXT",
         )
     else:
         # Table header
@@ -163,9 +177,13 @@ def generate_vaccination_certificate(data: CertificateData) -> Path:
                 pdf.set_fill_color(255, 255, 255)
 
             pdf.cell(col_widths[0], 6, vacc.vaccine_name[:25], border=1, fill=True)
-            pdf.cell(col_widths[1], 6, vacc.administered_date.isoformat(), border=1, fill=True, align="C")
+            pdf.cell(
+                col_widths[1], 6, vacc.administered_date.isoformat(), border=1, fill=True, align="C"
+            )
             pdf.cell(col_widths[2], 6, str(vacc.dose_number), border=1, fill=True, align="C")
-            pdf.cell(col_widths[3], 6, (vacc.batch_number or "-")[:15], border=1, fill=True, align="C")
+            pdf.cell(
+                col_widths[3], 6, (vacc.batch_number or "-")[:15], border=1, fill=True, align="C"
+            )
             pdf.cell(col_widths[4], 6, (vacc.administered_by or "-")[:18], border=1, fill=True)
             next_text = vacc.next_due_date.isoformat() if vacc.next_due_date else "-"
             pdf.cell(col_widths[5], 6, next_text, border=1, fill=True, align="C")

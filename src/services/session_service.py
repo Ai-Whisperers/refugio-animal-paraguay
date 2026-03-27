@@ -120,9 +120,7 @@ async def revoke_all_user_sessions(db: AsyncSession, user_id: str) -> int:
     return count
 
 
-async def list_active_sessions(
-    db: AsyncSession, user_id: str | None = None
-) -> list[ActiveSession]:
+async def list_active_sessions(db: AsyncSession, user_id: str | None = None) -> list[ActiveSession]:
     """List active (non-revoked, non-expired) sessions.
 
     If user_id is provided, filter to that user's sessions only.

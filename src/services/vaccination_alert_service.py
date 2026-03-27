@@ -73,7 +73,9 @@ async def get_vaccination_alerts(
     window_end = today + timedelta(days=window_days)
 
     query = (
-        sa.select(Vaccination, Animal.name.label("animal_name"), VaccineType.name.label("vaccine_name"))
+        sa.select(
+            Vaccination, Animal.name.label("animal_name"), VaccineType.name.label("vaccine_name")
+        )
         .join(Animal, Vaccination.animal_id == Animal.id)
         .join(VaccineType, Vaccination.vaccine_type_id == VaccineType.id)
         .where(

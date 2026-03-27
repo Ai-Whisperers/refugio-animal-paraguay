@@ -30,13 +30,15 @@ from src.config import get_settings
 logger = logging.getLogger(__name__)
 
 # Paths excluded from access logging — noisy or sensitive.
-_EXCLUDED_PATHS: frozenset[str] = frozenset({
-    "/health",
-    "/docs",
-    "/redoc",
-    "/openapi.json",
-    "/favicon.ico",
-})
+_EXCLUDED_PATHS: frozenset[str] = frozenset(
+    {
+        "/health",
+        "/docs",
+        "/redoc",
+        "/openapi.json",
+        "/favicon.ico",
+    }
+)
 
 # Requests slower than this threshold are logged at WARNING.
 _SLOW_REQUEST_THRESHOLD_MS: int = 1000
@@ -55,7 +57,7 @@ def _extract_user_id(request: Request) -> str | None:
     if not auth_header.startswith("Bearer "):
         return None
 
-    token = auth_header[len("Bearer "):]
+    token = auth_header[len("Bearer ") :]
     try:
         settings = get_settings()
         payload = decode_access_token(

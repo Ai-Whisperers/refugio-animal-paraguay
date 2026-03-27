@@ -10,21 +10,27 @@ pytestmark = [pytest.mark.asyncio(loop_scope="function"), pytest.mark.integratio
 
 
 async def _create_animal(client: AsyncClient, name_prefix: str = "Bulk") -> str:
-    resp = await client.post("/animals", json={
-        "name": f"{name_prefix}-{uuid.uuid4().hex[:6]}",
-        "species": "dog",
-        "breed": "mixed",
-    })
+    resp = await client.post(
+        "/animals",
+        json={
+            "name": f"{name_prefix}-{uuid.uuid4().hex[:6]}",
+            "species": "dog",
+            "breed": "mixed",
+        },
+    )
     assert resp.status_code == 201
     return resp.json()["id"]
 
 
 async def _create_vaccine_type(client: AsyncClient) -> dict:
-    resp = await client.post("/vaccine-types", json={
-        "name": f"Bulk-Vaccine-{uuid.uuid4().hex[:6]}",
-        "target_species": "all",
-        "is_required": True,
-    })
+    resp = await client.post(
+        "/vaccine-types",
+        json={
+            "name": f"Bulk-Vaccine-{uuid.uuid4().hex[:6]}",
+            "target_species": "all",
+            "is_required": True,
+        },
+    )
     assert resp.status_code == 201
     return resp.json()
 
@@ -37,11 +43,14 @@ class TestBulkVaccinationRecording:
         animal_ids = [await _create_animal(client) for _ in range(3)]
         vt = await _create_vaccine_type(client)
 
-        resp = await client.post("/vaccinations/bulk", json={
-            "animal_ids": animal_ids,
-            "vaccine_type_id": vt["id"],
-            "scheduled_date": date.today().isoformat(),
-        })
+        resp = await client.post(
+            "/vaccinations/bulk",
+            json={
+                "animal_ids": animal_ids,
+                "vaccine_type_id": vt["id"],
+                "scheduled_date": date.today().isoformat(),
+            },
+        )
         assert resp.status_code == 201
         body = resp.json()
         assert body["total_requested"] == 3
@@ -57,16 +66,19 @@ class TestBulkVaccinationRecording:
         animal_ids = [await _create_animal(client) for _ in range(2)]
         vt = await _create_vaccine_type(client)
 
-        resp = await client.post("/vaccinations/bulk", json={
-            "animal_ids": animal_ids,
-            "vaccine_type_id": vt["id"],
-            "scheduled_date": date.today().isoformat(),
-            "administered_date": date.today().isoformat(),
-            "administered_by": "Dr. Martinez",
-            "batch_number": "LOT-BATCH-001",
-            "vaccination_status": "administered",
-            "dose_number": 1,
-        })
+        resp = await client.post(
+            "/vaccinations/bulk",
+            json={
+                "animal_ids": animal_ids,
+                "vaccine_type_id": vt["id"],
+                "scheduled_date": date.today().isoformat(),
+                "administered_date": date.today().isoformat(),
+                "administered_by": "Dr. Martinez",
+                "batch_number": "LOT-BATCH-001",
+                "vaccination_status": "administered",
+                "dose_number": 1,
+            },
+        )
         assert resp.status_code == 201
         body = resp.json()
         assert body["total_created"] == 2
@@ -78,11 +90,14 @@ class TestBulkVaccinationRecording:
         fake_id = str(uuid.uuid4())
         vt = await _create_vaccine_type(client)
 
-        resp = await client.post("/vaccinations/bulk", json={
-            "animal_ids": [real_id, fake_id],
-            "vaccine_type_id": vt["id"],
-            "scheduled_date": date.today().isoformat(),
-        })
+        resp = await client.post(
+            "/vaccinations/bulk",
+            json={
+                "animal_ids": [real_id, fake_id],
+                "vaccine_type_id": vt["id"],
+                "scheduled_date": date.today().isoformat(),
+            },
+        )
         assert resp.status_code == 201
         body = resp.json()
         assert body["total_requested"] == 2
@@ -101,11 +116,14 @@ class TestBulkVaccinationRecording:
         animal_id = await _create_animal(client)
         fake_vt_id = str(uuid.uuid4())
 
-        resp = await client.post("/vaccinations/bulk", json={
-            "animal_ids": [animal_id],
-            "vaccine_type_id": fake_vt_id,
-            "scheduled_date": date.today().isoformat(),
-        })
+        resp = await client.post(
+            "/vaccinations/bulk",
+            json={
+                "animal_ids": [animal_id],
+                "vaccine_type_id": fake_vt_id,
+                "scheduled_date": date.today().isoformat(),
+            },
+        )
         assert resp.status_code == 404
 
     async def test_bulk_single_animal(self, client: AsyncClient) -> None:
@@ -113,11 +131,14 @@ class TestBulkVaccinationRecording:
         animal_id = await _create_animal(client)
         vt = await _create_vaccine_type(client)
 
-        resp = await client.post("/vaccinations/bulk", json={
-            "animal_ids": [animal_id],
-            "vaccine_type_id": vt["id"],
-            "scheduled_date": date.today().isoformat(),
-        })
+        resp = await client.post(
+            "/vaccinations/bulk",
+            json={
+                "animal_ids": [animal_id],
+                "vaccine_type_id": vt["id"],
+                "scheduled_date": date.today().isoformat(),
+            },
+        )
         assert resp.status_code == 201
         body = resp.json()
         assert body["total_requested"] == 1
@@ -128,12 +149,15 @@ class TestBulkVaccinationRecording:
         animal_id = await _create_animal(client)
         vt = await _create_vaccine_type(client)
 
-        await client.post("/vaccinations/bulk", json={
-            "animal_ids": [animal_id],
-            "vaccine_type_id": vt["id"],
-            "scheduled_date": date.today().isoformat(),
-            "vaccination_status": "scheduled",
-        })
+        await client.post(
+            "/vaccinations/bulk",
+            json={
+                "animal_ids": [animal_id],
+                "vaccine_type_id": vt["id"],
+                "scheduled_date": date.today().isoformat(),
+                "vaccination_status": "scheduled",
+            },
+        )
 
         resp = await client.get(f"/animals/{animal_id}/vaccinations")
         assert resp.status_code == 200
@@ -145,9 +169,12 @@ class TestBulkVaccinationRecording:
         """Empty animal_ids list should be rejected by validation."""
         vt = await _create_vaccine_type(client)
 
-        resp = await client.post("/vaccinations/bulk", json={
-            "animal_ids": [],
-            "vaccine_type_id": vt["id"],
-            "scheduled_date": date.today().isoformat(),
-        })
+        resp = await client.post(
+            "/vaccinations/bulk",
+            json={
+                "animal_ids": [],
+                "vaccine_type_id": vt["id"],
+                "scheduled_date": date.today().isoformat(),
+            },
+        )
         assert resp.status_code == 422

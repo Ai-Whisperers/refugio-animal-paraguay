@@ -124,9 +124,7 @@ class VetVisit(Base):
     reason: Mapped[str | None] = mapped_column(sa.Text, nullable=True)
     notes: Mapped[str | None] = mapped_column(sa.Text, nullable=True)
     weight_kg: Mapped[float | None] = mapped_column(sa.Numeric(6, 2), nullable=True)
-    temperature_celsius: Mapped[float | None] = mapped_column(
-        sa.Numeric(4, 1), nullable=True
-    )
+    temperature_celsius: Mapped[float | None] = mapped_column(sa.Numeric(4, 1), nullable=True)
     next_visit_date: Mapped[date | None] = mapped_column(sa.Date, nullable=True)
     created_at: Mapped[datetime] = mapped_column(
         sa.TIMESTAMP(timezone=True),
@@ -193,9 +191,7 @@ class Diagnosis(Base):
     )
 
     # Relationships
-    vet_visit: Mapped["VetVisit"] = relationship(
-        "VetVisit", back_populates="diagnoses"
-    )
+    vet_visit: Mapped["VetVisit"] = relationship("VetVisit", back_populates="diagnoses")
     treatments: Mapped[list["Treatment"]] = relationship(
         "Treatment",
         back_populates="diagnosis",
@@ -244,9 +240,7 @@ class Treatment(Base):
     )
 
     # Relationships
-    diagnosis: Mapped["Diagnosis"] = relationship(
-        "Diagnosis", back_populates="treatments"
-    )
+    diagnosis: Mapped["Diagnosis"] = relationship("Diagnosis", back_populates="treatments")
     medications: Mapped[list["Medication"]] = relationship(
         "Medication",
         back_populates="treatment",
@@ -303,9 +297,7 @@ class Medication(Base):
     )
 
     # Relationships
-    treatment: Mapped["Treatment"] = relationship(
-        "Treatment", back_populates="medications"
-    )
+    treatment: Mapped["Treatment"] = relationship("Treatment", back_populates="medications")
 
 
 class MedicalDocument(Base):
@@ -342,6 +334,4 @@ class MedicalDocument(Base):
     )
 
     # Relationships
-    vet_visit: Mapped["VetVisit"] = relationship(
-        "VetVisit", back_populates="medical_documents"
-    )
+    vet_visit: Mapped["VetVisit"] = relationship("VetVisit", back_populates="medical_documents")

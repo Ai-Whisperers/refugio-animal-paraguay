@@ -37,7 +37,10 @@ from src.schemas.public import (
 router = APIRouter(
     prefix="/public/animals",
     tags=["public"],
-    responses={**COMMON_RESPONSES, 404: {"description": "Animal not found", "model": ErrorResponse}},
+    responses={
+        **COMMON_RESPONSES,
+        404: {"description": "Animal not found", "model": ErrorResponse},
+    },
 )
 
 DEFAULT_PAGE_SIZE = 20
