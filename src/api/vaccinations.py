@@ -460,3 +460,35 @@ async def delete_vaccination(
     vacc = await _get_vaccination_or_404(vaccination_id, db)
     await db.delete(vacc)
     await db.commit()
+
+
+# ---------------------------------------------------------------------------
+# Vaccination alert endpoints
+# ---------------------------------------------------------------------------
+
+
+@vaccination_router.get(
+    "/vaccination-alerts",
+    response_model=VaccinationAlertSummary,
+    summary="Get vaccination due-date alerts",
+)
+async def list_vaccination_alerts(
+    db: AsyncSession = Depends(get_db),
+    window_days: int = Query(7, ge=1, le=90, description="Days ahead to check"),
+) -> VaccinationAlertSummary:
+    return await get_vaccination_alerts(db, window_days=window_days)
+
+
+@vaccination_router.get(
+    "/animals/{animal_id}/vaccination-alerts",
+    response_model=VaccinationAlertSummary,
+    responses=RESOURCE_RESPONSES,
+    summary="Get vaccination alerts for a specific animal",
+)
+async def list_animal_vaccination_alerts(
+    animal_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    window_days: int = Query(7, ge=1, le=90),
+) -> VaccinationAlertSummary:
+    await _get_animal_or_404(animal_id, db)
+    return await get_vaccination_alerts(db, window_days=window_days, animal_id=animal_id)
