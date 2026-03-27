@@ -3,7 +3,7 @@ story: S4
 epic: EPIC-24
 ticket: RAP-118
 title: "Donation receipt PDF generation"
-status: planned
+status: done
 points: 5
 priority: P1
 track: Fullstack
