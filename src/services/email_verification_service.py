@@ -7,6 +7,7 @@ Reuses the verification_tokens table with token_type = 'email_verification'.
 import logging
 import secrets
 from datetime import UTC, datetime, timedelta
+from enum import StrEnum
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -18,6 +19,17 @@ logger = logging.getLogger(__name__)
 
 EMAIL_VERIFICATION_TOKEN_EXPIRY_HOURS = 24
 TOKEN_BYTE_LENGTH = 32
+
+
+class VerificationResult(StrEnum):
+    """Possible outcomes of email verification."""
+
+    SUCCESS = "success"
+    TOKEN_NOT_FOUND = "invalid_token"
+    TOKEN_EXPIRED = "token_expired"
+    TOKEN_ALREADY_USED = "token_already_used"
+    USER_NOT_FOUND = "user_not_found"
+
 
 
 async def create_email_verification_token(db: AsyncSession, user_id: str) -> str | None:
@@ -56,28 +68,34 @@ async def create_email_verification_token(db: AsyncSession, user_id: str) -> str
     return token_value
 
 
-async def verify_email(db: AsyncSession, token: str) -> bool:
+async def verify_email(db: AsyncSession, token: str) -> VerificationResult:
     """Verify an email using a token.
 
     Validates the token, marks it as used, and sets user.email_verified = True.
-    Returns True on success, False if token is invalid/expired/used.
+    Returns a VerificationResult indicating the outcome.
     """
+    # First check if the token exists at all (including used tokens)
     result = await db.execute(
         select(VerificationToken).where(
             VerificationToken.token == token,
             VerificationToken.token_type == TokenType.EMAIL_VERIFICATION.value,
-            VerificationToken.used_at.is_(None),
         )
     )
     token_record = result.scalar_one_or_none()
 
     if token_record is None:
-        logger.warning("Email verification failed: token not found or already used")
-        return False
+        logger.warning("Email verification failed: token not found")
+        return VerificationResult.TOKEN_NOT_FOUND
 
+    # Check if token was already used
+    if token_record.used_at is not None:
+        logger.warning("Email verification failed: token already used")
+        return VerificationResult.TOKEN_ALREADY_USED
+
+    # Check if token is expired
     if token_record.expires_at < datetime.now(UTC):
         logger.warning("Email verification failed: token expired")
-        return False
+        return VerificationResult.TOKEN_EXPIRED
 
     user = await db.get(User, token_record.user_id)
     if user is None or not user.is_active:
@@ -85,16 +103,16 @@ async def verify_email(db: AsyncSession, token: str) -> bool:
             "Email verification failed: user not found or inactive, user_id=%s",
             token_record.user_id,
         )
-        return False
+        return VerificationResult.USER_NOT_FOUND
 
     # Already verified — idempotent success
     if user.email_verified:
         token_record.used_at = datetime.now(UTC)
-        return True
+        return VerificationResult.SUCCESS
 
     # Mark token as used and verify email
     token_record.used_at = datetime.now(UTC)
     user.email_verified = True
 
     logger.info("Email verified for user_id=%s", user.id)
-    return True
+    return VerificationResult.SUCCESS

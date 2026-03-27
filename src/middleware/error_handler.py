@@ -138,14 +138,28 @@ async def http_exception_handler(
     request: Request,
     exc: HTTPException,
 ) -> JSONResponse:
-    """Handle FastAPI HTTPExceptions with standard error format."""
-    error_code = STATUS_TO_ERROR_CODE.get(exc.status_code, f"HTTP_{exc.status_code}")
+    """Handle FastAPI HTTPExceptions with standard error format.
+
+    Supports both string and dict-style detail. When detail is a dict with
+    ``error_code`` and ``message`` keys, those values are used directly so
+    that endpoints can pass domain-specific error codes through HTTPException.
+    """
     headers = getattr(exc, "headers", None) or {}
+
+    # Support structured detail: {"message": "...", "error_code": "..."}
+    if isinstance(exc.detail, dict):
+        error_code = exc.detail.get("error_code") or STATUS_TO_ERROR_CODE.get(
+            exc.status_code, f"HTTP_{exc.status_code}"
+        )
+        message = exc.detail.get("message", str(exc.detail))
+    else:
+        error_code = STATUS_TO_ERROR_CODE.get(exc.status_code, f"HTTP_{exc.status_code}")
+        message = str(exc.detail)
 
     return _build_error_response(
         status_code=exc.status_code,
         error_code=error_code,
-        message=str(exc.detail),
+        message=message,
         request_id=_get_request_id(request),
         headers=headers if headers else None,
     )
