@@ -130,6 +130,28 @@ class Settings(BaseSettings):
         description="Stripe webhook signing secret (whsec_...). Required to verify webhook signatures.",
     )
 
+    # Tigo Money (local PYG payments)
+    tigo_money_enabled: bool = Field(
+        default=False,
+        description="Enable Tigo Money payment option. Requires tigo_merchant_id and tigo_api_key.",
+    )
+    tigo_merchant_id: str = Field(
+        default="",
+        description="Tigo Money merchant account identifier.",
+    )
+    tigo_api_key: str = Field(
+        default="",
+        description="Tigo Money API key for authenticating payment requests.",
+    )
+    tigo_webhook_secret: str = Field(
+        default="",
+        description="Secret used to verify Tigo Money webhook callback signatures.",
+    )
+    tigo_api_base_url: str = Field(
+        default="https://api.tigo.com.py/v1",
+        description="Tigo Money API base URL. Override for sandbox/staging environments.",
+    )
+
     # Rate limiting
     rate_limit_enabled: bool = Field(
         default=True,

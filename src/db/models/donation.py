@@ -25,6 +25,7 @@ class PaymentMethod(enum.StrEnum):
     CASH = "cash"
     TRANSFER = "transfer"
     SEPA_DEBIT = "sepa_debit"
+    TIGO_MONEY = "tigo_money"
 
 
 class RecurringInterval(enum.StrEnum):
@@ -134,6 +135,12 @@ class Donation(Base):
     )
     # Stripe customer ID — required for subscriptions and SEPA mandates
     stripe_customer_id: Mapped[str | None] = mapped_column(
+        sa.String(255),
+        nullable=True,
+        index=True,
+    )
+    # Tigo Money transaction ID — populated when payment_method = tigo_money
+    tigo_transaction_id: Mapped[str | None] = mapped_column(
         sa.String(255),
         nullable=True,
         index=True,
