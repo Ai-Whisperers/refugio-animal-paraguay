@@ -1,0 +1,266 @@
+================================================================================
+REFUGIO ANIMAL PARAGUAY - FRONTEND QUICK REFERENCE
+================================================================================
+
+📍 PROJECT LOCATION: /home/ai-whisperers/Projects/refugio-animal-paraguay/frontend/src
+
+COVERAGE: 100% - ALL FILES AUDITED
+Generated: 2026-03-27
+
+================================================================================
+ROUTE SUMMARY
+================================================================================
+
+PUBLIC PAGES:
+  ✓ / (home) - Hero + stats + testimonials
+  ✓ /animals - Browse with filters (species, size, age)
+  ✓ /animals/[id] - Animal detail page
+  ✓ /animals/[id]/apply - 3-step adoption application form
+  ✓ /donate - Donation intro page
+  ✓ /donate/campaigns/[id] - Campaign detail + donation form
+  ✓ /donate/confirmation - Success page
+  ✓ /about - About page
+  ✓ /contact - Contact form
+  ✓ /stories - Success stories
+  ✓ /volunteer - Volunteer page
+  ✓ /foster - Foster program page
+
+ADMIN PAGES (OAuth2 JWT):
+  ✓ /admin/login - Login form
+  ✓ /admin/dashboard - Dashboard with metrics
+  ✓ /admin/animals/* - CRUD operations
+  ✓ /admin/animals/[id]/vet-notes - Medical records
+  ✓ /admin/adoptions/* - Application tracking
+  ✓ /admin/adoptions/analytics - Analytics dashboard
+  ✓ /admin/appointments - Appointment scheduling
+  ✓ /admin/surgeries/* - Surgery management
+  ✓ /admin/surgeries/[id]/recovery - Recovery tracking
+  ✓ /admin/surgeries/stats - Surgery analytics
+  ✓ /admin/vaccinations - Vaccination tracking
+  ✓ /admin/prescriptions - Medication management
+  ✓ /admin/medical/alerts - Alert dashboard
+  ✓ /admin/vet-dashboard - Vet-specific view
+  ✓ /admin/donors/* - Donor management
+  ✓ /admin/donations/* - Donation tracking
+
+TOTAL ROUTES: 50+
+
+================================================================================
+COMPONENT COUNT
+================================================================================
+
+PUBLIC COMPONENTS (10):
+  Navbar, Footer, WhatsAppFab, LoadingSpinner, AnimalPlaceholder,
+  AnimalCardSkeleton, DynamicIcon, CampaignCard, DonationForm, StripePaymentStep
+
+ADMIN COMPONENTS (10):
+  AdminSidebar, AnimalForm, VetVisitForm, RichTextEditor, MedicalTimeline,
+  AnimalHistoryTimeline, StatusWorkflowModal, AdoptionStatusModal,
+  BatchStatusModal, Breadcrumbs
+
+TOTAL COMPONENTS: 20+
+
+================================================================================
+UTILITY MODULES
+================================================================================
+
+api.ts (116) ............. Auth token injection, error parsing
+public-api.ts (238) ...... Unauthenticated API calls
+auth.ts (108) ............ Token management, JWT decoding
+strings.ts (527) ......... ALL UI TEXT IN SPANISH ⚠️
+animal-utils.ts (50) ..... Age calculation
+animal-status.ts (56) .... Status constants
+campaign-utils.ts (72) ... Currency formatting
+error-handling.ts (135) .. Error messages
+role-access.ts (25) ...... Permission checks
+stripe.ts (26) ........... Stripe config
+
+================================================================================
+CRITICAL ISSUES (MUST FIX)
+================================================================================
+
+FILE SIZE VIOLATIONS (10 files exceed 500 lines):
+  674 lines ❌ app/admin/donations/page.tsx
+  644 lines ❌ app/admin/donors/[id]/page.tsx
+  630 lines ❌ app/admin/animals/page.tsx
+  597 lines ❌ app/animals/[id]/apply/page.tsx
+  567 lines ❌ components/admin/MedicalTimeline.tsx
+  555 lines ❌ types/api.ts
+  551 lines ❌ app/admin/donors/page.tsx
+  546 lines ❌ app/admin/adoptions/[id]/page.tsx
+  523 lines ❌ app/admin/vet-dashboard/page.tsx
+  527 lines ❌ lib/strings.ts (all UI text)
+
+HARDCODED DATA:
+  • Home stats: "150+", "80+", "50+" (not from API)
+  • Home team members, testimonials (static)
+  • All page content from strings.ts
+  • WhatsApp numbers: 595981000000 (hardcoded throughout)
+  • Email validation regex duplicated
+  • Form validation patterns scattered
+
+ERROR HANDLING:
+  • localStorage failures silently ignored
+  • No retry logic in some API calls
+  • Missing error recovery in forms
+  • CSV export endpoint may not exist
+
+FEATURES:
+  • SEPA integration: incomplete
+  • Image upload: URL-only
+  • Real-time updates: none
+  • Offline support: none
+  • Code splitting: minimal
+
+================================================================================
+FEATURE COVERAGE
+================================================================================
+
+✓ Public pages: COMPLETE
+✓ Adoption flow: COMPLETE (but file size issue)
+✓ Donation flow: COMPLETE (large files)
+✓ Admin dashboard: COMPLETE
+✓ Animals management: COMPLETE
+✓ Adoptions tracking: COMPLETE
+✓ Medical records: COMPLETE
+✓ Donor management: COMPLETE (large files)
+⚠️ Stripe integration: PARTIAL (cards work, SEPA unclear)
+✓ JWT authentication: COMPLETE
+
+QUALITY SCORE: 7/10 (Functional but needs refactoring)
+
+================================================================================
+REFACTORING PRIORITIES
+================================================================================
+
+🔴 HIGH (Do First):
+  1. Split 10 large files (>500 lines) into composable components
+  2. Extract hardcoded strings → i18n system
+  3. Fix error handling (add retries, better messages)
+  4. Extract validation patterns to shared validators
+  5. Centralize WhatsApp number & hardcoded constants
+
+🟡 MEDIUM (Next):
+  6. Add form composition pattern (adopt/donate/contact share structure)
+  7. Implement proper caching/memoization
+  8. Lazy load admin routes
+  9. Fix accessibility (aria labels, form associations)
+  10. Add offline support (service worker)
+
+🟢 LOW (Later):
+  11. Add i18n framework
+  12. Implement real-time updates (polling/websockets)
+  13. Add image upload feature
+  14. Complete SEPA flow documentation
+  15. Performance optimization (code splitting)
+
+================================================================================
+API ENDPOINTS (50+ CALLED)
+================================================================================
+
+PUBLIC (no auth):
+  GET /animals/public/list (with filters)
+  GET /animals/public/{id}
+  POST /animals/public/{id}/adoption-applications
+  GET /campaigns/public/{id}
+  POST /donations
+  POST /donors
+  POST /stripe-intent
+  POST /sepa-donations
+  POST /forms/contact
+
+AUTHENTICATED (admin):
+  POST /auth/token
+  POST /auth/forgot-password
+  POST /auth/reset-password
+  GET /animals/count
+  GET /adoptions/analytics
+  GET /donations/stats
+  GET /animals/list
+  POST /animals
+  PATCH /animals/{id}
+  DELETE /animals/{id}
+  GET /animals/{id}/history
+  GET /animals/{id}/vet-visits
+  GET /animals/{id}/vaccinations
+  GET /animals/{id}/surgeries
+  GET /animals/{id}/medications
+  ... and 20+ more for adoptions, appointments, surgeries, etc.
+
+================================================================================
+AUTHENTICATION
+================================================================================
+
+Method: OAuth2 JWT (bearer token)
+Storage: localStorage (access_token)
+Expiry: Detected via query param (?expired=true)
+Roles: Admin, Vet (checked via JWT payload)
+Protected: Admin section requires valid token
+
+Issues:
+  • No state management (direct localStorage access)
+  • Session expiry detection uses window.location.search
+  • Token refresh not mentioned
+
+================================================================================
+UI LANGUAGE
+================================================================================
+
+Spanish (hardcoded): ALL strings in lib/strings.ts
+No i18n framework implemented
+Would require refactoring to support multiple languages
+
+================================================================================
+PAYMENT INTEGRATION
+================================================================================
+
+Stripe:
+  ✓ Card payments (Stripe Elements)
+  ✓ Intent creation
+  ✓ Payment processing
+
+SEPA Direct Debit:
+  ⚠️ Page exists (/donate/sepa-setup)
+  ⚠️ Flow unclear
+  ⚠️ May be incomplete
+
+Bank Transfer:
+  • Info displayed
+  • Manual process (not integrated)
+
+================================================================================
+FILES TO REVIEW FIRST
+================================================================================
+
+Start with these for maximum impact:
+
+1. lib/strings.ts (527 lines)
+   → Extract all strings to i18n
+
+2. app/admin/donations/page.tsx (674 lines)
+   → Split into smaller components
+
+3. app/admin/donors/[id]/page.tsx (644 lines)
+   → Extract donor detail logic
+
+4. app/admin/animals/page.tsx (630 lines)
+   → Extract animal table component
+
+5. components/admin/MedicalTimeline.tsx (567 lines)
+   → Break into sub-components
+
+================================================================================
+QUICK NAVIGATION
+================================================================================
+
+Full audit: /home/ai-whisperers/Projects/refugio-animal-paraguay/FRONTEND_INVENTORY.md
+Source: /home/ai-whisperers/Projects/refugio-animal-paraguay/frontend/src
+
+Next Steps:
+  1. Read the full FRONTEND_INVENTORY.md for detailed breakdown
+  2. Start refactoring high-priority items
+  3. Run linting/code quality checks
+  4. Add tests for large components
+  5. Plan i18n migration
+
+================================================================================
