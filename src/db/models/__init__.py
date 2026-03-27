@@ -10,6 +10,20 @@ from .contact_submission import ContactFormType, ContactSubmission
 from .donation import CurrencyCode, Donation, DonationStatus, Donor, PaymentMethod
 from .fund_allocation import FundAllocation, FundCategory
 from .in_kind_donation import InKindDonation, ItemType
+from .medical import (
+    Diagnosis,
+    DiagnosisSeverity,
+    DocumentType,
+    MedicalDocument,
+    Medication,
+    MedicationFrequency,
+    MedicationStatus,
+    Treatment,
+    TreatmentStatus,
+    VetVisit,
+    VisitStatus,
+    VisitType,
+)
 from .notification import Notification, NotificationType
 from .notification_preference import NotificationChannel, NotificationPreference
 from .sponsorship import (
