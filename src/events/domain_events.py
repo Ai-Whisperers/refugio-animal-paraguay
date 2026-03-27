@@ -90,10 +90,17 @@ def create_adoption_status_changed(
     old_status: str,
     new_status: str,
     actor_id: UUID | None = None,
+    notes: str | None = None,
 ) -> AdoptionStatusChanged:
     """Factory for AdoptionStatusChanged events with typed payload."""
+    payload: dict[str, str | None] = {
+        "old_status": old_status,
+        "new_status": new_status,
+    }
+    if notes:
+        payload["notes"] = notes
     return AdoptionStatusChanged(
-        payload={"old_status": old_status, "new_status": new_status},
+        payload=payload,
         aggregate_id=aggregate_id,
         actor_id=actor_id,
     )
