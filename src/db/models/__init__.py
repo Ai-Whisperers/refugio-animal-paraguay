@@ -62,6 +62,8 @@ from .surgery import (
 )
 from .vaccination import Vaccination, VaccinationSchedule, VaccinationStatus, VaccineType
 from .verification_token import TokenType, VerificationToken
+from .vet_referral import ReferralStatus, ReferralUrgency, VetReferral  # noqa: E402
+
 __all__ = [
     "BRONZE_AMOUNT_CENTS",
     "GOLD_AMOUNT_CENTS",
@@ -129,5 +131,8 @@ __all__ = [
     "VerificationToken",
     "VetVisit",
     "VisitStatus",
+    "VetReferral",
+    "ReferralStatus",
+    "ReferralUrgency",
     "VisitType",
 ]
