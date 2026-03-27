@@ -279,6 +279,165 @@ export interface AuditLogListResponse {
   page_size: number;
 }
 
+// --- Medical Records ---
+
+export type VisitType =
+  | "checkup"
+  | "emergency"
+  | "surgery"
+  | "vaccination"
+  | "follow_up"
+  | "dental"
+  | "other";
+
+export type VisitStatus =
+  | "scheduled"
+  | "in_progress"
+  | "completed"
+  | "cancelled"
+  | "no_show";
+
+export type DiagnosisSeverity = "mild" | "moderate" | "severe" | "critical";
+
+export type TreatmentStatus = "planned" | "in_progress" | "completed" | "discontinued";
+
+export type MedicationFrequency =
+  | "once"
+  | "twice_daily"
+  | "three_times_daily"
+  | "daily"
+  | "every_other_day"
+  | "weekly"
+  | "as_needed";
+
+export type MedicationStatus = "active" | "completed" | "discontinued";
+
+export interface MedicationRecord {
+  id: string;
+  treatment_id: string;
+  name: string;
+  dosage: string;
+  frequency: MedicationFrequency;
+  route: string | null;
+  start_date: string;
+  end_date: string | null;
+  medication_status: MedicationStatus;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TreatmentRecord {
+  id: string;
+  diagnosis_id: string;
+  name: string;
+  description: string | null;
+  treatment_status: TreatmentStatus;
+  start_date: string | null;
+  end_date: string | null;
+  notes: string | null;
+  medications: MedicationRecord[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface DiagnosisRecord {
+  id: string;
+  vet_visit_id: string;
+  condition: string;
+  description: string | null;
+  severity: DiagnosisSeverity;
+  is_chronic: boolean;
+  treatments: TreatmentRecord[];
+  created_at: string;
+}
+
+export interface MedicalDocument {
+  id: string;
+  vet_visit_id: string;
+  document_type: string;
+  title: string;
+  description: string | null;
+  file_url: string;
+  file_name: string;
+  file_size_bytes: number | null;
+  mime_type: string | null;
+  created_at: string;
+}
+
+export interface VetVisit {
+  id: string;
+  animal_id: string;
+  veterinarian_name: string;
+  visit_type: VisitType;
+  visit_status: VisitStatus;
+  visit_date: string;
+  reason: string | null;
+  notes: string | null;
+  weight_kg: number | null;
+  temperature_celsius: number | null;
+  next_visit_date: string | null;
+  diagnoses: DiagnosisRecord[];
+  medical_documents: MedicalDocument[];
+  created_at: string;
+  updated_at: string;
+}
+
+export interface VetVisitListResponse {
+  items: VetVisit[];
+  total: number;
+  page: number;
+  page_size: number;
+}
+
+export interface VetVisitCreate {
+  veterinarian_name: string;
+  visit_type: VisitType;
+  visit_status: VisitStatus;
+  visit_date: string;
+  reason?: string | null;
+  notes?: string | null;
+  weight_kg?: number | null;
+  temperature_celsius?: number | null;
+  next_visit_date?: string | null;
+}
+
+// --- Vaccinations ---
+
+export interface VaccineType {
+  id: string;
+  name: string;
+  description: string | null;
+  manufacturer: string | null;
+  target_species: string;
+  is_required: boolean;
+  created_at: string;
+}
+
+export interface VaccinationRecord {
+  id: string;
+  animal_id: string;
+  vaccine_type_id: string;
+  vaccination_status: string;
+  scheduled_date: string;
+  administered_date: string | null;
+  administered_by: string | null;
+  batch_number: string | null;
+  dose_number: number;
+  next_due_date: string | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+  vaccine_type: VaccineType | null;
+}
+
+export interface VaccinationListResponse {
+  items: VaccinationRecord[];
+  total: number;
+  page: number;
+  size: number;
+}
+
 // --- API Error ---
 
 export interface ApiError {
