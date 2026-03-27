@@ -1,6 +1,13 @@
-"""Integration tests for email verification API endpoints."""
+"""Integration tests for email verification API endpoints.
+
+Covers:
+  POST /auth/email/verify  — API-friendly verification
+  GET  /auth/verify-email   — Browser-friendly verification (email link)
+  POST /auth/email/resend  — Resend verification email
+"""
 
 import uuid
+from datetime import UTC, datetime, timedelta
 
 import pytest
 import pytest_asyncio
@@ -195,3 +202,117 @@ class TestResendVerificationEmail:
         )
         assert response.status_code == 200
         assert "message" in response.json()
+
+
+async def _expire_token(token_value: str) -> None:
+    """Manually expire a token in the database for testing."""
+    settings = Settings()
+    engine = init_engine(settings)
+    session_factory = async_sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
+    async with session_factory() as session:
+        await session.execute(
+            text("UPDATE verification_tokens SET expires_at = :expired " "WHERE token = :token"),
+            {
+                "expired": datetime.now(UTC) - timedelta(hours=1),
+                "token": token_value,
+            },
+        )
+        await session.commit()
+
+
+async def _mark_token_used(token_value: str) -> None:
+    """Manually mark a token as used in the database for testing."""
+    settings = Settings()
+    engine = init_engine(settings)
+    session_factory = async_sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
+    async with session_factory() as session:
+        await session.execute(
+            text("UPDATE verification_tokens SET used_at = :used " "WHERE token = :token"),
+            {
+                "used": datetime.now(UTC),
+                "token": token_value,
+            },
+        )
+        await session.commit()
+
+
+@pytest.mark.integration()
+class TestGetVerifyEmail:
+    """Tests for GET /auth/verify-email?token=X (browser-friendly endpoint)."""
+
+    @pytest.mark.asyncio()
+    async def test_get_verify_valid_token(self, verify_client):
+        """Should verify email via GET request (email link click)."""
+        token = await _create_verification_token(str(_TEST_USER_ID))
+        assert token is not None
+
+        response = await verify_client.get(
+            f"/auth/verify-email?token={token}",
+        )
+        assert response.status_code == 200
+        data = response.json()
+        assert data["verified"] is True
+
+    @pytest.mark.asyncio()
+    async def test_get_verify_invalid_token(self, verify_client):
+        """Should return 400 with invalid_token error code."""
+        response = await verify_client.get(
+            "/auth/verify-email?token=completely-bogus-token",
+        )
+        assert response.status_code == 400
+
+    @pytest.mark.asyncio()
+    async def test_get_verify_missing_token_param(self, verify_client):
+        """Should return 422 when token query param is missing."""
+        response = await verify_client.get("/auth/verify-email")
+        assert response.status_code == 422
+
+
+@pytest.mark.integration()
+class TestVerificationErrorCodes:
+    """Tests for specific error codes in verification responses."""
+
+    @pytest.mark.asyncio()
+    async def test_expired_token_returns_token_expired(self, verify_client):
+        """Expired token should return error_code=token_expired."""
+        token = await _create_verification_token(str(_TEST_USER_ID))
+        assert token is not None
+
+        # Manually expire the token in DB
+        await _expire_token(token)
+
+        response = await verify_client.post(
+            "/auth/email/verify",
+            json={"token": token},
+        )
+        assert response.status_code == 400
+        body = response.json()
+        assert body["error_code"] == "token_expired"
+
+    @pytest.mark.asyncio()
+    async def test_used_token_returns_already_used(self, verify_client):
+        """Already-used token should return error_code=token_already_used."""
+        token = await _create_verification_token(str(_TEST_USER_ID))
+        assert token is not None
+
+        # Mark as used
+        await _mark_token_used(token)
+
+        response = await verify_client.post(
+            "/auth/email/verify",
+            json={"token": token},
+        )
+        assert response.status_code == 400
+        body = response.json()
+        assert body["error_code"] == "token_already_used"
+
+    @pytest.mark.asyncio()
+    async def test_nonexistent_token_returns_invalid(self, verify_client):
+        """Nonexistent token should return error_code=invalid_token."""
+        response = await verify_client.post(
+            "/auth/email/verify",
+            json={"token": "does-not-exist-in-db"},
+        )
+        assert response.status_code == 400
+        body = response.json()
+        assert body["error_code"] == "invalid_token"
