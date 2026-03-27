@@ -29,6 +29,11 @@ from src.db.models.vaccination import (
 from src.db.session import get_db
 from src.schemas.error import RESOURCE_RESPONSES
 from src.services.vaccination_alert_service import VaccinationAlertSummary, get_vaccination_alerts
+from src.services.vaccination_certificate_service import (
+    CertificateData,
+    VaccinationRecord,
+    generate_vaccination_certificate,
+)
 from src.schemas.vaccination import (
     VaccinationCreate,
     VaccinationListResponse,
@@ -492,3 +497,66 @@ async def list_animal_vaccination_alerts(
 ) -> VaccinationAlertSummary:
     await _get_animal_or_404(animal_id, db)
     return await get_vaccination_alerts(db, window_days=window_days, animal_id=animal_id)
+
+
+# ---------------------------------------------------------------------------
+# Vaccination certificate endpoint
+# ---------------------------------------------------------------------------
+
+
+@vaccination_router.get(
+    "/animals/{animal_id}/vaccination-certificate",
+    responses={
+        **RESOURCE_RESPONSES,
+        200: {"content": {"application/pdf": {}}, "description": "PDF certificate"},
+    },
+    summary="Generate vaccination certificate PDF for an animal",
+)
+async def generate_certificate(
+    animal_id: UUID,
+    db: AsyncSession = Depends(get_db),
+) -> Any:
+    from fastapi.responses import FileResponse
+
+    animal = await _get_animal_or_404(animal_id, db)
+
+    # Fetch administered vaccinations for this animal
+    query = (
+        sa.select(Vaccination)
+        .options(selectinload(Vaccination.vaccine_type))
+        .where(
+            Vaccination.animal_id == animal_id,
+            Vaccination.vaccination_status == "administered",
+        )
+        .order_by(Vaccination.administered_date.asc())
+    )
+    result = await db.execute(query)
+    vaccinations = list(result.scalars().unique().all())
+
+    records = [
+        VaccinationRecord(
+            vaccine_name=v.vaccine_type.name if v.vaccine_type else "Unknown",
+            administered_date=v.administered_date or v.scheduled_date,
+            batch_number=v.batch_number,
+            administered_by=v.administered_by,
+            dose_number=v.dose_number,
+            next_due_date=v.next_due_date,
+        )
+        for v in vaccinations
+    ]
+
+    cert_data = CertificateData(
+        animal_id=animal.id,
+        animal_name=animal.name,
+        animal_species=animal.species,
+        animal_breed=animal.breed,
+        animal_birth_date=animal.birth_date,
+        vaccinations=records,
+    )
+
+    filepath = generate_vaccination_certificate(cert_data)
+    return FileResponse(
+        path=str(filepath),
+        media_type="application/pdf",
+        filename=f"vaccination_certificate_{animal.name}.pdf",
+    )
