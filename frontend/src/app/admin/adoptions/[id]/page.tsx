@@ -169,10 +169,10 @@ export default function AdoptionDetailPage() {
     }
   }, [isChecking, fetchData]);
 
-  async function handleStatusChange(status: AdoptionRequestStatus, _notes: string) {
+  async function handleStatusChange(status: AdoptionRequestStatus, notes: string) {
     await api.patch<AdoptionRequestResponse>(
       `/adoption-requests/${requestId}/status`,
-      { status }
+      { status, notes }
     );
 
     setSuccessMessage(
