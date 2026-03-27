@@ -94,4 +94,29 @@ describe("AdminSidebar", () => {
     render(<AdminSidebar />);
     expect(screen.getAllByText("Cerrar Sesion").length).toBeGreaterThanOrEqual(1);
   });
+
+  describe("mobile responsive breakpoints", () => {
+    beforeEach(() => {
+      mockGetCurrentUserRole.mockReturnValue("staff");
+    });
+
+    it("desktop sidebar uses md:block breakpoint", () => {
+      const { container } = render(<AdminSidebar />);
+      const desktopSidebar = container.querySelector("aside.hidden");
+      expect(desktopSidebar).not.toBeNull();
+      expect(desktopSidebar?.className).toContain("md:block");
+    });
+
+    it("hamburger button uses md:hidden breakpoint", () => {
+      render(<AdminSidebar />);
+      const hamburger = screen.getByLabelText("Abrir menu");
+      expect(hamburger.className).toContain("md:hidden");
+    });
+
+    it("hamburger button is fixed positioned for mobile overlay", () => {
+      render(<AdminSidebar />);
+      const hamburger = screen.getByLabelText("Abrir menu");
+      expect(hamburger.className).toContain("fixed");
+    });
+  });
 });
