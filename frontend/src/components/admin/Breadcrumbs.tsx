@@ -23,6 +23,7 @@ const SEGMENT_LABELS: Record<string, string> = {
   edit: "Editar",
   medical: "Medico",
   alerts: "Alertas",
+  "vet-notes": "Notas Veterinarias",
 };
 
 const LABEL_DETAIL = "Detalle";
