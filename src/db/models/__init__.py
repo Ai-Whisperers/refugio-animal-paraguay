@@ -37,6 +37,7 @@ from .sponsorship import (
     SponsorshipTierLevel,
 )
 from .subscription import Subscription, SubscriptionInterval, SubscriptionStatus
+from .user import User, UserRole
 from .surgery import (
     AnesthesiaType,
     PostOpCheck,
@@ -115,7 +116,9 @@ __all__ = [
     "TokenType",
     "Treatment",
     "TreatmentStatus",
+    "User",
     "UserConsent",
+    "UserRole",
     "Vaccination",
     "VaccinationSchedule",
     "VaccinationStatus",
