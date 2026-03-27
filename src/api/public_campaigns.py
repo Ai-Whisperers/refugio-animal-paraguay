@@ -5,6 +5,7 @@ Endpoints:
   GET /public/campaigns/{id}        — campaign detail with progress stats
 """
 
+from datetime import UTC, datetime
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -25,12 +26,27 @@ DEFAULT_PAGE_SIZE = 12
 MAX_PAGE_SIZE = 50
 
 
+def _compute_days_remaining(deadline: datetime | None) -> int | None:
+    """Return whole days until deadline, or None if no deadline is set.
+
+    Returns 0 if the deadline has already passed.
+    """
+    if deadline is None:
+        return None
+    now = datetime.now(tz=UTC)
+    # Ensure deadline is timezone-aware for comparison
+    if deadline.tzinfo is None:
+        deadline = deadline.replace(tzinfo=UTC)
+    delta = deadline - now
+    return max(0, delta.days)
+
+
 def _build_campaign_public_response(
     campaign: Campaign,
     raised_amount_cents: int,
     donation_count: int,
 ) -> CampaignPublicResponse:
-    """Build a public campaign response with computed progress fields."""
+    """Build a public campaign response with computed progress and time fields."""
     progress = (
         min((raised_amount_cents / campaign.target_amount_cents) * 100, 100.0)
         if campaign.target_amount_cents > 0
@@ -46,8 +62,11 @@ def _build_campaign_public_response(
         currency=campaign.currency,  # type: ignore[arg-type]
         fund_category=campaign.fund_category,  # type: ignore[arg-type]
         status=campaign.status,  # type: ignore[arg-type]
+        featured=campaign.featured,
         image_url=campaign.image_url,
+        photo_urls=campaign.photo_urls,
         deadline=campaign.deadline,
+        days_remaining=_compute_days_remaining(campaign.deadline),
         min_donation_cents=campaign.min_donation_cents,
         max_donation_cents=campaign.max_donation_cents,
         allow_overfunding=campaign.allow_overfunding,
@@ -60,6 +79,9 @@ def _build_campaign_public_response(
 @router.get("", response_model=CampaignListResponse)
 async def list_active_campaigns(
     category: FundCategory | None = Query(default=None, description="Filter by fund category"),
+    featured: bool | None = Query(
+        default=None, description="Filter by featured flag (true = featured only)"
+    ),
     page: int = Query(default=1, ge=1, description="Page number (1-based)"),
     page_size: int = Query(
         default=DEFAULT_PAGE_SIZE, ge=1, le=MAX_PAGE_SIZE, description="Items per page"
@@ -69,25 +91,32 @@ async def list_active_campaigns(
     """List active campaigns with progress stats.
 
     Only campaigns with status='active' are shown publicly.
-    Results include computed raised amount and donation count.
+    Results include computed raised amount, donation count, and days remaining.
+    Use ?featured=true to surface featured campaigns prominently.
     """
     base_query = select(Campaign).where(Campaign.status == CampaignStatus.ACTIVE.value)
 
     if category is not None:
         base_query = base_query.where(Campaign.fund_category == category.value)
+    if featured is not None:
+        base_query = base_query.where(Campaign.featured == featured)
 
     # Count total matching campaigns
     count_query = select(func.count()).select_from(base_query.subquery())
     total_result = await db.execute(count_query)
     total = total_result.scalar_one()
 
-    # Fetch paginated campaigns
+    # Fetch paginated campaigns — featured campaigns sorted first
     offset = (page - 1) * page_size
-    data_query = base_query.order_by(Campaign.created_at.desc()).offset(offset).limit(page_size)
+    data_query = (
+        base_query.order_by(Campaign.featured.desc(), Campaign.created_at.desc())
+        .offset(offset)
+        .limit(page_size)
+    )
     result = await db.execute(data_query)
     campaigns = list(result.scalars().all())
 
-    # Compute raised amounts for all campaigns in a single query
+    # Compute raised amounts for all campaigns
     items = []
     for campaign in campaigns:
         raised_query = (
@@ -124,7 +153,7 @@ async def get_campaign_detail(
 ) -> CampaignPublicResponse:
     """Get a single campaign with progress stats.
 
-    Returns 404 if the campaign does not exist or is not active.
+    Returns 404 if the campaign does not exist or is not active/completed.
     """
     campaign = await db.get(Campaign, campaign_id)
 
@@ -137,7 +166,7 @@ async def get_campaign_detail(
             detail="Campaign not found",
         )
 
-    # Compute raised amount
+    # Compute raised amount and donation count
     raised_query = (
         select(
             func.coalesce(func.sum(Donation.amount_cents), 0),
