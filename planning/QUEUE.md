@@ -156,7 +156,7 @@ Week 3-4:
 |---|-------|--------|-----|--------|-------|
 | 1 | Subscription model and Stripe integration | RAP-155 | 8 | DONE (PR #143) | Backend |
 | 2 | Monthly giving signup flow | RAP-156 | 5 | DONE (PR #144) | Frontend |
-| 3 | Subscription management (pause, cancel, upgrade) | RAP-157 | 5 | READY | Fullstack |
+| 3 | Subscription management (pause, cancel, upgrade) | RAP-157 | 5 | DONE (PR #145) | Fullstack |
 | 4 | Recurring donation dashboard for donors | RAP-158 | 3 | READY | Frontend |
 | 5 | Failed payment retry and dunning emails | RAP-159 | 5 | READY | Backend |
 
