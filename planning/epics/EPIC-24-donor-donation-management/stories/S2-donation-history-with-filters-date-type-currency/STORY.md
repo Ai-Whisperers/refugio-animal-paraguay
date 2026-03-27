@@ -3,7 +3,7 @@ story: S2
 epic: EPIC-24
 ticket: RAP-116
 title: "Donation history with filters (date, type, currency)"
-status: planned
+status: done
 points: 5
 priority: P0
 track: Frontend
