@@ -19,12 +19,12 @@ from slowapi.errors import RateLimitExceeded
 from src.api.admin import router as admin_router
 from src.api.admin_campaigns import router as admin_campaigns_router
 from src.api.adopters import router as adopters_router
-from src.api.diagnoses import diagnosis_router, treatment_router
 from src.api.adoption_requests import router as adoption_requests_router
 from src.api.animal_updates import router as animal_updates_router
 from src.api.animals import router as animals_router
 from src.api.auth import router as auth_router
 from src.api.consents import router as consents_router
+from src.api.diagnoses import diagnosis_router, treatment_router
 from src.api.donations import router as donations_router
 from src.api.donors import router as donors_router
 from src.api.email_verification import router as email_verification_router
@@ -34,9 +34,9 @@ from src.api.gdpr import router as gdpr_router
 from src.api.gdpr_export import router as gdpr_export_router
 from src.api.health import router as health_router
 from src.api.impact_reports import router as impact_reports_router
+from src.api.in_kind_donations import router as in_kind_donations_router
 from src.api.medical_documents import router as medical_documents_router
 from src.api.medications import router as medications_router
-from src.api.in_kind_donations import router as in_kind_donations_router
 from src.api.notification_preferences import router as notification_preferences_router
 from src.api.notifications import router as notifications_router
 from src.api.password_reset import router as password_reset_router
@@ -47,8 +47,8 @@ from src.api.public_contact import router as public_contact_router
 from src.api.sepa import router as sepa_router
 from src.api.sessions import router as sessions_router
 from src.api.sponsorships import router as sponsorships_router
-from src.api.tigo_money import router as tigo_money_router
 from src.api.surgeries import surgery_router
+from src.api.tigo_money import router as tigo_money_router
 from src.api.vaccinations import vaccination_router, vaccine_type_router
 from src.api.vet_visits import router as vet_visits_router
 from src.api.vet_referrals import referral_router  # noqa: E402,F401

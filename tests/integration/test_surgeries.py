@@ -1,7 +1,7 @@
 """Integration tests for surgery and post-op monitoring endpoints."""
 
 import uuid
-from datetime import date, datetime, timezone
+from datetime import UTC, date, datetime
 
 import pytest
 from httpx import AsyncClient
@@ -152,7 +152,7 @@ class TestPostOpCheckCRUD:
         animal_id = await _create_animal(client)
         surgery = await _create_surgery(client, animal_id)
 
-        scheduled = datetime.now(timezone.utc).isoformat()
+        scheduled = datetime.now(UTC).isoformat()
         resp = await client.post(f"/surgeries/{surgery['id']}/post-op-checks", json={
             "scheduled_time": scheduled,
         })
@@ -165,7 +165,7 @@ class TestPostOpCheckCRUD:
         animal_id = await _create_animal(client)
         surgery = await _create_surgery(client, animal_id)
 
-        now = datetime.now(timezone.utc).isoformat()
+        now = datetime.now(UTC).isoformat()
         resp = await client.post(f"/surgeries/{surgery['id']}/post-op-checks", json={
             "scheduled_time": now,
             "check_status": "completed",
@@ -186,7 +186,7 @@ class TestPostOpCheckCRUD:
         animal_id = await _create_animal(client)
         surgery = await _create_surgery(client, animal_id)
 
-        now = datetime.now(timezone.utc).isoformat()
+        now = datetime.now(UTC).isoformat()
         await client.post(f"/surgeries/{surgery['id']}/post-op-checks", json={
             "scheduled_time": now,
         })
@@ -203,7 +203,7 @@ class TestPostOpCheckCRUD:
         animal_id = await _create_animal(client)
         surgery = await _create_surgery(client, animal_id)
 
-        now = datetime.now(timezone.utc).isoformat()
+        now = datetime.now(UTC).isoformat()
         create_resp = await client.post(
             f"/surgeries/{surgery['id']}/post-op-checks",
             json={"scheduled_time": now},
@@ -218,7 +218,7 @@ class TestPostOpCheckCRUD:
         animal_id = await _create_animal(client)
         surgery = await _create_surgery(client, animal_id)
 
-        now = datetime.now(timezone.utc).isoformat()
+        now = datetime.now(UTC).isoformat()
         create_resp = await client.post(
             f"/surgeries/{surgery['id']}/post-op-checks",
             json={"scheduled_time": now},
@@ -240,7 +240,7 @@ class TestPostOpCheckCRUD:
         animal_id = await _create_animal(client)
         surgery = await _create_surgery(client, animal_id)
 
-        now = datetime.now(timezone.utc).isoformat()
+        now = datetime.now(UTC).isoformat()
         create_resp = await client.post(
             f"/surgeries/{surgery['id']}/post-op-checks",
             json={"scheduled_time": now},
@@ -255,7 +255,7 @@ class TestPostOpCheckCRUD:
 
     async def test_post_op_check_nonexistent_surgery_404(self, client: AsyncClient) -> None:
         fake_id = str(uuid.uuid4())
-        now = datetime.now(timezone.utc).isoformat()
+        now = datetime.now(UTC).isoformat()
         resp = await client.post(f"/surgeries/{fake_id}/post-op-checks", json={
             "scheduled_time": now,
         })

@@ -438,6 +438,30 @@ export interface VaccinationListResponse {
   size: number;
 }
 
+// --- Vaccination Alerts ---
+
+export type AlertSeverity = "overdue" | "due_today" | "upcoming";
+
+export interface VaccinationAlertItem {
+  vaccination_id: string;
+  animal_id: string;
+  animal_name: string;
+  vaccine_name: string;
+  scheduled_date: string;
+  days_until_due: number;
+  severity: AlertSeverity;
+  dose_number: number;
+}
+
+export interface VaccinationAlertSummary {
+  overdue: VaccinationAlertItem[];
+  due_today: VaccinationAlertItem[];
+  upcoming: VaccinationAlertItem[];
+  total_overdue: number;
+  total_due_today: number;
+  total_upcoming: number;
+}
+
 // --- API Error ---
 
 export interface ApiError {

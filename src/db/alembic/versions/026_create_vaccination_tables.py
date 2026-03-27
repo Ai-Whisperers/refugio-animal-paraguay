@@ -7,9 +7,8 @@ Create Date: 2026-03-27
 Tables: vaccine_types, vaccination_schedules, vaccinations
 """
 
-from alembic import op
 import sqlalchemy as sa
-
+from alembic import op
 
 # revision identifiers
 revision = "026"

@@ -36,21 +36,6 @@ from .sponsorship import (
     SponsorshipTier,
     SponsorshipTierLevel,
 )
-from .user_consent import ConsentMethod, ConsentStatus, ConsentType, UserConsent
-from .medical import (
-    Diagnosis,
-    DiagnosisSeverity,
-    DocumentType,
-    MedicalDocument,
-    Medication,
-    MedicationFrequency,
-    MedicationStatus,
-    Treatment,
-    TreatmentStatus,
-    VetVisit,
-    VisitStatus,
-    VisitType,
-)
 from .surgery import (
     AnesthesiaType,
     PostOpCheck,
@@ -60,6 +45,7 @@ from .surgery import (
     SurgeryStatus,
     SurgeryType,
 )
+from .user_consent import ConsentMethod, ConsentStatus, ConsentType, UserConsent
 from .vaccination import Vaccination, VaccinationSchedule, VaccinationStatus, VaccineType
 from .verification_token import TokenType, VerificationToken
 from .vet_referral import ReferralStatus, ReferralUrgency, VetReferral  # noqa: E402
@@ -72,6 +58,7 @@ __all__ = [
     "Adopter",
     "AdoptionRequest",
     "AdoptionRequestStatus",
+    "AnesthesiaType",
     "Animal",
     "AnimalGender",
     "AnimalPhoto",
@@ -108,14 +95,13 @@ __all__ = [
     "NotificationPreference",
     "NotificationType",
     "PaymentMethod",
+    "PostOpCheck",
+    "PostOpStatus",
     "Sponsorship",
     "SponsorshipFrequency",
     "SponsorshipStatus",
     "SponsorshipTier",
     "SponsorshipTierLevel",
-    "AnesthesiaType",
-    "PostOpCheck",
-    "PostOpStatus",
     "Surgery",
     "SurgeryOutcome",
     "SurgeryStatus",

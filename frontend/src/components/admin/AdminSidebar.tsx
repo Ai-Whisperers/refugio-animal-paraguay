@@ -60,6 +60,11 @@ const NAV_ITEMS: NavItem[] = [
     icon: Syringe,
   },
   {
+    label: "Vacunaciones",
+    href: "/admin/vaccinations",
+    icon: Syringe,
+  },
+  {
     label: "Usuarios",
     href: "/admin/users",
     icon: Shield,

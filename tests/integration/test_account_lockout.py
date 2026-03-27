@@ -8,7 +8,6 @@ import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
-
 from src.app import app
 from src.auth.utils import hash_password
 from src.config import Settings

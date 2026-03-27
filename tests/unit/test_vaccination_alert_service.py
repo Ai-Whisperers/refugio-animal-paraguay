@@ -2,8 +2,6 @@
 
 from datetime import date, timedelta
 
-import pytest
-
 from src.services.vaccination_alert_service import (
     ALERT_WINDOW_DAYS,
     AlertSeverity,
