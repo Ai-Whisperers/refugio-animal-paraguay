@@ -1,0 +1,60 @@
+name: Security Scan
+
+on:
+  push:
+    branches:
+      - develop
+      - main
+  pull_request:
+    branches:
+      - develop
+      - main
+
+jobs:
+  security:
+    name: Bandit SAST + pip-audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Bandit SAST scan (MEDIUM+ severity)
+        # Fails on any MEDIUM or HIGH severity finding in src/
+        run: bandit -r src/ -ll
+
+      - name: Bandit JSON report (artifact)
+        if: always()
+        run: bandit -r src/ -ll --format json --output bandit-report.json || true
+
+      - name: pip-audit dependency vulnerability scan
+        # Informational for now — transitive CVEs may have no available fix.
+        # Tighten to hard-fail once all HIGH/CRITICAL direct deps are patched (RAP-404).
+        continue-on-error: true
+        run: pip-audit
+
+      - name: pip-audit JSON report (artifact)
+        if: always()
+        run: pip-audit --format json --output pip-audit-report.json || true
+
+      - name: Upload security reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-reports
+          path: |
+            bandit-report.json
+            pip-audit-report.json
+          retention-days: 30
