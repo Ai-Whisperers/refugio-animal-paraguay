@@ -3,7 +3,7 @@ story: S5
 epic: EPIC-24
 ticket: RAP-119
 title: "Missing GET /donors list endpoint"
-status: planned
+status: done
 points: 2
 priority: P0
 track: Backend
