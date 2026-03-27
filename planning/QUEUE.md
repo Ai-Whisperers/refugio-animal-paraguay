@@ -1,7 +1,7 @@
 # Development Queue — Refugio Animal Paraguay
 
 **Last updated**: 2026-03-27
-**Active version**: V6 Sprint 3 EPIC-31 complete — V6 Sprint 3 EPIC-32+ next
+**Active version**: V6 Sprint 3 EPIC-32 in progress — S1 done, S2-S5 next
 **Full roadmap**: [ROADMAP.md](ROADMAP.md) — 10 sprints, 50 epics, 250 stories
 **Tech stack**: Python 3.12, FastAPI, SQLAlchemy 2.x, PostgreSQL 16, Next.js 14
 
@@ -148,6 +148,20 @@ Week 3-4:
 
 ---
 
+## EPIC-32: Recurring Donations (26 pts)
+
+**Goal**: Monthly giving program — Stripe subscriptions, donor management, cancellation, and upgrade flows.
+
+| # | Story | Ticket | Pts | Status | Track |
+|---|-------|--------|-----|--------|-------|
+| 1 | Subscription model and Stripe integration | RAP-155 | 8 | DONE (PR #143) | Backend |
+| 2 | Monthly giving signup flow | RAP-156 | 5 | READY | Frontend |
+| 3 | Subscription management (pause, cancel, upgrade) | RAP-157 | 5 | READY | Fullstack |
+| 4 | Recurring donation dashboard for donors | RAP-158 | 3 | READY | Frontend |
+| 5 | Failed payment retry and dunning emails | RAP-159 | 5 | READY | Backend |
+
+---
+
 ## V3.1 — Priority Sprint: Stability & Quality Gates (92 pts, 25 stories)
 
 **Why now**: CI/CD deploys to production with ZERO tests. 14 bare `except Exception` blocks. Frontend has P0 bugs (/animals 404, no Stripe.js, no error boundaries). No structured logging, no monitoring, no staging environment. These must be fixed before adding more features.
@@ -216,6 +230,7 @@ Week 3-4:
 | RAP-051 to RAP-070 | V3 | Communications + workflow |
 | RAP-071 to RAP-099 | V2/V3 | Remaining stories |
 | RAP-100 to RAP-124 | V4 | Sprint 1: Staff Operations Launch (done) |
+| RAP-150 to RAP-159 | V6 | SEPA + Recurring Donations (EPIC-31, EPIC-32) |
 | RAP-400 to RAP-424 | V3.1 | Priority Sprint: Stability & Quality Gates |
 | RAP-125 to RAP-149 | V5 | Sprint 2: Veterinary & Medical Records |
 | RAP-150 to RAP-174 | V6 | Sprint 3: EU Payment Integration |
