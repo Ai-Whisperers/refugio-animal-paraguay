@@ -3,7 +3,7 @@ story: S1
 epic: EPIC-33
 ticket: RAP-160
 title: "Sponsorship tier model and API"
-status: planned
+status: done
 points: 5
 priority: P0
 track: Backend

@@ -3,7 +3,7 @@ story: S2
 epic: EPIC-76
 ticket: RAP-501
 title: "Email verification flow with token"
-status: ready
+status: done
 points: 3
 priority: P0
 track: Backend

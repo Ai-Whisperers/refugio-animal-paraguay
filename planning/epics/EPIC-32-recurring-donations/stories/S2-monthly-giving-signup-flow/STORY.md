@@ -3,7 +3,7 @@ story: S2
 epic: EPIC-32
 ticket: RAP-156
 title: "Monthly giving signup flow"
-status: planned
+status: done
 points: 5
 priority: P0
 track: Frontend

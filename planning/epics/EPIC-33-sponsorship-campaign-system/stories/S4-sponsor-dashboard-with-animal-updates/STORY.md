@@ -3,7 +3,7 @@ story: S4
 epic: EPIC-33
 ticket: RAP-163
 title: "Sponsor dashboard with animal updates"
-status: planned
+status: done
 points: 5
 priority: P1
 track: Frontend

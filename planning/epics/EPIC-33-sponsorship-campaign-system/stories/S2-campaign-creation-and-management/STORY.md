@@ -3,7 +3,7 @@ story: S2
 epic: EPIC-33
 ticket: RAP-161
 title: "Campaign creation and management"
-status: planned
+status: done
 points: 5
 priority: P0
 track: Fullstack

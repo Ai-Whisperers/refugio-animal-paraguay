@@ -3,7 +3,7 @@ story: S1
 epic: EPIC-32
 ticket: RAP-155
 title: "Subscription model and Stripe integration"
-status: planned
+status: done
 points: 8
 priority: P0
 track: Backend

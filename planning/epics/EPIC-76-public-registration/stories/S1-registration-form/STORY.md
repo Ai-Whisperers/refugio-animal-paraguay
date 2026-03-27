@@ -3,7 +3,7 @@ story: S1
 epic: EPIC-76
 ticket: RAP-500
 title: "Self-registration form"
-status: ready
+status: done
 points: 5
 priority: P0
 track: Fullstack

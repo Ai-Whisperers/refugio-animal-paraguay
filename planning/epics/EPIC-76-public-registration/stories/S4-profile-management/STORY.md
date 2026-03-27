@@ -3,7 +3,7 @@ story: S4
 epic: EPIC-76
 ticket: RAP-503
 title: "Profile management page"
-status: ready
+status: done
 points: 5
 priority: P1
 track: Fullstack

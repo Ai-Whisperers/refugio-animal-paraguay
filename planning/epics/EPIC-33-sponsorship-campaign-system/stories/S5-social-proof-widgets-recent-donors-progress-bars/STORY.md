@@ -3,7 +3,7 @@ story: S5
 epic: EPIC-33
 ticket: RAP-164
 title: "Social proof widgets (recent donors, progress bars)"
-status: planned
+status: done
 points: 3
 priority: P2
 track: Frontend

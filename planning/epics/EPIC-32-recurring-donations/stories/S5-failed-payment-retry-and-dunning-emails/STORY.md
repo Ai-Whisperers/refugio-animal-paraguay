@@ -3,7 +3,7 @@ story: S5
 epic: EPIC-32
 ticket: RAP-159
 title: "Failed payment retry and dunning emails"
-status: planned
+status: done
 points: 5
 priority: P1
 track: Backend

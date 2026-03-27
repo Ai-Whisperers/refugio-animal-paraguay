@@ -3,7 +3,7 @@ story: S3
 epic: EPIC-33
 ticket: RAP-162
 title: "Campaign progress tracking and widgets"
-status: planned
+status: done
 points: 5
 priority: P1
 track: Frontend

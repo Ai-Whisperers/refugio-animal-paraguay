@@ -3,7 +3,7 @@ story: S4
 epic: EPIC-32
 ticket: RAP-158
 title: "Recurring donation dashboard for donors"
-status: planned
+status: done
 points: 3
 priority: P1
 track: Frontend

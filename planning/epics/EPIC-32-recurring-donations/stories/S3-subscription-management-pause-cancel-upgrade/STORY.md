@@ -3,7 +3,7 @@ story: S3
 epic: EPIC-32
 ticket: RAP-157
 title: "Subscription management (pause, cancel, upgrade)"
-status: planned
+status: done
 points: 5
 priority: P1
 track: Fullstack

@@ -3,7 +3,7 @@ story: S6
 epic: EPIC-76
 ticket: RAP-505
 title: "WhatsApp-based phone verification"
-status: ready
+status: done
 points: 5
 priority: P2
 track: Backend
