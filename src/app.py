@@ -25,6 +25,7 @@ from src.api.animals import router as animals_router
 from src.api.auth import router as auth_router
 from src.api.email_verification import router as email_verification_router
 from src.api.password_reset import router as password_reset_router
+from src.api.sessions import router as sessions_router
 from src.api.consents import router as consents_router
 from src.api.donations import router as donations_router
 from src.api.donors import router as donors_router
@@ -131,6 +132,7 @@ def create_app() -> FastAPI:
     application.include_router(auth_router)
     application.include_router(password_reset_router)
     application.include_router(email_verification_router)
+    application.include_router(sessions_router)
     application.include_router(animals_router)
     application.include_router(adopters_router)
     application.include_router(adoption_requests_router)

@@ -23,10 +23,17 @@ def create_access_token(
     secret_key: str,
     algorithm: str,
     expires_delta: timedelta,
+    jti: str | None = None,
 ) -> str:
-    """Encode *data* as a signed JWT with an expiry claim."""
+    """Encode *data* as a signed JWT with an expiry claim.
+
+    If *jti* is provided, it is included as the JWT ID claim
+    for session tracking and revocation support.
+    """
     payload = data.copy()
     payload["exp"] = datetime.now(UTC) + expires_delta
+    if jti:
+        payload["jti"] = jti
     return jwt.encode(payload, secret_key, algorithm=algorithm)
 
 

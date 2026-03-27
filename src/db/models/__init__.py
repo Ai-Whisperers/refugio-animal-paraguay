@@ -1,5 +1,6 @@
 """ORM model exports for Refugio Animal Paraguay."""
 
+from .active_session import ActiveSession
 from .adopter import Adopter
 from .adoption_request import AdoptionRequest, AdoptionRequestStatus
 from .animal import Animal, AnimalGender, AnimalPhoto, AnimalSize, AnimalSpecies, AnimalStatus
@@ -25,6 +26,7 @@ from .user_consent import ConsentMethod, ConsentStatus, ConsentType, UserConsent
 from .verification_token import TokenType, VerificationToken
 
 __all__ = [
+    "ActiveSession",
     "BRONZE_AMOUNT_CENTS",
     "GOLD_AMOUNT_CENTS",
     "SILVER_AMOUNT_CENTS",
