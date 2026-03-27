@@ -3,7 +3,7 @@ story: S5
 epic: EPIC-25
 ticket: RAP-124
 title: "Mobile-responsive admin layout"
-status: planned
+status: done
 points: 3
 priority: P2
 track: Frontend
