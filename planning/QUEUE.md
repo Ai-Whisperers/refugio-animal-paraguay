@@ -322,7 +322,7 @@ Week 3-4:
 |---|-------|--------|-----|--------|-------|
 | 1 | Self-registration form | RAP-500 | 5 | DONE (PR #152) | Fullstack |
 | 2 | Email verification flow with token | RAP-501 | 3 | DONE (PR #153) | Backend |
-| 3 | Unified personal dashboard | RAP-502 | 8 | READY | Fullstack |
+| 3 | Unified personal dashboard | RAP-502 | 8 | DONE (PR #154) | Fullstack |
 | 4 | Profile management page | RAP-503 | 5 | READY | Fullstack |
 | 5 | Social login (Google OAuth) | RAP-504 | 5 | READY | Fullstack |
 | 6 | WhatsApp-based phone verification | RAP-505 | 5 | READY | Backend |
