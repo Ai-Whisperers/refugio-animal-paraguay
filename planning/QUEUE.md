@@ -100,7 +100,7 @@ Week 3-4:
 | 4 | Adoption Notifications (status changes) | EPIC-2 S03 | 5 | DONE (PR #39) |
 | 5 | PDF Adoption Contracts | EPIC-2 S04 | 6 | DONE (PR #43) |
 | 6 | Post-Adoption Follow-up | EPIC-2 S05 | 8 | DONE (PR #44) |
-| 7 | Tigo Money Integration (PYG) | EPIC-3 S03 | 8 | READY |
+| 7 | Tigo Money Integration (PYG) | EPIC-3 S03 | 8 | DONE (PR #58) |
 | 8 | Sponsor Update Notifications | EPIC-14 S02 | 6 | READY |
 | 9 | Campaign Progress & Social Proof | EPIC-14 S04 | 5 | READY |
 | 10 | Impact Report Generator | EPIC-13 S03 | 7 | DONE (PR #50) |
