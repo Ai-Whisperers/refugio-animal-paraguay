@@ -1,6 +1,6 @@
 # Development Queue — Refugio Animal Paraguay
 
-**Last updated**: 2026-03-26 (RAP-037 PR #56)
+**Last updated**: 2026-03-27 (RAP-037 PR #56)
 **Active version**: V2/V3 (completing remaining stories)
 **Full roadmap**: [ROADMAP.md](ROADMAP.md) — 10 sprints, 50 epics, 250 stories
 **Tech stack**: Python 3.12, FastAPI, SQLAlchemy 2.x, PostgreSQL 16, Next.js 14
