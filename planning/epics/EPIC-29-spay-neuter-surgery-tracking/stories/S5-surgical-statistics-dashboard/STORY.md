@@ -3,7 +3,7 @@ story: S5
 epic: EPIC-29
 ticket: RAP-144
 title: "Surgical statistics dashboard"
-status: planned
+status: done
 points: 3
 priority: P2
 track: Frontend
