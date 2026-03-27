@@ -23,6 +23,20 @@ from .sponsorship import (
     SponsorshipTierLevel,
 )
 from .user_consent import ConsentMethod, ConsentStatus, ConsentType, UserConsent
+from .medical import (
+    Diagnosis,
+    DiagnosisSeverity,
+    DocumentType,
+    MedicalDocument,
+    Medication,
+    MedicationFrequency,
+    MedicationStatus,
+    Treatment,
+    TreatmentStatus,
+    VetVisit,
+    VisitStatus,
+    VisitType,
+)
 from .vaccination import Vaccination, VaccinationSchedule, VaccinationStatus, VaccineType
 from .verification_token import TokenType, VerificationToken
 
@@ -51,6 +65,9 @@ __all__ = [
     "ContactFormType",
     "ContactSubmission",
     "CurrencyCode",
+    "Diagnosis",
+    "DiagnosisSeverity",
+    "DocumentType",
     "Donation",
     "DonationStatus",
     "Donor",
@@ -58,6 +75,10 @@ __all__ = [
     "FundCategory",
     "InKindDonation",
     "ItemType",
+    "MedicalDocument",
+    "Medication",
+    "MedicationFrequency",
+    "MedicationStatus",
     "Notification",
     "NotificationChannel",
     "NotificationPreference",
@@ -69,10 +90,15 @@ __all__ = [
     "SponsorshipTier",
     "SponsorshipTierLevel",
     "TokenType",
+    "Treatment",
+    "TreatmentStatus",
     "UserConsent",
     "Vaccination",
     "VaccinationSchedule",
     "VaccinationStatus",
     "VaccineType",
     "VerificationToken",
+    "VetVisit",
+    "VisitStatus",
+    "VisitType",
 ]
