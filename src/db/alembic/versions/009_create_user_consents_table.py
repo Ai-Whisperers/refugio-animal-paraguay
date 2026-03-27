@@ -41,9 +41,7 @@ def upgrade() -> None:
         sa.Column("opt_out_date", sa.TIMESTAMP(timezone=True), nullable=True),
         sa.Column("ip_address", sa.String(45), nullable=True),
         sa.Column("user_agent", sa.String(500), nullable=True),
-        sa.Column(
-            "method", sa.String(30), nullable=False, server_default="user_self_service"
-        ),
+        sa.Column("method", sa.String(30), nullable=False, server_default="user_self_service"),
         sa.Column(
             "granted_by_staff_id",
             sa.UUID(as_uuid=True),
@@ -67,19 +65,13 @@ def upgrade() -> None:
     )
 
     # Check constraints for enum validation
-    op.execute(
-        """ALTER TABLE user_consents ADD CONSTRAINT chk_consent_type
+    op.execute("""ALTER TABLE user_consents ADD CONSTRAINT chk_consent_type
         CHECK (consent_type IN ('marketing_email', 'newsletter', 'sms_updates',
-                                'event_invitations', 'donation_receipts'))"""
-    )
-    op.execute(
-        """ALTER TABLE user_consents ADD CONSTRAINT chk_consent_status
-        CHECK (status IN ('active', 'revoked'))"""
-    )
-    op.execute(
-        """ALTER TABLE user_consents ADD CONSTRAINT chk_consent_method
-        CHECK (method IN ('user_self_service', 'email_link', 'staff_assisted', 'import_batch'))"""
-    )
+                                'event_invitations', 'donation_receipts'))""")
+    op.execute("""ALTER TABLE user_consents ADD CONSTRAINT chk_consent_status
+        CHECK (status IN ('active', 'revoked'))""")
+    op.execute("""ALTER TABLE user_consents ADD CONSTRAINT chk_consent_method
+        CHECK (method IN ('user_self_service', 'email_link', 'staff_assisted', 'import_batch'))""")
 
 
 def downgrade() -> None:

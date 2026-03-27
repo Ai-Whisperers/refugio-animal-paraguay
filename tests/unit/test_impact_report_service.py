@@ -1,6 +1,6 @@
 """Unit tests for impact report service."""
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from unittest.mock import AsyncMock, MagicMock
 from uuid import uuid4
 
@@ -8,8 +8,8 @@ import pytest
 from src.services import impact_report_service
 
 # --- Helpers ---
-START = datetime(2026, 1, 1, tzinfo=timezone.utc)
-END = datetime(2026, 3, 31, tzinfo=timezone.utc)
+START = datetime(2026, 1, 1, tzinfo=UTC)
+END = datetime(2026, 3, 31, tzinfo=UTC)
 
 
 def _mock_db_rows(*row_dicts: dict) -> AsyncMock:
@@ -139,9 +139,7 @@ class TestGetFundAllocationBreakdown:
             {"category": "food", "total_cents": 400000, "count": 8},
         )
 
-        result = await impact_report_service.get_fund_allocation_breakdown(
-            db, START, END
-        )
+        result = await impact_report_service.get_fund_allocation_breakdown(db, START, END)
 
         assert result["total_cents"] == 1000000
         assert len(result["breakdown"]) == 2
@@ -153,9 +151,7 @@ class TestGetFundAllocationBreakdown:
     async def test_returns_zero_for_empty(self) -> None:
         db = _mock_db_rows()
 
-        result = await impact_report_service.get_fund_allocation_breakdown(
-            db, START, END
-        )
+        result = await impact_report_service.get_fund_allocation_breakdown(db, START, END)
 
         assert result["total_cents"] == 0
         assert result["breakdown"] == []
@@ -171,9 +167,7 @@ class TestCalculateAvgTimeToAdoption:
         mock_result.scalar.return_value = 14.567
         db.execute.return_value = mock_result
 
-        result = await impact_report_service.calculate_avg_time_to_adoption(
-            db, START, END
-        )
+        result = await impact_report_service.calculate_avg_time_to_adoption(db, START, END)
 
         assert result == 14.6  # Rounded to 1 decimal
 
@@ -184,9 +178,7 @@ class TestCalculateAvgTimeToAdoption:
         mock_result.scalar.return_value = None
         db.execute.return_value = mock_result
 
-        result = await impact_report_service.calculate_avg_time_to_adoption(
-            db, START, END
-        )
+        result = await impact_report_service.calculate_avg_time_to_adoption(db, START, END)
 
         assert result is None
 
@@ -248,13 +240,13 @@ class TestGenerateImpactReport:
         avg_time_result.scalar.return_value = 12.5
 
         db.execute.side_effect = [
-            animals_result,      # count_animals_served
-            adoptions_result,    # count_adoptions
-            don_currency_result, # sum_donations (currency)
-            don_method_result,   # sum_donations (method)
-            inkind_result,       # sum_in_kind_donations
-            fund_result,         # get_fund_allocation_breakdown
-            avg_time_result,     # calculate_avg_time_to_adoption
+            animals_result,  # count_animals_served
+            adoptions_result,  # count_adoptions
+            don_currency_result,  # sum_donations (currency)
+            don_method_result,  # sum_donations (method)
+            inkind_result,  # sum_in_kind_donations
+            fund_result,  # get_fund_allocation_breakdown
+            avg_time_result,  # calculate_avg_time_to_adoption
         ]
 
         result = await impact_report_service.generate_impact_report(
