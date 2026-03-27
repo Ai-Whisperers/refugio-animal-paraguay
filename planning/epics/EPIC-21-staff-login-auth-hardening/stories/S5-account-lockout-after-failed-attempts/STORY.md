@@ -3,7 +3,7 @@ story: S5
 epic: EPIC-21
 ticket: RAP-104
 title: "Account lockout after failed attempts"
-status: planned
+status: done
 points: 2
 priority: P2
 track: Backend

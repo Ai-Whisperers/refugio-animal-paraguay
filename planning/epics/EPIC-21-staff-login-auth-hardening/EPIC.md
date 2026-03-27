@@ -2,7 +2,7 @@
 epic: EPIC-21
 title: "Staff Login & Auth Hardening"
 sprint: 1
-status: planned
+status: done
 points: 18
 created: 2026-03-26T19:06:04
 version: V4
