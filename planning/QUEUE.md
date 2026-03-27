@@ -1,6 +1,6 @@
 # Development Queue — Refugio Animal Paraguay
 
-**Last updated**: 2026-03-26
+**Last updated**: 2026-03-26 (RAP-037 PR #56)
 **Active version**: V2/V3 (completing remaining stories)
 **Full roadmap**: [ROADMAP.md](ROADMAP.md) — 10 sprints, 50 epics, 250 stories
 **Tech stack**: Python 3.12, FastAPI, SQLAlchemy 2.x, PostgreSQL 16, Next.js 14
@@ -84,7 +84,7 @@ Week 3-4:
 | 8 | Sponsorship Tiers & Matching | EPIC-14 S01 | 8 | DONE (PR #54) |
 | 9 | Campaign Management | EPIC-14 S03 | 6 | DONE (PR #55) |
 | 10 | Donation Landing Page | EPIC-11 S04 | 13 | DONE (PR #51) |
-| 11 | Donation Dashboard (Staff) | EPIC-3 S04 | 6 | READY |
+| 11 | Donation Dashboard (Staff) | EPIC-3 S04 | 6 | DONE (PR #56) |
 | 12 | Email Notification System | EPIC-6 S01 | 8 | DONE (PR #18) |
 | 13 | GDPR Data Export | EPIC-13 S02 | 6 | DONE (PR #48) |
 

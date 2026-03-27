@@ -2,7 +2,9 @@
 story: S04
 epic: EPIC-3
 title: Donation Dashboard
-status: ready
+status: done
+ticket: RAP-037
+pr: 56
 created: 2026-03-25T17:13:26.729593
 version: V2
 ---
