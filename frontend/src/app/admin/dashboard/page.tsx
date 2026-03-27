@@ -94,15 +94,18 @@ export default function AdminDashboardPage() {
             </p>
           </button>
 
-          <div className="rounded-lg border border-warm-border bg-warm-surface p-6 opacity-60">
-            <Heart className="h-8 w-8 text-primary-300" aria-hidden="true" />
+          <button
+            onClick={() => router.push("/admin/adoptions")}
+            className="group rounded-lg border border-warm-border bg-warm-surface p-6 text-left transition-all hover:border-primary-300 hover:shadow-md"
+          >
+            <Heart className="h-8 w-8 text-primary-500 group-hover:text-primary-600" aria-hidden="true" />
             <h3 className="mt-3 font-semibold text-warm-text-primary">
               Solicitudes de Adopcion
             </h3>
             <p className="mt-1 text-sm text-warm-text-secondary">
-              Proximamente
+              Revisar y gestionar solicitudes de adopcion.
             </p>
-          </div>
+          </button>
 
           <div className="rounded-lg border border-warm-border bg-warm-surface p-6 opacity-60">
             <DollarSign className="h-8 w-8 text-primary-300" aria-hidden="true" />
