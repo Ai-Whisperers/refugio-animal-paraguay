@@ -134,7 +134,7 @@ Week 3-4:
 
 | # | Story | Ticket | Epic | Pts | Status | Depends On |
 |---|-------|--------|------|-----|--------|------------|
-| 1 | Add test + lint pipeline to GitHub Actions | RAP-400 | EPIC-71 | 5 | READY | — |
+| 1 | Add test + lint pipeline to GitHub Actions | RAP-400 | EPIC-71 | 5 | DONE (PR #66) | — |
 | 2 | Add security scanning (bandit + pip-audit) | RAP-401 | EPIC-71 | 3 | READY | RAP-400 |
 | 3 | Password reset tests (0% → 80%) | RAP-405 | EPIC-72 | 5 | READY | — |
 | 4 | Adoption requests coverage (41% → 80%) | RAP-406 | EPIC-72 | 3 | READY | — |
