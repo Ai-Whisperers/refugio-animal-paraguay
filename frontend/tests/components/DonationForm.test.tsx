@@ -33,13 +33,17 @@ function makeCampaign(overrides: Partial<CampaignPublic> = {}): CampaignPublic {
     currency: "EUR",
     fund_category: "medical",
     status: "active",
+    featured: false,
     image_url: null,
+    photo_urls: [],
     deadline: null,
+    days_remaining: null,
     min_donation_cents: null,
     max_donation_cents: null,
     allow_overfunding: false,
     donation_count: 5,
     progress_percentage: 20,
+    created_at: "2026-01-01T00:00:00Z",
     ...overrides,
   };
 }

@@ -11,6 +11,7 @@ import {
   RefreshCw,
   Star,
   Edit,
+  BarChart3,
 } from "lucide-react";
 import { isAuthenticated } from "@/lib/auth";
 import { api, ApiClientError } from "@/lib/api";
@@ -361,15 +362,26 @@ export default function AdminCampaignsPage() {
                       <p className="text-xs text-warm-text-tertiary">
                         Creada: {formatDate(campaign.created_at)}
                       </p>
-                      <button
-                        onClick={() =>
-                          router.push(`/admin/campaigns/${campaign.id}/edit`)
-                        }
-                        className="flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium text-primary-600 transition-colors hover:bg-primary-50"
-                      >
-                        <Edit className="h-3 w-3" />
-                        Editar
-                      </button>
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={() =>
+                            router.push(`/admin/campaigns/${campaign.id}/progress`)
+                          }
+                          className="flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium text-green-600 transition-colors hover:bg-green-50"
+                        >
+                          <BarChart3 className="h-3 w-3" />
+                          Progreso
+                        </button>
+                        <button
+                          onClick={() =>
+                            router.push(`/admin/campaigns/${campaign.id}/edit`)
+                          }
+                          className="flex items-center gap-1 rounded-lg px-2 py-1 text-xs font-medium text-primary-600 transition-colors hover:bg-primary-50"
+                        >
+                          <Edit className="h-3 w-3" />
+                          Editar
+                        </button>
+                      </div>
                     </div>
                   </div>
                 </div>

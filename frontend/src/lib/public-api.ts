@@ -91,6 +91,7 @@ import type {
   AnimalGender,
   CampaignListResponse,
   CampaignPublic,
+  CampaignSocialProof,
   DonationCreateRequest,
   DonationResponse,
   DonorCreateRequest,
@@ -200,6 +201,19 @@ export async function getCampaignPublic(
   campaignId: string
 ): Promise<CampaignPublic> {
   return api.get<CampaignPublic>(`/public/campaigns/${campaignId}`, NO_AUTH);
+}
+
+/**
+ * Fetch social proof data for a campaign (no auth required).
+ * Includes donor count, momentum, and recent donors list.
+ */
+export async function getCampaignSocialProof(
+  campaignId: string
+): Promise<CampaignSocialProof> {
+  return api.get<CampaignSocialProof>(
+    `/public/campaigns/${campaignId}/social-proof`,
+    NO_AUTH
+  );
 }
 
 // --- Donations (public) ---
