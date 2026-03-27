@@ -51,6 +51,15 @@ from .medical import (
     VisitStatus,
     VisitType,
 )
+from .surgery import (
+    AnesthesiaType,
+    PostOpCheck,
+    PostOpStatus,
+    Surgery,
+    SurgeryOutcome,
+    SurgeryStatus,
+    SurgeryType,
+)
 from .vaccination import Vaccination, VaccinationSchedule, VaccinationStatus, VaccineType
 from .verification_token import TokenType, VerificationToken
 
@@ -103,6 +112,13 @@ __all__ = [
     "SponsorshipStatus",
     "SponsorshipTier",
     "SponsorshipTierLevel",
+    "AnesthesiaType",
+    "PostOpCheck",
+    "PostOpStatus",
+    "Surgery",
+    "SurgeryOutcome",
+    "SurgeryStatus",
+    "SurgeryType",
     "TokenType",
     "Treatment",
     "TreatmentStatus",
