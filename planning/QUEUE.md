@@ -1,7 +1,7 @@
 # Development Queue — Refugio Animal Paraguay
 
-**Last updated**: 2026-03-27 (RAP-037 PR #56)
-**Active version**: V2/V3 (completing remaining stories)
+**Last updated**: 2026-03-27
+**Active version**: V3.1 Priority Sprint (stability before features)
 **Full roadmap**: [ROADMAP.md](ROADMAP.md) — 10 sprints, 50 epics, 250 stories
 **Tech stack**: Python 3.12, FastAPI, SQLAlchemy 2.x, PostgreSQL 16, Next.js 14
 
@@ -112,6 +112,76 @@ Week 3-4:
 
 ---
 
+## V4 Sprint 1 — Staff Operations Launch (EPIC-21, 18 pts) — COMPLETE
+
+| # | Story | Ticket | Pts | Status |
+|---|-------|--------|-----|--------|
+| 1 | Staff Login Page with JWT Auth | RAP-100 | 5 | DONE (PR #61) |
+| 2 | Password Reset with Email Token | RAP-101 | 3 | DONE (PR #62) |
+| 3 | Email Verification on Registration | RAP-102 | 3 | DONE |
+| 4 | Session Timeout & Forced Logout | RAP-103 | 3 | DONE |
+| 5 | Account Lockout After Failed Attempts | RAP-104 | 4 | DONE |
+
+---
+
+## V3.1 — Priority Sprint: Stability & Quality Gates (92 pts, 25 stories)
+
+**Why now**: CI/CD deploys to production with ZERO tests. 14 bare `except Exception` blocks. Frontend has P0 bugs (/animals 404, no Stripe.js, no error boundaries). No structured logging, no monitoring, no staging environment. These must be fixed before adding more features.
+
+**Execute order**: P0 stories first (top-to-bottom within each priority tier). All P0 stories MUST complete before any P1 starts.
+
+### P0 — Critical (must fix immediately)
+
+| # | Story | Ticket | Epic | Pts | Status | Depends On |
+|---|-------|--------|------|-----|--------|------------|
+| 1 | Add test + lint pipeline to GitHub Actions | RAP-400 | EPIC-71 | 5 | READY | — |
+| 2 | Add security scanning (bandit + pip-audit) | RAP-401 | EPIC-71 | 3 | READY | RAP-400 |
+| 3 | Password reset tests (0% → 80%) | RAP-405 | EPIC-72 | 5 | READY | — |
+| 4 | Adoption requests coverage (41% → 80%) | RAP-406 | EPIC-72 | 3 | READY | — |
+| 5 | Replace bare except Exception handlers | RAP-410 | EPIC-73 | 3 | READY | — |
+| 6 | Structured JSON logging (structlog) | RAP-415 | EPIC-74 | 5 | READY | — |
+| 7 | Sentry error tracking integration | RAP-416 | EPIC-74 | 3 | READY | RAP-415 |
+| 8 | Add error.tsx and loading.tsx boundaries | RAP-420 | EPIC-75 | 3 | READY | — |
+| 9 | Fix /animals page 404 rendering bug | RAP-421 | EPIC-75 | 3 | READY | — |
+| 10 | Integrate Stripe.js Elements into DonationForm | RAP-422 | EPIC-75 | 5 | READY | — |
+
+### P1 — High Priority (after all P0 complete)
+
+| # | Story | Ticket | Epic | Pts | Status | Depends On |
+|---|-------|--------|------|-----|--------|------------|
+| 11 | Create staging environment with approval gate | RAP-402 | EPIC-71 | 5 | BLOCKED | RAP-400 |
+| 12 | Harden Docker production image | RAP-403 | EPIC-71 | 3 | READY | — |
+| 13 | Notification handler exception tests | RAP-407 | EPIC-72 | 3 | READY | — |
+| 14 | Audit middleware tests | RAP-408 | EPIC-72 | 3 | READY | — |
+| 15 | Audit API input validation gaps | RAP-411 | EPIC-73 | 3 | READY | — |
+| 16 | Standardize error responses across routers | RAP-412 | EPIC-73 | 5 | READY | RAP-410 |
+| 17 | Database constraint error handling | RAP-413 | EPIC-73 | 3 | READY | RAP-412 |
+| 18 | Payment error handling (Stripe + Tigo) | RAP-414 | EPIC-73 | 3 | READY | RAP-412 |
+| 19 | Health check improvements | RAP-417 | EPIC-74 | 3 | READY | — |
+| 20 | Request/response logging middleware | RAP-418 | EPIC-74 | 3 | READY | RAP-415 |
+| 21 | Database backup automation | RAP-419 | EPIC-74 | 5 | READY | — |
+| 22 | Loading and error states on all pages | RAP-423 | EPIC-75 | 5 | READY | RAP-420 |
+| 23 | Centralized API error handling (frontend) | RAP-424 | EPIC-75 | 3 | READY | RAP-420 |
+
+### P2 — Medium Priority (after all P1 complete)
+
+| # | Story | Ticket | Epic | Pts | Status | Depends On |
+|---|-------|--------|------|-----|--------|------------|
+| 24 | Coverage reporting and PR status checks | RAP-404 | EPIC-71 | 5 | BLOCKED | RAP-400 |
+| 25 | Frontend component tests (Vitest) | RAP-409 | EPIC-72 | 3 | READY | — |
+
+### Epics in this sprint
+
+| Epic | Theme | Stories | Points |
+|------|-------|---------|--------|
+| EPIC-71 | CI/CD Quality Gates | RAP-400 to RAP-404 | 21 |
+| EPIC-72 | Test Coverage Gaps | RAP-405 to RAP-409 | 18 |
+| EPIC-73 | Exception Handling & Validation | RAP-410 to RAP-414 | 16 |
+| EPIC-74 | Logging & Observability | RAP-415 to RAP-419 | 19 |
+| EPIC-75 | Frontend Stability | RAP-420 to RAP-424 | 18 |
+
+---
+
 ## Ticket ID Allocation
 
 | Range | Version | Purpose |
@@ -121,7 +191,8 @@ Week 3-4:
 | RAP-034 to RAP-050 | V2 | Donations + EU compliance |
 | RAP-051 to RAP-070 | V3 | Communications + workflow |
 | RAP-071 to RAP-099 | V2/V3 | Remaining stories |
-| RAP-100 to RAP-124 | V4 | Sprint 1: Staff Operations Launch |
+| RAP-100 to RAP-124 | V4 | Sprint 1: Staff Operations Launch (done) |
+| RAP-400 to RAP-424 | V3.1 | Priority Sprint: Stability & Quality Gates |
 | RAP-125 to RAP-149 | V5 | Sprint 2: Veterinary & Medical Records |
 | RAP-150 to RAP-174 | V6 | Sprint 3: EU Payment Integration |
 | RAP-175 to RAP-199 | V7 | Sprint 4: Volunteer & Foster Programs |
@@ -171,13 +242,16 @@ Week 3-4:
 
 ---
 
-## Future Sprints (V4-V13)
+## Future Sprints (V4 Sprint 2 through V13)
 
 Full details in [ROADMAP.md](ROADMAP.md). Each sprint has epic and story docs in `planning/epics/EPIC-NN-*/` and sprint docs in `planning/sprints/sprint-NN/`.
 
+**V4 Sprint 1 (EPIC-21) is COMPLETE.** V3.1 Priority Sprint runs next. V4 Sprint 2 resumes after V3.1.
+
 | Sprint | Version | Theme | Points | Epics |
 |--------|---------|-------|--------|-------|
-| 1 | V4 | Staff Operations Launch | 105 | EPIC 21-25 |
+| — | V3.1 | **Priority: Stability & Quality Gates** | **92** | **EPIC 71-75** |
+| 1 | V4 | Staff Operations Launch (S1 done, S2+ pending) | 105 | EPIC 21-25 |
 | 2 | V5 | Veterinary & Medical Records | 105 | EPIC 26-30 |
 | 3 | V6 | EU Payment Integration | 112 | EPIC 31-35 |
 | 4 | V7 | Volunteer & Foster Programs | 99 | EPIC 36-40 |
