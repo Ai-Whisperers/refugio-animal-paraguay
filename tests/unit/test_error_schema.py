@@ -8,14 +8,20 @@ Covers:
 """
 
 from src.schemas.error import (
+    AUTHENTICATED_RESPONSES,
+    COMMON_RESPONSES,
+    ERROR_BAD_GATEWAY,
     ERROR_BAD_REQUEST,
     ERROR_CONFLICT,
     ERROR_FORBIDDEN,
     ERROR_INTERNAL,
     ERROR_NOT_FOUND,
     ERROR_RATE_LIMITED,
+    ERROR_SERVICE_UNAVAILABLE,
     ERROR_UNAUTHORIZED,
     ERROR_VALIDATION,
+    PAYMENT_RESPONSES,
+    RESOURCE_RESPONSES,
     STATUS_TO_ERROR_CODE,
     ErrorDetail,
     ErrorResponse,
@@ -86,6 +92,8 @@ class TestErrorCodeConstants:
             ERROR_RATE_LIMITED,
             ERROR_BAD_REQUEST,
             ERROR_INTERNAL,
+            ERROR_BAD_GATEWAY,
+            ERROR_SERVICE_UNAVAILABLE,
         ]
         for code in codes:
             assert isinstance(code, str)
@@ -101,6 +109,8 @@ class TestErrorCodeConstants:
             ERROR_RATE_LIMITED,
             ERROR_BAD_REQUEST,
             ERROR_INTERNAL,
+            ERROR_BAD_GATEWAY,
+            ERROR_SERVICE_UNAVAILABLE,
         ]
         assert len(set(codes)) == len(codes)
 
@@ -117,6 +127,11 @@ class TestStatusToErrorCodeMapping:
         assert STATUS_TO_ERROR_CODE[422] == ERROR_VALIDATION
         assert STATUS_TO_ERROR_CODE[429] == ERROR_RATE_LIMITED
 
+    def test_maps_gateway_status_codes(self) -> None:
+        """502 and 503 must map to gateway error codes for payment/external service errors."""
+        assert STATUS_TO_ERROR_CODE[502] == ERROR_BAD_GATEWAY
+        assert STATUS_TO_ERROR_CODE[503] == ERROR_SERVICE_UNAVAILABLE
+
     def test_does_not_map_success_codes(self) -> None:
         assert 200 not in STATUS_TO_ERROR_CODE
         assert 201 not in STATUS_TO_ERROR_CODE
@@ -125,3 +140,47 @@ class TestStatusToErrorCodeMapping:
     def test_does_not_map_500(self) -> None:
         """500 is handled by the unhandled exception handler, not the HTTP handler."""
         assert 500 not in STATUS_TO_ERROR_CODE
+
+
+class TestOpenApiResponseDicts:
+    """Tests for the pre-built OpenAPI response helper dicts."""
+
+    def test_common_responses_contains_422_and_500(self) -> None:
+        assert 422 in COMMON_RESPONSES
+        assert 500 in COMMON_RESPONSES
+
+    def test_authenticated_responses_extends_common(self) -> None:
+        assert 422 in AUTHENTICATED_RESPONSES
+        assert 500 in AUTHENTICATED_RESPONSES
+        assert 401 in AUTHENTICATED_RESPONSES
+        assert 403 in AUTHENTICATED_RESPONSES
+
+    def test_resource_responses_extends_authenticated(self) -> None:
+        assert 422 in RESOURCE_RESPONSES
+        assert 500 in RESOURCE_RESPONSES
+        assert 401 in RESOURCE_RESPONSES
+        assert 403 in RESOURCE_RESPONSES
+        assert 404 in RESOURCE_RESPONSES
+
+    def test_payment_responses_includes_gateway_codes(self) -> None:
+        assert 502 in PAYMENT_RESPONSES
+        assert 503 in PAYMENT_RESPONSES
+        assert 409 in PAYMENT_RESPONSES
+        assert 404 in PAYMENT_RESPONSES
+
+    def test_all_response_dicts_contain_description(self) -> None:
+        for responses in [COMMON_RESPONSES, AUTHENTICATED_RESPONSES, RESOURCE_RESPONSES, PAYMENT_RESPONSES]:
+            for _status_code, response_dict in responses.items():
+                assert "description" in response_dict
+
+    def test_response_dicts_are_disjoint_additions(self) -> None:
+        """Each level adds codes not present in its parent."""
+        common_keys = set(COMMON_RESPONSES.keys())
+        auth_keys = set(AUTHENTICATED_RESPONSES.keys())
+        resource_keys = set(RESOURCE_RESPONSES.keys())
+        payment_keys = set(PAYMENT_RESPONSES.keys())
+
+        assert common_keys.issubset(auth_keys)
+        assert auth_keys.issubset(resource_keys)
+        assert auth_keys.issubset(payment_keys)
+        assert payment_keys - auth_keys == {404, 409, 502, 503}

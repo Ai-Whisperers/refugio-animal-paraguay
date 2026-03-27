@@ -37,8 +37,9 @@ from src.schemas.donation import (
     StatusBreakdown,
     StripeIntentResponse,
 )
+from src.schemas.error import PAYMENT_RESPONSES
 
-router = APIRouter(prefix="/donations", tags=["donations"])
+router = APIRouter(prefix="/donations", tags=["donations"], responses=PAYMENT_RESPONSES)
 
 _STRIPE_CURRENCY_MAP = {
     "EUR": "eur",

@@ -21,6 +21,7 @@ from src.db.models.adoption_request import AdoptionRequest, AdoptionRequestStatu
 from src.db.models.follow_up import FollowUp
 from src.db.models.user import User
 from src.db.session import get_db
+from src.schemas.error import RESOURCE_RESPONSES
 from src.schemas.follow_up import (
     AdoptionOutcomeStats,
     FollowUpResponse,
@@ -35,7 +36,7 @@ from src.services.follow_up_service import (
     submit_survey,
 )
 
-router = APIRouter(prefix="/follow-ups", tags=["follow-ups"])
+router = APIRouter(prefix="/follow-ups", tags=["follow-ups"], responses=RESOURCE_RESPONSES)
 
 _DEFAULT_LIMIT = 20
 _MAX_LIMIT = 100

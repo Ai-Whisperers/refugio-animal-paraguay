@@ -21,6 +21,7 @@ from src.events.bus import EventBus
 from src.events.dependencies import get_event_bus
 from src.events.domain_events import create_adoption_request_created
 from src.middleware.rate_limiter import limiter
+from src.schemas.error import COMMON_RESPONSES
 from src.schemas.public_adoption import (
     PublicAdoptionApplicationCreate,
     PublicAdoptionApplicationResponse,
@@ -28,7 +29,7 @@ from src.schemas.public_adoption import (
 
 PUBLIC_ADOPTION_RATE_LIMIT = "10/hour"
 
-router = APIRouter(prefix="/public", tags=["public"])
+router = APIRouter(prefix="/public", tags=["public"], responses=COMMON_RESPONSES)
 
 
 @router.post(

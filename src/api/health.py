@@ -9,8 +9,9 @@ from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.db.session import get_db
+from src.schemas.error import COMMON_RESPONSES
 
-router = APIRouter(tags=["health"])
+router = APIRouter(tags=["health"], responses=COMMON_RESPONSES)
 
 _DB_PING_QUERY = text("SELECT 1")
 

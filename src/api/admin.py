@@ -26,8 +26,9 @@ from src.schemas.audit import (
     AuditLogListResponse,
     AuditLogResponse,
 )
+from src.schemas.error import AUTHENTICATED_RESPONSES
 
-router = APIRouter(prefix="/admin", tags=["admin"])
+router = APIRouter(prefix="/admin", tags=["admin"], responses=AUTHENTICATED_RESPONSES)
 
 
 @router.get(
