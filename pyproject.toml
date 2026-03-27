@@ -73,6 +73,28 @@ ignore = ["E501"]
 "src/api/*.py" = ["B008"]  # FastAPI uses Query()/Depends() in function defaults by design
 "src/auth/*.py" = ["B008"]  # FastAPI uses Depends() in function defaults by design
 
+[tool.coverage.run]
+source = ["src"]
+omit = [
+    "src/db/alembic/*",
+    "src/db/alembic/versions/*",
+]
+
+[tool.coverage.report]
+fail_under = 80
+show_missing = true
+skip_covered = false
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+]
+
+[tool.coverage.xml]
+output = "coverage.xml"
+
 [tool.black]
 target-version = ["py312"]
 line-length = 100
