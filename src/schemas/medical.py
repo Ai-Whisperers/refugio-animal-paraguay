@@ -15,7 +15,6 @@ from src.db.models.medical import (
     VisitType,
 )
 
-
 # --- Medication schemas ---
 
 

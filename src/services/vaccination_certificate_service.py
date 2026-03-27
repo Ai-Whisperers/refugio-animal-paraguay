@@ -8,7 +8,7 @@ batch numbers, and administering veterinarian.
 import logging
 import os
 from dataclasses import dataclass, field
-from datetime import UTC, datetime, date
+from datetime import UTC, date, datetime
 from pathlib import Path
 from uuid import UUID
 

@@ -5,7 +5,6 @@ from uuid import uuid4
 
 import pytest
 from pydantic import ValidationError
-
 from src.db.models.medical import (
     DiagnosisSeverity,
     DocumentType,
@@ -17,22 +16,17 @@ from src.db.models.medical import (
 )
 from src.schemas.medical import (
     DiagnosisCreate,
-    DiagnosisResponse,
     DiagnosisUpdate,
     MedicalDocumentCreate,
-    MedicalDocumentResponse,
     MedicationCreate,
-    MedicationResponse,
     MedicationUpdate,
     TreatmentCreate,
-    TreatmentResponse,
     TreatmentUpdate,
     VetVisitCreate,
     VetVisitListResponse,
     VetVisitResponse,
     VetVisitUpdate,
 )
-
 
 # --- VetVisitCreate ---
 

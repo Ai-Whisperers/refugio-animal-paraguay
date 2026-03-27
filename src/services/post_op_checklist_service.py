@@ -6,7 +6,7 @@ Each surgery type has a predefined schedule of monitoring intervals.
 
 import logging
 from dataclasses import dataclass
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from uuid import UUID
 
 import sqlalchemy as sa
@@ -134,7 +134,7 @@ async def generate_post_op_checklist(
         ref_date = surgery.performed_date or surgery.scheduled_date
         base_time = datetime(
             ref_date.year, ref_date.month, ref_date.day,
-            8, 0, 0, tzinfo=timezone.utc,
+            8, 0, 0, tzinfo=UTC,
         )
 
     # Get the check intervals for this surgery type

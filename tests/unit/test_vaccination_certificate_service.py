@@ -4,7 +4,6 @@ from datetime import date
 from uuid import uuid4
 
 import pytest
-
 from src.services.vaccination_certificate_service import (
     CertificateData,
     VaccinationCertificatePDF,

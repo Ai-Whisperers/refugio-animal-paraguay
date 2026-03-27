@@ -8,8 +8,8 @@ Adds failed_login_attempts (int, default 0) and locked_until (timestamp, nullabl
 to support account lockout after consecutive failed login attempts.
 """
 
-from alembic import op
 import sqlalchemy as sa
+from alembic import op
 
 # revision identifiers
 revision = "023"

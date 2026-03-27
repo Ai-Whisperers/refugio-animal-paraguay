@@ -5,7 +5,6 @@ from uuid import uuid4
 
 import pytest
 from pydantic import ValidationError
-
 from src.schemas.vaccination import (
     VaccinationCreate,
     VaccinationListResponse,
@@ -19,7 +18,6 @@ from src.schemas.vaccination import (
     VaccineTypeResponse,
     VaccineTypeUpdate,
 )
-
 
 # ---------------------------------------------------------------------------
 # VaccineType schemas

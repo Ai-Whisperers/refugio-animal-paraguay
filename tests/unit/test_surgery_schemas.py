@@ -5,7 +5,6 @@ from uuid import uuid4
 
 import pytest
 from pydantic import ValidationError
-
 from src.schemas.surgery import (
     PostOpCheckCreate,
     PostOpCheckResponse,
@@ -15,7 +14,6 @@ from src.schemas.surgery import (
     SurgeryResponse,
     SurgeryUpdate,
 )
-
 
 # ---------------------------------------------------------------------------
 # Surgery schemas

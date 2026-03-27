@@ -15,6 +15,7 @@ from uuid import UUID
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from src.auth.dependencies import require_staff
 from src.db.models.animal import Animal
 from src.db.models.medical import (
