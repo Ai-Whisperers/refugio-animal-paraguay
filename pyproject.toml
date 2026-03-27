@@ -23,7 +23,7 @@ dependencies = [
     "stripe>=8.0",
     "slowapi>=0.1.9",
     "aiosmtplib>=3.0",
-    "jinja2>=3.1",
+    "jinja2>=3.1.4",  # CVE-2024-22195, CVE-2024-34064 fixed in 3.1.4
     "fpdf2>=2.7",
     "twilio>=9.0",
 ]
