@@ -3,7 +3,7 @@ story: S3
 epic: EPIC-28
 ticket: RAP-137
 title: "Vaccination schedule dashboard"
-status: planned
+status: done
 points: 5
 priority: P1
 track: Frontend
