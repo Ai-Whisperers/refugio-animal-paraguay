@@ -22,6 +22,12 @@ from src.db.models.user import User
 from src.db.session import get_db
 from src.middleware.rate_limiter import AUTH_RATE_LIMIT, limiter
 from src.schemas.user import TokenResponse, UserCreate, UserResponse
+from src.services.account_lockout_service import (
+    is_account_locked,
+    lockout_remaining_seconds,
+    record_failed_attempt,
+    reset_failed_attempts,
+)
 from src.services.email_verification_service import create_email_verification_token
 from src.services.session_service import create_session
 
@@ -42,11 +48,38 @@ async def login(
     result = await db.execute(select(User).where(User.email == form.username))
     user = result.scalar_one_or_none()
 
-    if (
-        user is None
-        or not user.is_active
-        or not verify_password(form.password, user.hashed_password)
-    ):
+    # Unknown user or inactive — constant-time rejection, no lockout tracking
+    if user is None or not user.is_active:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+    # Check lockout BEFORE verifying the password
+    if is_account_locked(user):
+        remaining = lockout_remaining_seconds(user)
+        remaining_minutes = max(1, (remaining + 59) // 60)
+        raise HTTPException(
+            status_code=status.HTTP_423_LOCKED,
+            detail=(
+                f"Account temporarily locked due to too many failed login attempts. "
+                f"Try again in {remaining_minutes} minute(s)."
+            ),
+        )
+
+    # Wrong password — record the failure, possibly trigger lockout
+    if not verify_password(form.password, user.hashed_password):
+        just_locked = await record_failed_attempt(db, user)
+        await db.commit()
+        if just_locked:
+            raise HTTPException(
+                status_code=status.HTTP_423_LOCKED,
+                detail=(
+                    "Account temporarily locked due to too many failed login attempts. "
+                    "Try again in 15 minute(s)."
+                ),
+            )
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid credentials",
@@ -58,6 +91,10 @@ async def login(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Email not verified. Check your inbox for the verification link.",
         )
+
+    # Successful login — reset any failed-attempt counter
+    await reset_failed_attempts(db, user)
+
 
     expires_delta = timedelta(minutes=settings.access_token_expire_minutes)
     token_expires_at = datetime.now(UTC) + expires_delta
