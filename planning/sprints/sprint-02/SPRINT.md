@@ -19,8 +19,8 @@ Full medical records system: vet visits, vaccinations, surgeries, and a vet port
 Weeks 3-4 (2-week sprint)
 
 ## Epics
-- [ ] EPIC-26
-- [ ] EPIC-27
+- [x] EPIC-26
+- [x] EPIC-27
 - [ ] EPIC-28
 - [ ] EPIC-29
 - [ ] EPIC-30

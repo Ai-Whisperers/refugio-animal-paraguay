@@ -3,7 +3,7 @@ story: S3
 epic: EPIC-27
 ticket: RAP-132
 title: "Vaccination due date alerts"
-status: planned
+status: done
 points: 3
 priority: P1
 track: Backend

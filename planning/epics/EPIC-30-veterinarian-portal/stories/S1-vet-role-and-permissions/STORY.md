@@ -3,7 +3,7 @@ story: S1
 epic: EPIC-30
 ticket: RAP-145
 title: "Vet role and permissions"
-status: planned
+status: done
 points: 3
 priority: P0
 track: Backend

@@ -2,7 +2,7 @@
 epic: EPIC-27
 title: "Vaccination Management"
 sprint: 2
-status: planned
+status: done
 points: 19
 created: 2026-03-26T19:06:04
 version: V5

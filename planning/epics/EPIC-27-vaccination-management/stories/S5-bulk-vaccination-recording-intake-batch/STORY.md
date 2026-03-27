@@ -3,7 +3,7 @@ story: S5
 epic: EPIC-27
 ticket: RAP-134
 title: "Bulk vaccination recording (intake batch)"
-status: planned
+status: done
 points: 3
 priority: P2
 track: Backend

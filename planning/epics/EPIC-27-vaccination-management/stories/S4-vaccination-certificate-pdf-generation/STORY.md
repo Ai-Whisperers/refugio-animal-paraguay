@@ -3,7 +3,7 @@ story: S4
 epic: EPIC-27
 ticket: RAP-133
 title: "Vaccination certificate PDF generation"
-status: planned
+status: done
 points: 5
 priority: P1
 track: Fullstack

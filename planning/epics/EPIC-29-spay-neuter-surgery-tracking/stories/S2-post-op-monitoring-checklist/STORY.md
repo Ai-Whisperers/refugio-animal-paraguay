@@ -3,7 +3,7 @@ story: S2
 epic: EPIC-29
 ticket: RAP-141
 title: "Post-op monitoring checklist"
-status: planned
+status: done
 points: 3
 priority: P1
 track: Backend

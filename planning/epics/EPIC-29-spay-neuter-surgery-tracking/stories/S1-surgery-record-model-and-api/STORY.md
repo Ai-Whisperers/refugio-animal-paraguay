@@ -3,7 +3,7 @@ story: S1
 epic: EPIC-29
 ticket: RAP-140
 title: "Surgery record model and API"
-status: planned
+status: done
 points: 5
 priority: P0
 track: Backend
