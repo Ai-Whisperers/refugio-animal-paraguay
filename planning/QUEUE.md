@@ -138,7 +138,7 @@ Week 3-4:
 | 2 | Add security scanning (bandit + pip-audit) | RAP-401 | EPIC-71 | 3 | DONE (PR #67) | RAP-400 |
 | 3 | Password reset tests (0% → 80%) | RAP-405 | EPIC-72 | 5 | BLOCKED | RAP-101 (PR #62 not merged) |
 | 4 | Adoption requests coverage (41% → 80%) | RAP-406 | EPIC-72 | 3 | DONE (PR #69) | — |
-| 5 | Replace bare except Exception handlers | RAP-410 | EPIC-73 | 3 | READY | — |
+| 5 | Replace bare except Exception handlers | RAP-410 | EPIC-73 | 3 | DONE (PR #70) | — |
 | 6 | Structured JSON logging (structlog) | RAP-415 | EPIC-74 | 5 | READY | — |
 | 7 | Sentry error tracking integration | RAP-416 | EPIC-74 | 3 | READY | RAP-415 |
 | 8 | Add error.tsx and loading.tsx boundaries | RAP-420 | EPIC-75 | 3 | READY | — |
