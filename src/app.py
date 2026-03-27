@@ -19,6 +19,7 @@ from slowapi.errors import RateLimitExceeded
 from src.api.admin import router as admin_router
 from src.api.admin_campaigns import router as admin_campaigns_router
 from src.api.adopters import router as adopters_router
+from src.api.diagnoses import diagnosis_router, treatment_router
 from src.api.adoption_requests import router as adoption_requests_router
 from src.api.animal_updates import router as animal_updates_router
 from src.api.animals import router as animals_router
@@ -180,6 +181,8 @@ def create_app() -> FastAPI:
     application.include_router(vaccine_type_router)
     application.include_router(vaccination_router)
     application.include_router(vet_visits_router)
+    application.include_router(diagnosis_router)
+    application.include_router(treatment_router)
 
     return application
 
