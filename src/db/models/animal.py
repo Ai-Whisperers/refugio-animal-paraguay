@@ -147,3 +147,11 @@ class Animal(Base):
         lazy="select",
         order_by="VetVisit.visit_date.desc()",
     )
+
+    # Back-reference from Surgery.animal
+    surgeries: Mapped[list["Surgery"]] = relationship(  # type: ignore[name-defined]  # noqa: F821
+        "Surgery",
+        back_populates="animal",
+        lazy="select",
+        order_by="Surgery.scheduled_date.desc()",
+    )
