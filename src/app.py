@@ -52,6 +52,7 @@ from src.api.tigo_money import router as tigo_money_router
 from src.api.vaccinations import vaccination_router, vaccine_type_router
 from src.api.vet_visits import router as vet_visits_router
 from src.api.vet_referrals import referral_router  # noqa: E402,F401
+from src.api.prescriptions import router as prescriptions_router
 from src.api.webhooks import router as webhooks_router
 from src.audit.middleware import AuditMiddleware
 from src.config import Settings, get_settings
@@ -191,6 +192,7 @@ def create_app() -> FastAPI:
     application.include_router(medications_router)
     application.include_router(medical_documents_router)
     application.include_router(referral_router)
+    application.include_router(prescriptions_router)
 
     return application
 

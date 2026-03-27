@@ -15,6 +15,9 @@ import {
   Shield,
   Scissors,
   Syringe,
+  Stethoscope,
+  ClipboardList,
+  Calendar,
 } from "lucide-react";
 import { useState } from "react";
 import { clearAccessToken, getCurrentUserRole } from "@/lib/auth";
@@ -69,6 +72,21 @@ const NAV_ITEMS: NavItem[] = [
     label: "Vacunaciones",
     href: "/admin/vaccinations",
     icon: Syringe,
+  },
+  {
+    label: "Recetas",
+    href: "/admin/prescriptions",
+    icon: ClipboardList,
+  },
+  {
+    label: "Citas Medicas",
+    href: "/admin/appointments",
+    icon: Calendar,
+  },
+  {
+    label: "Panel Veterinario",
+    href: "/admin/vet-dashboard",
+    icon: Stethoscope,
   },
   {
     label: "Usuarios",
