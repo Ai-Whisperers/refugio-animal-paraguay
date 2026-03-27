@@ -44,9 +44,7 @@ def upgrade() -> None:
             server_default=sa.text("now()"),
         ),
         sa.ForeignKeyConstraint(["animal_id"], ["animals.id"], ondelete="CASCADE"),
-        sa.ForeignKeyConstraint(
-            ["published_by_user_id"], ["users.id"], ondelete="SET NULL"
-        ),
+        sa.ForeignKeyConstraint(["published_by_user_id"], ["users.id"], ondelete="SET NULL"),
         sa.CheckConstraint(
             "update_type IN ('health', 'behavior', 'milestone', 'general')",
             name="chk_animal_updates_update_type",
@@ -93,9 +91,7 @@ def upgrade() -> None:
             nullable=False,
             server_default=sa.text("now()"),
         ),
-        sa.ForeignKeyConstraint(
-            ["sponsorship_id"], ["sponsorships.id"], ondelete="CASCADE"
-        ),
+        sa.ForeignKeyConstraint(["sponsorship_id"], ["sponsorships.id"], ondelete="CASCADE"),
         sa.CheckConstraint(
             "notification_frequency IN "
             "('immediate', 'daily_digest', 'weekly_digest', 'monthly_digest')",

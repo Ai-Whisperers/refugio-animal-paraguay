@@ -34,12 +34,12 @@ async def create_donor(
     db.add(donor)
     try:
         await db.flush()
-    except Exception:
+    except Exception as exc:
         await db.rollback()
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail="A donor with this email already exists",
-        )
+        ) from exc
     await db.refresh(donor)
     return donor
 

@@ -70,6 +70,7 @@ ignore = ["E501"]
 
 [tool.ruff.lint.per-file-ignores]
 "src/api/*.py" = ["B008"]  # FastAPI uses Query()/Depends() in function defaults by design
+"src/auth/*.py" = ["B008"]  # FastAPI uses Depends() in function defaults by design
 
 [tool.black]
 target-version = ["py312"]

@@ -21,9 +21,7 @@ async def _create_animal(client: AsyncClient, name: str = "NotifyAnimal") -> str
 
 async def _create_adopter(client: AsyncClient) -> str:
     email = f"notify-adopter-{uuid4().hex[:8]}@example.com"
-    resp = await client.post(
-        "/adopters", json={"full_name": "Notify Adopter", "email": email}
-    )
+    resp = await client.post("/adopters", json={"full_name": "Notify Adopter", "email": email})
     assert resp.status_code == 201
     return resp.json()["id"]
 

@@ -1,7 +1,7 @@
 """SQLAlchemy ORM model for adoption requests."""
 
-import enum
 from datetime import datetime
+from enum import StrEnum
 from uuid import UUID
 
 import sqlalchemy as sa
@@ -10,7 +10,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from ..base import Base
 
 
-class AdoptionRequestStatus(str, enum.Enum):
+class AdoptionRequestStatus(StrEnum):
     """Status values — must match chk_adoption_requests_status CHECK constraint exactly."""
 
     PENDING = "pending"

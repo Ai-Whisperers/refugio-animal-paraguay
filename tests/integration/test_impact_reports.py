@@ -4,7 +4,7 @@ Tests run against the live PostgreSQL test database with an
 authenticated staff client.
 """
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 import pytest
 from httpx import ASGITransport, AsyncClient
@@ -13,7 +13,7 @@ from src.app import app
 
 def _report_payload(**overrides: object) -> dict:
     """Build a valid impact report request payload."""
-    now = datetime.now(tz=timezone.utc)
+    now = datetime.now(tz=UTC)
     defaults: dict = {
         "start_date": (now - timedelta(days=90)).isoformat(),
         "end_date": now.isoformat(),
@@ -27,9 +27,7 @@ class TestGenerateImpactReport:
     """POST /impact-reports/generate."""
 
     @pytest.mark.asyncio
-    async def test_generates_report_with_all_sections(
-        self, client: AsyncClient
-    ) -> None:
+    async def test_generates_report_with_all_sections(self, client: AsyncClient) -> None:
         payload = _report_payload()
         resp = await client.post("/impact-reports/generate", json=payload)
 
@@ -46,9 +44,7 @@ class TestGenerateImpactReport:
         assert "performance_metrics" in data
 
     @pytest.mark.asyncio
-    async def test_report_metadata_contains_dates(
-        self, client: AsyncClient
-    ) -> None:
+    async def test_report_metadata_contains_dates(self, client: AsyncClient) -> None:
         payload = _report_payload()
         resp = await client.post("/impact-reports/generate", json=payload)
 
@@ -90,9 +86,7 @@ class TestGenerateImpactReport:
         assert isinstance(fund["breakdown"], list)
 
     @pytest.mark.asyncio
-    async def test_performance_metrics_structure(
-        self, client: AsyncClient
-    ) -> None:
+    async def test_performance_metrics_structure(self, client: AsyncClient) -> None:
         payload = _report_payload()
         resp = await client.post("/impact-reports/generate", json=payload)
 
@@ -107,9 +101,7 @@ class TestGenerateImpactReport:
             transport=ASGITransport(app=app),
             base_url="http://test",
         ) as unauth_client:
-            resp = await unauth_client.post(
-                "/impact-reports/generate", json=payload
-            )
+            resp = await unauth_client.post("/impact-reports/generate", json=payload)
         assert resp.status_code == 401
 
     @pytest.mark.asyncio
@@ -118,9 +110,7 @@ class TestGenerateImpactReport:
         assert resp.status_code == 422
 
     @pytest.mark.asyncio
-    async def test_narrow_date_range_returns_empty(
-        self, client: AsyncClient
-    ) -> None:
+    async def test_narrow_date_range_returns_empty(self, client: AsyncClient) -> None:
         """A date range in the far past should return zero metrics."""
         payload = {
             "start_date": "2020-01-01T00:00:00Z",
