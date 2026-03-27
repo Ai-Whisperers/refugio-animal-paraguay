@@ -320,8 +320,8 @@ Week 3-4:
 
 | # | Story | Ticket | Pts | Status | Track |
 |---|-------|--------|-----|--------|-------|
-| 1 | Self-registration form | RAP-500 | 5 | READY | Fullstack |
-| 2 | Email verification flow with token | RAP-501 | 3 | READY | Backend |
+| 1 | Self-registration form | RAP-500 | 5 | DONE (PR #152) | Fullstack |
+| 2 | Email verification flow with token | RAP-501 | 3 | DONE (PR #153) | Backend |
 | 3 | Unified personal dashboard | RAP-502 | 8 | READY | Fullstack |
 | 4 | Profile management page | RAP-503 | 5 | READY | Fullstack |
 | 5 | Social login (Google OAuth) | RAP-504 | 5 | READY | Fullstack |
