@@ -9,6 +9,7 @@ import {
   Users,
   DollarSign,
   Megaphone,
+  HandHeart,
   LogOut,
   Menu,
   X,
@@ -63,6 +64,11 @@ const NAV_ITEMS: NavItem[] = [
     label: "Campanas",
     href: "/admin/campaigns",
     icon: Megaphone,
+  },
+  {
+    label: "Padrinos",
+    href: "/admin/sponsors",
+    icon: HandHeart,
   },
   {
     label: "Cirugias",
