@@ -530,3 +530,159 @@ async def test_webhook_subscription_deleted(client: AsyncClient) -> None:
     body = response.json()
     assert body["status"] == "processed"
     assert body["result"] == "cancelled"
+
+
+# ---------------------------------------------------------------------------
+# POST /donations/sepa/setup-intent
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+@pytest.mark.integration
+async def test_create_sepa_setup_intent(client: AsyncClient) -> None:
+    """POST /donations/sepa/setup-intent returns SetupIntent client_secret."""
+    donor = await _create_donor(client)
+
+    mock_customer_list = MagicMock()
+    mock_customer_list.data = []
+    mock_customer = MagicMock()
+    mock_customer.id = "cus_setup_test"
+    mock_setup_intent = MagicMock()
+    mock_setup_intent.id = "seti_test123"
+    mock_setup_intent.client_secret = "seti_test123_secret_xyz"
+
+    with (
+        patch("src.api.sepa.stripe") as mock_stripe,
+        patch.dict("os.environ", {"STRIPE_SECRET_KEY": "sk_test_fake"}),
+    ):
+        mock_stripe.Customer.list.return_value = mock_customer_list
+        mock_stripe.Customer.create.return_value = mock_customer
+        mock_stripe.SetupIntent.create.return_value = mock_setup_intent
+
+        resp = await client.post(
+            "/donations/sepa/setup-intent",
+            json={"donor_id": donor["id"]},
+        )
+
+    assert resp.status_code == 201
+    body = resp.json()
+    assert body["stripe_setup_intent_id"] == "seti_test123"
+    assert body["client_secret"] == "seti_test123_secret_xyz"
+    assert body["stripe_customer_id"] == "cus_setup_test"
+    assert body["donor_id"] == donor["id"]
+
+
+@pytest.mark.asyncio
+@pytest.mark.integration
+async def test_create_sepa_setup_intent_donor_not_found(client: AsyncClient) -> None:
+    """POST /donations/sepa/setup-intent returns 404 when donor does not exist."""
+    with patch.dict("os.environ", {"STRIPE_SECRET_KEY": "sk_test_fake"}):
+        resp = await client.post(
+            "/donations/sepa/setup-intent",
+            json={"donor_id": str(uuid4())},
+        )
+
+    assert resp.status_code == 404
+    body = resp.json()
+    assert "Donor not found" in body.get("message", body.get("detail", ""))
+
+
+@pytest.mark.asyncio
+@pytest.mark.integration
+async def test_create_sepa_setup_intent_no_stripe_key(client: AsyncClient) -> None:
+    """POST /donations/sepa/setup-intent returns 503 when Stripe key is missing."""
+    donor = await _create_donor(client)
+
+    with patch.dict("os.environ", {"STRIPE_SECRET_KEY": ""}):
+        resp = await client.post(
+            "/donations/sepa/setup-intent",
+            json={"donor_id": donor["id"]},
+        )
+
+    assert resp.status_code == 503
+
+
+# ---------------------------------------------------------------------------
+# GET /donations/sepa/payment-methods/{customer_id}
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+@pytest.mark.integration
+async def test_list_sepa_payment_methods_empty(client: AsyncClient) -> None:
+    """GET /donations/sepa/payment-methods/{customer_id} returns empty list when no PMs."""
+    mock_payment_methods = MagicMock()
+    mock_payment_methods.data = []
+
+    with (
+        patch("src.api.sepa.stripe") as mock_stripe,
+        patch.dict("os.environ", {"STRIPE_SECRET_KEY": "sk_test_fake"}),
+    ):
+        mock_stripe.PaymentMethod.list.return_value = mock_payment_methods
+
+        resp = await client.get("/donations/sepa/payment-methods/cus_test_empty")
+
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["stripe_customer_id"] == "cus_test_empty"
+    assert body["payment_methods"] == []
+
+
+@pytest.mark.asyncio
+@pytest.mark.integration
+async def test_list_sepa_payment_methods_with_items(client: AsyncClient) -> None:
+    """GET /donations/sepa/payment-methods/{customer_id} returns saved SEPA PMs."""
+    mock_pm = MagicMock()
+    mock_pm.id = "pm_sepa_nl123"
+    mock_pm.sepa_debit = MagicMock()
+    mock_pm.sepa_debit.get = lambda key, default=None: {
+        "bank_name": "ING",
+        "last4": "3000",
+        "country": "NL",
+    }.get(key, default)
+    mock_pm.get = lambda key, default=None: None  # no mandate
+
+    mock_payment_methods = MagicMock()
+    mock_payment_methods.data = [mock_pm]
+
+    with (
+        patch("src.api.sepa.stripe") as mock_stripe,
+        patch.dict("os.environ", {"STRIPE_SECRET_KEY": "sk_test_fake"}),
+    ):
+        mock_stripe.PaymentMethod.list.return_value = mock_payment_methods
+
+        resp = await client.get("/donations/sepa/payment-methods/cus_test_nl")
+
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["stripe_customer_id"] == "cus_test_nl"
+    assert len(body["payment_methods"]) == 1
+    pm = body["payment_methods"][0]
+    assert pm["payment_method_id"] == "pm_sepa_nl123"
+    assert pm["bank_name"] == "ING"
+    assert pm["last4"] == "3000"
+    assert pm["country"] == "NL"
+
+
+@pytest.mark.asyncio
+@pytest.mark.integration
+async def test_list_sepa_payment_methods_customer_not_found(client: AsyncClient) -> None:
+    """GET /donations/sepa/payment-methods/{customer_id} returns 404 for unknown customer."""
+    import stripe as stripe_lib
+
+    with (
+        patch("src.api.sepa.stripe") as mock_stripe,
+        patch.dict("os.environ", {"STRIPE_SECRET_KEY": "sk_test_fake"}),
+    ):
+        mock_stripe.PaymentMethod.list.side_effect = stripe_lib.InvalidRequestError(
+            "No such customer",
+            param="customer",
+        )
+        mock_stripe.InvalidRequestError = stripe_lib.InvalidRequestError
+
+        resp = await client.get("/donations/sepa/payment-methods/cus_nonexistent")
+
+    assert resp.status_code == 404
+    body = resp.json()
+    error_text = body.get("message", body.get("detail", ""))
+    assert "cus_nonexistent" in error_text

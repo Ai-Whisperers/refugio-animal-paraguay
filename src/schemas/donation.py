@@ -182,3 +182,41 @@ class SubscriptionCancelResponse(BaseModel):
 
     stripe_subscription_id: str
     status: str
+
+
+class SepaSetupIntentCreate(BaseModel):
+    """Request body for creating a SEPA SetupIntent (mandate-first flow).
+
+    Use this when you want to save a donor's IBAN for future charges
+    without charging immediately. The returned client_secret is used on
+    the frontend to confirm the SetupIntent with Stripe Elements.
+    """
+
+    donor_id: UUID
+
+
+class SepaSetupIntentResponse(BaseModel):
+    """Response for SEPA SetupIntent creation."""
+
+    stripe_setup_intent_id: str
+    client_secret: str
+    stripe_customer_id: str
+    donor_id: UUID
+
+
+class SepaPaymentMethodItem(BaseModel):
+    """A saved SEPA payment method (stored bank account)."""
+
+    payment_method_id: str
+    bank_name: str | None = None
+    last4: str | None = None
+    country: str | None = None
+    mandate_id: str | None = None
+    mandate_status: str | None = None
+
+
+class SepaPaymentMethodsResponse(BaseModel):
+    """List of saved SEPA payment methods for a Stripe customer."""
+
+    stripe_customer_id: str
+    payment_methods: list[SepaPaymentMethodItem]
