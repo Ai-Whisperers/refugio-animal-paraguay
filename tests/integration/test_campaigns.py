@@ -49,6 +49,8 @@ async def test_create_campaign_returns_201(client: AsyncClient) -> None:
     assert body["fund_category"] == "medical"
     assert body["target_amount_cents"] == 100000
     assert body["allow_overfunding"] is True
+    assert body["featured"] is False
+    assert body["photo_urls"] == []
     assert "id" in body
 
 
@@ -58,10 +60,12 @@ async def test_create_campaign_with_all_fields(client: AsyncClient) -> None:
     data = _make_campaign_data(
         impact_story="Last month we rescued 15 dogs.",
         image_url="https://example.com/campaign.jpg",
+        photo_urls=["https://example.com/p1.jpg", "https://example.com/p2.jpg"],
         deadline="2026-12-31T23:59:59Z",
         min_donation_cents=500,
         max_donation_cents=500000,
         allow_overfunding=False,
+        featured=True,
         fund_category="rescue",
         currency="PYG",
         target_amount_cents=50000000,
@@ -75,6 +79,8 @@ async def test_create_campaign_with_all_fields(client: AsyncClient) -> None:
     assert body["allow_overfunding"] is False
     assert body["min_donation_cents"] == 500
     assert body["max_donation_cents"] == 500000
+    assert body["featured"] is True
+    assert len(body["photo_urls"]) == 2
 
 
 @pytest.mark.asyncio
@@ -128,6 +134,66 @@ async def test_update_campaign_status_to_active(client: AsyncClient) -> None:
 
 @pytest.mark.asyncio
 @pytest.mark.integration
+async def test_update_campaign_status_to_paused(client: AsyncClient) -> None:
+    create_resp = await client.post("/admin/campaigns", json=_make_campaign_data())
+    campaign_id = create_resp.json()["id"]
+
+    # Activate then pause
+    await client.patch(f"/admin/campaigns/{campaign_id}", json={"status": "active"})
+    response = await client.patch(
+        f"/admin/campaigns/{campaign_id}",
+        json={"status": "paused"},
+    )
+    assert response.status_code == 200
+    assert response.json()["status"] == "paused"
+
+
+@pytest.mark.asyncio
+@pytest.mark.integration
+async def test_update_campaign_status_to_archived(client: AsyncClient) -> None:
+    create_resp = await client.post("/admin/campaigns", json=_make_campaign_data())
+    campaign_id = create_resp.json()["id"]
+
+    response = await client.patch(
+        f"/admin/campaigns/{campaign_id}",
+        json={"status": "archived"},
+    )
+    assert response.status_code == 200
+    assert response.json()["status"] == "archived"
+
+
+@pytest.mark.asyncio
+@pytest.mark.integration
+async def test_update_campaign_set_featured(client: AsyncClient) -> None:
+    create_resp = await client.post("/admin/campaigns", json=_make_campaign_data())
+    campaign_id = create_resp.json()["id"]
+    assert create_resp.json()["featured"] is False
+
+    response = await client.patch(
+        f"/admin/campaigns/{campaign_id}",
+        json={"featured": True},
+    )
+    assert response.status_code == 200
+    assert response.json()["featured"] is True
+
+
+@pytest.mark.asyncio
+@pytest.mark.integration
+async def test_update_campaign_photo_urls(client: AsyncClient) -> None:
+    create_resp = await client.post("/admin/campaigns", json=_make_campaign_data())
+    campaign_id = create_resp.json()["id"]
+
+    photos = ["https://example.com/dog1.jpg", "https://example.com/dog2.jpg"]
+    response = await client.patch(
+        f"/admin/campaigns/{campaign_id}",
+        json={"photo_urls": photos},
+    )
+    assert response.status_code == 200
+    assert response.json()["photo_urls"] == photos
+
+
+@pytest.mark.asyncio
+@pytest.mark.integration
 async def test_update_nonexistent_campaign_returns_404(client: AsyncClient) -> None:
     fake_id = str(uuid4())
     response = await client.patch(
@@ -164,6 +230,42 @@ async def test_list_admin_campaigns_includes_draft(client: AsyncClient) -> None:
     assert campaign_id in ids
 
 
+@pytest.mark.asyncio
+@pytest.mark.integration
+async def test_list_admin_campaigns_filter_by_featured(client: AsyncClient) -> None:
+    featured_resp = await client.post(
+        "/admin/campaigns",
+        json=_make_campaign_data(featured=True),
+    )
+    featured_id = featured_resp.json()["id"]
+
+    non_featured_resp = await client.post(
+        "/admin/campaigns",
+        json=_make_campaign_data(featured=False),
+    )
+    non_featured_id = non_featured_resp.json()["id"]
+
+    # Filter featured=true
+    response = await client.get("/admin/campaigns", params={"featured": "true"})
+    assert response.status_code == 200
+    ids = [c["id"] for c in response.json()]
+    assert featured_id in ids
+    assert non_featured_id not in ids
+
+
+@pytest.mark.asyncio
+@pytest.mark.integration
+async def test_list_admin_campaigns_filter_by_status(client: AsyncClient) -> None:
+    create_resp = await client.post("/admin/campaigns", json=_make_campaign_data())
+    campaign_id = create_resp.json()["id"]
+    await client.patch(f"/admin/campaigns/{campaign_id}", json={"status": "paused"})
+
+    response = await client.get("/admin/campaigns", params={"status": "paused"})
+    assert response.status_code == 200
+    ids = [c["id"] for c in response.json()]
+    assert campaign_id in ids
+
+
 # ---------------------------------------------------------------------------
 # Admin: GET /admin/campaigns/{id}
 # ---------------------------------------------------------------------------
@@ -178,6 +280,8 @@ async def test_get_admin_campaign_by_id(client: AsyncClient) -> None:
     response = await client.get(f"/admin/campaigns/{campaign_id}")
     assert response.status_code == 200
     assert response.json()["id"] == campaign_id
+    assert "featured" in response.json()
+    assert "photo_urls" in response.json()
 
 
 @pytest.mark.asyncio
@@ -195,7 +299,6 @@ async def test_get_admin_campaign_not_found(client: AsyncClient) -> None:
 @pytest.mark.asyncio
 @pytest.mark.integration
 async def test_public_campaigns_excludes_drafts(client: AsyncClient) -> None:
-    # Create a draft campaign
     create_resp = await client.post("/admin/campaigns", json=_make_campaign_data())
     draft_id = create_resp.json()["id"]
 
@@ -203,6 +306,21 @@ async def test_public_campaigns_excludes_drafts(client: AsyncClient) -> None:
     assert response.status_code == 200
     public_ids = [c["id"] for c in response.json()["items"]]
     assert draft_id not in public_ids
+
+
+@pytest.mark.asyncio
+@pytest.mark.integration
+async def test_public_campaigns_excludes_paused(client: AsyncClient) -> None:
+    create_resp = await client.post("/admin/campaigns", json=_make_campaign_data())
+    campaign_id = create_resp.json()["id"]
+    # Activate then pause
+    await client.patch(f"/admin/campaigns/{campaign_id}", json={"status": "active"})
+    await client.patch(f"/admin/campaigns/{campaign_id}", json={"status": "paused"})
+
+    response = await client.get("/public/campaigns")
+    assert response.status_code == 200
+    public_ids = [c["id"] for c in response.json()["items"]]
+    assert campaign_id not in public_ids
 
 
 @pytest.mark.asyncio
@@ -217,11 +335,74 @@ async def test_public_campaigns_includes_active(client: AsyncClient) -> None:
     body = response.json()
     public_ids = [c["id"] for c in body["items"]]
     assert campaign_id in public_ids
-    # Public responses include progress fields
+    # Public responses include progress and time fields
     campaign = next(c for c in body["items"] if c["id"] == campaign_id)
     assert "raised_amount_cents" in campaign
     assert "donation_count" in campaign
     assert "progress_percentage" in campaign
+    assert "days_remaining" in campaign
+    assert "featured" in campaign
+    assert "photo_urls" in campaign
+
+
+@pytest.mark.asyncio
+@pytest.mark.integration
+async def test_public_campaigns_includes_days_remaining_none_without_deadline(
+    client: AsyncClient,
+) -> None:
+    create_resp = await client.post("/admin/campaigns", json=_make_campaign_data())
+    campaign_id = create_resp.json()["id"]
+    await client.patch(f"/admin/campaigns/{campaign_id}", json={"status": "active"})
+
+    response = await client.get(f"/public/campaigns/{campaign_id}")
+    assert response.status_code == 200
+    assert response.json()["days_remaining"] is None
+
+
+@pytest.mark.asyncio
+@pytest.mark.integration
+async def test_public_campaigns_includes_days_remaining_with_deadline(
+    client: AsyncClient,
+) -> None:
+    create_resp = await client.post(
+        "/admin/campaigns",
+        json=_make_campaign_data(deadline="2099-12-31T23:59:59Z"),
+    )
+    campaign_id = create_resp.json()["id"]
+    await client.patch(f"/admin/campaigns/{campaign_id}", json={"status": "active"})
+
+    response = await client.get(f"/public/campaigns/{campaign_id}")
+    assert response.status_code == 200
+    days = response.json()["days_remaining"]
+    assert isinstance(days, int)
+    assert days > 0
+
+
+@pytest.mark.asyncio
+@pytest.mark.integration
+async def test_public_campaigns_filter_by_featured(client: AsyncClient) -> None:
+    # Create featured campaign and activate it
+    feat_resp = await client.post(
+        "/admin/campaigns",
+        json=_make_campaign_data(featured=True),
+    )
+    feat_id = feat_resp.json()["id"]
+    await client.patch(f"/admin/campaigns/{feat_id}", json={"status": "active"})
+
+    # Create non-featured campaign and activate it
+    nonfeat_resp = await client.post(
+        "/admin/campaigns",
+        json=_make_campaign_data(featured=False),
+    )
+    nonfeat_id = nonfeat_resp.json()["id"]
+    await client.patch(f"/admin/campaigns/{nonfeat_id}", json={"status": "active"})
+
+    # Filter featured=true
+    response = await client.get("/public/campaigns", params={"featured": "true"})
+    assert response.status_code == 200
+    ids = [c["id"] for c in response.json()["items"]]
+    assert feat_id in ids
+    assert nonfeat_id not in ids
 
 
 @pytest.mark.asyncio
@@ -270,6 +451,8 @@ async def test_public_get_active_campaign(client: AsyncClient) -> None:
     assert body["raised_amount_cents"] == 0
     assert body["donation_count"] == 0
     assert body["progress_percentage"] == 0.0
+    assert body["featured"] is False
+    assert body["photo_urls"] == []
 
 
 @pytest.mark.asyncio
@@ -284,11 +467,62 @@ async def test_public_get_draft_campaign_returns_404(client: AsyncClient) -> Non
 
 @pytest.mark.asyncio
 @pytest.mark.integration
+async def test_public_get_paused_campaign_returns_404(client: AsyncClient) -> None:
+    create_resp = await client.post("/admin/campaigns", json=_make_campaign_data())
+    campaign_id = create_resp.json()["id"]
+    await client.patch(f"/admin/campaigns/{campaign_id}", json={"status": "active"})
+    await client.patch(f"/admin/campaigns/{campaign_id}", json={"status": "paused"})
+
+    response = await client.get(f"/public/campaigns/{campaign_id}")
+    assert response.status_code == 404
+
+
+@pytest.mark.asyncio
+@pytest.mark.integration
 async def test_public_get_nonexistent_campaign_returns_404(
     client: AsyncClient,
 ) -> None:
     response = await client.get(f"/public/campaigns/{uuid4()}")
     assert response.status_code == 404
+
+
+# ---------------------------------------------------------------------------
+# Full campaign lifecycle: draft → active → paused → completed
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+@pytest.mark.integration
+async def test_full_campaign_lifecycle(client: AsyncClient) -> None:
+    """Verify complete status lifecycle: draft → active → paused → completed."""
+    create_resp = await client.post("/admin/campaigns", json=_make_campaign_data())
+    campaign_id = create_resp.json()["id"]
+    assert create_resp.json()["status"] == "draft"
+
+    # Activate
+    r = await client.patch(f"/admin/campaigns/{campaign_id}", json={"status": "active"})
+    assert r.json()["status"] == "active"
+
+    # Visible on public listing
+    public_list = await client.get("/public/campaigns")
+    assert campaign_id in [c["id"] for c in public_list.json()["items"]]
+
+    # Pause
+    r = await client.patch(f"/admin/campaigns/{campaign_id}", json={"status": "paused"})
+    assert r.json()["status"] == "paused"
+
+    # No longer on public listing
+    public_list = await client.get("/public/campaigns")
+    assert campaign_id not in [c["id"] for c in public_list.json()["items"]]
+
+    # Complete
+    r = await client.patch(f"/admin/campaigns/{campaign_id}", json={"status": "completed"})
+    assert r.json()["status"] == "completed"
+
+    # Completed campaign visible via public detail endpoint
+    public_detail = await client.get(f"/public/campaigns/{campaign_id}")
+    assert public_detail.status_code == 200
+    assert public_detail.json()["status"] == "completed"
 
 
 # ---------------------------------------------------------------------------
@@ -362,10 +596,7 @@ async def test_cash_donation_linked_to_campaign_updates_progress(
         },
     )
     assert cash_resp.status_code == 201
-    # Manually link cash donation to campaign via a regular donation with campaign_id
-    # Since cash endpoint doesn't support campaign_id, we test via the public endpoint
-    # by verifying the progress query logic works with completed donations.
-    # For now, verify the campaign shows zero (cash wasn't linked to campaign).
+    # Verify the campaign shows zero (cash wasn't linked to campaign).
     public_resp = await client.get(f"/public/campaigns/{campaign_id}")
     body = public_resp.json()
     assert body["raised_amount_cents"] == 0

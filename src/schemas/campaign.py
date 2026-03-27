@@ -8,6 +8,9 @@ from pydantic import BaseModel, ConfigDict, Field
 from src.db.models.campaign import CampaignStatus, FundCategory
 from src.db.models.donation import CurrencyCode
 
+# Maximum number of additional photos per campaign
+MAX_PHOTO_URLS = 10
+
 
 class CampaignCreate(BaseModel):
     """Fields for creating a new campaign (admin only)."""
@@ -18,7 +21,9 @@ class CampaignCreate(BaseModel):
     target_amount_cents: int = Field(..., gt=0)
     currency: CurrencyCode = CurrencyCode.EUR
     fund_category: FundCategory = FundCategory.GENERAL
+    featured: bool = False
     image_url: str | None = Field(default=None, max_length=500)
+    photo_urls: list[str] = Field(default_factory=list, max_length=MAX_PHOTO_URLS)
     deadline: datetime | None = None
     min_donation_cents: int | None = Field(default=None, gt=0)
     max_donation_cents: int | None = Field(default=None, gt=0)
@@ -33,7 +38,9 @@ class CampaignUpdate(BaseModel):
     impact_story: str | None = None
     target_amount_cents: int | None = Field(default=None, gt=0)
     status: CampaignStatus | None = None
+    featured: bool | None = None
     image_url: str | None = Field(default=None, max_length=500)
+    photo_urls: list[str] | None = Field(default=None, max_length=MAX_PHOTO_URLS)
     deadline: datetime | None = None
     min_donation_cents: int | None = Field(default=None, gt=0)
     max_donation_cents: int | None = Field(default=None, gt=0)
@@ -41,7 +48,7 @@ class CampaignUpdate(BaseModel):
 
 
 class CampaignResponse(BaseModel):
-    """Shape returned for a campaign record."""
+    """Shape returned for a campaign record (admin view, full detail)."""
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -53,7 +60,9 @@ class CampaignResponse(BaseModel):
     currency: CurrencyCode
     fund_category: FundCategory
     status: CampaignStatus
+    featured: bool
     image_url: str | None
+    photo_urls: list[str]
     deadline: datetime | None
     min_donation_cents: int | None
     max_donation_cents: int | None
@@ -64,7 +73,7 @@ class CampaignResponse(BaseModel):
 
 
 class CampaignPublicResponse(BaseModel):
-    """Public campaign data with computed progress fields."""
+    """Public campaign data with computed progress and time fields."""
 
     id: UUID
     title: str
@@ -75,8 +84,12 @@ class CampaignPublicResponse(BaseModel):
     currency: CurrencyCode
     fund_category: FundCategory
     status: CampaignStatus
+    featured: bool
     image_url: str | None
+    photo_urls: list[str]
     deadline: datetime | None
+    # Number of whole days remaining until deadline; None if no deadline set
+    days_remaining: int | None
     min_donation_cents: int | None
     max_donation_cents: int | None
     allow_overfunding: bool

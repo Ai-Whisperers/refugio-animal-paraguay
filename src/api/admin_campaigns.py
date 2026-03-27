@@ -4,7 +4,7 @@ Endpoints:
   POST  /admin/campaigns             — create a new campaign
   PATCH /admin/campaigns/{id}        — update an existing campaign
   GET   /admin/campaigns             — list all campaigns (any status)
-  GET   /admin/campaigns/{id}        — get campaign detail with progress
+  GET   /admin/campaigns/{id}        — get campaign detail
 """
 
 from uuid import UUID
@@ -40,7 +40,9 @@ async def create_campaign(
         target_amount_cents=payload.target_amount_cents,
         currency=payload.currency.value,
         fund_category=payload.fund_category.value,
+        featured=payload.featured,
         image_url=payload.image_url,
+        photo_urls=payload.photo_urls,
         deadline=payload.deadline,
         min_donation_cents=payload.min_donation_cents,
         max_donation_cents=payload.max_donation_cents,
@@ -83,15 +85,18 @@ async def update_campaign(
 @router.get("", response_model=list[CampaignResponse])
 async def list_all_campaigns(
     campaign_status: CampaignStatus | None = Query(default=None, alias="status"),
+    featured: bool | None = Query(default=None, description="Filter by featured flag"),
     limit: int = Query(default=20, ge=1, le=100),
     offset: int = Query(default=0, ge=0),
     db: AsyncSession = Depends(get_db),
     _current_user: User = Depends(require_staff),
 ) -> list[Campaign]:
-    """List all campaigns with optional status filter. Staff or admin only."""
+    """List all campaigns with optional status and featured filters. Staff or admin only."""
     stmt = select(Campaign)
     if campaign_status is not None:
         stmt = stmt.where(Campaign.status == campaign_status.value)
+    if featured is not None:
+        stmt = stmt.where(Campaign.featured == featured)
     stmt = stmt.order_by(Campaign.created_at.desc()).limit(limit).offset(offset)
     result = await db.execute(stmt)
     return list(result.scalars().all())

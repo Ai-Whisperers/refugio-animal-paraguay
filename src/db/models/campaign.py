@@ -11,11 +11,17 @@ from ..base import Base
 
 
 class CampaignStatus(enum.StrEnum):
-    """Campaign lifecycle status."""
+    """Campaign lifecycle status.
+
+    Lifecycle: draft → active → paused (optional) → completed | archived
+    Cancelled is retained for backward compatibility with existing data.
+    """
 
     DRAFT = "draft"
     ACTIVE = "active"
+    PAUSED = "paused"
     COMPLETED = "completed"
+    ARCHIVED = "archived"
     CANCELLED = "cancelled"
 
 
@@ -62,8 +68,20 @@ class Campaign(Base):
         nullable=False,
         server_default="draft",
     )
-    # Optional campaign image URL
+    # Whether this campaign is featured prominently on the public fundraising page
+    featured: Mapped[bool] = mapped_column(
+        sa.Boolean,
+        nullable=False,
+        server_default=sa.text("false"),
+    )
+    # Optional primary campaign image URL
     image_url: Mapped[str | None] = mapped_column(sa.String(500), nullable=True)
+    # Additional campaign photos (array of URLs)
+    photo_urls: Mapped[list[str]] = mapped_column(
+        sa.ARRAY(sa.Text),
+        nullable=False,
+        server_default=sa.text("'{}'"),
+    )
     # Optional deadline; campaigns without deadline run indefinitely
     deadline: Mapped[datetime | None] = mapped_column(
         sa.TIMESTAMP(timezone=True),
