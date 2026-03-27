@@ -23,6 +23,7 @@ from src.schemas.consent import (
     ConsentResponse,
     ConsentSummary,
 )
+from src.schemas.error import RESOURCE_RESPONSES
 from src.services.consent_service import (
     get_consent_summary,
     get_user_consents,
@@ -32,7 +33,7 @@ from src.services.consent_service import (
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/users", tags=["consents"])
+router = APIRouter(prefix="/users", tags=["consents"], responses=RESOURCE_RESPONSES)
 
 
 @router.get("/{user_id}/consents", response_model=ConsentSummary)

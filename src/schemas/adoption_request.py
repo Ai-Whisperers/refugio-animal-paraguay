@@ -20,6 +20,7 @@ class AdoptionRequestStatusUpdate(BaseModel):
     """Payload for the PATCH …/status endpoint — changes workflow state."""
 
     status: AdoptionRequestStatus
+    notes: str | None = None
 
 
 class AdoptionRequestResponse(BaseModel):
@@ -48,3 +49,23 @@ class ContractGeneratedResponse(BaseModel):
     request_id: UUID
     contract_pdf_path: str
     contract_generated_at: datetime
+
+
+class StatusBreakdown(BaseModel):
+    """Count of requests per status."""
+
+    pending: int = 0
+    approved: int = 0
+    rejected: int = 0
+    cancelled: int = 0
+
+
+class AdoptionAnalyticsResponse(BaseModel):
+    """Analytics summary for adoption requests."""
+
+    total_requests: int
+    avg_time_to_decision_hours: float | None
+    approval_rate_percent: float | None
+    requests_last_7_days: int
+    requests_last_30_days: int
+    status_breakdown: StatusBreakdown

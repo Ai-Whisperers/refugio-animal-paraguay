@@ -34,6 +34,7 @@ from src.db.models.sponsorship import (
 )
 from src.db.models.user import User
 from src.db.session import get_db
+from src.schemas.error import RESOURCE_RESPONSES
 from src.schemas.sponsorship import (
     SponsorshipCancelRequest,
     SponsorshipCreate,
@@ -44,7 +45,7 @@ from src.schemas.sponsorship import (
     SponsorshipTierUpdate,
 )
 
-router = APIRouter(tags=["sponsorships"])
+router = APIRouter(tags=["sponsorships"], responses=RESOURCE_RESPONSES)
 
 # ---------------------------------------------------------------------------
 # Stripe helper

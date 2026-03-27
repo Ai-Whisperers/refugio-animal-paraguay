@@ -3,7 +3,7 @@ story: S4
 epic: EPIC-23
 ticket: RAP-113
 title: "Automated email on status change"
-status: planned
+status: done
 points: 3
 priority: P1
 track: Backend

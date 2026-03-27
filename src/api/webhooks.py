@@ -21,10 +21,11 @@ from src.db.models.donation import Donation, DonationStatus
 from src.db.session import get_db
 from src.events.bus import EventBus
 from src.events.domain_events import create_donation_received
+from src.schemas.error import PAYMENT_RESPONSES
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/webhooks", tags=["webhooks"])
+router = APIRouter(prefix="/webhooks", tags=["webhooks"], responses=PAYMENT_RESPONSES)
 
 # Stripe event types we handle
 EVENT_PAYMENT_INTENT_SUCCEEDED = "payment_intent.succeeded"

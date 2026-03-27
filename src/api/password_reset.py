@@ -15,6 +15,7 @@ from src.config import Settings, get_settings
 from src.db.session import get_db
 from src.middleware.rate_limiter import AUTH_RATE_LIMIT, limiter
 from src.notifications.service import EmailMessage, EmailService
+from src.schemas.error import COMMON_RESPONSES
 from src.schemas.password_reset import (
     PasswordResetConfirm,
     PasswordResetConfirmResponse,
@@ -29,7 +30,7 @@ from src.services.password_reset_service import (
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/auth/password-reset", tags=["auth"])
+router = APIRouter(prefix="/auth/password-reset", tags=["auth"], responses=COMMON_RESPONSES)
 
 PASSWORD_RESET_SUBJECT = "Restablecer contrasena - Refugio Animal Paraguay"
 

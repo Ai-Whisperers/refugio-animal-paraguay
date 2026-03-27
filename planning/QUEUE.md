@@ -124,6 +124,18 @@ Week 3-4:
 
 ---
 
+## V4 Sprint 1.5 — EPIC-23: Adoption Request Queue (21 pts) — COMPLETE
+
+| # | Story | Ticket | Pts | Status |
+|---|-------|--------|-----|--------|
+| 1 | Adoption request list page with status filters | RAP-110 | 5 | DONE (PR #97) |
+| 2 | Application detail view with adopter info | RAP-111 | 3 | DONE (PR #98) |
+| 3 | Approve/reject workflow with mandatory notes | RAP-112 | 5 | DONE (PR #99) |
+| 4 | Automated email on status change (bilingual) | RAP-113 | 5 | DONE (PR #100) |
+| 5 | Adoption request analytics (time to decision) | RAP-114 | 3 | DONE (PR #101) |
+
+---
+
 ## V3.1 — Priority Sprint: Stability & Quality Gates (92 pts, 25 stories)
 
 **Why now**: CI/CD deploys to production with ZERO tests. 14 bare `except Exception` blocks. Frontend has P0 bugs (/animals 404, no Stripe.js, no error boundaries). No structured logging, no monitoring, no staging environment. These must be fixed before adding more features.
@@ -136,39 +148,39 @@ Week 3-4:
 |---|-------|--------|------|-----|--------|------------|
 | 1 | Add test + lint pipeline to GitHub Actions | RAP-400 | EPIC-71 | 5 | DONE (PR #66) | — |
 | 2 | Add security scanning (bandit + pip-audit) | RAP-401 | EPIC-71 | 3 | DONE (PR #67) | RAP-400 |
-| 3 | Password reset tests (0% → 80%) | RAP-405 | EPIC-72 | 5 | BLOCKED | RAP-101 (PR #62 not merged) |
+| 3 | Password reset tests (0% → 80%) | RAP-405 | EPIC-72 | 5 | DONE (PR #91) | RAP-101 (PR #62 merged) |
 | 4 | Adoption requests coverage (41% → 80%) | RAP-406 | EPIC-72 | 3 | DONE (PR #69) | — |
 | 5 | Replace bare except Exception handlers | RAP-410 | EPIC-73 | 3 | DONE (PR #70) | — |
-| 6 | Structured JSON logging (structlog) | RAP-415 | EPIC-74 | 5 | READY | — |
-| 7 | Sentry error tracking integration | RAP-416 | EPIC-74 | 3 | READY | RAP-415 |
-| 8 | Add error.tsx and loading.tsx boundaries | RAP-420 | EPIC-75 | 3 | READY | — |
-| 9 | Fix /animals page 404 rendering bug | RAP-421 | EPIC-75 | 3 | READY | — |
-| 10 | Integrate Stripe.js Elements into DonationForm | RAP-422 | EPIC-75 | 5 | READY | — |
+| 6 | Structured JSON logging (structlog) | RAP-415 | EPIC-74 | 5 | DONE (PR #74) | — |
+| 7 | Sentry error tracking integration | RAP-416 | EPIC-74 | 3 | DONE (PR #75) | RAP-415 |
+| 8 | Add error.tsx and loading.tsx boundaries | RAP-420 | EPIC-75 | 3 | DONE (PR #76) | — |
+| 9 | Fix /animals page 404 rendering bug | RAP-421 | EPIC-75 | 3 | DONE (PR #77) | — |
+| 10 | Integrate Stripe.js Elements into DonationForm | RAP-422 | EPIC-75 | 5 | DONE (PR #89) | — |
 
 ### P1 — High Priority (after all P0 complete)
 
 | # | Story | Ticket | Epic | Pts | Status | Depends On |
 |---|-------|--------|------|-----|--------|------------|
-| 11 | Create staging environment with approval gate | RAP-402 | EPIC-71 | 5 | BLOCKED | RAP-400 |
+| 11 | Create staging environment with approval gate | RAP-402 | EPIC-71 | 5 | DONE (PR #90) | RAP-400 ✓ |
 | 12 | Harden Docker production image | RAP-403 | EPIC-71 | 3 | DONE (PR #68) | — |
-| 13 | Notification handler exception tests | RAP-407 | EPIC-72 | 3 | READY | — |
-| 14 | Audit middleware tests | RAP-408 | EPIC-72 | 3 | READY | — |
-| 15 | Audit API input validation gaps | RAP-411 | EPIC-73 | 3 | READY | — |
-| 16 | Standardize error responses across routers | RAP-412 | EPIC-73 | 5 | READY | RAP-410 |
-| 17 | Database constraint error handling | RAP-413 | EPIC-73 | 3 | READY | RAP-412 |
-| 18 | Payment error handling (Stripe + Tigo) | RAP-414 | EPIC-73 | 3 | READY | RAP-412 |
-| 19 | Health check improvements | RAP-417 | EPIC-74 | 3 | READY | — |
-| 20 | Request/response logging middleware | RAP-418 | EPIC-74 | 3 | READY | RAP-415 |
-| 21 | Database backup automation | RAP-419 | EPIC-74 | 5 | READY | — |
-| 22 | Loading and error states on all pages | RAP-423 | EPIC-75 | 5 | READY | RAP-420 |
-| 23 | Centralized API error handling (frontend) | RAP-424 | EPIC-75 | 3 | READY | RAP-420 |
+| 13 | Notification handler exception tests | RAP-407 | EPIC-72 | 3 | PR OPEN (#71) | — |
+| 14 | Audit middleware tests | RAP-408 | EPIC-72 | 3 | DONE (PR #72) | — |
+| 15 | Audit API input validation gaps | RAP-411 | EPIC-73 | 3 | DONE (PR #73) | — |
+| 16 | Standardize error responses across routers | RAP-412 | EPIC-73 | 5 | DONE (PR #79) | RAP-410 |
+| 17 | Database constraint error handling | RAP-413 | EPIC-73 | 3 | DONE (PR #80) | RAP-412 |
+| 18 | Payment error handling (Stripe + Tigo) | RAP-414 | EPIC-73 | 3 | DONE (PR #81) | RAP-412 |
+| 19 | Health check improvements | RAP-417 | EPIC-74 | 3 | DONE (PR #82) | — |
+| 20 | Request/response logging middleware | RAP-418 | EPIC-74 | 3 | DONE (PR #83) | RAP-415 |
+| 21 | Database backup automation | RAP-419 | EPIC-74 | 5 | DONE (PR #84) | — |
+| 22 | Loading and error states on all pages | RAP-423 | EPIC-75 | 5 | DONE (PR #86) | RAP-420 |
+| 23 | Centralized API error handling (frontend) | RAP-424 | EPIC-75 | 3 | DONE (PR #85) | RAP-420 |
 
 ### P2 — Medium Priority (after all P1 complete)
 
 | # | Story | Ticket | Epic | Pts | Status | Depends On |
 |---|-------|--------|------|-----|--------|------------|
-| 24 | Coverage reporting and PR status checks | RAP-404 | EPIC-71 | 5 | BLOCKED | RAP-400 |
-| 25 | Frontend component tests (Vitest) | RAP-409 | EPIC-72 | 3 | READY | — |
+| 24 | Coverage reporting and PR status checks | RAP-404 | EPIC-71 | 5 | DONE (PR #88) | RAP-400 ✓ |
+| 25 | Frontend component tests (Vitest) | RAP-409 | EPIC-72 | 3 | DONE (PR #87) | — |
 
 ### Epics in this sprint
 

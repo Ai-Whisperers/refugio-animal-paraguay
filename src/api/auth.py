@@ -21,6 +21,7 @@ from src.config import Settings, get_settings
 from src.db.models.user import User
 from src.db.session import get_db
 from src.middleware.rate_limiter import AUTH_RATE_LIMIT, limiter
+from src.schemas.error import COMMON_RESPONSES
 from src.schemas.user import TokenResponse, UserCreate, UserResponse
 from src.services.account_lockout_service import (
     is_account_locked,
@@ -33,7 +34,7 @@ from src.services.session_service import create_session
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/auth", tags=["auth"])
+router = APIRouter(prefix="/auth", tags=["auth"], responses=COMMON_RESPONSES)
 
 
 @router.post("/token", response_model=TokenResponse)

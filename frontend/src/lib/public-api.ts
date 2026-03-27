@@ -3,13 +3,92 @@
  *
  * Used by the public-facing pages: animal browsing, detail, and
  * adoption application submission. All requests skip JWT injection.
+ *
+ * Also exports ApiError and apiFetch for centralized error handling
+ * across all public API calls.
  */
 
 import { api } from "./api";
+
+// --- Centralized error class ---
+
+/**
+ * Structured API error thrown by apiFetch when the backend returns
+ * a non-2xx response.
+ *
+ * Satisfies the ApiError type from error-handling.ts, enabling
+ * getErrorMessage() and getRecoveryAction() to work with these errors.
+ */
+export class ApiError extends Error {
+  constructor(
+    public readonly status: number,
+    public readonly error_code: string,
+    public readonly detail: string
+  ) {
+    super(detail);
+    this.name = "ApiError";
+  }
+}
+
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+
+/**
+ * Centralized fetch wrapper for public (no-auth) API calls.
+ *
+ * Parses error responses into ApiError instances so callers can use
+ * getErrorMessage() and getRecoveryAction() from error-handling.ts.
+ * Network failures (DNS, timeout, etc.) are re-thrown as plain Error.
+ */
+export async function apiFetch<T = unknown>(
+  endpoint: string,
+  options: RequestInit = {}
+): Promise<T> {
+  const url = `${API_BASE_URL}${endpoint}`;
+
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        ...options.headers,
+      },
+    });
+  } catch (networkError) {
+    throw new Error(
+      `Network error — unable to reach ${endpoint}. Please check your connection.`
+    );
+  }
+
+  if (!response.ok) {
+    let error_code = "UNKNOWN_ERROR";
+    let detail = "Unknown error";
+    try {
+      const body = (await response.json()) as {
+        error_code?: string;
+        detail?: string;
+        message?: string;
+      };
+      if (body.error_code) error_code = body.error_code;
+      detail = body.detail ?? body.message ?? detail;
+    } catch {
+      // Response body was not JSON — keep defaults
+    }
+    throw new ApiError(response.status, error_code, detail);
+  }
+
+  if (response.status === 204) {
+    return undefined as T;
+  }
+
+  return response.json() as Promise<T>;
+}
 import type {
   Animal,
   AnimalSpecies,
-  AnimalStatus,
+  AnimalSize,
+  AnimalGender,
   CampaignListResponse,
   CampaignPublic,
   DonationCreateRequest,
@@ -17,55 +96,60 @@ import type {
   DonorCreateRequest,
   DonorResponse,
   FundCategory,
+  PaginatedAnimalListResponse,
   PublicAdoptionApplicationCreate,
   PublicAdoptionApplicationResponse,
+  StripeIntentResponse,
 } from "@/types/api";
 
 const NO_AUTH = { requiresAuth: false } as const;
 
-/** Query parameters for filtering animal listings. */
+/** Query parameters for filtering the public animal listing. */
 export interface AnimalListParams {
   species?: AnimalSpecies;
-  status?: AnimalStatus;
-  size?: string;
-  age_min?: number;
-  age_max?: number;
+  size?: AnimalSize;
+  gender?: AnimalGender;
+  breed?: string;
+  min_age_months?: number;
+  max_age_months?: number;
   search?: string;
-  offset?: number;
-  limit?: number;
+  page?: number;
+  page_size?: number;
 }
 
 /**
- * Fetch a paginated/filtered list of animals (no auth required).
- * The backend GET /animals does not require authentication.
+ * Fetch a paginated/filtered list of available animals (no auth required).
+ * Calls GET /public/animals — returns only animals with status=available.
  */
 export async function listAnimalsPublic(
   params: AnimalListParams = {}
-): Promise<Animal[]> {
+): Promise<PaginatedAnimalListResponse> {
   const searchParams = new URLSearchParams();
   if (params.species) searchParams.set("species", params.species);
-  if (params.status) searchParams.set("status", params.status);
   if (params.size) searchParams.set("size", params.size);
-  if (params.age_min !== undefined)
-    searchParams.set("age_min", String(params.age_min));
-  if (params.age_max !== undefined)
-    searchParams.set("age_max", String(params.age_max));
+  if (params.gender) searchParams.set("gender", params.gender);
+  if (params.breed) searchParams.set("breed", params.breed);
+  if (params.min_age_months !== undefined)
+    searchParams.set("min_age_months", String(params.min_age_months));
+  if (params.max_age_months !== undefined)
+    searchParams.set("max_age_months", String(params.max_age_months));
   if (params.search) searchParams.set("search", params.search);
-  if (params.offset !== undefined)
-    searchParams.set("offset", String(params.offset));
-  if (params.limit !== undefined)
-    searchParams.set("limit", String(params.limit));
+  if (params.page !== undefined)
+    searchParams.set("page", String(params.page));
+  if (params.page_size !== undefined)
+    searchParams.set("page_size", String(params.page_size));
 
   const query = searchParams.toString();
-  const endpoint = `/animals${query ? `?${query}` : ""}`;
-  return api.get<Animal[]>(endpoint, NO_AUTH);
+  const endpoint = `/public/animals${query ? `?${query}` : ""}`;
+  return api.get<PaginatedAnimalListResponse>(endpoint, NO_AUTH);
 }
 
 /**
- * Fetch a single animal by ID (no auth required).
+ * Fetch a single available animal by ID (no auth required).
+ * Returns 404 if the animal doesn't exist or is not available.
  */
 export async function getAnimalPublic(animalId: string): Promise<Animal> {
-  return api.get<Animal>(`/animals/${animalId}`, NO_AUTH);
+  return api.get<Animal>(`/public/animals/${animalId}`, NO_AUTH);
 }
 
 /**
@@ -136,4 +220,19 @@ export async function createDonor(
   data: DonorCreateRequest
 ): Promise<DonorResponse> {
   return api.post<DonorResponse>("/donors", data, NO_AUTH);
+}
+
+/**
+ * Create a Stripe PaymentIntent for an existing pending donation.
+ * Returns a client_secret to pass to Stripe.js confirmPayment().
+ * POST /donations/{donationId}/stripe-intent (no auth required — public campaign flow)
+ */
+export async function createStripeIntent(
+  donationId: string
+): Promise<StripeIntentResponse> {
+  return api.post<StripeIntentResponse>(
+    `/donations/${donationId}/stripe-intent`,
+    {},
+    NO_AUTH
+  );
 }

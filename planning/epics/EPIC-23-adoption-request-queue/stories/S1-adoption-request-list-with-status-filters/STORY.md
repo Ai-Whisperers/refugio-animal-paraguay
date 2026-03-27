@@ -3,7 +3,7 @@ story: S1
 epic: EPIC-23
 ticket: RAP-110
 title: "Adoption request list with status filters"
-status: planned
+status: done
 points: 5
 priority: P0
 track: Frontend

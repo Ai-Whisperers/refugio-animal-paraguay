@@ -16,9 +16,12 @@ from fastapi import HTTPException
 from fastapi.exceptions import RequestValidationError
 from pydantic_core import InitErrorDetails, PydanticCustomError
 from slowapi.errors import RateLimitExceeded
+from sqlalchemy.exc import IntegrityError
 from src.middleware.error_handler import (
+    _extract_constraint_name,
     _get_request_id,
     http_exception_handler,
+    integrity_error_handler,
     rate_limit_handler,
     unhandled_exception_handler,
     validation_exception_handler,
@@ -176,6 +179,108 @@ class TestRateLimitHandler:
         assert body["error_code"] == "RATE_LIMITED"
         assert "retry" in body["message"].lower()
         assert "Retry-After" in response.headers
+
+
+class TestExtractConstraintName:
+    """Tests for _extract_constraint_name helper."""
+
+    def test_returns_none_when_no_orig(self) -> None:
+        exc = MagicMock(spec=IntegrityError)
+        exc.orig = None
+        assert _extract_constraint_name(exc) is None
+
+    def test_extracts_from_pgerror_string(self) -> None:
+        orig = MagicMock()
+        orig.pgerror = 'ERROR:  duplicate key value violates unique constraint "uq_adopters_email"\nDETAIL:  Key (email)=(test@test.com) already exists.'
+        orig.constraint_name = None
+        orig.diag = None
+        exc = MagicMock(spec=IntegrityError)
+        exc.orig = orig
+        assert _extract_constraint_name(exc) == "uq_adopters_email"
+
+    def test_extracts_from_asyncpg_constraint_name(self) -> None:
+        orig = MagicMock()
+        orig.pgerror = ""
+        orig.constraint_name = "uq_donors_email"
+        exc = MagicMock(spec=IntegrityError)
+        exc.orig = orig
+        assert _extract_constraint_name(exc) == "uq_donors_email"
+
+    def test_extracts_from_diag(self) -> None:
+        orig = MagicMock()
+        orig.pgerror = ""
+        orig.constraint_name = None
+        orig.diag.constraint_name = "uq_users_email"
+        exc = MagicMock(spec=IntegrityError)
+        exc.orig = orig
+        assert _extract_constraint_name(exc) == "uq_users_email"
+
+
+class TestIntegrityErrorHandler:
+    """Tests for integrity_error_handler."""
+
+    @pytest.mark.asyncio
+    async def test_returns_409_for_known_constraint(self) -> None:
+        request = MagicMock()
+        request.state.request_id = "req-int-001"
+
+        orig = MagicMock()
+        orig.pgerror = 'duplicate key value violates unique constraint "uq_adopters_email"'
+        orig.constraint_name = None
+        orig.diag = None
+        exc = MagicMock(spec=IntegrityError)
+        exc.orig = orig
+
+        response = await integrity_error_handler(request, exc)
+
+        assert response.status_code == 409
+        body = json.loads(response.body)
+        assert body["error_code"] == "CONFLICT"
+        assert "adopter" in body["message"].lower()
+        assert body["request_id"] == "req-int-001"
+
+    @pytest.mark.asyncio
+    async def test_returns_409_for_unknown_constraint(self) -> None:
+        request = MagicMock()
+        request.state.request_id = "req-int-002"
+
+        orig = MagicMock()
+        orig.pgerror = ""
+        orig.constraint_name = "uq_some_unknown_table_column"
+        orig.diag = None
+        exc = MagicMock(spec=IntegrityError)
+        exc.orig = orig
+
+        response = await integrity_error_handler(request, exc)
+
+        assert response.status_code == 409
+        body = json.loads(response.body)
+        assert body["error_code"] == "CONFLICT"
+        assert body["message"] == "A resource conflict occurred"
+
+    @pytest.mark.asyncio
+    async def test_returns_409_when_orig_is_none(self) -> None:
+        request = MagicMock()
+        del request.state.request_id
+
+        exc = MagicMock(spec=IntegrityError)
+        exc.orig = None
+
+        response = await integrity_error_handler(request, exc)
+
+        assert response.status_code == 409
+        body = json.loads(response.body)
+        assert body["error_code"] == "CONFLICT"
+
+    @pytest.mark.asyncio
+    async def test_known_constraints_have_specific_messages(self) -> None:
+        """Each known constraint returns a message more specific than the generic fallback."""
+        from src.middleware.error_handler import _CONSTRAINT_MESSAGES
+
+        generic = "A resource conflict occurred"
+        for constraint_name, message in _CONSTRAINT_MESSAGES.items():
+            assert message != generic, f"Constraint '{constraint_name}' uses generic fallback message"
+            assert len(message) > 10  # non-trivial message
 
 
 class TestUnhandledExceptionHandler:

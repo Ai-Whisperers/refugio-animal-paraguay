@@ -1,24 +1,37 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>Adoption Request Update</h2>
-<p>Dear {{ adopter_name }},</p>
+<h2>Actualizacion de Solicitud de Adopcion / Adoption Request Update</h2>
+<p>Estimado/a {{ adopter_name }}, / Dear {{ adopter_name }},</p>
 
+<p>Su solicitud de adopcion para <strong>{{ animal_name }}</strong> ha sido actualizada.</p>
 <p>Your adoption request for <strong>{{ animal_name }}</strong> has been updated.</p>
 
 <p>
-  <strong>Previous status:</strong> {{ old_status | replace("_", " ") | title }}<br>
-  <strong>New status:</strong> {{ new_status | replace("_", " ") | title }}
+  <strong>Estado anterior / Previous status:</strong> {{ old_status | replace("_", " ") | title }}<br>
+  <strong>Nuevo estado / New status:</strong> {{ new_status | replace("_", " ") | title }}
 </p>
 
 {% if new_status == "approved" %}
+<p>Felicitaciones! Su solicitud de adopcion ha sido aprobada. Nuestro equipo se comunicara con usted para coordinar los proximos pasos.</p>
 <p>Congratulations! Your adoption request has been approved. Our team will contact you shortly to arrange the next steps.</p>
 {% elif new_status == "rejected" %}
+<p>Lamentamos informarle que su solicitud de adopcion no fue aprobada en este momento. No dude en contactarnos si tiene preguntas o desea explorar otros animales disponibles para adopcion.</p>
 <p>We regret to inform you that your adoption request was not approved at this time. Please don't hesitate to reach out if you have questions or would like to explore other animals available for adoption.</p>
-{% elif new_status == "under_review" %}
-<p>Your application is now being reviewed by our team. We will notify you once a decision has been made.</p>
+{% elif new_status == "cancelled" %}
+<p>Su solicitud de adopcion ha sido cancelada. Si esto fue un error o tiene preguntas, por favor contactenos.</p>
+<p>Your adoption request has been cancelled. If this was in error or you have questions, please contact us.</p>
 {% else %}
+<p>Si tiene preguntas sobre su solicitud, por favor contactenos.</p>
 <p>If you have any questions about your application, please contact us.</p>
 {% endif %}
 
+{% if staff_notes %}
+<div style="background-color: #f8f9fa; border-left: 4px solid #6c757d; padding: 12px 16px; margin: 16px 0;">
+  <strong>Notas del equipo / Staff notes:</strong>
+  <p style="margin: 8px 0 0 0;">{{ staff_notes }}</p>
+</div>
+{% endif %}
+
+<p>Gracias por su interes en darle un hogar amoroso a un animal.</p>
 <p>Thank you for your interest in giving an animal a loving home.</p>
 {% endblock %}

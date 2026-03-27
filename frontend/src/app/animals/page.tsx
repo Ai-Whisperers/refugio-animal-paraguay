@@ -5,9 +5,9 @@ import { useSearchParams, useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { Search, X, SlidersHorizontal, AlertCircle, Heart } from "lucide-react";
-import type { Animal, AnimalSpecies } from "@/types/api";
+import type { PublicAnimalListItem, AnimalSpecies } from "@/types/api";
 import { listAnimalsPublic } from "@/lib/public-api";
-import { STATUS_LABELS, statusBadgeClass, calculateAge } from "@/lib/animal-utils";
+import { calculateAge } from "@/lib/animal-utils";
 import { ANIMALS_LIST, SPECIES_LABELS } from "@/lib/strings";
 import AnimalPlaceholder from "@/components/AnimalPlaceholder";
 import AnimalCardSkeleton from "@/components/AnimalCardSkeleton";
@@ -60,9 +60,9 @@ function AnimalsPageContent() {
   const sizeFilter = searchParams.get("size") ?? "";
   const ageFilter = searchParams.get("age") ?? "";
   const searchQuery = searchParams.get("search") ?? "";
-  const currentOffset = Number(searchParams.get("offset") ?? "0");
+  const currentPage = Math.max(1, Number(searchParams.get("page") ?? "1"));
 
-  const [animals, setAnimals] = useState<Animal[]>([]);
+  const [animals, setAnimals] = useState<PublicAnimalListItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(false);
@@ -89,9 +89,9 @@ function AnimalsPageContent() {
           params.delete(key);
         }
       }
-      // Reset offset when filters change (unless explicitly setting offset)
-      if (!("offset" in updates)) {
-        params.delete("offset");
+      // Reset to page 1 when filters change (unless explicitly setting page)
+      if (!("page" in updates)) {
+        params.delete("page");
       }
       const query = params.toString();
       return `/animals${query ? `?${query}` : ""}`;
@@ -123,22 +123,21 @@ function AnimalsPageContent() {
     try {
       const result = await listAnimalsPublic({
         species: speciesFilter || undefined,
-        status: "available",
-        size: sizeFilter || undefined,
-        age_min: ageRange.min,
-        age_max: ageRange.max,
+        size: (sizeFilter as "small" | "medium" | "large" | "extra_large") || undefined,
+        min_age_months: ageRange.min,
+        max_age_months: ageRange.max,
         search: searchQuery || undefined,
-        offset: currentOffset,
-        limit: PAGE_SIZE + 1,
+        page: currentPage,
+        page_size: PAGE_SIZE,
       });
-      setHasMore(result.length > PAGE_SIZE);
-      setAnimals(result.slice(0, PAGE_SIZE));
+      setAnimals(result.items);
+      setHasMore(currentPage < result.pagination.total_pages);
     } catch (err) {
       setError(err instanceof Error ? err.message : ANIMALS_LIST.errorTitle);
     } finally {
       setIsLoading(false);
     }
-  }, [speciesFilter, sizeFilter, ageRange, searchQuery, currentOffset]);
+  }, [speciesFilter, sizeFilter, ageRange, searchQuery, currentPage]);
 
   useEffect(() => {
     fetchAnimals();
@@ -339,12 +338,7 @@ function AnimalsPageContent() {
                   ) : (
                     <AnimalPlaceholder species={animal.species} />
                   )}
-                  {/* Status badge overlay */}
-                  <span
-                    className={`absolute top-3 right-3 text-xs px-2.5 py-1 rounded-full font-medium shadow-sm ${statusBadgeClass(animal.status)}`}
-                  >
-                    {STATUS_LABELS[animal.status]}
-                  </span>
+                  {/* All public animals are available — no status badge needed */}
                 </div>
 
                 {/* Info */}
@@ -376,14 +370,14 @@ function AnimalsPageContent() {
           {/* Pagination */}
           <div className="flex justify-center gap-4 mt-10">
             <button
-              onClick={() => router.push(buildUrl({ offset: String(Math.max(0, currentOffset - PAGE_SIZE)) }))}
-              disabled={currentOffset === 0}
+              onClick={() => router.push(buildUrl({ page: String(Math.max(1, currentPage - 1)) }))}
+              disabled={currentPage === 1}
               className="px-5 py-2.5 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
             >
               {ANIMALS_LIST.previous}
             </button>
             <button
-              onClick={() => router.push(buildUrl({ offset: String(currentOffset + PAGE_SIZE) }))}
+              onClick={() => router.push(buildUrl({ page: String(currentPage + 1) }))}
               disabled={!hasMore}
               className="px-5 py-2.5 rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium"
             >

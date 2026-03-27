@@ -1,0 +1,111 @@
+# Staging deployment for sunstein.cloud VPS
+#
+# Mirrors docker-compose.deploy.yml but runs at /petShelter-staging with an
+# isolated database volume and Traefik routes. Used by the staging CI/CD job
+# that runs on every push to the develop branch.
+#
+# Env vars expected in .env.staging on the VPS:
+#   POSTGRES_PASSWORD_STAGING  — separate from production DB password
+#   SECRET_KEY_STAGING         — separate signing key
+#   STRIPE_SECRET_KEY          — Stripe test-mode key (sk_test_...)
+#   STRIPE_WEBHOOK_SECRET      — Stripe staging webhook secret
+#
+# Usage: docker compose -f docker-compose.staging.yml up -d
+
+services:
+  db-staging:
+    image: postgres:16-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: refugio_staging
+      POSTGRES_USER: refugio_staging
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD_STAGING:?POSTGRES_PASSWORD_STAGING is required}
+    volumes:
+      - refugio_postgres_staging_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U refugio_staging -d refugio_staging"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - internal-staging
+
+  api-staging:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    restart: always
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 512m
+    memswap_limit: 512m
+    environment:
+      DATABASE_URL: postgresql+asyncpg://refugio_staging:${POSTGRES_PASSWORD_STAGING}@db-staging:5432/refugio_staging
+      APP_ENV: staging
+      DEBUG: "false"
+      SECRET_KEY: ${SECRET_KEY_STAGING:?SECRET_KEY_STAGING is required}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
+      SMTP_ENABLED: "false"
+      EMAIL_FROM_ADDRESS: noreply@sunstein.cloud
+      EMAIL_FROM_NAME: "Refugio Animal Paraguay (Staging)"
+      ALLOWED_ORIGINS: https://sunstein.cloud,https://www.sunstein.cloud
+      RATE_LIMIT_ENABLED: "true"
+    depends_on:
+      db-staging:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:8000/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      start_period: 30s
+      retries: 3
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.refugio-api-staging.rule: "Host(`sunstein.cloud`) && PathPrefix(`/petShelter-staging/api`)"
+      traefik.http.routers.refugio-api-staging.entrypoints: websecure
+      traefik.http.routers.refugio-api-staging.tls.certresolver: letsencryptresolver
+      traefik.http.routers.refugio-api-staging.priority: "10"
+      traefik.http.routers.refugio-api-staging.middlewares: refugio-api-staging-strip
+      traefik.http.middlewares.refugio-api-staging-strip.stripprefix.prefixes: /petShelter-staging/api
+      traefik.http.services.refugio-api-staging.loadbalancer.server.port: "8000"
+      traefik.docker.network: refugio-net
+    networks:
+      - internal-staging
+      - refugio-net
+
+  frontend-staging:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: https://sunstein.cloud/petShelter-staging/api
+        NEXT_PUBLIC_BASE_PATH: /petShelter-staging
+    restart: always
+    security_opt:
+      - no-new-privileges:true
+    mem_limit: 256m
+    memswap_limit: 256m
+    depends_on:
+      - api-staging
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.refugio-frontend-staging.rule: "Host(`sunstein.cloud`) && PathPrefix(`/petShelter-staging`)"
+      traefik.http.routers.refugio-frontend-staging.entrypoints: websecure
+      traefik.http.routers.refugio-frontend-staging.tls.certresolver: letsencryptresolver
+      traefik.http.routers.refugio-frontend-staging.priority: "5"
+      traefik.http.services.refugio-frontend-staging.loadbalancer.server.port: "3000"
+      traefik.docker.network: refugio-net
+    networks:
+      - internal-staging
+      - refugio-net
+
+volumes:
+  refugio_postgres_staging_data:
+
+networks:
+  internal-staging:
+    driver: bridge
+  refugio-net:
+    external: true

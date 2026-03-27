@@ -122,6 +122,7 @@ class NotificationHandlers:
                     "animal_name": animal_name or "your requested animal",
                     "old_status": payload.get("old_status", "unknown"),
                     "new_status": payload.get("new_status", "unknown"),
+                    "staff_notes": payload.get("notes"),
                 },
             )
 

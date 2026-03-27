@@ -17,13 +17,14 @@ from src.db.models.donation import Donor
 from src.db.models.in_kind_donation import InKindDonation
 from src.db.models.user import User
 from src.db.session import get_db
+from src.schemas.error import RESOURCE_RESPONSES
 from src.schemas.in_kind_donation import (
     InKindDonationCreate,
     InKindDonationListResponse,
     InKindDonationResponse,
 )
 
-router = APIRouter(prefix="/in-kind-donations", tags=["in-kind-donations"])
+router = APIRouter(prefix="/in-kind-donations", tags=["in-kind-donations"], responses=RESOURCE_RESPONSES)
 
 
 @router.post("", response_model=InKindDonationResponse, status_code=status.HTTP_201_CREATED)

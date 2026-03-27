@@ -26,10 +26,10 @@ from .user_consent import ConsentMethod, ConsentStatus, ConsentType, UserConsent
 from .verification_token import TokenType, VerificationToken
 
 __all__ = [
-    "ActiveSession",
     "BRONZE_AMOUNT_CENTS",
     "GOLD_AMOUNT_CENTS",
     "SILVER_AMOUNT_CENTS",
+    "ActiveSession",
     "Adopter",
     "AdoptionRequest",
     "AdoptionRequestStatus",

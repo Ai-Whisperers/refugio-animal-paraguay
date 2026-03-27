@@ -19,12 +19,16 @@ from src.db.session import get_db
 from src.schemas.audit import (
     DEFAULT_PAGE,
     DEFAULT_PAGE_SIZE,
+    MAX_ACTION_LENGTH,
     MAX_PAGE_SIZE,
+    MAX_RESOURCE_ID_LENGTH,
+    MAX_RESOURCE_TYPE_LENGTH,
     AuditLogListResponse,
     AuditLogResponse,
 )
+from src.schemas.error import AUTHENTICATED_RESPONSES
 
-router = APIRouter(prefix="/admin", tags=["admin"])
+router = APIRouter(prefix="/admin", tags=["admin"], responses=AUTHENTICATED_RESPONSES)
 
 
 @router.get(
@@ -34,9 +38,17 @@ router = APIRouter(prefix="/admin", tags=["admin"])
 )
 async def list_audit_logs(
     user_id: UUID | None = Query(default=None, description="Filter by user ID"),
-    action: str | None = Query(default=None, description="Filter by action type"),
-    resource_type: str | None = Query(default=None, description="Filter by resource type"),
-    resource_id: str | None = Query(default=None, description="Filter by resource ID"),
+    action: str | None = Query(
+        default=None, max_length=MAX_ACTION_LENGTH, description="Filter by action type"
+    ),
+    resource_type: str | None = Query(
+        default=None,
+        max_length=MAX_RESOURCE_TYPE_LENGTH,
+        description="Filter by resource type",
+    ),
+    resource_id: str | None = Query(
+        default=None, max_length=MAX_RESOURCE_ID_LENGTH, description="Filter by resource ID"
+    ),
     start_date: datetime | None = Query(
         default=None, description="Filter entries from this date (inclusive)"
     ),
@@ -80,9 +92,9 @@ async def list_audit_logs(
 )
 async def export_audit_logs(
     user_id: UUID | None = Query(default=None),
-    action: str | None = Query(default=None),
-    resource_type: str | None = Query(default=None),
-    resource_id: str | None = Query(default=None),
+    action: str | None = Query(default=None, max_length=MAX_ACTION_LENGTH),
+    resource_type: str | None = Query(default=None, max_length=MAX_RESOURCE_TYPE_LENGTH),
+    resource_id: str | None = Query(default=None, max_length=MAX_RESOURCE_ID_LENGTH),
     start_date: datetime | None = Query(default=None),
     end_date: datetime | None = Query(default=None),
     format: str = Query(

@@ -3,7 +3,7 @@ story: S4
 epic: EPIC-22
 ticket: RAP-108
 title: "Batch status updates and bulk actions"
-status: planned
+status: done
 points: 3
 priority: P1
 track: Frontend

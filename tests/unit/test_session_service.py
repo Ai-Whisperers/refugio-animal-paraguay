@@ -5,12 +5,10 @@ from datetime import UTC, datetime, timedelta
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
-
 from src.db.models.active_session import ActiveSession
 from src.services.session_service import (
     SESSION_INACTIVITY_TIMEOUT_MINUTES,
     create_session,
-    list_active_sessions,
     revoke_all_user_sessions,
     revoke_session,
     validate_session,

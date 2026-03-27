@@ -10,10 +10,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.auth.dependencies import require_admin
 from src.db.models.user import User
 from src.db.session import get_db
+from src.schemas.error import AUTHENTICATED_RESPONSES
 from src.schemas.gdpr_export import GDPRExportRequest, GDPRExportResponse
 from src.services.gdpr_export_service import generate_data_export
 
-router = APIRouter(prefix="/gdpr", tags=["gdpr"])
+router = APIRouter(prefix="/gdpr", tags=["gdpr"], responses=AUTHENTICATED_RESPONSES)
 
 
 @router.post("/data-export", response_model=GDPRExportResponse)

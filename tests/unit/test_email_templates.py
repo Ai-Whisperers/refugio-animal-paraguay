@@ -97,17 +97,17 @@ class TestAdoptionStatusChangedTemplate:
         )
         assert "not approved" in html
 
-    def test_under_review_includes_review_message(self, renderer: TemplateRenderer) -> None:
+    def test_cancelled_includes_cancellation_message(self, renderer: TemplateRenderer) -> None:
         html = renderer.render(
             "adoption_status_changed",
             {
                 "adopter_name": "Maria",
                 "animal_name": "Luna",
                 "old_status": "pending",
-                "new_status": "under_review",
+                "new_status": "cancelled",
             },
         )
-        assert "reviewed" in html
+        assert "cancelled" in html.lower()
 
     def test_renders_status_values(self, renderer: TemplateRenderer) -> None:
         html = renderer.render(

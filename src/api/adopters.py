@@ -13,7 +13,6 @@ from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from sqlalchemy import select
-from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.dependencies import require_staff
@@ -21,8 +20,9 @@ from src.db.models.adopter import Adopter
 from src.db.models.user import User
 from src.db.session import get_db
 from src.schemas.adopter import AdopterCreate, AdopterResponse, AdopterUpdate
+from src.schemas.error import RESOURCE_RESPONSES
 
-router = APIRouter(prefix="/adopters", tags=["adopters"])
+router = APIRouter(prefix="/adopters", tags=["adopters"], responses=RESOURCE_RESPONSES)
 
 _DEFAULT_LIMIT = 20
 _MAX_LIMIT = 100
@@ -70,14 +70,8 @@ async def create_adopter(
         gdpr_consent_at=payload.gdpr_consent_at,
     )
     db.add(adopter)
-    try:
-        await db.flush()
-    except IntegrityError as exc:
-        await db.rollback()
-        raise HTTPException(
-            status_code=status.HTTP_409_CONFLICT,
-            detail="An adopter with this email already exists",
-        ) from exc
+    # IntegrityError (duplicate email) is handled centrally by integrity_error_handler
+    await db.flush()
     await db.refresh(adopter)
     return adopter
 

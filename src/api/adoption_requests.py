@@ -3,16 +3,17 @@
 Endpoints:
   GET    /adoption-requests              — paginated list (filter by status / animal / adopter)
   GET    /adoption-requests/{id}         — single request or 404
+  GET    /adoption-requests/analytics    — time-to-decision, approval rate, weekly volume
   POST   /adoption-requests              — create, returns 201
   PATCH  /adoption-requests/{id}/status  — transition status; approved sets animal → adopted
   POST   /adoption-requests/{id}/contract — generate adoption contract PDF
 """
 
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.dependencies import require_staff
@@ -28,14 +29,17 @@ from src.events.domain_events import (
     create_adoption_status_changed,
 )
 from src.schemas.adoption_request import (
+    AdoptionAnalyticsResponse,
     AdoptionRequestCreate,
     AdoptionRequestResponse,
     AdoptionRequestStatusUpdate,
     ContractGeneratedResponse,
+    StatusBreakdown,
 )
+from src.schemas.error import RESOURCE_RESPONSES
 from src.services.contract_service import ContractData, ContractPDFGenerator
 
-router = APIRouter(prefix="/adoption-requests", tags=["adoption-requests"])
+router = APIRouter(prefix="/adoption-requests", tags=["adoption-requests"], responses=RESOURCE_RESPONSES)
 
 _DEFAULT_LIMIT = 20
 _MAX_LIMIT = 100
@@ -79,6 +83,82 @@ async def list_adoption_requests(
 
     result = await db.execute(stmt)
     return list(result.scalars().all())
+
+
+_SECONDS_PER_HOUR = 3600.0
+_DAYS_7 = 7
+_DAYS_30 = 30
+
+
+@router.get("/analytics", response_model=AdoptionAnalyticsResponse)
+async def get_adoption_analytics(
+    db: AsyncSession = Depends(get_db),
+    _: User = Depends(require_staff),
+) -> AdoptionAnalyticsResponse:
+    """Return adoption request analytics: time-to-decision, approval rate, volume."""
+    now = datetime.now(UTC)
+
+    # Total count
+    total_result = await db.execute(select(func.count(AdoptionRequest.id)))
+    total_requests = total_result.scalar() or 0
+
+    # Status breakdown
+    status_counts_result = await db.execute(
+        select(AdoptionRequest.status, func.count(AdoptionRequest.id)).group_by(
+            AdoptionRequest.status
+        )
+    )
+    breakdown = StatusBreakdown()
+    for row_status, count in status_counts_result:
+        if hasattr(breakdown, row_status):
+            setattr(breakdown, row_status, count)
+
+    # Average time-to-decision (only decided requests)
+    avg_seconds_result = await db.execute(
+        select(
+            func.avg(
+                func.extract("epoch", AdoptionRequest.decided_at)
+                - func.extract("epoch", AdoptionRequest.submitted_at)
+            )
+        ).where(AdoptionRequest.decided_at.isnot(None))
+    )
+    avg_seconds = avg_seconds_result.scalar()
+    avg_time_to_decision_hours = (
+        round(float(avg_seconds) / _SECONDS_PER_HOUR, 1) if avg_seconds is not None else None
+    )
+
+    # Approval rate (approved / (approved + rejected))
+    decided_count = breakdown.approved + breakdown.rejected
+    approval_rate_percent = (
+        round(breakdown.approved / decided_count * 100, 1) if decided_count > 0 else None
+    )
+
+    # Requests in last 7 days
+    week_ago = now - timedelta(days=_DAYS_7)
+    last_7_result = await db.execute(
+        select(func.count(AdoptionRequest.id)).where(
+            AdoptionRequest.submitted_at >= week_ago
+        )
+    )
+    requests_last_7_days = last_7_result.scalar() or 0
+
+    # Requests in last 30 days
+    month_ago = now - timedelta(days=_DAYS_30)
+    last_30_result = await db.execute(
+        select(func.count(AdoptionRequest.id)).where(
+            AdoptionRequest.submitted_at >= month_ago
+        )
+    )
+    requests_last_30_days = last_30_result.scalar() or 0
+
+    return AdoptionAnalyticsResponse(
+        total_requests=total_requests,
+        avg_time_to_decision_hours=avg_time_to_decision_hours,
+        approval_rate_percent=approval_rate_percent,
+        requests_last_7_days=requests_last_7_days,
+        requests_last_30_days=requests_last_30_days,
+        status_breakdown=breakdown,
+    )
 
 
 @router.get("/{request_id}", response_model=AdoptionRequestResponse)
@@ -175,6 +255,10 @@ async def update_adoption_request_status(
     req.decided_at = datetime.now(UTC)
     req.updated_at = datetime.now(UTC)
 
+    # Store decision notes if provided
+    if payload.notes is not None:
+        req.notes = payload.notes
+
     # Side-effect: approved request marks animal as adopted
     if new_status == AdoptionRequestStatus.APPROVED:
         animal = await db.get(Animal, req.animal_id)
@@ -192,6 +276,7 @@ async def update_adoption_request_status(
             old_status=old_status_value,
             new_status=new_status.value,
             actor_id=current_user.id,
+            notes=payload.notes,
         )
         await event_bus.publish(event)
 

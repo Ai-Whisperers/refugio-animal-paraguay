@@ -1,15 +1,28 @@
-name: Deploy to VPS
+name: Deploy to Production
 
 on:
   push:
     branches:
-      - develop
+      - main
+  # Allow triggering production deploy manually from the Actions tab
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Branch or SHA to deploy (defaults to main)"
+        required: false
+        default: main
 
 jobs:
-  deploy:
-    name: Deploy to Production VPS
+  deploy-production:
+    name: Deploy to Production (sunstein.cloud/petShelter)
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
+    # GitHub Environment with required reviewers — set up protection rules in:
+    # Settings → Environments → production → Required reviewers
+    # This creates the manual approval gate before any production deploy proceeds.
+    environment:
+      name: production
+      url: https://sunstein.cloud/petShelter
 
     steps:
       - name: Set up SSH
@@ -19,25 +32,28 @@ jobs:
           chmod 600 ~/.ssh/deploy_key
           echo "${{ secrets.VPS_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
 
-      - name: Deploy to VPS
+      - name: Deploy to production VPS
         run: |
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=yes \
             ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} \
-            'cd /opt/refugio-animal-paraguay && \
-             git fetch origin develop && \
-             git reset --hard origin/develop && \
-             docker compose -f docker-compose.deploy.yml build && \
+            'set -e
+             cd /opt/refugio-animal-paraguay
+             git fetch origin main
+             git checkout main
+             git reset --hard origin/main
+             docker compose -f docker-compose.deploy.yml build
              docker compose -f docker-compose.deploy.yml up -d'
 
-      - name: Health check
-        continue-on-error: true
+      - name: Production health check
         run: |
-          sleep 15
+          sleep 20
           ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=yes \
             ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} \
-            'cd /opt/refugio-animal-paraguay && \
-             docker compose -f docker-compose.deploy.yml ps --format "table {{.Name}}\t{{.Status}}" && \
-             curl -sf --max-time 10 http://localhost:8000/api/v1/animals?limit=1 > /dev/null && echo "API OK" || echo "API not responding yet (may still be starting)"'
+            'docker compose -f /opt/refugio-animal-paraguay/docker-compose.deploy.yml \
+               ps --format "table {{.Name}}\t{{.Status}}" && \
+             curl -sf --max-time 15 https://sunstein.cloud/petShelter/api/health \
+               && echo "Production API healthy" \
+               || echo "Production API not yet responding"'
 
       - name: Cleanup SSH
         if: always()

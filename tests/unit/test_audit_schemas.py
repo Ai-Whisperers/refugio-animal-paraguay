@@ -8,7 +8,10 @@ from pydantic import ValidationError
 from src.schemas.audit import (
     DEFAULT_PAGE,
     DEFAULT_PAGE_SIZE,
+    MAX_ACTION_LENGTH,
     MAX_PAGE_SIZE,
+    MAX_RESOURCE_ID_LENGTH,
+    MAX_RESOURCE_TYPE_LENGTH,
     AuditLogFilters,
     AuditLogListResponse,
     AuditLogResponse,
@@ -120,3 +123,61 @@ class TestAuditLogFilters:
         assert filters.action == "create"
         assert filters.page == 2
         assert filters.page_size == 25
+
+    # ------------------------------------------------------------------
+    # String field max_length constraints
+    # ------------------------------------------------------------------
+
+    def test_action_too_long_raises(self) -> None:
+        with pytest.raises(ValidationError):
+            AuditLogFilters(action="x" * (MAX_ACTION_LENGTH + 1))
+
+    def test_action_at_max_length_is_valid(self) -> None:
+        filters = AuditLogFilters(action="a" * MAX_ACTION_LENGTH)
+        assert len(filters.action) == MAX_ACTION_LENGTH  # type: ignore[arg-type]
+
+    def test_resource_type_too_long_raises(self) -> None:
+        with pytest.raises(ValidationError):
+            AuditLogFilters(resource_type="x" * (MAX_RESOURCE_TYPE_LENGTH + 1))
+
+    def test_resource_type_at_max_length_is_valid(self) -> None:
+        filters = AuditLogFilters(resource_type="r" * MAX_RESOURCE_TYPE_LENGTH)
+        assert len(filters.resource_type) == MAX_RESOURCE_TYPE_LENGTH  # type: ignore[arg-type]
+
+    def test_resource_id_too_long_raises(self) -> None:
+        with pytest.raises(ValidationError):
+            AuditLogFilters(resource_id="x" * (MAX_RESOURCE_ID_LENGTH + 1))
+
+    def test_resource_id_at_max_length_is_valid(self) -> None:
+        filters = AuditLogFilters(resource_id="i" * MAX_RESOURCE_ID_LENGTH)
+        assert len(filters.resource_id) == MAX_RESOURCE_ID_LENGTH  # type: ignore[arg-type]
+
+    # ------------------------------------------------------------------
+    # Date range validator
+    # ------------------------------------------------------------------
+
+    def test_valid_date_range_passes(self) -> None:
+        start = datetime(2025, 1, 1, tzinfo=UTC)
+        end = datetime(2025, 12, 31, tzinfo=UTC)
+        filters = AuditLogFilters(start_date=start, end_date=end)
+        assert filters.start_date == start
+        assert filters.end_date == end
+
+    def test_same_start_and_end_date_passes(self) -> None:
+        ts = datetime(2025, 6, 15, tzinfo=UTC)
+        filters = AuditLogFilters(start_date=ts, end_date=ts)
+        assert filters.start_date == ts
+
+    def test_end_date_before_start_date_raises(self) -> None:
+        start = datetime(2025, 12, 31, tzinfo=UTC)
+        end = datetime(2025, 1, 1, tzinfo=UTC)
+        with pytest.raises(ValidationError, match="end_date must not be before start_date"):
+            AuditLogFilters(start_date=start, end_date=end)
+
+    def test_only_start_date_is_valid(self) -> None:
+        filters = AuditLogFilters(start_date=datetime(2025, 1, 1, tzinfo=UTC))
+        assert filters.end_date is None
+
+    def test_only_end_date_is_valid(self) -> None:
+        filters = AuditLogFilters(end_date=datetime(2025, 12, 31, tzinfo=UTC))
+        assert filters.start_date is None

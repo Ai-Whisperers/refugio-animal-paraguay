@@ -1,7 +1,7 @@
 """SQLAlchemy ORM model for verification tokens (password reset, email verification)."""
 
-import enum
 from datetime import datetime
+from enum import StrEnum
 from uuid import UUID
 
 import sqlalchemy as sa
@@ -10,7 +10,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from ..base import Base
 
 
-class TokenType(str, enum.Enum):
+class TokenType(StrEnum):
     """Verification token types."""
 
     PASSWORD_RESET = "password_reset"

@@ -18,6 +18,7 @@ from src.db.session import get_db
 from src.middleware.rate_limiter import AUTH_RATE_LIMIT, limiter
 from src.notifications.service import EmailMessage, EmailService
 from src.notifications.templates import TemplateRenderer
+from src.schemas.error import COMMON_RESPONSES
 from src.services.email_verification_service import (
     create_email_verification_token,
     verify_email,
@@ -25,7 +26,7 @@ from src.services.email_verification_service import (
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/auth/email", tags=["auth"])
+router = APIRouter(prefix="/auth/email", tags=["auth"], responses=COMMON_RESPONSES)
 
 FRONTEND_BASE_URL = "http://localhost:3000"
 
