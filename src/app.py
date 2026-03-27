@@ -23,12 +23,10 @@ from src.api.adoption_requests import router as adoption_requests_router
 from src.api.animal_updates import router as animal_updates_router
 from src.api.animals import router as animals_router
 from src.api.auth import router as auth_router
-from src.api.email_verification import router as email_verification_router
-from src.api.password_reset import router as password_reset_router
-from src.api.sessions import router as sessions_router
 from src.api.consents import router as consents_router
 from src.api.donations import router as donations_router
 from src.api.donors import router as donors_router
+from src.api.email_verification import router as email_verification_router
 from src.api.follow_ups import router as follow_ups_router
 from src.api.fund_allocations import router as fund_allocations_router
 from src.api.gdpr import router as gdpr_router
@@ -38,11 +36,13 @@ from src.api.impact_reports import router as impact_reports_router
 from src.api.in_kind_donations import router as in_kind_donations_router
 from src.api.notification_preferences import router as notification_preferences_router
 from src.api.notifications import router as notifications_router
+from src.api.password_reset import router as password_reset_router
 from src.api.public import router as public_router
 from src.api.public_adoption import router as public_adoption_router
 from src.api.public_campaigns import router as public_campaigns_router
 from src.api.public_contact import router as public_contact_router
 from src.api.sepa import router as sepa_router
+from src.api.sessions import router as sessions_router
 from src.api.sponsorships import router as sponsorships_router
 from src.api.tigo_money import router as tigo_money_router
 from src.api.webhooks import router as webhooks_router
@@ -50,6 +50,7 @@ from src.audit.middleware import AuditMiddleware
 from src.config import Settings, get_settings
 from src.db.session import dispose_engine, init_engine
 from src.events.bus import EventBus
+from src.logging_config import configure_logging
 from src.middleware.error_handler import register_exception_handlers
 from src.middleware.rate_limiter import configure_limiter, limiter
 from src.middleware.request_id import RequestIDMiddleware
@@ -96,6 +97,9 @@ async def lifespan(application: FastAPI) -> AsyncGenerator[None, None]:
 def create_app() -> FastAPI:
     """Create and configure the FastAPI application."""
     settings = get_settings()
+
+    # Configure structured logging before any logger is used.
+    configure_logging(is_dev=settings.app_env == "development")
 
     application = FastAPI(
         title=settings.app_name,
