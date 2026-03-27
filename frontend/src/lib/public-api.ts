@@ -10,6 +10,7 @@ import type {
   Animal,
   AnimalSpecies,
   AnimalStatus,
+  StripeIntentResponse,
   CampaignListResponse,
   CampaignPublic,
   DonationCreateRequest,
@@ -127,6 +128,21 @@ export async function createDonation(
   data: DonationCreateRequest
 ): Promise<DonationResponse> {
   return api.post<DonationResponse>("/donations", data, NO_AUTH);
+}
+
+/**
+ * Create a Stripe PaymentIntent for an existing pending donation.
+ * Returns a client_secret to confirm the payment with Stripe.js.
+ * POST /donations/{donationId}/stripe-intent (no auth required).
+ */
+export async function createStripeIntent(
+  donationId: string
+): Promise<StripeIntentResponse> {
+  return api.post<StripeIntentResponse>(
+    `/donations/${donationId}/stripe-intent`,
+    {},
+    NO_AUTH
+  );
 }
 
 /**
