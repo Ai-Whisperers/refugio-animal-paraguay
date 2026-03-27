@@ -3,7 +3,7 @@ story: S1
 epic: EPIC-21
 ticket: RAP-100
 title: "Staff login page with JWT auth flow"
-status: planned
+status: done
 points: 5
 priority: P0
 track: Frontend
