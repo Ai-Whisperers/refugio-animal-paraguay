@@ -22,6 +22,7 @@ from .sponsorship import (
     SponsorshipTierLevel,
 )
 from .user_consent import ConsentMethod, ConsentStatus, ConsentType, UserConsent
+from .verification_token import TokenType, VerificationToken
 
 __all__ = [
     "Adopter",
@@ -64,5 +65,7 @@ __all__ = [
     "SponsorshipStatus",
     "SponsorshipTier",
     "SponsorshipTierLevel",
+    "TokenType",
     "UserConsent",
+    "VerificationToken",
 ]
