@@ -568,6 +568,48 @@ export interface PostOpCheckListResponse {
   total: number;
 }
 
+// --- Subscriptions (Recurring Donations) ---
+
+export type SubscriptionInterval = "month" | "year";
+
+export type SubscriptionStatus =
+  | "active"
+  | "paused"
+  | "canceled"
+  | "past_due"
+  | "incomplete"
+  | "trialing";
+
+export interface SubscriptionCreateRequest {
+  donor_id: string;
+  amount_cents: number;
+  currency: CurrencyCode;
+  interval: SubscriptionInterval;
+  payment_method_id: string;
+  notes?: string | null;
+}
+
+export interface SubscriptionDetailResponse {
+  id: string;
+  donor_id: string;
+  stripe_subscription_id: string;
+  stripe_customer_id: string;
+  stripe_price_id: string | null;
+  amount_cents: number;
+  currency: string;
+  interval: string;
+  status: SubscriptionStatus;
+  current_period_start: string | null;
+  current_period_end: string | null;
+  cancel_at_period_end: boolean;
+  canceled_at: string | null;
+  last_payment_error: string | null;
+  failed_payment_count: number;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 // --- API Error ---
 
 export interface ApiError {

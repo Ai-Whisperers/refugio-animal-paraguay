@@ -525,3 +525,46 @@ export const DATE_FORMAT_OPTIONS: Intl.DateTimeFormatOptions = {
 export function formatDate(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString(DATE_LOCALE, DATE_FORMAT_OPTIONS);
 }
+
+// --- Monthly Giving / Subscriptions ---
+export const MONTHLY_GIVING = {
+  title: "Donaciones Mensuales",
+  metaDescription:
+    "Conviertete en donante mensual del Refugio Animal Paraguay y ayuda a los animales cada mes.",
+  heroTitle: "Dona cada mes, cambia una vida",
+  heroSubtitle:
+    "Tu compromiso mensual nos permite planificar mejor el cuidado de nuestros animales. Desde comida y medicinas hasta refugio seguro.",
+  stepAmount: "Monto",
+  stepDetails: "Datos",
+  stepPayment: "Pago",
+  stepConfirmation: "Listo",
+  chooseAmount: "Elige tu donacion mensual",
+  customAmount: "Otro monto",
+  currencyLabel: "Moneda",
+  intervalMonth: "Mensual",
+  intervalYear: "Anual",
+  intervalLabel: "Frecuencia",
+  donorName: "Nombre completo",
+  donorEmail: "Email",
+  gdprConsent:
+    "Acepto que mis datos sean procesados para gestionar mi donacion recurrente, conforme a la politica de privacidad.",
+  continueButton: "Continuar",
+  backButton: "Volver",
+  submitButton: "Iniciar donacion mensual",
+  processing: "Procesando tu suscripcion...",
+  successTitle: "Gracias por tu generosidad!",
+  successMessage:
+    "Tu donacion mensual ha sido activada. Recibiras un recibo por email cada mes.",
+  successBackHome: "Volver al inicio",
+  errorTitle: "Algo salio mal",
+  errorRetry: "Intentar de nuevo",
+  impactTitle: "Tu impacto mensual",
+  impactItems: [
+    { amount: "5.000 PYG", description: "Un dia de comida para un animal" },
+    { amount: "20.000 PYG", description: "Vacunas basicas mensuales" },
+    { amount: "50.000 PYG", description: "Cuidado veterinario de emergencia" },
+    { amount: "100.000 PYG", description: "Apadrina un animal completo" },
+  ],
+  suggestedAmountsEUR: [500, 1000, 2500, 5000] as const,
+  suggestedAmountsPYG: [5000, 20000, 50000, 100000] as const,
+} as const;

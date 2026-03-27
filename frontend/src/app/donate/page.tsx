@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import DynamicIcon from "@/components/DynamicIcon";
-import { Building2, MessageCircle, Phone, ArrowLeft } from "lucide-react";
-import { DONATE, SITE_TITLE } from "@/lib/strings";
+import { Building2, MessageCircle, Phone, ArrowLeft, Heart } from "lucide-react";
+import { DONATE, MONTHLY_GIVING, SITE_TITLE } from "@/lib/strings";
 import CampaignListSection from "./CampaignListSection";
 import FeaturedCampaignBanner from "@/components/campaigns/FeaturedCampaignBanner";
 
@@ -70,6 +70,27 @@ export default function DonatePage() {
                 </p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Monthly Giving CTA */}
+      <section className="py-10 sm:py-16 px-4 bg-gradient-to-r from-primary-50 to-green-50">
+        <div className="max-w-3xl mx-auto">
+          <div className="bg-white rounded-xl p-6 sm:p-8 shadow-sm border border-primary-100 text-center">
+            <Heart className="h-10 w-10 text-primary-600 mx-auto mb-3" />
+            <h2 className="text-xl sm:text-2xl font-heading font-bold text-gray-900 mb-2">
+              {MONTHLY_GIVING.heroTitle}
+            </h2>
+            <p className="text-sm text-gray-600 mb-4 max-w-md mx-auto">
+              {MONTHLY_GIVING.heroSubtitle}
+            </p>
+            <Link
+              href="/donate/monthly"
+              className="inline-block bg-primary-600 text-white text-sm font-medium px-6 py-3 rounded-lg hover:bg-primary-700 transition-colors"
+            >
+              Comenzar donacion mensual
+            </Link>
           </div>
         </div>
       </section>

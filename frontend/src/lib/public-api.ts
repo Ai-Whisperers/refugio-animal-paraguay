@@ -101,6 +101,8 @@ import type {
   PublicAdoptionApplicationCreate,
   PublicAdoptionApplicationResponse,
   StripeIntentResponse,
+  SubscriptionCreateRequest,
+  SubscriptionDetailResponse,
 } from "@/types/api";
 
 const NO_AUTH = { requiresAuth: false } as const;
@@ -249,4 +251,16 @@ export async function createStripeIntent(
     {},
     NO_AUTH
   );
+}
+
+// --- Subscriptions (Recurring Donations) ---
+
+/**
+ * Create a recurring donation subscription via Stripe.
+ * POST /subscriptions (no auth required — public monthly giving flow)
+ */
+export async function createSubscription(
+  data: SubscriptionCreateRequest
+): Promise<SubscriptionDetailResponse> {
+  return api.post<SubscriptionDetailResponse>("/subscriptions", data, NO_AUTH);
 }
