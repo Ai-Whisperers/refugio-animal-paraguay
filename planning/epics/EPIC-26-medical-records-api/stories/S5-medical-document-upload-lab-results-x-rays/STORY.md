@@ -3,7 +3,7 @@ story: S5
 epic: EPIC-26
 ticket: RAP-129
 title: "Medical document upload (lab results, X-rays)"
-status: planned
+status: done
 points: 5
 priority: P1
 track: Backend

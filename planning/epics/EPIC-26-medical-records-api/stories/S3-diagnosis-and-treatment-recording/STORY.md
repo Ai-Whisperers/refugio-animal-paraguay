@@ -3,7 +3,7 @@ story: S3
 epic: EPIC-26
 ticket: RAP-127
 title: "Diagnosis and treatment recording"
-status: planned
+status: done
 points: 5
 priority: P0
 track: Backend

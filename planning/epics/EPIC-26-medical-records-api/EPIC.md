@@ -2,7 +2,7 @@
 epic: EPIC-26
 title: "Medical Records API"
 sprint: 2
-status: planned
+status: done
 points: 25
 created: 2026-03-26T19:06:04
 version: V5
@@ -16,11 +16,11 @@ version: V5
 **Target users**: Veterinarians, shelter staff
 
 ## Stories
-- [ ] [S1] Medical record schema and Alembic migration (5 pts, P0, Backend)
-- [ ] [S2] Vet visit CRUD API endpoints (5 pts, P0, Backend)
-- [ ] [S3] Diagnosis and treatment recording (5 pts, P0, Backend)
-- [ ] [S4] Medication tracking with dosage/schedule (5 pts, P1, Backend)
-- [ ] [S5] Medical document upload (lab results, X-rays) (5 pts, P1, Backend)
+- [x] [S1] Medical record schema and Alembic migration (5 pts, P0, Backend)
+- [x] [S2] Vet visit CRUD API endpoints (5 pts, P0, Backend)
+- [x] [S3] Diagnosis and treatment recording (5 pts, P0, Backend)
+- [x] [S4] Medication tracking with dosage/schedule (5 pts, P1, Backend)
+- [x] [S5] Medical document upload (lab results, X-rays) (5 pts, P1, Backend)
 
 ## Total Points
 25

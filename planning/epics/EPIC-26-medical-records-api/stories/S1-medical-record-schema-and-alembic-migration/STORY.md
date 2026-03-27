@@ -3,7 +3,7 @@ story: S1
 epic: EPIC-26
 ticket: RAP-125
 title: "Medical record schema and Alembic migration"
-status: planned
+status: done
 points: 5
 priority: P0
 track: Backend

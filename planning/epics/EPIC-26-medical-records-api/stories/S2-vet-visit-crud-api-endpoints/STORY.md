@@ -3,7 +3,7 @@ story: S2
 epic: EPIC-26
 ticket: RAP-126
 title: "Vet visit CRUD API endpoints"
-status: planned
+status: done
 points: 5
 priority: P0
 track: Backend

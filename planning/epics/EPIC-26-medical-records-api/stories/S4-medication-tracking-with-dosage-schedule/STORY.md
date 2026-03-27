@@ -3,7 +3,7 @@ story: S4
 epic: EPIC-26
 ticket: RAP-128
 title: "Medication tracking with dosage/schedule"
-status: planned
+status: done
 points: 5
 priority: P1
 track: Backend
