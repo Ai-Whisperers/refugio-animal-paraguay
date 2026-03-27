@@ -5,11 +5,9 @@ from datetime import UTC, datetime, timedelta
 from unittest.mock import AsyncMock, MagicMock
 
 import pytest
-
 from src.db.models.user import User
 from src.db.models.verification_token import TokenType, VerificationToken
 from src.services.email_verification_service import (
-    EMAIL_VERIFICATION_TOKEN_EXPIRY_HOURS,
     create_email_verification_token,
     verify_email,
 )

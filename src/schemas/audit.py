@@ -5,9 +5,10 @@ models for filtering and pagination.
 """
 
 from datetime import datetime
+from typing import Self
 from uuid import UUID
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 
 class AuditLogResponse(BaseModel):
@@ -43,14 +44,30 @@ DEFAULT_PAGE_SIZE = 50
 MAX_PAGE_SIZE = 200
 
 
+MAX_ACTION_LENGTH = 100
+MAX_RESOURCE_TYPE_LENGTH = 100
+MAX_RESOURCE_ID_LENGTH = 255
+
+
 class AuditLogFilters(BaseModel):
     """Query filters for audit log listing."""
 
     user_id: UUID | None = None
-    action: str | None = None
-    resource_type: str | None = None
-    resource_id: str | None = None
+    action: str | None = Field(default=None, max_length=MAX_ACTION_LENGTH)
+    resource_type: str | None = Field(default=None, max_length=MAX_RESOURCE_TYPE_LENGTH)
+    resource_id: str | None = Field(default=None, max_length=MAX_RESOURCE_ID_LENGTH)
     start_date: datetime | None = None
     end_date: datetime | None = None
     page: int = Field(default=DEFAULT_PAGE, ge=1)
     page_size: int = Field(default=DEFAULT_PAGE_SIZE, ge=1, le=MAX_PAGE_SIZE)
+
+    @model_validator(mode="after")
+    def end_date_not_before_start_date(self) -> Self:
+        """Reject date ranges where end_date precedes start_date."""
+        if (
+            self.start_date is not None
+            and self.end_date is not None
+            and self.end_date < self.start_date
+        ):
+            raise ValueError("end_date must not be before start_date")
+        return self
