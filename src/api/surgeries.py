@@ -277,3 +277,29 @@ async def delete_post_op_check(
     check = await _get_post_op_check_or_404(check_id, db)
     await db.delete(check)
     await db.commit()
+
+
+# ---------------------------------------------------------------------------
+# Post-op checklist generation
+# ---------------------------------------------------------------------------
+
+
+@surgery_router.post(
+    "/surgeries/{surgery_id}/generate-checklist",
+    status_code=status.HTTP_201_CREATED,
+    responses=RESOURCE_RESPONSES,
+    summary="Generate post-op monitoring checklist for a surgery",
+)
+async def generate_checklist(
+    surgery_id: UUID,
+    db: AsyncSession = Depends(get_db),
+) -> dict[str, Any]:
+    from src.services.post_op_checklist_service import generate_post_op_checklist
+
+    await _get_surgery_or_404(surgery_id, db)
+    result = await generate_post_op_checklist(surgery_id, db)
+    return {
+        "surgery_id": str(result.surgery_id),
+        "checks_created": result.checks_created,
+        "check_ids": [str(cid) for cid in result.check_ids],
+    }
