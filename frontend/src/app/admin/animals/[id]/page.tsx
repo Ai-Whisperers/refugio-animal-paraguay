@@ -15,6 +15,7 @@ import { isAuthenticated } from "@/lib/auth";
 import { api, ApiClientError } from "@/lib/api";
 import { STATUS_LABELS, STATUS_COLORS, VALID_TRANSITIONS } from "@/lib/animal-status";
 import StatusWorkflowModal from "@/components/admin/StatusWorkflowModal";
+import AnimalHistoryTimeline from "@/components/admin/AnimalHistoryTimeline";
 import type { Animal, AnimalStatus } from "@/types/api";
 
 // --- Labels (Spanish) ---
@@ -344,6 +345,11 @@ export default function AnimalDetailPage() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* History timeline */}
+      <div className="mt-6">
+        <AnimalHistoryTimeline animalId={animal.id} />
       </div>
 
       {/* Status workflow modal */}
