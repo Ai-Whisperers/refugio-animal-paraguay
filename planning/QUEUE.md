@@ -94,7 +94,7 @@ Week 3-4:
 
 | # | Story | Epic | Points | Status |
 |---|-------|------|--------|--------|
-| 1 | WhatsApp Integration | EPIC-6 S02 | 8 | READY |
+| 1 | WhatsApp Integration | EPIC-6 S02 | 8 | DONE (PR #57) |
 | 2 | In-App Notifications | EPIC-6 S03 | 6 | DONE (PR #32) |
 | 3 | Notification Preferences | EPIC-6 S04 | 5 | DONE (PR #34) |
 | 4 | Adoption Notifications (status changes) | EPIC-2 S03 | 5 | DONE (PR #39) |
