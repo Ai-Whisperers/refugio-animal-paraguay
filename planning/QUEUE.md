@@ -159,7 +159,7 @@ Week 3-4:
 | 18 | Payment error handling (Stripe + Tigo) | RAP-414 | EPIC-73 | 3 | DONE (PR #81) | RAP-412 |
 | 19 | Health check improvements | RAP-417 | EPIC-74 | 3 | DONE (PR #82) | — |
 | 20 | Request/response logging middleware | RAP-418 | EPIC-74 | 3 | DONE (PR #83) | RAP-415 |
-| 21 | Database backup automation | RAP-419 | EPIC-74 | 5 | READY | — |
+| 21 | Database backup automation | RAP-419 | EPIC-74 | 5 | DONE (PR #84) | — |
 | 22 | Loading and error states on all pages | RAP-423 | EPIC-75 | 5 | READY | RAP-420 |
 | 23 | Centralized API error handling (frontend) | RAP-424 | EPIC-75 | 3 | READY | RAP-420 |
 
