@@ -36,6 +36,12 @@ class User(Base):
     )
     is_active: Mapped[bool] = mapped_column(sa.Boolean, nullable=False, server_default=sa.true())
     email_verified: Mapped[bool] = mapped_column(sa.Boolean, nullable=False, server_default=sa.false())
+    failed_login_attempts: Mapped[int] = mapped_column(
+        sa.Integer, nullable=False, server_default=sa.text("0")
+    )
+    locked_until: Mapped[datetime | None] = mapped_column(
+        sa.TIMESTAMP(timezone=True), nullable=True
+    )
     created_at: Mapped[datetime] = mapped_column(
         sa.TIMESTAMP(timezone=True),
         nullable=False,
