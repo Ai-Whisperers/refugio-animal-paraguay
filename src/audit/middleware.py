@@ -135,13 +135,13 @@ class AuditMiddleware(BaseHTTPMiddleware):
                 )
                 session.add(entry)
                 await session.commit()
-        except Exception:
-            # Audit logging must never break the request — log and continue
+        except Exception as exc:
             logger.exception(
-                "Failed to record audit entry: user=%s action=%s resource=%s",
+                "Failed to record audit entry: user=%s action=%s resource=%s error=%s",
                 user_id,
                 action,
                 resource_type,
+                exc,
             )
 
         return response

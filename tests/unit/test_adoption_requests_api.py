@@ -12,7 +12,6 @@ from uuid import uuid4
 
 import pytest
 from fastapi import HTTPException
-
 from src.api.adoption_requests import (
     _ALLOWED_TRANSITIONS,
     create_adoption_request,
@@ -21,15 +20,14 @@ from src.api.adoption_requests import (
     list_adoption_requests,
     update_adoption_request_status,
 )
+from src.db.models.adopter import Adopter
 from src.db.models.adoption_request import AdoptionRequest, AdoptionRequestStatus
 from src.db.models.animal import Animal
-from src.db.models.adopter import Adopter
 from src.db.models.user import User, UserRole
 from src.schemas.adoption_request import (
     AdoptionRequestCreate,
     AdoptionRequestStatusUpdate,
 )
-
 
 # ---------------------------------------------------------------------------
 # Helpers
@@ -281,7 +279,7 @@ class TestCreateAdoptionRequest:
 
         req_id = uuid4()
 
-        async def refresh_side_effect(obj: AdoptionRequest) -> None:  # noqa: ARG001
+        async def refresh_side_effect(obj: AdoptionRequest) -> None:
             obj.id = req_id
 
         db.refresh.side_effect = refresh_side_effect
@@ -293,7 +291,7 @@ class TestCreateAdoptionRequest:
         user = _make_user()
         event_bus = _make_event_bus(running=False)
 
-        result = await create_adoption_request(
+        await create_adoption_request(
             payload=payload,
             db=db,
             current_user=user,

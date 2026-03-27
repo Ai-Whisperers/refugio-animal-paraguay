@@ -85,10 +85,11 @@ class WhatsAppHandlers:
                 new_status=payload.get("new_status", "actualizado"),
             )
             await self._wa.send_message(WhatsAppMessage(to=phone, body=body))
-        except Exception:
+        except Exception as exc:
             logger.exception(
-                "WhatsApp adoption status handler failed for event_id=%s",
+                "WhatsApp adoption status handler failed for event_id=%s: %s",
                 event.id,
+                exc,
             )
 
     async def on_volunteer_shift_created(self, event: DomainEvent) -> None:
@@ -114,10 +115,11 @@ class WhatsAppHandlers:
                     shift_time=payload.get("shift_time", "la hora indicada"),
                 )
             await self._wa.send_message(WhatsAppMessage(to=phone, body=body))
-        except Exception:
+        except Exception as exc:
             logger.exception(
-                "WhatsApp shift confirmation handler failed for event_id=%s",
+                "WhatsApp shift confirmation handler failed for event_id=%s: %s",
                 event.id,
+                exc,
             )
 
     async def on_volunteer_shift_completed(self, event: DomainEvent) -> None:
@@ -136,10 +138,11 @@ class WhatsAppHandlers:
                 shift_time=payload.get("shift_time", "la hora indicada"),
             )
             await self._wa.send_message(WhatsAppMessage(to=phone, body=body))
-        except Exception:
+        except Exception as exc:
             logger.exception(
-                "WhatsApp shift reminder handler failed for event_id=%s",
+                "WhatsApp shift reminder handler failed for event_id=%s: %s",
                 event.id,
+                exc,
             )
 
     # ------------------------------------------------------------------
@@ -183,9 +186,10 @@ class WhatsAppHandlers:
                     animal.name if animal else None,
                     None,
                 )
-        except Exception:
+        except Exception as exc:
             logger.exception(
-                "DB lookup failed for adoption_request_id=%s in WhatsApp handler",
+                "DB lookup failed for adoption_request_id=%s in WhatsApp handler: %s",
                 adoption_request_id,
+                exc,
             )
             return None, None, None, None
