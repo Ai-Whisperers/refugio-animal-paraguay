@@ -13,6 +13,7 @@ import {
   X,
   Settings,
   Shield,
+  Scissors,
   Syringe,
 } from "lucide-react";
 import { useState } from "react";
@@ -53,6 +54,11 @@ const NAV_ITEMS: NavItem[] = [
     label: "Donaciones",
     href: "/admin/donations",
     icon: DollarSign,
+  },
+  {
+    label: "Cirugias",
+    href: "/admin/surgeries",
+    icon: Scissors,
   },
   {
     label: "Alertas Medicas",
