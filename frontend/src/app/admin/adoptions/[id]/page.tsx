@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { isAuthenticated } from "@/lib/auth";
 import { api, ApiClientError } from "@/lib/api";
+import AdoptionStatusModal from "@/components/admin/AdoptionStatusModal";
 import type { AdoptionRequestStatus, AdoptionRequestResponse } from "@/types/api";
 
 // --- Spanish labels ---
@@ -42,6 +43,10 @@ const LABEL_CONTRACT_GENERATED = "Contrato generado";
 const LABEL_NO_CONTRACT = "Sin contrato";
 const LABEL_ADOPTER_DELETED = "Adoptante eliminado (datos eliminados por GDPR)";
 const LABEL_ANIMAL_DELETED = "Animal eliminado del sistema";
+const LABEL_APPROVE = "Aprobar";
+const LABEL_REJECT = "Rechazar";
+const LABEL_SUCCESS_APPROVED = "Solicitud aprobada correctamente";
+const LABEL_SUCCESS_REJECTED = "Solicitud rechazada correctamente";
 
 // --- Status config ---
 const STATUS_LABELS: Record<AdoptionRequestStatus, string> = {
@@ -97,12 +102,16 @@ export default function AdoptionDetailPage() {
   const [isChecking, setIsChecking] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const [request, setRequest] = useState<AdoptionRequestResponse | null>(null);
   const [adopter, setAdopter] = useState<AdopterDetail | null>(null);
   const [animal, setAnimal] = useState<AnimalDetail | null>(null);
   const [adopterError, setAdopterError] = useState(false);
   const [animalError, setAnimalError] = useState(false);
+
+  // Modal state
+  const [modalAction, setModalAction] = useState<"approved" | "rejected" | null>(null);
 
   useEffect(() => {
     if (!isAuthenticated()) {
@@ -158,6 +167,23 @@ export default function AdoptionDetailPage() {
     }
   }, [isChecking, fetchData]);
 
+  async function handleStatusChange(status: AdoptionRequestStatus, notes: string) {
+    await api.patch<AdoptionRequestResponse>(
+      `/adoption-requests/${requestId}/status`,
+      { status }
+    );
+
+    setSuccessMessage(
+      status === "approved" ? LABEL_SUCCESS_APPROVED : LABEL_SUCCESS_REJECTED
+    );
+
+    // Refresh data to show updated status
+    await fetchData();
+
+    // Clear success message after 5 seconds
+    setTimeout(() => setSuccessMessage(null), 5000);
+  }
+
   function formatDate(dateStr: string): string {
     return new Date(dateStr).toLocaleDateString("es-PY", {
       year: "numeric",
@@ -195,6 +221,8 @@ export default function AdoptionDetailPage() {
     extra_large: "Extra grande",
   };
 
+  const canChangeStatus = request?.status === "pending";
+
   if (isChecking) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -221,18 +249,46 @@ export default function AdoptionDetailPage() {
               {LABEL_PAGE_TITLE}
             </h1>
           </div>
-          <button
-            onClick={fetchData}
-            disabled={isLoading}
-            className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm text-warm-text-secondary transition-colors hover:bg-warm-bg hover:text-warm-text-primary disabled:opacity-50"
-            aria-label={LABEL_RETRY}
-          >
-            <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
-          </button>
+          <div className="flex items-center gap-2">
+            {canChangeStatus && (
+              <>
+                <button
+                  onClick={() => setModalAction("approved")}
+                  className="flex items-center gap-1.5 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700"
+                >
+                  <CheckCircle className="h-4 w-4" />
+                  {LABEL_APPROVE}
+                </button>
+                <button
+                  onClick={() => setModalAction("rejected")}
+                  className="flex items-center gap-1.5 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"
+                >
+                  <XCircle className="h-4 w-4" />
+                  {LABEL_REJECT}
+                </button>
+              </>
+            )}
+            <button
+              onClick={fetchData}
+              disabled={isLoading}
+              className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm text-warm-text-secondary transition-colors hover:bg-warm-bg hover:text-warm-text-primary disabled:opacity-50"
+              aria-label={LABEL_RETRY}
+            >
+              <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
+            </button>
+          </div>
         </div>
       </header>
 
       <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+        {/* Success message */}
+        {successMessage && (
+          <div className="mb-4 rounded-lg border border-green-200 bg-green-50 p-4 flex items-center gap-2">
+            <CheckCircle className="h-5 w-5 text-green-600" />
+            <p className="text-sm text-green-800">{successMessage}</p>
+          </div>
+        )}
+
         {/* Loading state */}
         {isLoading && (
           <div className="flex items-center justify-center py-16">
@@ -473,6 +529,16 @@ export default function AdoptionDetailPage() {
           </div>
         )}
       </div>
+
+      {/* Status change modal */}
+      {modalAction && (
+        <AdoptionStatusModal
+          action={modalAction}
+          isOpen={modalAction !== null}
+          onClose={() => setModalAction(null)}
+          onConfirm={handleStatusChange}
+        />
+      )}
     </div>
   );
 }
