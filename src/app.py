@@ -49,6 +49,7 @@ from src.api.public_contact import router as public_contact_router
 from src.api.sepa import router as sepa_router
 from src.api.sessions import router as sessions_router
 from src.api.sponsorships import router as sponsorships_router
+from src.api.subscriptions import router as subscriptions_router
 from src.api.surgeries import surgery_router
 from src.api.tigo_money import router as tigo_money_router
 from src.api.vaccinations import vaccination_router, vaccine_type_router
@@ -176,6 +177,7 @@ def create_app() -> FastAPI:
     application.include_router(public_campaigns_router)
     application.include_router(public_contact_router)
     application.include_router(sepa_router)
+    application.include_router(subscriptions_router)
     application.include_router(tigo_money_router)
     application.include_router(webhooks_router)
     application.include_router(admin_campaigns_router)

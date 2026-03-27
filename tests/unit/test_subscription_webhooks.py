@@ -4,7 +4,7 @@ Tests the internal handler functions for invoice and subscription events
 without requiring a real database or HTTP requests.
 """
 
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import AsyncMock, MagicMock, patch
 from uuid import uuid4
 
 import pytest
@@ -133,7 +133,12 @@ class TestHandleInvoicePaymentFailed:
         db.execute.return_value = mock_result
 
         data_object = {"subscription": "sub_test123"}
-        result = await _handle_invoice_payment_failed(db, data_object)
+
+        with patch(
+            "src.api.webhooks.subscription_service.record_payment_failure",
+            new_callable=AsyncMock,
+        ):
+            result = await _handle_invoice_payment_failed(db, data_object)
 
         assert result == "failed"
         assert donation.status == DonationStatus.FAILED.value
@@ -191,7 +196,12 @@ class TestHandleSubscriptionDeleted:
         db.execute.return_value = mock_result
 
         data_object = {"id": "sub_test123"}
-        result = await _handle_subscription_deleted(db, data_object)
+
+        with patch(
+            "src.api.webhooks.subscription_service.handle_subscription_updated",
+            new_callable=AsyncMock,
+        ):
+            result = await _handle_subscription_deleted(db, data_object)
 
         assert result == "cancelled"
         assert donation.is_recurring is False

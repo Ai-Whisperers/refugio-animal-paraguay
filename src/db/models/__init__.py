@@ -36,6 +36,7 @@ from .sponsorship import (
     SponsorshipTier,
     SponsorshipTierLevel,
 )
+from .subscription import Subscription, SubscriptionInterval, SubscriptionStatus
 from .surgery import (
     AnesthesiaType,
     PostOpCheck,
@@ -48,7 +49,7 @@ from .surgery import (
 from .user_consent import ConsentMethod, ConsentStatus, ConsentType, UserConsent
 from .vaccination import Vaccination, VaccinationSchedule, VaccinationStatus, VaccineType
 from .verification_token import TokenType, VerificationToken
-from .vet_referral import ReferralStatus, ReferralUrgency, VetReferral  # noqa: E402
+from .vet_referral import ReferralStatus, ReferralUrgency, VetReferral
 
 __all__ = [
     "BRONZE_AMOUNT_CENTS",
@@ -97,11 +98,16 @@ __all__ = [
     "PaymentMethod",
     "PostOpCheck",
     "PostOpStatus",
+    "ReferralStatus",
+    "ReferralUrgency",
     "Sponsorship",
     "SponsorshipFrequency",
     "SponsorshipStatus",
     "SponsorshipTier",
     "SponsorshipTierLevel",
+    "Subscription",
+    "SubscriptionInterval",
+    "SubscriptionStatus",
     "Surgery",
     "SurgeryOutcome",
     "SurgeryStatus",
@@ -115,10 +121,8 @@ __all__ = [
     "VaccinationStatus",
     "VaccineType",
     "VerificationToken",
+    "VetReferral",
     "VetVisit",
     "VisitStatus",
-    "VetReferral",
-    "ReferralStatus",
-    "ReferralUrgency",
     "VisitType",
 ]
