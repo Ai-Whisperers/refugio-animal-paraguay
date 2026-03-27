@@ -9,7 +9,8 @@ import { api } from "./api";
 import type {
   Animal,
   AnimalSpecies,
-  AnimalStatus,
+  AnimalSize,
+  AnimalGender,
   CampaignListResponse,
   CampaignPublic,
   DonationCreateRequest,
@@ -17,55 +18,59 @@ import type {
   DonorCreateRequest,
   DonorResponse,
   FundCategory,
+  PaginatedAnimalListResponse,
   PublicAdoptionApplicationCreate,
   PublicAdoptionApplicationResponse,
 } from "@/types/api";
 
 const NO_AUTH = { requiresAuth: false } as const;
 
-/** Query parameters for filtering animal listings. */
+/** Query parameters for filtering the public animal listing. */
 export interface AnimalListParams {
   species?: AnimalSpecies;
-  status?: AnimalStatus;
-  size?: string;
-  age_min?: number;
-  age_max?: number;
+  size?: AnimalSize;
+  gender?: AnimalGender;
+  breed?: string;
+  min_age_months?: number;
+  max_age_months?: number;
   search?: string;
-  offset?: number;
-  limit?: number;
+  page?: number;
+  page_size?: number;
 }
 
 /**
- * Fetch a paginated/filtered list of animals (no auth required).
- * The backend GET /animals does not require authentication.
+ * Fetch a paginated/filtered list of available animals (no auth required).
+ * Calls GET /public/animals — returns only animals with status=available.
  */
 export async function listAnimalsPublic(
   params: AnimalListParams = {}
-): Promise<Animal[]> {
+): Promise<PaginatedAnimalListResponse> {
   const searchParams = new URLSearchParams();
   if (params.species) searchParams.set("species", params.species);
-  if (params.status) searchParams.set("status", params.status);
   if (params.size) searchParams.set("size", params.size);
-  if (params.age_min !== undefined)
-    searchParams.set("age_min", String(params.age_min));
-  if (params.age_max !== undefined)
-    searchParams.set("age_max", String(params.age_max));
+  if (params.gender) searchParams.set("gender", params.gender);
+  if (params.breed) searchParams.set("breed", params.breed);
+  if (params.min_age_months !== undefined)
+    searchParams.set("min_age_months", String(params.min_age_months));
+  if (params.max_age_months !== undefined)
+    searchParams.set("max_age_months", String(params.max_age_months));
   if (params.search) searchParams.set("search", params.search);
-  if (params.offset !== undefined)
-    searchParams.set("offset", String(params.offset));
-  if (params.limit !== undefined)
-    searchParams.set("limit", String(params.limit));
+  if (params.page !== undefined)
+    searchParams.set("page", String(params.page));
+  if (params.page_size !== undefined)
+    searchParams.set("page_size", String(params.page_size));
 
   const query = searchParams.toString();
-  const endpoint = `/animals${query ? `?${query}` : ""}`;
-  return api.get<Animal[]>(endpoint, NO_AUTH);
+  const endpoint = `/public/animals${query ? `?${query}` : ""}`;
+  return api.get<PaginatedAnimalListResponse>(endpoint, NO_AUTH);
 }
 
 /**
- * Fetch a single animal by ID (no auth required).
+ * Fetch a single available animal by ID (no auth required).
+ * Returns 404 if the animal doesn't exist or is not available.
  */
 export async function getAnimalPublic(animalId: string): Promise<Animal> {
-  return api.get<Animal>(`/animals/${animalId}`, NO_AUTH);
+  return api.get<Animal>(`/public/animals/${animalId}`, NO_AUTH);
 }
 
 /**
