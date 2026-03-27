@@ -152,6 +152,24 @@ class Settings(BaseSettings):
         description="Tigo Money API base URL. Override for sandbox/staging environments.",
     )
 
+    # Sentry error tracking
+    sentry_dsn: str = Field(
+        default="",
+        description=(
+            "Sentry DSN for error tracking. Leave empty to disable Sentry. "
+            "Required in production: https://sentry.io"
+        ),
+    )
+    sentry_traces_sample_rate: float = Field(
+        default=0.1,
+        ge=0.0,
+        le=1.0,
+        description=(
+            "Fraction of transactions to send to Sentry for performance monitoring "
+            "(0.0 = none, 1.0 = all). Keep low in production to control costs."
+        ),
+    )
+
     # Rate limiting
     rate_limit_enabled: bool = Field(
         default=True,

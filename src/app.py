@@ -61,6 +61,7 @@ from src.notifications.service import EmailService
 from src.notifications.templates import TemplateRenderer
 from src.notifications.whatsapp_handlers import WhatsAppHandlers
 from src.notifications.whatsapp_service import WhatsAppService
+from src.sentry_config import configure_sentry
 
 
 @asynccontextmanager
@@ -101,6 +102,14 @@ def create_app() -> FastAPI:
 
     # Configure structured logging before any logger is used.
     configure_logging(is_dev=settings.app_env == "development")
+
+    # Initialise Sentry before the first request is processed.
+    # No-op when sentry_dsn is empty (development default).
+    configure_sentry(
+        dsn=settings.sentry_dsn,
+        environment=settings.app_env,
+        traces_sample_rate=settings.sentry_traces_sample_rate,
+    )
 
     application = FastAPI(
         title=settings.app_name,
