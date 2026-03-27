@@ -83,6 +83,28 @@ export interface AnimalUpdate {
   primary_photo_url?: string | null;
 }
 
+// --- Adoption Requests (Staff) ---
+
+export type AdoptionRequestStatus = "pending" | "approved" | "rejected" | "cancelled";
+
+export interface AdoptionRequestResponse {
+  id: string;
+  animal_id: string;
+  adopter_id: string;
+  status: AdoptionRequestStatus;
+  submitted_at: string;
+  decided_at: string | null;
+  notes: string | null;
+  contract_pdf_path: string | null;
+  contract_generated_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface AdoptionRequestStatusUpdate {
+  status: AdoptionRequestStatus;
+}
+
 // --- Adoption Applications (Public) ---
 
 export interface PublicAdoptionApplicationCreate {
