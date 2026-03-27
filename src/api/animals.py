@@ -36,6 +36,7 @@ from src.schemas.animal import (
     PhotoResponse,
 )
 from src.schemas.error import RESOURCE_RESPONSES
+from src.services.animal_status import InvalidStatusTransitionError, validate_status_transition
 
 router = APIRouter(prefix="/animals", tags=["animals"], responses=RESOURCE_RESPONSES)
 
@@ -107,6 +108,20 @@ async def update_animal(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Animal not found")
 
     updates = payload.model_dump(exclude_unset=True)
+
+    # Validate status transition if status is being changed
+    if "status" in updates and updates["status"] is not None:
+        new_status = updates["status"]
+        if isinstance(new_status, AnimalStatus):
+            new_status = new_status.value
+        try:
+            validate_status_transition(animal.status, new_status)
+        except InvalidStatusTransitionError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                detail=str(exc),
+            ) from exc
+
     for field, value in updates.items():
         # Enum fields stored as plain strings in DB
         if isinstance(value, (AnimalSpecies, AnimalStatus, AnimalSize, AnimalGender)):

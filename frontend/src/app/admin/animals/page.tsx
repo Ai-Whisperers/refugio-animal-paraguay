@@ -13,9 +13,11 @@ import {
   RefreshCw,
   Plus,
   Pencil,
+  ArrowRightLeft,
 } from "lucide-react";
 import { isAuthenticated } from "@/lib/auth";
 import { api, ApiClientError } from "@/lib/api";
+import StatusWorkflowModal from "@/components/admin/StatusWorkflowModal";
 import type { AnimalStatus, AnimalSpecies } from "@/types/api";
 
 // --- Labels (Spanish) ---
@@ -42,6 +44,7 @@ const LABEL_NEXT = "Siguiente";
 const LABEL_ADD_ANIMAL = "Nuevo Animal";
 const LABEL_ACTIONS = "Acciones";
 const LABEL_EDIT = "Editar";
+const LABEL_CHANGE_STATUS = "Estado";
 
 const PAGE_SIZE = 20;
 
@@ -108,6 +111,9 @@ export default function AdminAnimalsPage() {
 
   // --- Pagination state ---
   const [currentPage, setCurrentPage] = useState(1);
+
+  // --- Status workflow modal state ---
+  const [statusModalAnimal, setStatusModalAnimal] = useState<AnimalListItem | null>(null);
 
   // --- Auth check ---
   useEffect(() => {
@@ -465,15 +471,25 @@ export default function AdminAnimalsPage() {
                           {formatDate(animal.created_at)}
                         </td>
                         <td className="px-4 py-3 text-right">
-                          <button
-                            onClick={() =>
-                              router.push(`/admin/animals/${animal.id}/edit`)
-                            }
-                            className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-primary-600 transition-colors hover:bg-primary-50"
-                          >
-                            <Pencil className="h-3 w-3" />
-                            {LABEL_EDIT}
-                          </button>
+                          <div className="flex items-center justify-end gap-1">
+                            <button
+                              onClick={() => setStatusModalAnimal(animal)}
+                              className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-warm-text-secondary transition-colors hover:bg-warm-bg hover:text-warm-text-primary"
+                              aria-label={`${LABEL_CHANGE_STATUS} ${animal.name}`}
+                            >
+                              <ArrowRightLeft className="h-3 w-3" />
+                              {LABEL_CHANGE_STATUS}
+                            </button>
+                            <button
+                              onClick={() =>
+                                router.push(`/admin/animals/${animal.id}/edit`)
+                              }
+                              className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-primary-600 transition-colors hover:bg-primary-50"
+                            >
+                              <Pencil className="h-3 w-3" />
+                              {LABEL_EDIT}
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -519,6 +535,25 @@ export default function AdminAnimalsPage() {
           </>
         )}
       </div>
+
+      {/* Status workflow modal */}
+      {statusModalAnimal && (
+        <StatusWorkflowModal
+          animalId={statusModalAnimal.id}
+          animalName={statusModalAnimal.name}
+          currentStatus={statusModalAnimal.status}
+          onClose={() => setStatusModalAnimal(null)}
+          onStatusChanged={(newStatus) => {
+            setAnimals((prev) =>
+              prev.map((a) =>
+                a.id === statusModalAnimal.id
+                  ? { ...a, status: newStatus }
+                  : a
+              )
+            );
+          }}
+        />
+      )}
     </div>
   );
 }
