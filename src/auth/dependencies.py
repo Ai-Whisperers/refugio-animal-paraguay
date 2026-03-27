@@ -77,3 +77,24 @@ async def require_admin(user: User = Depends(_get_current_user)) -> User:
             detail="Admin access required",
         )
     return user
+
+
+async def require_vet(user: User = Depends(_get_current_user)) -> User:
+    """Require a valid JWT with role vet. Raises 403 otherwise."""
+    if user.role != UserRole.VET.value:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Veterinarian access required",
+        )
+    return user
+
+
+async def require_medical_staff(user: User = Depends(_get_current_user)) -> User:
+    """Require vet, staff, or admin role — anyone who can access medical records."""
+    allowed = (UserRole.VET.value, UserRole.STAFF.value, UserRole.ADMIN.value)
+    if user.role not in allowed:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Medical staff access required",
+        )
+    return user

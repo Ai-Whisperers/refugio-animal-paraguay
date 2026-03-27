@@ -15,6 +15,7 @@ class UserRole(StrEnum):
 
     STAFF = "staff"
     ADMIN = "admin"
+    VET = "vet"
 
 
 class User(Base):
