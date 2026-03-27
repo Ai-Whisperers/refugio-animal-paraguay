@@ -332,7 +332,7 @@ Week 3-4:
 
 | # | Story | Ticket | Pts | Status | Track | Depends On |
 |---|-------|--------|-----|--------|-------|------------|
-| 1 | Partner veterinary clinic registration model and API | RAP-507 | 5 | READY | Backend | — |
+| 1 | Partner veterinary clinic registration model and API | RAP-507 | 5 | IN REVIEW (PR #158) | Backend | — |
 | 2 | Clinic service catalog with pricing | RAP-508 | 5 | READY | Backend | RAP-507 |
 | 3 | Voucher purchase flow for donors | RAP-509 | 8 | READY | Fullstack | RAP-508 |
 | 4 | VetVoucher model and lifecycle API | RAP-510 | 5 | READY | Backend | RAP-507 |
