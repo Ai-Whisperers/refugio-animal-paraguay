@@ -46,6 +46,7 @@ from src.api.sessions import router as sessions_router
 from src.api.sponsorships import router as sponsorships_router
 from src.api.tigo_money import router as tigo_money_router
 from src.api.vaccinations import vaccination_router, vaccine_type_router
+from src.api.vet_visits import router as vet_visits_router
 from src.api.webhooks import router as webhooks_router
 from src.audit.middleware import AuditMiddleware
 from src.config import Settings, get_settings
@@ -178,6 +179,7 @@ def create_app() -> FastAPI:
     application.include_router(animal_updates_router)
     application.include_router(vaccine_type_router)
     application.include_router(vaccination_router)
+    application.include_router(vet_visits_router)
 
     return application
 
