@@ -264,3 +264,125 @@ async def test_webhook_donation_not_found_returns_processed(client: AsyncClient)
 
     assert response.status_code == 200
     assert response.json()["result"] == "donation_not_found"
+
+
+# ---------------------------------------------------------------------------
+# SEPA-specific webhook events
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+@pytest.mark.integration
+async def test_webhook_payment_intent_processing(client: AsyncClient) -> None:
+    """payment_intent.processing keeps donation in pending state (SEPA async)."""
+    intent_id = f"pi_sepa_proc_{uuid4().hex[:8]}"
+    await _create_donation_with_intent(client, 5000, intent_id)
+
+    event = _make_stripe_event(
+        "payment_intent.processing",
+        {"id": intent_id, "amount": 5000, "currency": "eur"},
+    )
+    response = await _send_webhook(client, event)
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["status"] == "processed"
+    assert body["result"] == "processing"
+
+
+@pytest.mark.asyncio
+@pytest.mark.integration
+async def test_webhook_payment_intent_processing_unknown_donation(
+    client: AsyncClient,
+) -> None:
+    """payment_intent.processing with unknown intent returns donation_not_found."""
+    event = _make_stripe_event(
+        "payment_intent.processing",
+        {"id": "pi_unknown_sepa", "amount": 1000, "currency": "eur"},
+    )
+    response = await _send_webhook(client, event)
+
+    assert response.status_code == 200
+    assert response.json()["result"] == "donation_not_found"
+
+
+@pytest.mark.asyncio
+@pytest.mark.integration
+async def test_webhook_setup_intent_succeeded(client: AsyncClient) -> None:
+    """setup_intent.succeeded returns 200 with 'mandate_saved'."""
+    event = _make_stripe_event(
+        "setup_intent.succeeded",
+        {
+            "id": "seti_test_ok",
+            "customer": "cus_test_nl",
+            "payment_method": "pm_sepa_test",
+            "metadata": {"donor_id": str(uuid4())},
+        },
+    )
+    response = await _send_webhook(client, event)
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["status"] == "processed"
+    assert body["result"] == "mandate_saved"
+
+
+@pytest.mark.asyncio
+@pytest.mark.integration
+async def test_webhook_setup_intent_failed(client: AsyncClient) -> None:
+    """setup_intent.setup_failed returns 200 with 'mandate_failed'."""
+    event = _make_stripe_event(
+        "setup_intent.setup_failed",
+        {
+            "id": "seti_test_fail",
+            "customer": "cus_test_nl",
+            "last_setup_error": {"code": "invalid_account_number"},
+            "metadata": {"donor_id": str(uuid4())},
+        },
+    )
+    response = await _send_webhook(client, event)
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["status"] == "processed"
+    assert body["result"] == "mandate_failed"
+
+
+@pytest.mark.asyncio
+@pytest.mark.integration
+async def test_webhook_mandate_updated_active(client: AsyncClient) -> None:
+    """mandate.updated with active status returns 200 with 'mandate_active'."""
+    event = _make_stripe_event(
+        "mandate.updated",
+        {
+            "id": "mandate_test_active",
+            "status": "active",
+            "payment_method": "pm_sepa_test",
+        },
+    )
+    response = await _send_webhook(client, event)
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["status"] == "processed"
+    assert body["result"] == "mandate_active"
+
+
+@pytest.mark.asyncio
+@pytest.mark.integration
+async def test_webhook_mandate_updated_inactive(client: AsyncClient) -> None:
+    """mandate.updated with inactive status returns 200 with 'mandate_inactive'."""
+    event = _make_stripe_event(
+        "mandate.updated",
+        {
+            "id": "mandate_test_inactive",
+            "status": "inactive",
+            "payment_method": "pm_sepa_test",
+        },
+    )
+    response = await _send_webhook(client, event)
+
+    assert response.status_code == 200
+    body = response.json()
+    assert body["status"] == "processed"
+    assert body["result"] == "mandate_inactive"
