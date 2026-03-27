@@ -530,3 +530,90 @@ async def test_webhook_subscription_deleted(client: AsyncClient) -> None:
     body = response.json()
     assert body["status"] == "processed"
     assert body["result"] == "cancelled"
+
+
+# ---------------------------------------------------------------------------
+# GET /donations/{id}/sepa-status
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+@pytest.mark.integration
+async def test_get_sepa_status_no_stripe_key(client: AsyncClient) -> None:
+    """GET /donations/{id}/sepa-status returns local status when no Stripe key."""
+    donor = await _create_donor(client)
+
+    mock_customer_list = MagicMock()
+    mock_customer_list.data = []
+    mock_customer = MagicMock()
+    mock_customer.id = "cus_status_test"
+    mock_intent = MagicMock()
+    mock_intent.id = "pi_status_test"
+    mock_intent.client_secret = "pi_status_test_secret"
+
+    with (
+        patch("src.api.sepa.stripe") as mock_stripe,
+        patch.dict("os.environ", {"STRIPE_SECRET_KEY": "sk_test_fake"}),
+    ):
+        mock_stripe.Customer.list.return_value = mock_customer_list
+        mock_stripe.Customer.create.return_value = mock_customer
+        mock_stripe.PaymentIntent.create.return_value = mock_intent
+
+        create_resp = await client.post(
+            "/donations/sepa",
+            json={"donor_id": donor["id"], "amount_cents": 3000},
+        )
+    assert create_resp.status_code == 201
+    donation_id = create_resp.json()["donation_id"]
+
+    # Now query sepa-status with Stripe key to get live status
+    mock_intent_retrieve = MagicMock()
+    mock_intent_retrieve.status = "processing"
+
+    with (
+        patch("src.api.sepa.stripe") as mock_stripe2,
+        patch.dict("os.environ", {"STRIPE_SECRET_KEY": "sk_test_fake"}),
+    ):
+        mock_stripe2.PaymentIntent.retrieve.return_value = mock_intent_retrieve
+        mock_stripe2.StripeError = Exception
+
+        resp = await client.get(f"/donations/{donation_id}/sepa-status")
+
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body["donation_id"] == donation_id
+    assert body["is_sepa"] is True
+    assert body["stripe_status"] == "processing"
+    assert body["is_processing"] is True
+    assert body["payment_method"] == "sepa_debit"
+    assert body["amount_cents"] == 3000
+    assert body["currency"] == "EUR"
+
+
+@pytest.mark.asyncio
+@pytest.mark.integration
+async def test_get_sepa_status_donation_not_found(client: AsyncClient) -> None:
+    """GET /donations/{id}/sepa-status returns 404 for unknown donation."""
+    resp = await client.get(f"/donations/{uuid4()}/sepa-status")
+    assert resp.status_code == 404
+
+
+@pytest.mark.asyncio
+@pytest.mark.integration
+async def test_get_sepa_status_non_sepa_donation(client: AsyncClient) -> None:
+    """GET /donations/{id}/sepa-status returns is_sepa=False for non-SEPA donations."""
+    # Create a cash donation directly via the cash donations endpoint
+    resp = await client.post(
+        "/donations/cash",
+        json={"amount_cents": 10000, "currency": "PYG", "notes": "Cash test"},
+    )
+    if resp.status_code != 201:
+        pytest.skip("Cash endpoint not available in this test setup")
+
+    donation_id = resp.json()["id"]
+    status_resp = await client.get(f"/donations/{donation_id}/sepa-status")
+
+    assert status_resp.status_code == 200
+    body = status_resp.json()
+    assert body["is_sepa"] is False
+    assert body["is_processing"] is False

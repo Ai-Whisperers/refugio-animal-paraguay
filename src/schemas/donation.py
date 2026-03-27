@@ -182,3 +182,25 @@ class SubscriptionCancelResponse(BaseModel):
 
     stripe_subscription_id: str
     status: str
+
+
+class SepaPaymentStatus(BaseModel):
+    """Detailed SEPA payment status for a donation.
+
+    Combines our local donation status with the live Stripe PaymentIntent status,
+    providing a full picture of where a SEPA payment is in its lifecycle.
+
+    SEPA payments are asynchronous: pending → processing → completed/failed
+    (settlement takes 1-3 business days after the bank accepts the debit).
+    """
+
+    donation_id: UUID
+    local_status: str
+    stripe_payment_intent_id: str | None = None
+    stripe_status: str | None = None
+    is_sepa: bool
+    is_processing: bool
+    payment_method: str
+    amount_cents: int
+    currency: str
+    stripe_customer_id: str | None = None
