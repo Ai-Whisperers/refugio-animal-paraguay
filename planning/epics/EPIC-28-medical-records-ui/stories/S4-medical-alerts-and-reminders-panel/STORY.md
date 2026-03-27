@@ -3,7 +3,7 @@ story: S4
 epic: EPIC-28
 ticket: RAP-138
 title: "Medical alerts and reminders panel"
-status: planned
+status: done
 points: 3
 priority: P1
 track: Frontend
