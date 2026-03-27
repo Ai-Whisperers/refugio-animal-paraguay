@@ -3,9 +3,87 @@
  *
  * Used by the public-facing pages: animal browsing, detail, and
  * adoption application submission. All requests skip JWT injection.
+ *
+ * Also exports ApiError and apiFetch for centralized error handling
+ * across all public API calls.
  */
 
 import { api } from "./api";
+
+// --- Centralized error class ---
+
+/**
+ * Structured API error thrown by apiFetch when the backend returns
+ * a non-2xx response.
+ *
+ * Satisfies the ApiError type from error-handling.ts, enabling
+ * getErrorMessage() and getRecoveryAction() to work with these errors.
+ */
+export class ApiError extends Error {
+  constructor(
+    public readonly status: number,
+    public readonly error_code: string,
+    public readonly detail: string
+  ) {
+    super(detail);
+    this.name = "ApiError";
+  }
+}
+
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+
+/**
+ * Centralized fetch wrapper for public (no-auth) API calls.
+ *
+ * Parses error responses into ApiError instances so callers can use
+ * getErrorMessage() and getRecoveryAction() from error-handling.ts.
+ * Network failures (DNS, timeout, etc.) are re-thrown as plain Error.
+ */
+export async function apiFetch<T = unknown>(
+  endpoint: string,
+  options: RequestInit = {}
+): Promise<T> {
+  const url = `${API_BASE_URL}${endpoint}`;
+
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      ...options,
+      headers: {
+        "Content-Type": "application/json",
+        ...options.headers,
+      },
+    });
+  } catch (networkError) {
+    throw new Error(
+      `Network error — unable to reach ${endpoint}. Please check your connection.`
+    );
+  }
+
+  if (!response.ok) {
+    let error_code = "UNKNOWN_ERROR";
+    let detail = "Unknown error";
+    try {
+      const body = (await response.json()) as {
+        error_code?: string;
+        detail?: string;
+        message?: string;
+      };
+      if (body.error_code) error_code = body.error_code;
+      detail = body.detail ?? body.message ?? detail;
+    } catch {
+      // Response body was not JSON — keep defaults
+    }
+    throw new ApiError(response.status, error_code, detail);
+  }
+
+  if (response.status === 204) {
+    return undefined as T;
+  }
+
+  return response.json() as Promise<T>;
+}
 import type {
   Animal,
   AnimalSpecies,
