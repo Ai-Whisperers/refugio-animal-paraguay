@@ -54,6 +54,9 @@ export interface Animal {
   name: string;
   species: AnimalSpecies;
   status: AnimalStatus;
+  breed: string | null;
+  size: AnimalSize | null;
+  gender: AnimalGender | null;
   birth_date: string | null;
   description: string | null;
   primary_photo_url: string | null;

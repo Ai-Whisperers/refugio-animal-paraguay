@@ -11,6 +11,8 @@ import {
   ChevronRight,
   ArrowLeft,
   RefreshCw,
+  Plus,
+  Pencil,
 } from "lucide-react";
 import { isAuthenticated } from "@/lib/auth";
 import { api, ApiClientError } from "@/lib/api";
@@ -37,6 +39,9 @@ const LABEL_BREED = "Raza";
 const LABEL_INTAKE_DATE = "Fecha de ingreso";
 const LABEL_PREVIOUS = "Anterior";
 const LABEL_NEXT = "Siguiente";
+const LABEL_ADD_ANIMAL = "Nuevo Animal";
+const LABEL_ACTIONS = "Acciones";
+const LABEL_EDIT = "Editar";
 
 const PAGE_SIZE = 20;
 
@@ -118,7 +123,6 @@ export default function AdminAnimalsPage() {
     setIsLoading(true);
     setError(null);
     try {
-      // Fetch all animals (backend doesn't support search/sort, we do it client-side)
       const params = new URLSearchParams();
       if (speciesFilter) {
         params.set("species", speciesFilter);
@@ -255,13 +259,22 @@ export default function AdminAnimalsPage() {
               {LABEL_PAGE_TITLE}
             </h1>
           </div>
-          <button
-            onClick={fetchAnimals}
-            className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm text-warm-text-secondary transition-colors hover:bg-warm-bg hover:text-warm-text-primary"
-            aria-label={LABEL_RETRY}
-          >
-            <RefreshCw className="h-4 w-4" />
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => router.push("/admin/animals/new")}
+              className="flex items-center gap-1.5 rounded-lg bg-primary-600 px-3 py-1.5 text-sm font-medium text-white transition-colors hover:bg-primary-700"
+            >
+              <Plus className="h-4 w-4" />
+              {LABEL_ADD_ANIMAL}
+            </button>
+            <button
+              onClick={fetchAnimals}
+              className="rounded-lg p-1.5 text-warm-text-secondary transition-colors hover:bg-warm-bg hover:text-warm-text-primary"
+              aria-label={LABEL_RETRY}
+            >
+              <RefreshCw className="h-4 w-4" />
+            </button>
+          </div>
         </div>
       </header>
 
@@ -406,6 +419,9 @@ export default function AdminAnimalsPage() {
                         {LABEL_INTAKE_DATE}
                         {renderSortIcon("created_at")}
                       </th>
+                      <th className="px-4 py-3 text-right font-medium text-warm-text-secondary">
+                        {LABEL_ACTIONS}
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
@@ -447,6 +463,17 @@ export default function AdminAnimalsPage() {
                         </td>
                         <td className="px-4 py-3 text-warm-text-secondary">
                           {formatDate(animal.created_at)}
+                        </td>
+                        <td className="px-4 py-3 text-right">
+                          <button
+                            onClick={() =>
+                              router.push(`/admin/animals/${animal.id}/edit`)
+                            }
+                            className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-primary-600 transition-colors hover:bg-primary-50"
+                          >
+                            <Pencil className="h-3 w-3" />
+                            {LABEL_EDIT}
+                          </button>
                         </td>
                       </tr>
                     ))}
