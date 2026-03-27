@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { PawPrint, LogOut } from "lucide-react";
+import { PawPrint, LogOut, List, Heart, DollarSign } from "lucide-react";
 import { isAuthenticated, clearAccessToken, getAccessToken, decodeToken } from "@/lib/auth";
 import type { UserRole } from "@/types/api";
 
@@ -73,16 +73,46 @@ export default function AdminDashboardPage() {
         </div>
       </header>
 
-      {/* Dashboard content placeholder */}
+      {/* Dashboard content */}
       <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="rounded-lg border border-warm-border bg-warm-surface p-8 text-center">
-          <PawPrint className="mx-auto h-12 w-12 text-primary-300" aria-hidden="true" />
-          <h2 className="mt-4 text-lg font-medium text-warm-text-primary">
-            {LABEL_WELCOME}
-          </h2>
-          <p className="mt-2 text-sm text-warm-text-secondary">
-            Aqui podras gestionar animales, adopciones, donaciones y mas.
-          </p>
+        <h2 className="mb-6 text-lg font-medium text-warm-text-primary">
+          {LABEL_WELCOME}
+        </h2>
+
+        {/* Quick access cards */}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <button
+            onClick={() => router.push("/admin/animals")}
+            className="group rounded-lg border border-warm-border bg-warm-surface p-6 text-left transition-all hover:border-primary-300 hover:shadow-md"
+          >
+            <List className="h-8 w-8 text-primary-500 group-hover:text-primary-600" aria-hidden="true" />
+            <h3 className="mt-3 font-semibold text-warm-text-primary">
+              Gestion de Animales
+            </h3>
+            <p className="mt-1 text-sm text-warm-text-secondary">
+              Ver, buscar y gestionar todos los animales del refugio.
+            </p>
+          </button>
+
+          <div className="rounded-lg border border-warm-border bg-warm-surface p-6 opacity-60">
+            <Heart className="h-8 w-8 text-primary-300" aria-hidden="true" />
+            <h3 className="mt-3 font-semibold text-warm-text-primary">
+              Solicitudes de Adopcion
+            </h3>
+            <p className="mt-1 text-sm text-warm-text-secondary">
+              Proximamente
+            </p>
+          </div>
+
+          <div className="rounded-lg border border-warm-border bg-warm-surface p-6 opacity-60">
+            <DollarSign className="h-8 w-8 text-primary-300" aria-hidden="true" />
+            <h3 className="mt-3 font-semibold text-warm-text-primary">
+              Donaciones
+            </h3>
+            <p className="mt-1 text-sm text-warm-text-secondary">
+              Proximamente
+            </p>
+          </div>
         </div>
       </div>
     </div>
