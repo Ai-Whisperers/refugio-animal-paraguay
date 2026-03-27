@@ -3,7 +3,7 @@ story: S2
 epic: EPIC-27
 ticket: RAP-131
 title: "Vaccine administration recording"
-status: planned
+status: done
 points: 3
 priority: P0
 track: Backend

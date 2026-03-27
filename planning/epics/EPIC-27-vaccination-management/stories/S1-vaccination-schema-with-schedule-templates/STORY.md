@@ -3,7 +3,7 @@ story: S1
 epic: EPIC-27
 ticket: RAP-130
 title: "Vaccination schema with schedule templates"
-status: planned
+status: done
 points: 5
 priority: P0
 track: Backend
