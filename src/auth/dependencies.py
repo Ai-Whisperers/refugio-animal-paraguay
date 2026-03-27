@@ -31,8 +31,8 @@ async def _get_current_user(
         user_id: str | None = payload.get("sub")  # type: ignore[assignment]
         if user_id is None:
             raise exc
-    except JWTError:
-        raise exc
+    except JWTError as jwt_exc:
+        raise exc from jwt_exc
 
     user = await db.get(User, user_id)
     if user is None or not user.is_active:

@@ -216,9 +216,7 @@ def upgrade() -> None:
         sa.column("display_order"),
     )
     # psycopg2 cannot adapt dict to JSON directly — serialize benefits to JSON string
-    serialized_seeds = [
-        {**seed, "benefits": json.dumps(seed["benefits"])} for seed in _TIER_SEEDS
-    ]
+    serialized_seeds = [{**seed, "benefits": json.dumps(seed["benefits"])} for seed in _TIER_SEEDS]
     op.bulk_insert(tiers_table, serialized_seeds)
 
 

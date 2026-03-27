@@ -264,9 +264,7 @@ async def generate_impact_report(
     # Cost per adoption: total fund allocation / number of adoptions
     cost_per_adoption_cents = None
     if adoptions["total"] > 0 and fund_allocation["total_cents"] > 0:
-        cost_per_adoption_cents = round(
-            fund_allocation["total_cents"] / adoptions["total"]
-        )
+        cost_per_adoption_cents = round(fund_allocation["total_cents"] / adoptions["total"])
 
     return {
         "report_metadata": {

@@ -86,7 +86,7 @@ class TestAnimalResponse:
             birth_date = None
             description = None
             primary_photo_url = None
-            photos: list = []
+            photos: list = []  # noqa: RUF012
             created_at = now
             updated_at = now
 

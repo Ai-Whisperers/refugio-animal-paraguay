@@ -56,9 +56,7 @@ class TestAnonymizeDonor:
         mock_db.flush.assert_not_awaited()
 
     @pytest.mark.asyncio
-    async def test_anonymize_donor_generates_unique_emails(
-        self, mock_db: AsyncMock
-    ) -> None:
+    async def test_anonymize_donor_generates_unique_emails(self, mock_db: AsyncMock) -> None:
         """Each anonymization produces a unique email to avoid constraint violations."""
         donor1 = MagicMock()
         donor2 = MagicMock()
@@ -132,9 +130,7 @@ class TestDeleteUserNotifications:
     """Tests for delete_user_notifications()."""
 
     @pytest.mark.asyncio
-    async def test_delete_notifications_returns_count(
-        self, mock_db: AsyncMock
-    ) -> None:
+    async def test_delete_notifications_returns_count(self, mock_db: AsyncMock) -> None:
         """Return count of deleted notification records."""
         mock_result = MagicMock()
         mock_result.rowcount = 5

@@ -1,7 +1,7 @@
 """SQLAlchemy ORM model for users (staff and admin accounts)."""
 
-import enum
 from datetime import datetime
+from enum import StrEnum
 from uuid import UUID
 
 import sqlalchemy as sa
@@ -10,7 +10,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from ..base import Base
 
 
-class UserRole(str, enum.Enum):
+class UserRole(StrEnum):
     """User role values — must match chk_users_role CHECK constraint exactly."""
 
     STAFF = "staff"
