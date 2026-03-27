@@ -144,6 +144,27 @@ class Settings(BaseSettings):
         description="Rate limit for general API endpoints (slowapi format).",
     )
 
+    # WhatsApp / Twilio
+    whatsapp_enabled: bool = Field(
+        default=False,
+        description="Enable WhatsApp message delivery via Twilio. Disable in tests and local dev.",
+    )
+    twilio_account_sid: str = Field(
+        default="",
+        description="Twilio Account SID. Required when whatsapp_enabled=True.",
+    )
+    twilio_auth_token: str = Field(
+        default="",
+        description="Twilio Auth Token. Required when whatsapp_enabled=True.",
+    )
+    twilio_whatsapp_from: str = Field(
+        default="whatsapp:+14155238886",
+        description=(
+            "Twilio WhatsApp sender number in E.164 format with 'whatsapp:' prefix. "
+            "Use the Twilio sandbox number for development."
+        ),
+    )
+
     @property
     def allowed_origins_list(self) -> list[str]:
         """Parse ALLOWED_ORIGINS into a list of origin strings."""

@@ -52,6 +52,8 @@ from src.notifications.handlers import NotificationHandlers
 from src.notifications.in_app_handlers import InAppNotificationHandlers
 from src.notifications.service import EmailService
 from src.notifications.templates import TemplateRenderer
+from src.notifications.whatsapp_handlers import WhatsAppHandlers
+from src.notifications.whatsapp_service import WhatsAppService
 
 
 @asynccontextmanager
@@ -74,6 +76,11 @@ async def lifespan(application: FastAPI) -> AsyncGenerator[None, None]:
     # Register in-app notification handlers on the event bus
     in_app_handlers = InAppNotificationHandlers()
     in_app_handlers.register(event_bus)
+
+    # Register WhatsApp notification handlers on the event bus
+    whatsapp_service = WhatsAppService(settings)
+    whatsapp_handlers = WhatsAppHandlers(whatsapp_service)
+    whatsapp_handlers.register(event_bus)
 
     yield
 
