@@ -3,7 +3,7 @@ story: S1
 epic: EPIC-39
 ticket: RAP-190
 title: "Foster family registration and approval"
-status: planned
+status: done
 points: 5
 priority: P0
 track: Fullstack
