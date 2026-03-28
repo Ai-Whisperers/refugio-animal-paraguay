@@ -472,7 +472,7 @@ Week 3-4:
 | 2 | Emergency case creation form | RAP-581 | 5 | PR #243 | Fullstack |
 | 3 | Emergency featured on homepage | RAP-582 | 5 | PR #244 | Frontend |
 | 4 | Push notifications to donors | RAP-583 | 3 | DONE | Backend |
-| 5 | Simplified 1-click donation for emergencies | RAP-584 | 5 | READY | Fullstack |
+| 5 | Simplified 1-click donation for emergencies | RAP-584 | 5 | PR #245 | Fullstack |
 | 6 | Auto-close when funded | RAP-585 | 3 | DONE | Backend |
 | 7 | Post-emergency update | RAP-586 | 3 | PR #242 | Fullstack |
 | 8 | Emergency analytics | RAP-587 | 3 | DONE | Backend |
