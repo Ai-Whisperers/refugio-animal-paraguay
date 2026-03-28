@@ -529,7 +529,7 @@ Week 3-4:
 | 1 | Survey model with question types | RAP-612 | 5 | DONE | Backend |
 | 2 | Admin survey creation form | RAP-613 | 6 | READY | Fullstack |
 | 3 | Public survey response collection | RAP-614 | 4 | DONE (PR #268) | Fullstack |
-| 4 | Survey results analytics dashboard | RAP-615 | 5 | READY | Fullstack |
+| 4 | Survey results analytics dashboard | RAP-615 | 5 | PR #269 | Fullstack |
 | 5 | Community feature request board | RAP-616 | 3 | PR #267 | Frontend |
 | 6 | Survey distribution via WhatsApp/email | RAP-617 | 3 | PR #205 | Backend |
 
