@@ -395,7 +395,7 @@ Week 3-4:
 | 1 | Image upload endpoint with validation | RAP-559 | 5 | DONE (PR #178) | Backend |
 | 2 | Image optimization pipeline | RAP-560 | 5 | DONE (PR #179) | Backend |
 | 3 | Storage backend (local + S3 compatible) | RAP-561 | 5 | DONE (PR #180) | Backend |
-| 4 | Animal photo gallery management UI | RAP-562 | 5 | READY | Frontend |
+| 4 | Animal photo gallery management UI | RAP-562 | 5 | IN_REVIEW (PR #230) | Frontend |
 | 5 | Medical document upload with validation | RAP-563 | 3 | DONE (PR #181) | Backend |
 | 6 | Campaign and story image uploads | RAP-564 | 3 | READY | Fullstack |
 | 7 | Image CDN headers | RAP-565 | 3 | DONE (PR #182) | Backend |
