@@ -348,7 +348,7 @@ Week 3-4:
 | # | Story | Ticket | Pts | Status | Track | Depends On |
 |---|-------|--------|-----|--------|-------|------------|
 | 1 | Configurable adoption requirements model | RAP-517 | 5 | IN PR #167 | Backend | — |
-| 2 | Pre-qualification questionnaire API | RAP-518 | 5 | READY | Backend | RAP-517 |
+| 2 | Pre-qualification questionnaire API | RAP-518 | 5 | IN PR #168 | Backend | RAP-517 |
 | 3 | Pre-qualification form UI | RAP-519 | 8 | READY | Frontend | RAP-518 |
 | 4 | Qualification result page with alternatives | RAP-520 | 5 | READY | Frontend | RAP-519 |
 | 5 | Admin requirement configuration UI | RAP-521 | 5 | READY | Frontend | RAP-517 |
