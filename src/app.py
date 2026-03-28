@@ -56,7 +56,7 @@ from src.api.clinic_services import router as clinic_services_router
 from src.api.cms import public_router as cms_public_router
 from src.api.cms import router as cms_router
 from src.api.community_engagement_analytics import router as community_engagement_analytics_router
-from src.api.community_needs import admin_router as community_needs_admin_router
+from src.api.community_feed import router as community_feed_router
 from src.api.community_needs import (
     public_router as community_needs_public_router,
 )
@@ -431,7 +431,7 @@ def create_app() -> FastAPI:
     application.include_router(castration_report_admin_router)
     application.include_router(castration_report_public_router)
     application.include_router(community_needs_public_router)
-    application.include_router(community_needs_admin_router)
+    application.include_router(community_feed_router)
     application.include_router(homepage_content_router)
     application.include_router(rescuer_emergencies_router)
     application.include_router(public_emergencies_router)
