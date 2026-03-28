@@ -25,6 +25,7 @@ from src.api.animal_updates import router as animal_updates_router
 from src.api.animals import router as animals_router
 from src.api.appointments import router as appointments_router
 from src.api.auth import router as auth_router
+from src.api.campaign_voucher_integration import router as campaign_voucher_integration_router
 from src.api.consents import router as consents_router
 from src.api.diagnoses import diagnosis_router, treatment_router
 from src.api.donations import router as donations_router
@@ -197,6 +198,7 @@ def create_app() -> FastAPI:
     application.include_router(webhooks_router)
     application.include_router(admin_campaigns_router)
     application.include_router(admin_castration_campaigns_router)
+    application.include_router(campaign_voucher_integration_router)
     application.include_router(consents_router)
     application.include_router(notifications_router)
     application.include_router(gdpr_export_router)
