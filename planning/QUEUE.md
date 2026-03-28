@@ -538,7 +538,7 @@ Week 3-4:
 | # | Story | Ticket | Pts | Status | Track |
 |---|-------|--------|-----|--------|-------|
 | 1 | Transport request model and API | RAP-618 | 4 | DONE | Backend |
-| 2 | Transport request creation form | RAP-619 | 5 | READY | Fullstack |
+| 2 | Transport request creation form | RAP-619 | 5 | PR #282 | Fullstack |
 | 3 | Volunteer driver registration | RAP-620 | 5 | READY | Fullstack |
 | 4 | Intelligent request matching and notification | RAP-621 | 6 | READY | Fullstack |
 | 5 | Real-time trip tracking with photos | RAP-622 | 4 | PR #277 | Fullstack |
