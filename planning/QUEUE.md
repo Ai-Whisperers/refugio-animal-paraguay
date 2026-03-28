@@ -423,11 +423,11 @@ Week 3-4:
 | # | Story | Ticket | Pts | Status | Track | Depends On |
 |---|-------|--------|-----|--------|-------|------------|
 | 1 | Rescuer self-registration and profile model | RAP-533 | 5 | DONE (PR #184) | Backend | RAP-500 (EPIC-76) |
-| 2 | Rescuer profile page | RAP-534 | 8 | READY | Fullstack | RAP-533 |
+| 2 | Rescuer profile page | RAP-534 | Rescuer profile page | 8 | EPIC-80 | PR_CREATED | #292 |
 | 3 | Rescuer animal listing management | RAP-535 | 8 | READY | Fullstack | RAP-533 |
-| 4 | Rescuer campaign creation | RAP-536 | 5 | BLOCKED | Fullstack | RAP-534 |
+| 4 | Rescuer campaign creation | RAP-536 | 5 | BLOCKED | Fullstack | RAP-534 | Rescuer profile page | 8 | EPIC-80 | PR_CREATED | #292 |
 | 5 | Needs board | RAP-537 | 5 | PR #289 | Fullstack | RAP-533 |
-| 6 | Community feed | RAP-538 | 5 | BLOCKED | Fullstack | RAP-534 |
+| 6 | Community feed | RAP-538 | 5 | BLOCKED | Fullstack | RAP-534 | Rescuer profile page | 8 | EPIC-80 | PR_CREATED | #292 |
 | 7 | Donor choice interface | RAP-539 | Donor choice interface | 5 | EPIC-80 | PR_CREATED | #290 |
 | 8 | Rescuer verification system | RAP-540 | 3 | DONE (PR #185) | Backend | RAP-533 |
 | 9 | Admin moderation tools | RAP-541 | Admin moderation tools | 5 | EPIC-80 | PR_CREATED | #291 |
