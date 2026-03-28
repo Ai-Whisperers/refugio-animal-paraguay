@@ -49,6 +49,7 @@ from src.api.notifications import router as notifications_router
 from src.api.password_reset import router as password_reset_router
 from src.api.phone_verification import router as phone_verification_router
 from src.api.portal import router as portal_router
+from src.api.pre_qualification import router as pre_qualification_router
 from src.api.prescriptions import router as prescriptions_router
 from src.api.profile import router as profile_router
 from src.api.public import router as public_router
@@ -225,6 +226,7 @@ def create_app() -> FastAPI:
     application.include_router(profile_router)
     application.include_router(vet_clinics_router)
     application.include_router(user_roles_router)
+    application.include_router(pre_qualification_router)
 
     return application
 
