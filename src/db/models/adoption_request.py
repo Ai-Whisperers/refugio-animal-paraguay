@@ -69,6 +69,19 @@ class AdoptionRequest(Base):
         server_default=sa.func.now(),
         onupdate=sa.func.now(),
     )
+    # Pipeline tracking — populated after migration 054
+    current_stage_id: Mapped[UUID | None] = mapped_column(
+        sa.UUID(as_uuid=True),
+        sa.ForeignKey(
+            "adoption_pipeline_stages.id",
+            name="fk_adoption_requests_current_stage_id",
+        ),
+        nullable=True,
+    )
+    current_stage_started_at: Mapped[datetime | None] = mapped_column(
+        sa.TIMESTAMP(timezone=True),
+        nullable=True,
+    )
 
     # Relationships for ORM navigation
     animal: Mapped["Animal"] = relationship(  # type: ignore[name-defined]  # noqa: F821

@@ -454,9 +454,9 @@ Week 3-4:
 | 2 | WhatsApp share buttons on animal cards | RAP-567 | 3 | READY | Frontend |
 | 3 | WhatsApp share for campaigns | RAP-568 | 3 | READY | Frontend |
 | 4 | Social media share buttons (Facebook, Instagram, Twitter) | RAP-569 | 3 | READY | Frontend |
-| 5 | Share tracking analytics | RAP-570 | 5 | READY | Backend |
-| 6 | Referral tracking | RAP-571 | 5 | READY | Backend |
-| 7 | Auto-generated social media cards | RAP-572 | 3 | READY | Backend |
+| 5 | Share tracking analytics | RAP-570 | 5 | DONE (PR #189) | Backend |
+| 6 | Referral tracking | RAP-571 | 5 | DONE (on develop) | Backend |
+| 7 | Auto-generated social media cards | RAP-572 | 3 | IN PR #190 | Backend |
 
 ---
 
@@ -468,21 +468,21 @@ Week 3-4:
 
 | # | Story | Ticket | Pts | Status | Track |
 |---|-------|--------|-----|--------|-------|
-| 1 | Emergency case model and creation API | RAP-580 | 5 | READY | Backend |
+| 1 | Emergency case model and creation API | RAP-580 | 5 | IN PR #191 | Backend |
 | 2 | Emergency case creation form | RAP-581 | 5 | READY | Fullstack |
 | 3 | Emergency featured on homepage | RAP-582 | 5 | READY | Frontend |
-| 4 | Push notifications to donors | RAP-583 | 3 | READY | Backend |
+| 4 | Push notifications to donors | RAP-583 | 3 | IN PR #192 | Backend |
 | 5 | Simplified 1-click donation for emergencies | RAP-584 | 5 | READY | Fullstack |
-| 6 | Auto-close when funded | RAP-585 | 3 | READY | Backend |
+| 6 | Auto-close when funded | RAP-585 | 3 | IN PR #193 | Backend |
 | 7 | Post-emergency update | RAP-586 | 3 | READY | Fullstack |
-| 8 | Emergency analytics | RAP-587 | 3 | READY | Backend |
+| 8 | Emergency analytics | RAP-587 | 3 | IN PR #194 | Backend |
 
 ### EPIC-87: Advanced Adoption Workflow (40 pts)
 
 | # | Story | Ticket | Pts | Status | Track |
 |---|-------|--------|-----|--------|-------|
-| 1 | Configurable adoption pipeline stages | RAP-588 | 5 | READY | Backend |
-| 2 | Pipeline status tracking API | RAP-589 | 5 | READY | Backend |
+| 1 | Configurable adoption pipeline stages | RAP-588 | 5 | IN PR #195 | Backend |
+| 2 | Pipeline status tracking API | RAP-589 | 5 | IN PR #TBD | Backend |
 | 3 | Adoption pipeline board UI | RAP-590 | 8 | READY | Frontend |
 | 4 | Home visit scheduling | RAP-591 | 5 | READY | Fullstack |
 | 5 | Trial period management | RAP-592 | 5 | READY | Fullstack |
