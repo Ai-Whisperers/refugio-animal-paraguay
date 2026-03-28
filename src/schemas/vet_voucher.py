@@ -61,6 +61,11 @@ class VetVoucherResponse(BaseModel):
     assigned_at: datetime | None
     redeemed_at: datetime | None
     cancelled_at: datetime | None
+    proof_photo_url: str | None = None
+    proof_description: str | None = None
+    invoice_url: str | None = None
+    invoice_filename: str | None = None
+    redeemed_by_user_id: UUID | None = None
     notes: str | None
     cancellation_reason: str | None
     created_at: datetime

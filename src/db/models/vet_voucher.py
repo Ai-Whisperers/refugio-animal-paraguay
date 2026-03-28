@@ -152,6 +152,34 @@ class VetVoucher(Base):
         nullable=True,
     )
 
+    # -- Proof of service (populated at redemption) --
+    proof_photo_url: Mapped[str | None] = mapped_column(
+        sa.String(500),
+        nullable=True,
+        comment="URL of proof photo",
+    )
+    proof_description: Mapped[str | None] = mapped_column(
+        sa.String(1000),
+        nullable=True,
+        comment="Description of service performed",
+    )
+    invoice_url: Mapped[str | None] = mapped_column(
+        sa.String(500),
+        nullable=True,
+        comment="URL of clinic invoice",
+    )
+    invoice_filename: Mapped[str | None] = mapped_column(
+        sa.String(255),
+        nullable=True,
+        comment="Original invoice filename",
+    )
+    redeemed_by_user_id: Mapped[UUID | None] = mapped_column(
+        sa.UUID(as_uuid=True),
+        sa.ForeignKey("users.id", ondelete="SET NULL"),
+        nullable=True,
+        comment="Clinic staff user who processed the redemption",
+    )
+
     # -- Notes --
     notes: Mapped[str | None] = mapped_column(sa.Text, nullable=True)
     cancellation_reason: Mapped[str | None] = mapped_column(sa.String(500), nullable=True)
