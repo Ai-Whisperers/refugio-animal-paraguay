@@ -3,7 +3,7 @@ story: S1
 epic: EPIC-34
 ticket: RAP-165
 title: "Tax receipt PDF template (EU format)"
-status: planned
+status: done
 points: 5
 priority: P0
 track: Fullstack
