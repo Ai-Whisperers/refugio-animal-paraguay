@@ -103,6 +103,7 @@ from src.api.public_register import router as public_register_router
 from src.api.public_rescuer_support import router as public_rescuer_support_router
 from src.api.public_sponsorships import router as public_sponsorships_router
 from src.api.public_statistics import router as public_statistics_router
+from src.api.public_survey import router as public_survey_router
 from src.api.public_voucher_stats import router as public_voucher_stats_router
 from src.api.referral_tracking import admin_router as referral_tracking_admin_router
 from src.api.referral_tracking import public_router as referral_tracking_public_router
@@ -330,6 +331,7 @@ def create_app() -> FastAPI:
     application.include_router(pre_qualification_router)
     application.include_router(smart_matching_router)
     application.include_router(public_statistics_router)
+    application.include_router(public_survey_router)
     application.include_router(public_clinic_fund_router)
     application.include_router(public_rescuer_support_router)
     application.include_router(public_sponsorships_router)
