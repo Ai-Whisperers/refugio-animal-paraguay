@@ -8,6 +8,7 @@ from .audit_log import AuditAction, AuditLog
 from .campaign import Campaign, CampaignDonation, CampaignStatus
 from .castration_drive import CastrationDrive
 from .castration_photo import CastrationPhoto
+from .community_need import CommunityNeed, NeedCategory, NeedStatus
 from .contact_submission import ContactFormType, ContactSubmission
 from .donation import CurrencyCode, Donation, DonationStatus, Donor, PaymentMethod
 from .fund_allocation import FundAllocation, FundCategory
@@ -76,6 +77,9 @@ __all__ = [
     "CampaignStatus",
     "CastrationDrive",
     "CastrationPhoto",
+    "CommunityNeed",
+    "NeedCategory",
+    "NeedStatus",
     "ConsentMethod",
     "ConsentStatus",
     "ConsentType",
