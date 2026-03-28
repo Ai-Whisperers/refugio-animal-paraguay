@@ -135,6 +135,7 @@ from src.api.survey_analytics import router as survey_analytics_router
 from src.api.survey_distribution import router as survey_distribution_router
 from src.api.tigo_money import router as tigo_money_router
 from src.api.transport import router as transport_router
+from src.api.transport_request import router as transport_request_router
 from src.api.trial_periods import admin_router as trial_admin_router
 from src.api.trial_periods import public_router as trial_public_router
 from src.api.user_roles import router as user_roles_router
@@ -414,6 +415,7 @@ def create_app() -> FastAPI:
     application.include_router(report_export_router)
     application.include_router(donation_analytics_router)
     application.include_router(donor_retention_analytics_router)
+    application.include_router(transport_request_router)
 
     return application
 
