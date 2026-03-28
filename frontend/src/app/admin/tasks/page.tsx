@@ -11,6 +11,8 @@ import {
   AlertCircle,
   Clock,
   ChevronDown,
+  UserPlus,
+  User,
 } from "lucide-react";
 import { isAuthenticated } from "@/lib/auth";
 import { api, ApiClientError } from "@/lib/api";
@@ -21,6 +23,8 @@ import type {
   TaskStatus,
   TaskListResponse,
   TaskCreateRequest,
+  VolunteerListItem,
+  PaginatedVolunteerList,
 } from "@/types/api";
 
 // ---------------------------------------------------------------------------
@@ -36,6 +40,8 @@ const LABEL_RETRY = "Reintentar";
 const LABEL_NO_TASKS = "Sin tareas";
 const LABEL_FILTER_ALL = "Todas las categorías";
 const LABEL_FILTER_PRIORITY = "Todas las prioridades";
+const LABEL_UNASSIGNED = "Sin asignar";
+const LABEL_REASSIGN = "Reasignar";
 
 const STATUS_COLUMNS: { status: TaskStatus; label: string; color: string; headerBg: string }[] = [
   {
@@ -116,8 +122,7 @@ function isDueSoon(dueDate: string | null): boolean {
   if (!dueDate) return false;
   const due = new Date(dueDate);
   const now = new Date();
-  const diffMs = due.getTime() - now.getTime();
-  const diffHours = diffMs / (1000 * 60 * 60);
+  const diffHours = (due.getTime() - now.getTime()) / (1000 * 60 * 60);
   return diffHours >= 0 && diffHours <= 24;
 }
 
@@ -126,21 +131,27 @@ function isOverdue(dueDate: string | null, status: TaskStatus): boolean {
   return new Date(dueDate) < new Date();
 }
 
+function volunteerDisplayName(v: VolunteerListItem): string {
+  return v.full_name ?? v.email;
+}
+
 // ---------------------------------------------------------------------------
 // Task Card
 // ---------------------------------------------------------------------------
 
 interface TaskCardProps {
   task: Task;
+  volunteers: VolunteerListItem[];
   onStatusChange: (taskId: string, newStatus: TaskStatus) => Promise<void>;
+  onReassign: (task: Task) => void;
 }
 
-function TaskCard({ task, onStatusChange }: TaskCardProps) {
+function TaskCard({ task, volunteers, onStatusChange, onReassign }: TaskCardProps) {
   const [updating, setUpdating] = useState(false);
 
-  const nextStatusOptions: { status: TaskStatus; label: string }[] = STATUS_COLUMNS.filter(
-    (col) => col.status !== task.status
-  ).map((col) => ({ status: col.status, label: col.label }));
+  const nextStatusOptions = STATUS_COLUMNS.filter((col) => col.status !== task.status).map(
+    (col) => ({ status: col.status, label: col.label })
+  );
 
   async function handleStatusChange(newStatus: TaskStatus) {
     setUpdating(true);
@@ -153,6 +164,10 @@ function TaskCard({ task, onStatusChange }: TaskCardProps) {
 
   const overdue = isOverdue(task.due_date, task.status);
   const dueSoon = isDueSoon(task.due_date);
+
+  const assignedVolunteer = task.assigned_to
+    ? volunteers.find((v) => v.user_id === task.assigned_to)
+    : null;
 
   return (
     <div
@@ -182,14 +197,36 @@ function TaskCard({ task, onStatusChange }: TaskCardProps) {
         <p className="mt-1.5 text-xs text-gray-400 line-clamp-2">{task.description}</p>
       )}
 
+      {/* Assignee row */}
+      <div className="mt-2 flex items-center justify-between gap-1">
+        <div className="flex items-center gap-1 text-xs text-gray-500">
+          <User className="h-3 w-3 shrink-0 text-gray-400" />
+          <span className={assignedVolunteer ? "text-gray-700" : "text-gray-400 italic"}>
+            {assignedVolunteer
+              ? volunteerDisplayName(assignedVolunteer)
+              : LABEL_UNASSIGNED}
+          </span>
+        </div>
+        {task.status !== "completed" && task.status !== "cancelled" && (
+          <button
+            onClick={() => onReassign(task)}
+            className="flex items-center gap-0.5 rounded px-1.5 py-0.5 text-xs text-gray-400 hover:bg-blue-50 hover:text-blue-600"
+            title={LABEL_REASSIGN}
+          >
+            <UserPlus className="h-3 w-3" />
+            {LABEL_REASSIGN}
+          </button>
+        )}
+      </div>
+
       {/* Due date */}
       {task.due_date && (
         <div
-          className={`mt-2 flex items-center gap-1 text-xs ${
+          className={`mt-1.5 flex items-center gap-1 text-xs ${
             overdue
-              ? "text-red-600 font-medium"
+              ? "font-medium text-red-600"
               : dueSoon
-              ? "text-orange-500 font-medium"
+              ? "font-medium text-orange-500"
               : "text-gray-400"
           }`}
         >
@@ -206,9 +243,7 @@ function TaskCard({ task, onStatusChange }: TaskCardProps) {
             disabled={updating}
             value=""
             onChange={(e) => {
-              if (e.target.value) {
-                handleStatusChange(e.target.value as TaskStatus);
-              }
+              if (e.target.value) handleStatusChange(e.target.value as TaskStatus);
             }}
             className="w-full appearance-none rounded border border-gray-200 bg-gray-50 py-1 pl-2 pr-6 text-xs text-gray-600 hover:bg-gray-100 disabled:opacity-50 cursor-pointer"
             aria-label="Cambiar estado"
@@ -228,10 +263,125 @@ function TaskCard({ task, onStatusChange }: TaskCardProps) {
 
       {/* Completion timestamp */}
       {task.completed_at && (
-        <p className="mt-1.5 text-xs text-green-600">
-          Completado: {fmtDate(task.completed_at)}
-        </p>
+        <p className="mt-1.5 text-xs text-green-600">Completado: {fmtDate(task.completed_at)}</p>
       )}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Assign Volunteer Modal
+// ---------------------------------------------------------------------------
+
+interface AssignModalProps {
+  task: Task;
+  volunteers: VolunteerListItem[];
+  onClose: () => void;
+  onAssigned: (taskId: string, userId: string | null) => Promise<void>;
+}
+
+function AssignModal({ task, volunteers, onClose, onAssigned }: AssignModalProps) {
+  const currentAssignee = task.assigned_to
+    ? volunteers.find((v) => v.user_id === task.assigned_to)
+    : null;
+
+  const [selected, setSelected] = useState<string>(task.assigned_to ?? "");
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError(null);
+    setSaving(true);
+    try {
+      await onAssigned(task.id, selected || null);
+      onClose();
+    } catch (err) {
+      if (err instanceof ApiClientError) {
+        setError(err.detail || "Error al asignar la tarea");
+      } else {
+        setError("Error inesperado");
+      }
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+      <div className="w-full max-w-sm rounded-xl bg-white p-6 shadow-xl">
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-base font-semibold text-gray-800">Asignar voluntario</h2>
+          <button
+            onClick={onClose}
+            className="rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+            aria-label="Cerrar"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+
+        <p className="mb-3 text-xs text-gray-500 line-clamp-2">
+          Tarea: <span className="font-medium text-gray-700">{task.title}</span>
+        </p>
+
+        {currentAssignee && (
+          <p className="mb-3 text-xs text-gray-500">
+            Asignado actualmente:{" "}
+            <span className="font-medium text-blue-700">
+              {volunteerDisplayName(currentAssignee)}
+            </span>
+          </p>
+        )}
+
+        {error && (
+          <div className="mb-3 flex items-start gap-2 rounded-lg bg-red-50 p-3 text-sm text-red-700">
+            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">Voluntario</label>
+            {volunteers.length === 0 ? (
+              <p className="mt-1 text-sm text-gray-400 italic">
+                No hay voluntarios aprobados disponibles.
+              </p>
+            ) : (
+              <select
+                value={selected}
+                onChange={(e) => setSelected(e.target.value)}
+                className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none"
+              >
+                <option value="">{LABEL_UNASSIGNED}</option>
+                {volunteers.map((v) => (
+                  <option key={v.user_id} value={v.user_id}>
+                    {volunteerDisplayName(v)} — {v.email}
+                  </option>
+                ))}
+              </select>
+            )}
+          </div>
+
+          <div className="flex gap-3 pt-1">
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 rounded-lg border border-gray-300 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              disabled={saving || volunteers.length === 0}
+              className="flex-1 rounded-lg bg-emerald-600 py-2 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-50"
+            >
+              {saving ? "Guardando..." : "Guardar"}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }
@@ -241,16 +391,18 @@ function TaskCard({ task, onStatusChange }: TaskCardProps) {
 // ---------------------------------------------------------------------------
 
 interface CreateTaskModalProps {
+  volunteers: VolunteerListItem[];
   onClose: () => void;
   onCreated: () => void;
 }
 
-function CreateTaskModal({ onClose, onCreated }: CreateTaskModalProps) {
+function CreateTaskModal({ volunteers, onClose, onCreated }: CreateTaskModalProps) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState<TaskCategory>("other");
   const [priority, setPriority] = useState<TaskPriority>("medium");
   const [dueDate, setDueDate] = useState("");
+  const [assignedTo, setAssignedTo] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -264,6 +416,7 @@ function CreateTaskModal({ onClose, onCreated }: CreateTaskModalProps) {
         description: description.trim() || null,
         category,
         priority,
+        assigned_to: assignedTo || null,
         due_date: dueDate ? new Date(dueDate).toISOString() : null,
       };
       await api.post("/api/tasks", body);
@@ -360,6 +513,29 @@ function CreateTaskModal({ onClose, onCreated }: CreateTaskModalProps) {
 
           <div>
             <label className="block text-sm font-medium text-gray-700">
+              Asignar a voluntario (opcional)
+            </label>
+            <select
+              value={assignedTo}
+              onChange={(e) => setAssignedTo(e.target.value)}
+              className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none"
+            >
+              <option value="">{LABEL_UNASSIGNED}</option>
+              {volunteers.map((v) => (
+                <option key={v.user_id} value={v.user_id}>
+                  {volunteerDisplayName(v)} — {v.email}
+                </option>
+              ))}
+            </select>
+            {volunteers.length === 0 && (
+              <p className="mt-1 text-xs text-gray-400 italic">
+                No hay voluntarios aprobados.
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
               Fecha límite (opcional)
             </label>
             <input
@@ -399,9 +575,11 @@ function CreateTaskModal({ onClose, onCreated }: CreateTaskModalProps) {
 export default function TasksPage() {
   const router = useRouter();
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [volunteers, setVolunteers] = useState<VolunteerListItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showCreate, setShowCreate] = useState(false);
+  const [reassignTask, setReassignTask] = useState<Task | null>(null);
   const [filterCategory, setFilterCategory] = useState<TaskCategory | "">("");
   const [filterPriority, setFilterPriority] = useState<TaskPriority | "">("");
 
@@ -410,6 +588,18 @@ export default function TasksPage() {
       router.push("/admin/login");
     }
   }, [router]);
+
+  const loadVolunteers = useCallback(async () => {
+    try {
+      const data = await api.get<PaginatedVolunteerList>(
+        "/api/volunteers?status=approved&page_size=100"
+      );
+      setVolunteers(data.items);
+    } catch {
+      // Non-fatal: tasks board still works without volunteer data
+      setVolunteers([]);
+    }
+  }, []);
 
   const loadTasks = useCallback(async () => {
     setLoading(true);
@@ -432,8 +622,9 @@ export default function TasksPage() {
   }, [filterCategory, filterPriority]);
 
   useEffect(() => {
+    loadVolunteers();
     loadTasks();
-  }, [loadTasks]);
+  }, [loadVolunteers, loadTasks]);
 
   async function handleStatusChange(taskId: string, newStatus: TaskStatus) {
     try {
@@ -444,8 +635,7 @@ export default function TasksPage() {
             ? {
                 ...t,
                 status: newStatus,
-                completed_at:
-                  newStatus === "completed" ? new Date().toISOString() : null,
+                completed_at: newStatus === "completed" ? new Date().toISOString() : null,
               }
             : t
         )
@@ -457,6 +647,13 @@ export default function TasksPage() {
         setError("Error inesperado al actualizar");
       }
     }
+  }
+
+  async function handleAssign(taskId: string, userId: string | null) {
+    await api.patch(`/api/tasks/${taskId}`, { assigned_to: userId });
+    setTasks((prev) =>
+      prev.map((t) => (t.id === taskId ? { ...t, assigned_to: userId } : t))
+    );
   }
 
   function handleCreated() {
@@ -493,7 +690,7 @@ export default function TasksPage() {
 
           <div className="flex items-center gap-2">
             <button
-              onClick={loadTasks}
+              onClick={() => { loadTasks(); loadVolunteers(); }}
               disabled={loading}
               className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 disabled:opacity-40"
               aria-label="Actualizar"
@@ -540,10 +737,7 @@ export default function TasksPage() {
 
           {(filterCategory || filterPriority) && (
             <button
-              onClick={() => {
-                setFilterCategory("");
-                setFilterPriority("");
-              }}
+              onClick={() => { setFilterCategory(""); setFilterPriority(""); }}
               className="flex items-center gap-1 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm text-gray-500 hover:bg-gray-50"
             >
               <X className="h-3.5 w-3.5" />
@@ -587,16 +781,10 @@ export default function TasksPage() {
                   <div
                     className={`flex items-center justify-between rounded-lg border px-3 py-2 ${col.headerBg}`}
                   >
-                    <div className="flex items-center gap-2">
-                      <span
-                        className={`rounded-full px-2 py-0.5 text-xs font-semibold ${col.color}`}
-                      >
-                        {col.label}
-                      </span>
-                    </div>
-                    <span className="text-xs font-medium text-gray-500">
-                      {colTasks.length}
+                    <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${col.color}`}>
+                      {col.label}
                     </span>
+                    <span className="text-xs font-medium text-gray-500">{colTasks.length}</span>
                   </div>
 
                   {/* Task cards */}
@@ -610,7 +798,9 @@ export default function TasksPage() {
                         <TaskCard
                           key={task.id}
                           task={task}
+                          volunteers={volunteers}
                           onStatusChange={handleStatusChange}
+                          onReassign={setReassignTask}
                         />
                       ))
                     )}
@@ -624,7 +814,21 @@ export default function TasksPage() {
 
       {/* Create modal */}
       {showCreate && (
-        <CreateTaskModal onClose={() => setShowCreate(false)} onCreated={handleCreated} />
+        <CreateTaskModal
+          volunteers={volunteers}
+          onClose={() => setShowCreate(false)}
+          onCreated={handleCreated}
+        />
+      )}
+
+      {/* Assign modal */}
+      {reassignTask && (
+        <AssignModal
+          task={reassignTask}
+          volunteers={volunteers}
+          onClose={() => setReassignTask(null)}
+          onAssigned={handleAssign}
+        />
       )}
     </div>
   );
