@@ -685,6 +685,26 @@ export interface PreQualifyResult {
   estimated_wait_time: string;
 }
 
+// --- Donor Leaderboard ---
+
+export interface LeaderboardEntry {
+  rank: number;
+  donor_id: string | null;
+  display_name: string;
+  country: string | null;
+  total_donated_cents: number;
+  currency: CurrencyCode;
+  donation_count: number;
+  is_anonymous: boolean;
+}
+
+export interface LeaderboardResponse {
+  items: LeaderboardEntry[];
+  total_donors: number;
+  total_raised_cents: number;
+  currency: CurrencyCode;
+}
+
 // --- API Error ---
 
 export interface ApiError {
