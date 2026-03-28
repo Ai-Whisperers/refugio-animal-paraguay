@@ -109,7 +109,6 @@ import type {
   PreQualifyRequest,
   PreQualifyResult,
   PublicAdoptionApplicationCreate,
-  PublicStatisticsResponse,
   PublicAdoptionApplicationResponse,
   PublicStatisticsResponse,
   StripeIntentResponse,
@@ -128,6 +127,7 @@ export interface AnimalListParams {
   min_age_months?: number;
   max_age_months?: number;
   search?: string;
+  featured?: boolean;
   page?: number;
   page_size?: number;
 }
@@ -149,6 +149,8 @@ export async function listAnimalsPublic(
   if (params.max_age_months !== undefined)
     searchParams.set("max_age_months", String(params.max_age_months));
   if (params.search) searchParams.set("search", params.search);
+  if (params.featured !== undefined)
+    searchParams.set("featured", String(params.featured));
   if (params.page !== undefined)
     searchParams.set("page", String(params.page));
   if (params.page_size !== undefined)

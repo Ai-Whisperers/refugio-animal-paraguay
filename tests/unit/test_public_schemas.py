@@ -48,6 +48,7 @@ class TestPublicAnimalListItem:
             birth_date=date(2023, 1, 15),
             description="Friendly dog",
             primary_photo_url="https://example.com/photo.jpg",
+            is_featured=False,
             created_at=datetime(2026, 1, 1, tzinfo=UTC),
         )
         assert item.name == "Firulais"
@@ -55,6 +56,25 @@ class TestPublicAnimalListItem:
         assert item.breed == "Labrador"
         assert item.size == AnimalSize.LARGE
         assert item.gender == AnimalGender.MALE
+        assert item.is_featured is False
+
+    def test_featured_animal(self) -> None:
+        item = PublicAnimalListItem(
+            id=uuid4(),
+            name="Luna",
+            species=AnimalSpecies.CAT,
+            breed="Siamese",
+            size=AnimalSize.SMALL,
+            gender=AnimalGender.FEMALE,
+            birth_date=date(2024, 6, 1),
+            description="Featured cat",
+            primary_photo_url="https://example.com/luna.jpg",
+            is_featured=True,
+            created_at=datetime(2026, 1, 1, tzinfo=UTC),
+        )
+        assert item.is_featured is True
+        data = item.model_dump()
+        assert data["is_featured"] is True
 
     def test_nullable_fields_explicit_null(self) -> None:
         """Nullable fields are represented as null, never omitted."""
@@ -68,6 +88,7 @@ class TestPublicAnimalListItem:
             birth_date=None,
             description=None,
             primary_photo_url=None,
+            is_featured=False,
             created_at=datetime(2026, 1, 1, tzinfo=UTC),
         )
         data = item.model_dump()
@@ -77,6 +98,7 @@ class TestPublicAnimalListItem:
         assert data["birth_date"] is None
         assert data["description"] is None
         assert data["primary_photo_url"] is None
+        assert data["is_featured"] is False
 
 
 class TestPublicAnimalDetail:
@@ -97,6 +119,7 @@ class TestPublicAnimalDetail:
             birth_date=date(2024, 6, 1),
             description="Playful cat",
             primary_photo_url="https://example.com/photo.jpg",
+            is_featured=False,
             photos=[photo],
             created_at=datetime(2026, 1, 1, tzinfo=UTC),
             updated_at=datetime(2026, 1, 2, tzinfo=UTC),
@@ -115,6 +138,7 @@ class TestPublicAnimalDetail:
             birth_date=None,
             description=None,
             primary_photo_url=None,
+            is_featured=False,
             photos=[],
             created_at=datetime(2026, 1, 1, tzinfo=UTC),
             updated_at=datetime(2026, 1, 1, tzinfo=UTC),
@@ -171,6 +195,7 @@ class TestPaginatedAnimalResponse:
             birth_date=date(2022, 3, 1),
             description="Good boy",
             primary_photo_url=None,
+            is_featured=False,
             created_at=datetime(2026, 1, 1, tzinfo=UTC),
         )
         response = PaginatedAnimalResponse(

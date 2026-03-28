@@ -41,6 +41,7 @@ class PublicAnimalListItem(BaseModel):
     birth_date: date | None
     description: str | None
     primary_photo_url: str | None
+    is_featured: bool
     created_at: datetime
 
 
@@ -61,6 +62,7 @@ class PublicAnimalDetail(BaseModel):
     birth_date: date | None
     description: str | None
     primary_photo_url: str | None
+    is_featured: bool
     photos: list[PublicPhotoResponse]
     created_at: datetime
     updated_at: datetime

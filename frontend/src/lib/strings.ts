@@ -88,6 +88,10 @@ export const HOME = {
       animal: "Buddy (perro)",
     },
   ],
+  featuredTitle: "Animales destacados",
+  featuredSubtitle: "Estos amigos buscan un hogar con urgencia",
+  featuredViewAll: "Ver todos los animales",
+  featuredAdopt: "Conocer",
   footerCtaText: "Cada adopcion, donacion o hora de voluntariado hace una diferencia enorme.",
   footerCtaWhatsApp: "Escribinos por WhatsApp",
   footerCtaDonate: "Hacer una donacion",
@@ -155,6 +159,7 @@ export const ANIMAL_DETAIL = {
   photoGallery: "Galeria de fotos",
   previousPhoto: "Foto anterior",
   nextPhoto: "Siguiente foto",
+  sponsorAnimal: (name: string) => `Apadrinar a ${name}`,
 } as const;
 
 // --- Adoption Form ---

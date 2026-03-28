@@ -137,6 +137,7 @@ export interface PublicAnimalListItem {
   birth_date: string | null;
   description: string | null;
   primary_photo_url: string | null;
+  is_featured: boolean;
   created_at: string;
 }
 
