@@ -68,6 +68,7 @@ from src.api.emergencies import router as emergencies_router
 from src.api.emergency_donations import router as emergency_donations_router
 from src.api.expense_approval import router as expense_approval_router
 from src.api.financial_stats import router as financial_stats_router
+from src.api.feature_requests import router as feature_requests_router
 from src.api.follow_ups import router as follow_ups_router
 from src.api.followup_automation import admin_router as followup_auto_admin_router
 from src.api.followup_automation import public_router as followup_auto_public_router
@@ -375,6 +376,7 @@ def create_app() -> FastAPI:
     application.include_router(referral_tracking_admin_router)
     application.include_router(emergencies_router)
     application.include_router(emergency_donations_router)
+    application.include_router(feature_requests_router)
     application.include_router(pipeline_tracking_router)
     application.include_router(transport_router)
     application.include_router(followup_auto_admin_router)
