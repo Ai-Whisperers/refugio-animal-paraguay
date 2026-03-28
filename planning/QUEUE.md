@@ -456,7 +456,7 @@ Week 3-4:
 | 4 | Social media share buttons (Facebook, Instagram, Twitter) | RAP-569 | 3 | READY | Frontend |
 | 5 | Share tracking analytics | RAP-570 | 5 | DONE (PR #189) | Backend |
 | 6 | Referral tracking | RAP-571 | 5 | DONE (on develop) | Backend |
-| 7 | Auto-generated social media cards | RAP-572 | 3 | IN PR #190 | Backend |
+| 7 | Auto-generated social media cards | RAP-572 | 3 | DONE | Backend |
 
 ---
 
@@ -468,27 +468,27 @@ Week 3-4:
 
 | # | Story | Ticket | Pts | Status | Track |
 |---|-------|--------|-----|--------|-------|
-| 1 | Emergency case model and creation API | RAP-580 | 5 | IN PR #191 | Backend |
+| 1 | Emergency case model and creation API | RAP-580 | 5 | DONE | Backend |
 | 2 | Emergency case creation form | RAP-581 | 5 | READY | Fullstack |
 | 3 | Emergency featured on homepage | RAP-582 | 5 | READY | Frontend |
-| 4 | Push notifications to donors | RAP-583 | 3 | IN PR #192 | Backend |
+| 4 | Push notifications to donors | RAP-583 | 3 | DONE | Backend |
 | 5 | Simplified 1-click donation for emergencies | RAP-584 | 5 | READY | Fullstack |
-| 6 | Auto-close when funded | RAP-585 | 3 | IN PR #193 | Backend |
+| 6 | Auto-close when funded | RAP-585 | 3 | DONE | Backend |
 | 7 | Post-emergency update | RAP-586 | 3 | READY | Fullstack |
-| 8 | Emergency analytics | RAP-587 | 3 | IN PR #194 | Backend |
+| 8 | Emergency analytics | RAP-587 | 3 | DONE | Backend |
 
 ### EPIC-87: Advanced Adoption Workflow (40 pts)
 
 | # | Story | Ticket | Pts | Status | Track |
 |---|-------|--------|-----|--------|-------|
-| 1 | Configurable adoption pipeline stages | RAP-588 | 5 | IN PR #195 | Backend |
+| 1 | Configurable adoption pipeline stages | RAP-588 | 5 | DONE | Backend |
 | 2 | Pipeline status tracking API | RAP-589 | 5 | DONE | Backend |
 | 3 | Adoption pipeline board UI | RAP-590 | 8 | READY | Frontend |
 | 4 | Home visit scheduling | RAP-591 | 5 | READY | Fullstack |
 | 5 | Trial period management | RAP-592 | 5 | READY | Fullstack |
 | 6 | Post-adoption follow-up automation | RAP-593 | 5 | DONE | Backend |
-| 7 | Return/exchange management | RAP-594 | 3 | IN PR #198 | Backend |
-| 8 | Adoption success scoring | RAP-595 | 5 | READY | Backend |
+| 7 | Return/exchange management | RAP-594 | 3 | DONE | Backend |
+| 8 | Adoption success scoring | RAP-595 | 5 | DONE | Backend |
 
 ### EPIC-88: Mobile-First PWA (41 pts)
 
@@ -512,7 +512,7 @@ Week 3-4:
 | 3 | Financial transparency dashboard | RAP-606 | 7 | READY | Fullstack |
 | 4 | Campaign-specific financial reports | RAP-607 | 5 | READY | Fullstack |
 | 5 | Donor impact summaries | RAP-608 | 6 | READY | Fullstack |
-| 6 | Automated monthly impact emails | RAP-609 | 4 | READY | Backend |
+| 6 | Automated monthly impact emails | RAP-609 | 4 | DONE (PR #206) | Backend |
 | 7 | Annual financial report generation | RAP-610 | 3 | READY | Backend |
 | 8 | Expense approval workflow | RAP-611 | 2 | READY | Fullstack |
 
@@ -526,30 +526,30 @@ Week 3-4:
 
 | # | Story | Ticket | Pts | Status | Track |
 |---|-------|--------|-----|--------|-------|
-| 1 | Survey model with question types | RAP-612 | 5 | READY | Backend |
+| 1 | Survey model with question types | RAP-612 | 5 | DONE | Backend |
 | 2 | Admin survey creation form | RAP-613 | 6 | READY | Fullstack |
 | 3 | Public survey response collection | RAP-614 | 4 | READY | Fullstack |
 | 4 | Survey results analytics dashboard | RAP-615 | 5 | READY | Fullstack |
 | 5 | Community feature request board | RAP-616 | 3 | READY | Frontend |
-| 6 | Survey distribution via WhatsApp/email | RAP-617 | 3 | READY | Backend |
+| 6 | Survey distribution via WhatsApp/email | RAP-617 | 3 | PR #205 | Backend |
 
 ### EPIC-91: Animal Transport & Logistics Network (29 pts)
 
 | # | Story | Ticket | Pts | Status | Track |
 |---|-------|--------|-----|--------|-------|
-| 1 | Transport request model and API | RAP-618 | 4 | IN PR #201 | Backend |
+| 1 | Transport request model and API | RAP-618 | 4 | DONE | Backend |
 | 2 | Transport request creation form | RAP-619 | 5 | READY | Fullstack |
 | 3 | Volunteer driver registration | RAP-620 | 5 | READY | Fullstack |
 | 4 | Intelligent request matching and notification | RAP-621 | 6 | READY | Fullstack |
 | 5 | Real-time trip tracking with photos | RAP-622 | 4 | READY | Fullstack |
-| 6 | Integration with vet appointments | RAP-623 | 3 | READY | Backend |
-| 7 | Driver reimbursement tracking | RAP-624 | 2 | READY | Backend |
+| 6 | Integration with vet appointments | RAP-623 | 3 | PR #204 | Backend |
+| 7 | Driver reimbursement tracking | RAP-624 | 2 | PR #203 | Backend |
 
 ### EPIC-92: Education & Responsible Pet Ownership Hub (31 pts)
 
 | # | Story | Ticket | Pts | Status | Track |
 |---|-------|--------|-----|--------|-------|
-| 1 | Educational article model and API | RAP-625 | 4 | READY | Backend |
+| 1 | Educational article model and API | RAP-625 | 4 | PR #202 | Backend |
 | 2 | Education hub public page | RAP-626 | 5 | READY | Frontend |
 | 3 | Article detail page with related articles | RAP-627 | 5 | READY | Frontend |
 | 4 | Required pre-adoption reading enforcement | RAP-628 | 4 | READY | Fullstack |
