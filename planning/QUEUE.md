@@ -511,7 +511,7 @@ Week 3-4:
 | 2 | Expense management UI with receipts | RAP-605 | 5 | PR #263 | Frontend |
 | 3 | Financial transparency dashboard | RAP-606 | 7 | PR #264 | Fullstack |
 | 4 | Campaign-specific financial reports | RAP-607 | 5 | PR #265 | Fullstack |
-| 5 | Donor impact summaries | RAP-608 | 6 | READY | Fullstack |
+| 5 | Donor impact summaries | RAP-608 | 6 | PR #266 | Fullstack |
 | 6 | Automated monthly impact emails | RAP-609 | 4 | DONE (PR #206) | Backend |
 | 7 | Annual financial report generation | RAP-610 | 3 | PR #261 | Backend |
 | 8 | Expense approval workflow | RAP-611 | 2 | PR #260 | Fullstack |
