@@ -717,6 +717,19 @@ export interface CastrationCampaignListResponse {
   total: number;
 }
 
+
+// --- Public Statistics ---
+
+export interface PublicStatisticsResponse {
+  total_animals_rescued: number;
+  total_adopted: number;
+  total_castrated: number;
+  total_donors: number;
+  total_donations_amount_cents: number;
+  total_volunteers: number;
+  last_updated: string;
+}
+
 // --- API Error ---
 
 export interface ApiError {
