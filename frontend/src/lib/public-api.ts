@@ -110,6 +110,11 @@ import type {
   PreQualifyResult,
   PublicAdoptionApplicationCreate,
   PublicAdoptionApplicationResponse,
+  PublicClinicDetail,
+  PublicClinicListResponse,
+  ClinicFundingStats,
+  ClinicFundRequest,
+  ClinicFundResponse,
   PublicStatisticsResponse,
   StripeIntentResponse,
   SubscriptionCreateRequest,
@@ -511,4 +516,56 @@ export async function getPublicStatistics(): Promise<PublicStatisticsResponse> {
  */
 export async function getImpactStatistics(): Promise<ImpactResponse> {
   return apiFetch<ImpactResponse>("/api/stats/impact");
+}
+
+// --- Public Clinic Fund ---
+
+/**
+ * Fetch list of active clinics (public, no auth).
+ * GET /public/clinics
+ */
+export async function listClinicsPublic(
+  city?: string,
+  page = 1,
+  pageSize = 20
+): Promise<PublicClinicListResponse> {
+  const params = new URLSearchParams({
+    page: String(page),
+    page_size: String(pageSize),
+  });
+  if (city) params.set("city", city);
+  return apiFetch<PublicClinicListResponse>(`/public/clinics?${params}`);
+}
+
+/**
+ * Fetch a single clinic with services (public, no auth).
+ * GET /public/clinics/{clinicId}
+ */
+export async function getClinicPublic(
+  clinicId: string
+): Promise<PublicClinicDetail> {
+  return apiFetch<PublicClinicDetail>(`/public/clinics/${clinicId}`);
+}
+
+/**
+ * Fetch funding stats for a clinic (public, no auth).
+ * GET /public/clinics/{clinicId}/stats
+ */
+export async function getClinicFundingStats(
+  clinicId: string
+): Promise<ClinicFundingStats> {
+  return apiFetch<ClinicFundingStats>(`/public/clinics/${clinicId}/stats`);
+}
+
+/**
+ * Create a clinic-targeted donation (public, no auth).
+ * POST /public/clinic-fund
+ */
+export async function createClinicFundDonation(
+  data: ClinicFundRequest
+): Promise<ClinicFundResponse> {
+  return apiFetch<ClinicFundResponse>("/public/clinic-fund", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
 }

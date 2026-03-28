@@ -896,6 +896,74 @@ export interface SponsorshipTierResponse {
   updated_at: string;
 }
 
+// --- Public Clinic Fund ---
+
+export interface PublicClinicSummary {
+  id: string;
+  name: string;
+  city: string;
+  department: string | null;
+  specialties: string | null;
+  accepts_emergencies: boolean;
+}
+
+export interface PublicClinicListResponse {
+  items: PublicClinicSummary[];
+  total: number;
+  page: number;
+  page_size: number;
+}
+
+export interface PublicServiceSummary {
+  id: string;
+  name: string;
+  description: string | null;
+  category: string;
+  price_eur: number | null;
+}
+
+export interface PublicClinicDetail {
+  id: string;
+  name: string;
+  city: string;
+  department: string | null;
+  address: string;
+  phone: string;
+  email: string;
+  specialties: string | null;
+  accepts_emergencies: boolean;
+  services: PublicServiceSummary[];
+}
+
+export interface ClinicFundingStats {
+  clinic_id: string;
+  clinic_name: string;
+  total_funded_cents: number;
+  donation_count: number;
+  currency: string;
+}
+
+export interface ClinicFundRequest {
+  clinic_id: string;
+  amount_cents: number;
+  currency: string;
+  service_id?: string | null;
+  donor_name: string;
+  donor_email: string;
+  message?: string | null;
+}
+
+export interface ClinicFundResponse {
+  donation_id: string;
+  clinic_name: string;
+  donor_email: string;
+  amount_cents: number;
+  currency: string;
+  service_name: string | null;
+  stripe_checkout_url: string | null;
+  message: string;
+}
+
 // --- API Error ---
 
 export interface ApiError {
