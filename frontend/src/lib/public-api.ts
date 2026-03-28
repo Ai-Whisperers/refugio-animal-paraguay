@@ -94,6 +94,7 @@ import type {
   CampaignSocialProof,
   CastrationCampaignPublic,
   CastrationCampaignListResponse,
+  CastrationDriveListResponse,
   DonationCreateRequest,
   DonationResponse,
   DonorCreateRequest,
@@ -406,5 +407,27 @@ export async function getCastrationCampaignPublic(
   return api.get<CastrationCampaignPublic>(
     `/public/castration-campaigns/${campaignId}`,
     NO_AUTH
+  );
+}
+
+// --- Castration Drives ---
+
+/**
+ * Fetch upcoming castration drives for a campaign.
+ * GET /public/castration-campaigns/{campaignId}/drives
+ */
+export async function getCastrationCampaignDrives(
+  campaignId: string,
+  page = 1,
+  pageSize = 20,
+  includePast = false
+): Promise<CastrationDriveListResponse> {
+  const params = new URLSearchParams({
+    page: String(page),
+    page_size: String(pageSize),
+  });
+  if (includePast) params.set("include_past", "true");
+  return apiFetch<CastrationDriveListResponse>(
+    `/public/castration-campaigns/${campaignId}/drives?${params}`
   );
 }

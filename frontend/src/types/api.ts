@@ -717,6 +717,36 @@ export interface CastrationCampaignListResponse {
   total: number;
 }
 
+// --- Castration Drives ---
+
+export type CastrationDriveStatus = "scheduled" | "in_progress" | "completed" | "cancelled";
+
+export interface CastrationDrivePublic {
+  id: string;
+  campaign_id: string;
+  title: string;
+  description: string | null;
+  location_name: string;
+  location_address: string | null;
+  drive_date: string;
+  start_time: string | null;
+  end_time: string | null;
+  max_capacity: number;
+  registered_count: number;
+  spots_available: number;
+  is_full: boolean;
+  status: CastrationDriveStatus;
+  contact_phone: string | null;
+  contact_name: string | null;
+}
+
+export interface CastrationDriveListResponse {
+  items: CastrationDrivePublic[];
+  total: number;
+  page: number;
+  page_size: number;
+}
+
 // --- API Error ---
 
 export interface ApiError {
