@@ -1,4 +1,4 @@
-"""Unit tests for volunteer registration API (RAP-640).
+"""Unit tests for volunteer registration API (RAP-640, RAP-642).
 
 Tests the schemas, validation, and business logic of volunteer endpoints
 without requiring a live database.
@@ -9,10 +9,17 @@ from uuid import uuid4
 import pytest
 from pydantic import ValidationError
 from src.api.volunteer import (
+    OnboardingChecklistResponse,
+    OnboardingItemResponse,
+    OnboardingItemUpdateRequest,
     VolunteerApplyRequest,
     VolunteerReviewRequest,
     VolunteerUpdateRequest,
     _build_profile_response,
+)
+from src.db.models.volunteer_onboarding import (
+    MANDATORY_ITEM_KEYS,
+    ONBOARDING_ITEMS,
 )
 from src.db.models.volunteer_profile import (
     VOLUNTEER_SKILL_OPTIONS,
@@ -518,3 +525,192 @@ class TestGetVolunteerProfileById:
         result = _build_profile_response(profile, user)
 
         assert result["rejection_reason"] == reason
+
+
+# ---------------------------------------------------------------------------
+# ONBOARDING_ITEMS constant (RAP-642)
+# ---------------------------------------------------------------------------
+
+
+class TestOnboardingItemsConstant:
+    def test_has_five_items(self):
+        assert len(ONBOARDING_ITEMS) == 5
+
+    def test_contains_expected_keys(self):
+        expected_keys = {
+            "orientation",
+            "safety_training",
+            "animal_handling",
+            "shelter_rules",
+            "emergency_procedures",
+        }
+        assert set(ONBOARDING_ITEMS.keys()) == expected_keys
+
+    def test_all_titles_are_non_empty_strings(self):
+        for key, title in ONBOARDING_ITEMS.items():
+            assert isinstance(title, str), f"Title for '{key}' is not a string"
+            assert len(title) > 0, f"Title for '{key}' is empty"
+
+    def test_is_dict(self):
+        assert isinstance(ONBOARDING_ITEMS, dict)
+
+
+# ---------------------------------------------------------------------------
+# MANDATORY_ITEM_KEYS constant (RAP-642)
+# ---------------------------------------------------------------------------
+
+
+class TestMandatoryItemKeys:
+    def test_is_frozenset(self):
+        assert isinstance(MANDATORY_ITEM_KEYS, frozenset)
+
+    def test_has_four_mandatory_items(self):
+        assert len(MANDATORY_ITEM_KEYS) == 4
+
+    def test_contains_mandatory_keys(self):
+        assert "orientation" in MANDATORY_ITEM_KEYS
+        assert "safety_training" in MANDATORY_ITEM_KEYS
+        assert "animal_handling" in MANDATORY_ITEM_KEYS
+        assert "shelter_rules" in MANDATORY_ITEM_KEYS
+
+    def test_emergency_procedures_is_not_mandatory(self):
+        assert "emergency_procedures" not in MANDATORY_ITEM_KEYS
+
+    def test_mandatory_keys_are_subset_of_onboarding_items(self):
+        assert MANDATORY_ITEM_KEYS.issubset(set(ONBOARDING_ITEMS.keys()))
+
+
+# ---------------------------------------------------------------------------
+# OnboardingItemUpdateRequest schema (RAP-642)
+# ---------------------------------------------------------------------------
+
+
+class TestOnboardingItemUpdateRequest:
+    def test_mark_complete_valid(self):
+        req = OnboardingItemUpdateRequest(completed=True)
+        assert req.completed is True
+        assert req.notes is None
+
+    def test_mark_incomplete_valid(self):
+        req = OnboardingItemUpdateRequest(completed=False)
+        assert req.completed is False
+
+    def test_with_notes_valid(self):
+        req = OnboardingItemUpdateRequest(completed=True, notes="Aprobado en sesión grupal.")
+        assert req.notes == "Aprobado en sesión grupal."
+
+    def test_notes_too_long_raises(self):
+        with pytest.raises(ValidationError):
+            OnboardingItemUpdateRequest(completed=True, notes="A" * 501)
+
+    def test_notes_exactly_500_chars_valid(self):
+        req = OnboardingItemUpdateRequest(completed=True, notes="A" * 500)
+        assert req.notes is not None
+        assert len(req.notes) == 500
+
+    def test_completed_field_required(self):
+        with pytest.raises(ValidationError):
+            OnboardingItemUpdateRequest()
+
+
+# ---------------------------------------------------------------------------
+# OnboardingItemResponse schema (RAP-642)
+# ---------------------------------------------------------------------------
+
+
+class TestOnboardingItemResponse:
+    def test_build_from_dict(self):
+        item_id = uuid4()
+        resp = OnboardingItemResponse(
+            id=item_id,
+            item_key="orientation",
+            title="Orientación general del refugio",
+            is_mandatory=True,
+            completed=False,
+            completed_at=None,
+            notes=None,
+        )
+        assert resp.id == item_id
+        assert resp.item_key == "orientation"
+        assert resp.is_mandatory is True
+        assert resp.completed is False
+        assert resp.completed_at is None
+
+    def test_completed_item_with_timestamp(self):
+        from datetime import UTC, datetime
+
+        now = datetime.now(UTC)
+        resp = OnboardingItemResponse(
+            id=uuid4(),
+            item_key="safety_training",
+            title="Capacitación en seguridad",
+            is_mandatory=True,
+            completed=True,
+            completed_at=now,
+            notes="Completado en la primera sesión.",
+        )
+        assert resp.completed is True
+        assert resp.completed_at == now
+        assert resp.notes == "Completado en la primera sesión."
+
+
+# ---------------------------------------------------------------------------
+# OnboardingChecklistResponse schema (RAP-642)
+# ---------------------------------------------------------------------------
+
+
+class TestOnboardingChecklistResponse:
+    def _make_item(self, item_key: str, *, is_mandatory: bool, completed: bool):
+        return OnboardingItemResponse(
+            id=uuid4(),
+            item_key=item_key,
+            title=ONBOARDING_ITEMS[item_key],
+            is_mandatory=is_mandatory,
+            completed=completed,
+            completed_at=None,
+            notes=None,
+        )
+
+    def test_empty_checklist(self):
+        resp = OnboardingChecklistResponse(
+            items=[],
+            total=0,
+            completed_count=0,
+            mandatory_complete=True,
+        )
+        assert resp.total == 0
+        assert resp.completed_count == 0
+        assert resp.mandatory_complete is True
+
+    def test_partial_completion_state(self):
+        items = [
+            self._make_item("orientation", is_mandatory=True, completed=True),
+            self._make_item("safety_training", is_mandatory=True, completed=False),
+            self._make_item("emergency_procedures", is_mandatory=False, completed=False),
+        ]
+        resp = OnboardingChecklistResponse(
+            items=items,
+            total=3,
+            completed_count=1,
+            mandatory_complete=False,
+        )
+        assert resp.total == 3
+        assert resp.completed_count == 1
+        assert resp.mandatory_complete is False
+
+    def test_all_mandatory_complete_flag(self):
+        items = [
+            self._make_item("orientation", is_mandatory=True, completed=True),
+            self._make_item("safety_training", is_mandatory=True, completed=True),
+            self._make_item("animal_handling", is_mandatory=True, completed=True),
+            self._make_item("shelter_rules", is_mandatory=True, completed=True),
+            self._make_item("emergency_procedures", is_mandatory=False, completed=False),
+        ]
+        resp = OnboardingChecklistResponse(
+            items=items,
+            total=5,
+            completed_count=4,
+            mandatory_complete=True,
+        )
+        assert resp.mandatory_complete is True
+        assert resp.completed_count == 4
