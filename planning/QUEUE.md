@@ -337,7 +337,7 @@ Week 3-4:
 | 3 | Voucher purchase flow for donors | RAP-509 | 8 | READY | Fullstack | RAP-508 |
 | 4 | VetVoucher model and lifecycle API | RAP-510 | 5 | DONE (PR #161) | Backend | RAP-507 |
 | 5 | Rescuer voucher wallet and claim flow | RAP-511 | 5 | READY | Fullstack | RAP-510, RAP-500 |
-| 6 | Clinic redemption interface | RAP-512 | 5 | READY | Fullstack | RAP-510 |
+| 6 | Clinic redemption interface | RAP-512 | 5 | IN REVIEW (PR #163) | Fullstack | RAP-510 |
 | 7 | Donor transparency notifications | RAP-513 | 3 | READY | Backend | RAP-509 |
 | 8 | Voucher expiry and refund policy | RAP-514 | 3 | IN REVIEW (PR #162) | Backend | RAP-510 |
 | 9 | Financial reconciliation dashboard | RAP-515 | 5 | READY | Fullstack | RAP-512 |
