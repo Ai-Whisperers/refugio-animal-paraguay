@@ -440,9 +440,9 @@ Week 3-4:
 |---|-------|--------|-----|--------|-------|
 | 1 | CMS content model and API | RAP-551 | 5 | DONE (PR #187) | Backend |
 | 2 | Homepage dynamic content | RAP-552 | 5 | DONE (PR #241) | Fullstack |
-| 3 | Admin content editor | RAP-553 | 8 | PR #249 | Frontend |
-| 4 | Success stories CRUD | RAP-554 | 5 | PR #246 | Fullstack |
-| 5 | News/blog posts | RAP-555 | 5 | PR #247 | Fullstack |
+| 3 | Admin content editor | RAP-553 | 8 | DONE (PR #249) | Frontend |
+| 4 | Success stories CRUD | RAP-554 | 5 | DONE (PR #246) | Fullstack |
+| 5 | News/blog posts | RAP-555 | 5 | DONE (PR #247) | Fullstack |
 | 6 | Featured animals on homepage | RAP-556 | 3 | DONE (PR #237) | Fullstack |
 | 7 | Featured campaigns on homepage | RAP-557 | 3 | DONE (PR #238) | Fullstack |
 | 8 | Multilingual content support | RAP-558 | 5 | DONE (PR #188) | Backend |
@@ -452,8 +452,8 @@ Week 3-4:
 | # | Story | Ticket | Pts | Status | Track |
 |---|-------|--------|-----|--------|-------|
 | 1 | Open Graph meta tags for all public pages | RAP-566 | 5 | DONE (PR #240) | Frontend |
-| 2 | WhatsApp share buttons on animal cards | RAP-567 | 3 | IN_REVIEW (PR #226) | Frontend |
-| 3 | WhatsApp share for campaigns | RAP-568 | 3 | IN_REVIEW (PR #228) | Frontend |
+| 2 | WhatsApp share buttons on animal cards | RAP-567 | 3 | DONE (PR #226) | Frontend |
+| 3 | WhatsApp share for campaigns | RAP-568 | 3 | DONE (PR #228) | Frontend |
 | 4 | Social media share buttons (Facebook, Instagram, Twitter) | RAP-569 | 3 | DONE (PR #239) | Frontend |
 | 5 | Share tracking analytics | RAP-570 | 5 | DONE (PR #189) | Backend |
 | 6 | Referral tracking | RAP-571 | 5 | DONE (on develop) | Backend |
@@ -470,12 +470,12 @@ Week 3-4:
 | # | Story | Ticket | Pts | Status | Track |
 |---|-------|--------|-----|--------|-------|
 | 1 | Emergency case model and creation API | RAP-580 | 5 | DONE | Backend |
-| 2 | Emergency case creation form | RAP-581 | 5 | PR #243 | Fullstack |
-| 3 | Emergency featured on homepage | RAP-582 | 5 | PR #244 | Frontend |
+| 2 | Emergency case creation form | RAP-581 | 5 | DONE (PR #243) | Fullstack |
+| 3 | Emergency featured on homepage | RAP-582 | 5 | DONE (PR #244) | Frontend |
 | 4 | Push notifications to donors | RAP-583 | 3 | DONE | Backend |
-| 5 | Simplified 1-click donation for emergencies | RAP-584 | 5 | PR #245 | Fullstack |
+| 5 | Simplified 1-click donation for emergencies | RAP-584 | 5 | DONE (PR #245) | Fullstack |
 | 6 | Auto-close when funded | RAP-585 | 3 | DONE | Backend |
-| 7 | Post-emergency update | RAP-586 | 3 | PR #242 | Fullstack |
+| 7 | Post-emergency update | RAP-586 | 3 | DONE (PR #242) | Fullstack |
 | 8 | Emergency analytics | RAP-587 | 3 | DONE | Backend |
 
 ### EPIC-87: Advanced Adoption Workflow (40 pts)
@@ -484,9 +484,9 @@ Week 3-4:
 |---|-------|--------|-----|--------|-------|
 | 1 | Configurable adoption pipeline stages | RAP-588 | 5 | DONE | Backend |
 | 2 | Pipeline status tracking API | RAP-589 | 5 | DONE | Backend |
-| 3 | Adoption pipeline board UI | RAP-590 | 8 | PR #251 | Frontend |
-| 4 | Home visit scheduling | RAP-591 | 5 | PR #250 | Fullstack |
-| 5 | Trial period management | RAP-592 | 5 | PR #248 | Fullstack |
+| 3 | Adoption pipeline board UI | RAP-590 | 8 | DONE (PR #251) | Frontend |
+| 4 | Home visit scheduling | RAP-591 | 5 | DONE (PR #250) | Fullstack |
+| 5 | Trial period management | RAP-592 | 5 | DONE (PR #248) | Fullstack |
 | 6 | Post-adoption follow-up automation | RAP-593 | 5 | DONE | Backend |
 | 7 | Return/exchange management | RAP-594 | 3 | DONE | Backend |
 | 8 | Adoption success scoring | RAP-595 | 5 | DONE | Backend |
@@ -495,26 +495,26 @@ Week 3-4:
 
 | # | Story | Ticket | Pts | Status | Track |
 |---|-------|--------|-----|--------|-------|
-| 1 | PWA manifest and service worker setup | RAP-596 | 5 | PR #255 | Frontend |
+| 1 | PWA manifest and service worker setup | RAP-596 | 5 | DONE (PR #255) | Frontend |
 | 2 | Responsive design audit and fixes | RAP-597 | 6 | DONE (PR #256) | Frontend |
 | 3 | Camera integration for forms | RAP-598 | 7 | DONE (PR #259) | Fullstack |
 | 4 | Offline donation forms with IndexedDB | RAP-599 | 6 | DONE (PR #258) | Fullstack |
 | 5 | Web push notifications | RAP-600 | 6 | DONE (PR #257) | Fullstack |
 | 6 | Touch-friendly admin interface | RAP-601 | 4 | DONE (PR #254) | Frontend |
-| 7 | App-like bottom navigation bar | RAP-602 | 4 | PR #253 | Frontend |
+| 7 | App-like bottom navigation bar | RAP-602 | 4 | DONE (PR #253) | Frontend |
 | 8 | Performance optimization and bundling | RAP-603 | 3 | DONE (PR #252) | Fullstack |
 
 ### EPIC-89: Financial Transparency & Impact Reporting (38 pts)
 
 | # | Story | Ticket | Pts | Status | Track |
 |---|-------|--------|-----|--------|-------|
-| 1 | Expense recording system | RAP-604 | 6 | PR #262 | Fullstack |
+| 1 | Expense recording system | RAP-604 | 6 | DONE (PR #262) | Fullstack |
 | 2 | Expense management UI with receipts | RAP-605 | 5 | DONE (PR #263) | Frontend |
 | 3 | Financial transparency dashboard | RAP-606 | 7 | DONE (PR #264) | Fullstack |
 | 4 | Campaign-specific financial reports | RAP-607 | 5 | DONE (PR #265) | Fullstack |
 | 5 | Donor impact summaries | RAP-608 | 6 | DONE (PR #266) | Fullstack |
 | 6 | Automated monthly impact emails | RAP-609 | 4 | DONE (PR #206) | Backend |
-| 7 | Annual financial report generation | RAP-610 | 3 | PR #261 | Backend |
+| 7 | Annual financial report generation | RAP-610 | 3 | DONE (PR #261) | Backend |
 | 8 | Expense approval workflow | RAP-611 | 2 | DONE (PR #260) | Fullstack |
 
 ---
@@ -528,35 +528,35 @@ Week 3-4:
 | # | Story | Ticket | Pts | Status | Track |
 |---|-------|--------|-----|--------|-------|
 | 1 | Survey model with question types | RAP-612 | 5 | DONE | Backend |
-| 2 | Admin survey creation form | RAP-613 | 6 | PR #270 | Fullstack |
+| 2 | Admin survey creation form | RAP-613 | 6 | DONE (PR #270) | Fullstack |
 | 3 | Public survey response collection | RAP-614 | 4 | DONE (PR #268) | Fullstack |
-| 4 | Survey results analytics dashboard | RAP-615 | 5 | PR #269 | Fullstack |
-| 5 | Community feature request board | RAP-616 | 3 | PR #267 | Frontend |
-| 6 | Survey distribution via WhatsApp/email | RAP-617 | 3 | PR #205 | Backend |
+| 4 | Survey results analytics dashboard | RAP-615 | 5 | DONE (PR #269) | Fullstack |
+| 5 | Community feature request board | RAP-616 | 3 | DONE (PR #267) | Frontend |
+| 6 | Survey distribution via WhatsApp/email | RAP-617 | 3 | DONE (PR #205) | Backend |
 
 ### EPIC-91: Animal Transport & Logistics Network (29 pts)
 
 | # | Story | Ticket | Pts | Status | Track |
 |---|-------|--------|-----|--------|-------|
 | 1 | Transport request model and API | RAP-618 | 4 | DONE | Backend |
-| 2 | Transport request creation form | RAP-619 | 5 | PR #282 | Fullstack |
+| 2 | Transport request creation form | RAP-619 | 5 | DONE (PR #282) | Fullstack |
 | 3 | Volunteer driver registration | RAP-620 | 5 | DONE (PR #283) | Fullstack |
 | 4 | Intelligent request matching and notification | RAP-621 | 6 | DONE (PR #286) | Fullstack |
-| 5 | Real-time trip tracking with photos | RAP-622 | 4 | PR #277 | Fullstack |
-| 6 | Integration with vet appointments | RAP-623 | 3 | PR #204 | Backend |
-| 7 | Driver reimbursement tracking | RAP-624 | 2 | PR #203 | Backend |
+| 5 | Real-time trip tracking with photos | RAP-622 | 4 | DONE (PR #277) | Fullstack |
+| 6 | Integration with vet appointments | RAP-623 | 3 | DONE (PR #204) | Backend |
+| 7 | Driver reimbursement tracking | RAP-624 | 2 | DONE (PR #203) | Backend |
 
 ### EPIC-92: Education & Responsible Pet Ownership Hub (31 pts)
 
 | # | Story | Ticket | Pts | Status | Track |
 |---|-------|--------|-----|--------|-------|
 | 1 | Educational article model and API | RAP-625 | 4 | DONE (PR #202) | Backend |
-| 2 | Education hub public page | RAP-626 | 5 | PR #273 | Frontend |
-| 3 | Article detail page with related articles | RAP-627 | 5 | PR #274 | Frontend |
-| 4 | Required pre-adoption reading enforcement | RAP-628 | 4 | PR #275 | Fullstack |
-| 5 | Sterilization awareness campaign page | RAP-629 | 4 | PR #272 | Frontend |
-| 6 | Video embed support | RAP-630 | 3 | PR #271 | Frontend |
-| 7 | Admin article editor with rich text | RAP-631 | 6 | PR #276 | Fullstack |
+| 2 | Education hub public page | RAP-626 | 5 | DONE (PR #273) | Frontend |
+| 3 | Article detail page with related articles | RAP-627 | 5 | DONE (PR #274) | Frontend |
+| 4 | Required pre-adoption reading enforcement | RAP-628 | 4 | DONE (PR #275) | Fullstack |
+| 5 | Sterilization awareness campaign page | RAP-629 | 4 | DONE (PR #272) | Frontend |
+| 6 | Video embed support | RAP-630 | 3 | DONE (PR #271) | Frontend |
+| 7 | Admin article editor with rich text | RAP-631 | 6 | DONE (PR #276) | Fullstack |
 
 ---
 
@@ -570,11 +570,11 @@ Week 3-4:
 |---|-------|--------|-----|--------|-------|
 | 1 | Executive KPI dashboard | RAP-632 | 7 | DONE (PR #288) | Fullstack |
 | 2 | Animal intake/outcome analytics | RAP-633 | 6 | DONE (PR #287) | Fullstack |
-| 3 | Donation analytics and trends | RAP-634 | 5 | PR #280 | Fullstack |
-| 4 | Donor analytics and retention | RAP-635 | 5 | PR #281 | Fullstack |
-| 5 | Veterinary care analytics | RAP-636 | 4 | PR #278 | Fullstack |
+| 3 | Donation analytics and trends | RAP-634 | 5 | DONE (PR #280) | Fullstack |
+| 4 | Donor analytics and retention | RAP-635 | 5 | DONE (PR #281) | Fullstack |
+| 5 | Veterinary care analytics | RAP-636 | 4 | DONE (PR #278) | Fullstack |
 | 6 | Community engagement analytics | RAP-637 | 5 | DONE (PR #284) | Fullstack |
-| 7 | Exportable reports (PDF/CSV) | RAP-638 | 4 | PR #279 | Fullstack |
+| 7 | Exportable reports (PDF/CSV) | RAP-638 | 4 | DONE (PR #279) | Fullstack |
 | 8 | Predictive analytics and forecasting | RAP-639 | 5 | DONE (PR #285) | Backend |
 
 ---
@@ -591,7 +591,7 @@ Full details in [ROADMAP.md](ROADMAP.md). Each sprint has epic and story docs in
 | 1 | V4 | Staff Operations Launch (S1 done, S2+ pending) | 105 | EPIC 21-25 |
 | 2 | V5 | Veterinary & Medical Records | 105 | EPIC 26-30 |
 | 3 | V6 | EU Payment Integration | 112 | EPIC 31-35 |
-| 4 | V7 | Volunteer & Foster Programs | 99 | EPIC 36-40 | EPIC-36 S1 DONE (PR #301), S2 DONE (PR #302), S3 BLOCKED (PR #303 conflict — needs manual resolution), S4 DONE (PR #304), S5 DONE (PR #305) | EPIC-37 S1 DONE (PR #306), S2 DONE (PR #307), S3 BLOCKED (PR #308 conflict — needs manual resolution), S4 DONE (PR #309), S5 DONE (PR #310) |
+| 4 | V7 | Volunteer & Foster Programs | 99 | EPIC 36-40 | EPIC-36: S1 DONE (PR #301), S2 DONE (PR #302), S3 BLOCKED (PR #303 conflict), S4 DONE (PR #304), S5 DONE (PR #305). EPIC-37: S1 DONE (PR #306), S2 DONE (PR #307), S3 BLOCKED (PR #308 conflict), S4 DONE (PR #309), S5 DONE (PR #310). EPIC-38: S1 DONE (PR #311), S2 DONE (PR #312), S3 DONE (PR #313), S4 DONE (PR #314), S5 planned. |
 | 5 | V8 | Notifications & Communications | 102 | EPIC 41-45 |
 | 6 | V9 | GDPR, Security & Compliance | 87 | EPIC 46-50 |
 | 7 | V10 | Analytics & Reporting | 101 | EPIC 51-55 |
