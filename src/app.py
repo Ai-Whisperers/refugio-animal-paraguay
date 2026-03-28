@@ -60,6 +60,7 @@ from src.api.public_adoption import router as public_adoption_router
 from src.api.public_campaigns import router as public_campaigns_router
 from src.api.public_contact import router as public_contact_router
 from src.api.public_register import router as public_register_router
+from src.api.public_statistics import router as public_statistics_router
 from src.api.rescuer_vouchers import router as rescuer_vouchers_router
 from src.api.sepa import router as sepa_router
 from src.api.sessions import router as sessions_router
@@ -239,6 +240,7 @@ def create_app() -> FastAPI:
     application.include_router(user_roles_router)
     application.include_router(pre_qualification_router)
     application.include_router(smart_matching_router)
+    application.include_router(public_statistics_router)
 
     return application
 
