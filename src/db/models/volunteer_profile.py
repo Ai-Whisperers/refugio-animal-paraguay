@@ -68,9 +68,11 @@ class VolunteerProfile(Base):
     )
     # Application fields
     motivation: Mapped[str] = mapped_column(sa.Text, nullable=False)
+    bio: Mapped[str | None] = mapped_column(sa.String(500), nullable=True)
     skills: Mapped[list | None] = mapped_column(sa.JSON, nullable=True)
     availability: Mapped[list | None] = mapped_column(sa.JSON, nullable=True)
     hours_per_week: Mapped[int | None] = mapped_column(sa.Integer, nullable=True)
+    languages_spoken: Mapped[list | None] = mapped_column(sa.JSON, nullable=True)
     # Emergency contact
     emergency_contact_name: Mapped[str | None] = mapped_column(sa.String(100), nullable=True)
     emergency_contact_phone: Mapped[str | None] = mapped_column(sa.String(20), nullable=True)

@@ -266,3 +266,155 @@ class TestBuildProfileResponse:
         user = self._make_user()
         result = _build_profile_response(profile, user)
         assert result["availability"] == []
+
+
+# ---------------------------------------------------------------------------
+# RAP-641: VolunteerProfileUpdateRequest schema validation
+# ---------------------------------------------------------------------------
+
+
+class TestVolunteerProfileUpdateRequest:
+    """Tests for the new skills/availability/bio update schema (RAP-641)."""
+
+    def test_empty_request_is_valid(self):
+        from src.api.volunteer import VolunteerProfileUpdateRequest
+
+        req = VolunteerProfileUpdateRequest()
+        assert req.bio is None
+        assert req.skills is None
+        assert req.availability is None
+        assert req.hours_per_week is None
+        assert req.languages_spoken is None
+
+    def test_full_valid_request(self):
+        from src.api.volunteer import VolunteerProfileUpdateRequest
+
+        req = VolunteerProfileUpdateRequest(
+            bio="Soy amante de los animales y tengo experiencia con perros rescatados.",
+            skills=["animal_care", "photography"],
+            availability=["weekend_mornings", "flexible"],
+            hours_per_week=6,
+            languages_spoken=["Español", "Inglés"],
+        )
+        assert req.bio is not None
+        assert "animal_care" in req.skills
+        assert req.hours_per_week == 6
+        assert "Español" in req.languages_spoken
+
+    def test_bio_max_length_enforced(self):
+        from pydantic import ValidationError
+        from src.api.volunteer import VolunteerProfileUpdateRequest
+
+        with pytest.raises(ValidationError):
+            VolunteerProfileUpdateRequest(bio="x" * 501)
+
+    def test_bio_500_chars_is_valid(self):
+        from src.api.volunteer import VolunteerProfileUpdateRequest
+
+        req = VolunteerProfileUpdateRequest(bio="a" * 500)
+        assert req.bio is not None
+        assert len(req.bio) == 500
+
+    def test_hours_per_week_min_1(self):
+        from pydantic import ValidationError
+        from src.api.volunteer import VolunteerProfileUpdateRequest
+
+        with pytest.raises(ValidationError):
+            VolunteerProfileUpdateRequest(hours_per_week=0)
+
+    def test_hours_per_week_max_40(self):
+        from pydantic import ValidationError
+        from src.api.volunteer import VolunteerProfileUpdateRequest
+
+        with pytest.raises(ValidationError):
+            VolunteerProfileUpdateRequest(hours_per_week=41)
+
+    def test_hours_per_week_boundary_valid(self):
+        from src.api.volunteer import VolunteerProfileUpdateRequest
+
+        req1 = VolunteerProfileUpdateRequest(hours_per_week=1)
+        req2 = VolunteerProfileUpdateRequest(hours_per_week=40)
+        assert req1.hours_per_week == 1
+        assert req2.hours_per_week == 40
+
+
+# ---------------------------------------------------------------------------
+# RAP-641: VolunteerProfileOptions schema
+# ---------------------------------------------------------------------------
+
+
+class TestVolunteerProfileOptions:
+    def test_options_structure(self):
+        from src.api.volunteer import VolunteerProfileOptions
+
+        opts = VolunteerProfileOptions(
+            skills=["animal_care", "photography"],
+            availability=["weekday_mornings", "flexible"],
+        )
+        assert "animal_care" in opts.skills
+        assert "flexible" in opts.availability
+
+
+# ---------------------------------------------------------------------------
+# RAP-641: _build_profile_response includes new fields
+# ---------------------------------------------------------------------------
+
+
+class TestBuildProfileResponseRAP641:
+    def _make_profile(self, **overrides):
+        from unittest.mock import MagicMock
+
+        profile = MagicMock(spec=VolunteerProfile)
+        profile.id = overrides.get("id", uuid4())
+        profile.user_id = overrides.get("user_id", uuid4())
+        profile.motivation = overrides.get("motivation", "Me gustan los animales y quiero ayudar.")
+        profile.bio = overrides.get("bio", "Voluntaria con experiencia en cuidado felino.")
+        profile.skills = overrides.get("skills", ["animal_care"])
+        profile.availability = overrides.get("availability", ["weekend_mornings"])
+        profile.hours_per_week = overrides.get("hours_per_week", 5)
+        profile.languages_spoken = overrides.get("languages_spoken", ["Español", "Guaraní"])
+        profile.emergency_contact_name = overrides.get("emergency_contact_name")
+        profile.emergency_contact_phone = overrides.get("emergency_contact_phone")
+        profile.status = overrides.get("status", VolunteerStatus.APPROVED)
+        profile.rejection_reason = overrides.get("rejection_reason")
+        profile.reviewed_by = overrides.get("reviewed_by")
+        profile.reviewed_at = overrides.get("reviewed_at")
+        profile.total_hours_logged = overrides.get("total_hours_logged", 0)
+        profile.created_at = overrides.get("created_at")
+        profile.updated_at = overrides.get("updated_at")
+        return profile
+
+    def _make_user(self, **overrides):
+        from unittest.mock import MagicMock
+
+        from src.db.models.user import User
+
+        user = MagicMock(spec=User)
+        user.id = overrides.get("id", uuid4())
+        user.full_name = overrides.get("full_name", "María González")
+        user.email = overrides.get("email", "maria@example.com")
+        return user
+
+    def test_bio_included_in_response(self):
+        profile = self._make_profile(bio="Voluntaria con años de experiencia.")
+        user = self._make_user()
+        result = _build_profile_response(profile, user)
+        assert result["bio"] == "Voluntaria con años de experiencia."
+
+    def test_bio_none_is_preserved(self):
+        profile = self._make_profile(bio=None)
+        user = self._make_user()
+        result = _build_profile_response(profile, user)
+        assert result["bio"] is None
+
+    def test_languages_spoken_included(self):
+        profile = self._make_profile(languages_spoken=["Español", "Inglés"])
+        user = self._make_user()
+        result = _build_profile_response(profile, user)
+        assert result["languages_spoken"] == ["Español", "Inglés"]
+
+    def test_languages_spoken_none_returns_empty_list(self):
+        profile = self._make_profile(languages_spoken=None)
+        user = self._make_user()
+        result = _build_profile_response(profile, user)
+        assert result["languages_spoken"] == []
