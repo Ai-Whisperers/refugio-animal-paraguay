@@ -18,8 +18,8 @@ from slowapi.errors import RateLimitExceeded
 
 from src.api.admin import router as admin_router
 from src.api.admin_campaigns import router as admin_campaigns_router
-from src.api.admin_fund_dashboard import router as admin_fund_dashboard_router
 from src.api.admin_castration_campaigns import router as admin_castration_campaigns_router
+from src.api.admin_fund_dashboard import router as admin_fund_dashboard_router
 from src.api.admin_sse import router as admin_sse_router
 from src.api.admin_voucher_finance import router as admin_voucher_finance_router
 from src.api.adopters import router as adopters_router
@@ -35,6 +35,8 @@ from src.api.animal_updates import router as animal_updates_router
 from src.api.animals import router as animals_router
 from src.api.appointments import router as appointments_router
 from src.api.auth import router as auth_router
+from src.api.blog_posts import admin_router as blog_admin_router
+from src.api.blog_posts import public_router as blog_public_router
 from src.api.campaign_voucher_integration import router as campaign_voucher_integration_router
 from src.api.castration_drives import admin_router as castration_drives_admin_router
 from src.api.castration_drives import public_router as castration_drives_public_router
@@ -59,8 +61,6 @@ from src.api.educational_article import admin_router as article_admin_router
 from src.api.educational_article import public_router as article_public_router
 from src.api.email_verification import router as email_verification_router
 from src.api.emergencies import router as emergencies_router
-from src.api.emergency_updates import public_router as emergency_updates_public_router
-from src.api.emergency_updates import staff_router as emergency_updates_staff_router
 from src.api.follow_ups import router as follow_ups_router
 from src.api.followup_automation import admin_router as followup_auto_admin_router
 from src.api.followup_automation import public_router as followup_auto_public_router
@@ -91,8 +91,8 @@ from src.api.profile import router as profile_router
 from src.api.public import router as public_router
 from src.api.public_adoption import router as public_adoption_router
 from src.api.public_campaigns import router as public_campaigns_router
-from src.api.public_clinic_fund import router as public_clinic_fund_router
 from src.api.public_castration_campaigns import router as public_castration_campaigns_router
+from src.api.public_clinic_fund import router as public_clinic_fund_router
 from src.api.public_contact import router as public_contact_router
 from src.api.public_impact import router as public_impact_router
 from src.api.public_register import router as public_register_router
@@ -248,6 +248,8 @@ def create_app() -> FastAPI:
 
     # --- Routers ---
     application.include_router(health_router)
+    application.include_router(blog_admin_router)
+    application.include_router(blog_public_router)
     application.include_router(auth_router)
     application.include_router(google_oauth_router)
     application.include_router(password_reset_router)
