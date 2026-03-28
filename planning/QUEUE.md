@@ -482,11 +482,11 @@ Week 3-4:
 | # | Story | Ticket | Pts | Status | Track |
 |---|-------|--------|-----|--------|-------|
 | 1 | Configurable adoption pipeline stages | RAP-588 | 5 | IN PR #195 | Backend |
-| 2 | Pipeline status tracking API | RAP-589 | 5 | IN PR #TBD | Backend |
+| 2 | Pipeline status tracking API | RAP-589 | 5 | DONE | Backend |
 | 3 | Adoption pipeline board UI | RAP-590 | 8 | READY | Frontend |
 | 4 | Home visit scheduling | RAP-591 | 5 | READY | Fullstack |
 | 5 | Trial period management | RAP-592 | 5 | READY | Fullstack |
-| 6 | Post-adoption follow-up automation | RAP-593 | 5 | READY | Backend |
+| 6 | Post-adoption follow-up automation | RAP-593 | 5 | IN PR #TBD | Backend |
 | 7 | Return/exchange management | RAP-594 | 3 | READY | Backend |
 | 8 | Adoption success scoring | RAP-595 | 5 | READY | Backend |
 

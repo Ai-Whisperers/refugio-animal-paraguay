@@ -45,6 +45,8 @@ from src.api.donors import router as donors_router
 from src.api.email_verification import router as email_verification_router
 from src.api.emergencies import router as emergencies_router
 from src.api.follow_ups import router as follow_ups_router
+from src.api.followup_automation import admin_router as followup_auto_admin_router
+from src.api.followup_automation import public_router as followup_auto_public_router
 from src.api.fund_allocations import router as fund_allocations_router
 from src.api.gdpr import router as gdpr_router
 from src.api.gdpr_export import router as gdpr_export_router
@@ -299,6 +301,8 @@ def create_app() -> FastAPI:
     application.include_router(emergencies_router)
     application.include_router(pipeline_tracking_router)
     application.include_router(transport_router)
+    application.include_router(followup_auto_admin_router)
+    application.include_router(followup_auto_public_router)
 
     return application
 
