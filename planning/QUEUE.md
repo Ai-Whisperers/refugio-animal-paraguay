@@ -469,7 +469,7 @@ Week 3-4:
 | # | Story | Ticket | Pts | Status | Track |
 |---|-------|--------|-----|--------|-------|
 | 1 | Emergency case model and creation API | RAP-580 | 5 | DONE | Backend |
-| 2 | Emergency case creation form | RAP-581 | 5 | READY | Fullstack |
+| 2 | Emergency case creation form | RAP-581 | 5 | PR #243 | Fullstack |
 | 3 | Emergency featured on homepage | RAP-582 | 5 | READY | Frontend |
 | 4 | Push notifications to donors | RAP-583 | 3 | DONE | Backend |
 | 5 | Simplified 1-click donation for emergencies | RAP-584 | 5 | READY | Fullstack |
