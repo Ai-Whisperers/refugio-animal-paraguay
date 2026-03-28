@@ -19,6 +19,7 @@ from slowapi.errors import RateLimitExceeded
 from src.api.admin import router as admin_router
 from src.api.admin_campaigns import router as admin_campaigns_router
 from src.api.admin_castration_campaigns import router as admin_castration_campaigns_router
+from src.api.admin_sse import router as admin_sse_router
 from src.api.adopters import router as adopters_router
 from src.api.adoption_requests import router as adoption_requests_router
 from src.api.adoption_requirements import (
@@ -85,6 +86,7 @@ from src.middleware.error_handler import register_exception_handlers
 from src.middleware.logging_middleware import RequestLoggingMiddleware
 from src.middleware.rate_limiter import configure_limiter, limiter
 from src.middleware.request_id import RequestIDMiddleware
+from src.notifications.donation_sse_handlers import DonationSSEHandlers
 from src.notifications.handlers import NotificationHandlers
 from src.notifications.in_app_handlers import InAppNotificationHandlers
 from src.notifications.service import EmailService
@@ -94,6 +96,7 @@ from src.notifications.whatsapp_service import WhatsAppService
 from src.sentry_config import configure_sentry
 from src.services.dunning_service import DunningService
 from src.services.sepa_notification_service import SepaNotificationService
+from src.services.sse_service import sse_manager
 
 
 @asynccontextmanager
@@ -121,6 +124,10 @@ async def lifespan(application: FastAPI) -> AsyncGenerator[None, None]:
     whatsapp_service = WhatsAppService(settings)
     whatsapp_handlers = WhatsAppHandlers(whatsapp_service)
     whatsapp_handlers.register(event_bus)
+
+    # Register SSE handlers for real-time admin dashboard notifications
+    donation_sse_handlers = DonationSSEHandlers(sse_manager)
+    donation_sse_handlers.register(event_bus)
 
     # Attach SEPA notification service for webhook handlers
     application.state.sepa_notifier = SepaNotificationService(email_service, renderer)
@@ -198,6 +205,7 @@ def create_app() -> FastAPI:
     application.include_router(in_kind_donations_router)
     application.include_router(fund_allocations_router)
     application.include_router(admin_router)
+    application.include_router(admin_sse_router)
     application.include_router(adoption_req_admin_router)
     application.include_router(adoption_req_public_router)
     application.include_router(public_router)
