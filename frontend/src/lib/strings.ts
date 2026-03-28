@@ -155,6 +155,7 @@ export const ANIMAL_DETAIL = {
   photoGallery: "Galeria de fotos",
   previousPhoto: "Foto anterior",
   nextPhoto: "Siguiente foto",
+  sponsorAnimal: (name: string) => `Apadrinar a ${name}`,
 } as const;
 
 // --- Adoption Form ---
