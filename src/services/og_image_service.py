@@ -46,6 +46,7 @@ class OGCardType(StrEnum):
 
     ANIMAL = "animal"
     CAMPAIGN = "campaign"
+    CASTRATION_CAMPAIGN = "castration-campaign"
     STORY = "story"
     BLOG = "blog"
 
