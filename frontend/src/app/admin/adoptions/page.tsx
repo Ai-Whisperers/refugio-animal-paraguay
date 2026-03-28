@@ -27,6 +27,7 @@ const LABEL_EMPTY_FILTERED = "No hay solicitudes con este estado";
 const LABEL_RETRY = "Reintentar";
 const LABEL_BACK = "Volver al panel";
 const LABEL_ANALYTICS = "Analiticas";
+const LABEL_PIPELINE = "Pipeline";
 const LABEL_SHOWING = "Mostrando";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const LABEL_OF = "de";
@@ -233,6 +234,12 @@ export default function AdminAdoptionsPage() {
             </h1>
           </div>
           <div className="flex items-center gap-2">
+            <button
+              onClick={() => router.push("/admin/adoptions/pipeline")}
+              className="flex items-center gap-1.5 rounded-lg border border-warm-border px-3 py-1.5 text-sm text-warm-text-secondary transition-colors hover:bg-warm-bg hover:text-warm-text-primary"
+            >
+              {LABEL_PIPELINE}
+            </button>
             <button
               onClick={() => router.push("/admin/adoptions/analytics")}
               className="flex items-center gap-1.5 rounded-lg border border-warm-border px-3 py-1.5 text-sm text-warm-text-secondary transition-colors hover:bg-warm-bg hover:text-warm-text-primary"
