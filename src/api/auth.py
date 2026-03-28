@@ -57,6 +57,14 @@ async def login(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
+    # OAuth-only users cannot log in with password
+    if user.hashed_password is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="This account uses social login. Please sign in with Google.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
     # Check lockout BEFORE verifying the password
     if is_account_locked(user):
         remaining = lockout_remaining_seconds(user)

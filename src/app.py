@@ -41,6 +41,7 @@ from src.api.follow_ups import router as follow_ups_router
 from src.api.fund_allocations import router as fund_allocations_router
 from src.api.gdpr import router as gdpr_router
 from src.api.gdpr_export import router as gdpr_export_router
+from src.api.google_oauth import router as google_oauth_router
 from src.api.health import router as health_router
 from src.api.impact_reports import router as impact_reports_router
 from src.api.in_kind_donations import router as in_kind_donations_router
@@ -182,6 +183,7 @@ def create_app() -> FastAPI:
     # --- Routers ---
     application.include_router(health_router)
     application.include_router(auth_router)
+    application.include_router(google_oauth_router)
     application.include_router(password_reset_router)
     application.include_router(email_verification_router)
     application.include_router(phone_verification_router)

@@ -152,6 +152,24 @@ class Settings(BaseSettings):
         description="Tigo Money API base URL. Override for sandbox/staging environments.",
     )
 
+    # Google OAuth
+    google_client_id: str = Field(
+        default="",
+        description="Google OAuth2 client ID. Required for social login.",
+    )
+    google_client_secret: str = Field(
+        default="",
+        description="Google OAuth2 client secret. Required for social login.",
+    )
+    google_redirect_uri: str = Field(
+        default="http://localhost:3000/auth/google/callback",
+        description="OAuth2 redirect URI. Must match Google Cloud Console configuration.",
+    )
+    frontend_url: str = Field(
+        default="http://localhost:3000",
+        description="Frontend base URL for redirects after OAuth.",
+    )
+
     # Sentry error tracking
     sentry_dsn: str = Field(
         default="",

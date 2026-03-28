@@ -99,6 +99,8 @@ class UserResponse(BaseModel):
     role: UserRole
     is_active: bool
     email_verified: bool
+    oauth_provider: str | None = None
+    profile_picture_url: str | None = None
 
 
 class TokenResponse(BaseModel):

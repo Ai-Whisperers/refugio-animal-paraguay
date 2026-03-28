@@ -41,7 +41,10 @@ class User(Base):
     full_name: Mapped[str | None] = mapped_column(sa.String(100), nullable=True)
     email: Mapped[str] = mapped_column(sa.String(255), nullable=False, unique=True)
     phone: Mapped[str | None] = mapped_column(sa.String(20), nullable=True, unique=True)
-    hashed_password: Mapped[str] = mapped_column(sa.String(255), nullable=False)
+    hashed_password: Mapped[str | None] = mapped_column(sa.String(255), nullable=True)
+    oauth_provider: Mapped[str | None] = mapped_column(sa.String(50), nullable=True)
+    oauth_id: Mapped[str | None] = mapped_column(sa.String(255), nullable=True)
+    profile_picture_url: Mapped[str | None] = mapped_column(sa.String(500), nullable=True)
     role: Mapped[str] = mapped_column(
         sa.String(50),
         nullable=False,
