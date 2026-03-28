@@ -410,7 +410,7 @@ Week 3-4:
 | 4 | Castration counter widget | RAP-576 | 3 | DONE (PR #219) | Fullstack |
 | 5 | Admin real-time activity feed | RAP-577 | 5 | READY | Fullstack |
 | 6 | Real-time donation notifications | RAP-578 | 5 | DONE (PR #183) | Backend |
-| 7 | Campaign real-time progress | RAP-579 | 3 | READY | Frontend |
+| 7 | Campaign real-time progress | RAP-579 | 3 | DONE (PR #225) | Frontend |
 
 ---
 

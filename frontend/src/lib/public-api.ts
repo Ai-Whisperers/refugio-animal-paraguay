@@ -110,7 +110,6 @@ import type {
   PublicAdoptionApplicationCreate,
   PublicStatisticsResponse,
   PublicAdoptionApplicationResponse,
-  PublicStatisticsResponse,
   StripeIntentResponse,
   SubscriptionCreateRequest,
   SubscriptionDetailResponse,
@@ -495,6 +494,7 @@ export async function getCastrationCampaignReport(
     `/public/castration-campaigns/${campaignId}/report`
   );
 }
+
 // --- Public Statistics ---
 
 /**

@@ -742,6 +742,11 @@ export interface CastrationDrivePublic {
 
 export interface CastrationDriveListResponse {
   items: CastrationDrivePublic[];
+  total: number;
+  page: number;
+  page_size: number;
+}
+
 // --- Castration Photos ---
 
 export type CastrationPhotoType = "before" | "after" | "recovery";
@@ -776,6 +781,8 @@ export interface CastrationGalleryResponse {
   total: number;
   page: number;
   page_size: number;
+}
+
 // --- Donor Leaderboard ---
 
 export interface LeaderboardEntry {
@@ -794,6 +801,8 @@ export interface LeaderboardResponse {
   total_donors: number;
   total_raised_cents: number;
   currency: CurrencyCode;
+}
+
 // --- Castration Impact Report ---
 
 export interface ClinicContribution {
@@ -834,6 +843,7 @@ export interface ImpactReportResponse {
   total_clinics: number;
   drives: DrivesSummary;
   photos: PhotoSummary;
+}
 
 // --- Public Statistics ---
 
