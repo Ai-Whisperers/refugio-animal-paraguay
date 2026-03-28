@@ -5,6 +5,19 @@
 ---
 
 ## 2026-03 (March)
+### [2026-03-28 11:27] Worker Run — EPIC-36 Volunteer Registration (S1)
+- **Stories completed**: 1 — RAP-640 (Volunteer registration form + profile model + API, EPIC-36 S1)
+- **PRs opened**: #301 (RAP-640, targeting develop)
+- **Epic**: EPIC-36 Volunteer Registration & Profiles — S1 DONE (S2-S5 pending)
+- **Tests added**: 25 unit tests (`tests/unit/test_volunteer.py`)
+- **New model**: `VolunteerProfile` (skills/availability JSON, status lifecycle, motivation/hours constraints)
+- **New APIs**: `public_router` (POST /apply, GET/PUT /me) + `staff_router` (paginated list, approve/reject)
+- **Migration**: 071 (`volunteer_profiles` table with CHECK constraints and indexes)
+- **Frontend**: `/volunteer/apply` Next.js page with toggle-button multi-select for skills/availability
+- **Quality gates**: ruff clean, black clean, 25/25 unit tests pass, no regressions
+- **QUEUE.md + STORY.md**: EPIC-36 S1 marked DONE on develop
+- **Note**: Ticket ID RAP-640 used (RAP-175 collision with UX sprint). Pre-existing 113 test collection errors from community_needs.admin_router not caused by this PR.
+
 ### [2026-03-28 10:52] Worker Run — EPIC-80 Rescuer Network (S4 + S6)
 - **Stories completed**: 2 — RAP-536 (Rescuer campaign creation, S4) and RAP-538 (Community feed, S6)
 - **PRs opened**: #299 (RAP-536), #300 (RAP-538), both targeting develop
