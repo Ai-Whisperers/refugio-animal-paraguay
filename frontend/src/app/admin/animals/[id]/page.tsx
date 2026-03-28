@@ -21,6 +21,7 @@ import AnimalHistoryTimeline from "@/components/admin/AnimalHistoryTimeline";
 import MedicalTimeline from "@/components/admin/MedicalTimeline";
 import VetVisitForm from "@/components/admin/VetVisitForm";
 import type { Animal, AnimalStatus } from "@/types/api";
+import PhotoGalleryManager from "@/components/admin/PhotoGalleryManager";
 
 // --- Labels (Spanish) ---
 const LABEL_LOADING = "Cargando animal...";
@@ -333,30 +334,13 @@ export default function AnimalDetailPage() {
               </div>
             </div>
             <div className="space-y-6">
-              <div className="rounded-lg border border-warm-border bg-warm-surface p-6">
-                <h2 className="mb-3 text-base font-semibold text-warm-text-primary">
-                  {LABEL_PHOTOS}
-                </h2>
-                {animal.photos && animal.photos.length > 0 ? (
-                  <div className="grid grid-cols-2 gap-2">
-                    {animal.photos.map((photo) => (
-                      <img
-                        key={photo.id}
-                        src={photo.url}
-                        alt={photo.caption ?? animal.name}
-                        className="aspect-square rounded-lg object-cover"
-                      />
-                    ))}
-                  </div>
-                ) : (
-                  <div className="flex flex-col items-center rounded-lg bg-warm-bg py-6">
-                    <PawPrint className="h-8 w-8 text-primary-200" />
-                    <p className="mt-2 text-xs text-warm-text-tertiary">
-                      {LABEL_NO_PHOTOS}
-                    </p>
-                  </div>
-                )}
-              </div>
+              <PhotoGalleryManager
+                animalId={animal.id}
+                animalName={animal.name}
+                photos={animal.photos ?? []}
+                primaryPhotoUrl={animal.primary_photo_url}
+                onPhotosChanged={fetchAnimal}
+              />
               <div className="rounded-lg border border-warm-border bg-warm-surface p-6">
                 <div className="space-y-3">
                   <div className="flex items-center gap-2 text-xs text-warm-text-tertiary">
