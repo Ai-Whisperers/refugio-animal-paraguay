@@ -108,6 +108,11 @@ const NAV_ITEMS: NavItem[] = [
     icon: UserCheck,
   },
   {
+    label: "Turnos",
+    href: "/admin/shifts",
+    icon: Calendar,
+  },
+  {
     label: "Contenido",
     href: "/admin/content",
     icon: FileText,

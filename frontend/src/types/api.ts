@@ -1011,6 +1011,54 @@ export interface VolunteerReviewRequest {
   rejection_reason?: string | null;
 }
 
+// --- Shift Scheduling (RAP-180, RAP-181) ---
+
+export type ShiftStatus = "open" | "full" | "cancelled" | "completed";
+export type ShiftRole =
+  | "animal_care"
+  | "veterinary_assistance"
+  | "cleaning"
+  | "transport_driving"
+  | "admin_office"
+  | "education_outreach"
+  | "event_coordination"
+  | "general";
+
+export interface Shift {
+  id: string;
+  created_by: string;
+  shift_date: string; // ISO date: YYYY-MM-DD
+  start_time: string; // HH:MM:SS
+  end_time: string; // HH:MM:SS
+  role: ShiftRole;
+  capacity: number;
+  slots_filled: number;
+  status: ShiftStatus;
+  title: string | null;
+  notes: string | null;
+  location: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PaginatedShiftList {
+  items: Shift[];
+  total: number;
+  page: number;
+  page_size: number;
+}
+
+export interface ShiftCreateRequest {
+  shift_date: string;
+  start_time: string;
+  end_time: string;
+  role?: ShiftRole;
+  capacity?: number;
+  title?: string | null;
+  notes?: string | null;
+  location?: string | null;
+}
+
 // --- API Error ---
 
 export interface ApiError {
