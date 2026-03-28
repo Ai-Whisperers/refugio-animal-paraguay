@@ -3,7 +3,7 @@ story: S4
 epic: EPIC-34
 ticket: RAP-168
 title: "Donor tax ID (BSN/TIN) secure storage"
-status: planned
+status: done
 points: 3
 priority: P1
 track: Backend
