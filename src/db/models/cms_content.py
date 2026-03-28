@@ -28,6 +28,24 @@ class ContentStatus(StrEnum):
     ARCHIVED = "archived"
 
 
+class ContentLanguage(StrEnum):
+    """Supported content languages."""
+
+    ES = "es"  # Spanish (default — Paraguay)
+    EN = "en"  # English (EU donors)
+    DE = "de"  # German (EU donors)
+    NL = "nl"  # Dutch (founder's network)
+
+
+class TranslationStatus(StrEnum):
+    """Translation lifecycle status."""
+
+    ORIGINAL = "original"  # Source language version
+    TRANSLATED = "translated"  # Translation complete
+    PENDING = "pending"  # Translation needed
+    OUTDATED = "outdated"  # Original updated after translation
+
+
 class CMSContent(Base):
     """CMS content item — pages, blog posts, success stories, announcements."""
 
@@ -46,7 +64,6 @@ class CMSContent(Base):
     slug: Mapped[str] = mapped_column(
         sa.String(200),
         nullable=False,
-        unique=True,
         index=True,
     )
     title: Mapped[str] = mapped_column(
@@ -78,6 +95,23 @@ class CMSContent(Base):
     tags: Mapped[list | None] = mapped_column(
         sa.JSON,
         nullable=True,
+    )
+    language: Mapped[str] = mapped_column(
+        sa.String(5),
+        nullable=False,
+        server_default=sa.text("'es'"),
+        index=True,
+    )
+    translation_status: Mapped[str] = mapped_column(
+        sa.String(20),
+        nullable=False,
+        server_default=sa.text("'original'"),
+    )
+    source_content_id: Mapped[UUID | None] = mapped_column(
+        sa.UUID(as_uuid=True),
+        sa.ForeignKey("cms_contents.id", ondelete="SET NULL"),
+        nullable=True,
+        index=True,
     )
     author_id: Mapped[UUID] = mapped_column(
         sa.UUID(as_uuid=True),
@@ -123,6 +157,15 @@ class CMSContent(Base):
             "length(title) <= 300",
             name="chk_cms_title_max_len",
         ),
+        sa.CheckConstraint(
+            "language IN ('es', 'en', 'de', 'nl')",
+            name="chk_cms_language_valid",
+        ),
+        sa.CheckConstraint(
+            "translation_status IN ('original', 'translated', 'pending', 'outdated')",
+            name="chk_cms_translation_status_valid",
+        ),
+        sa.UniqueConstraint("slug", "language", name="uq_cms_contents_slug_language"),
         sa.Index("ix_cms_contents_type_status", "content_type", "status"),
         sa.Index("ix_cms_contents_published_at", "published_at"),
     )

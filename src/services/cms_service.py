@@ -13,7 +13,13 @@ from uuid import UUID
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.db.models.cms_content import CMSContent, ContentStatus, ContentType
+from src.db.models.cms_content import (
+    CMSContent,
+    ContentLanguage,
+    ContentStatus,
+    ContentType,
+    TranslationStatus,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -28,8 +34,13 @@ MAX_BODY_LENGTH = 100_000
 MAX_TAGS = 20
 MAX_TAG_LENGTH = 50
 
+DEFAULT_LANGUAGE = ContentLanguage.ES
+FALLBACK_LANGUAGE = ContentLanguage.ES
+
 VALID_CONTENT_TYPES = frozenset({t.value for t in ContentType})
 VALID_STATUSES = frozenset({s.value for s in ContentStatus})
+VALID_LANGUAGES = frozenset({lang.value for lang in ContentLanguage})
+VALID_TRANSLATION_STATUSES = frozenset({s.value for s in TranslationStatus})
 
 
 class CMSError(Exception):
@@ -80,6 +91,26 @@ class InvalidStatusTransitionError(CMSError):
         super().__init__(
             message="Invalid status transition",
             details=f"Cannot transition from '{current}' to '{requested}'",
+        )
+
+
+class InvalidLanguageError(CMSError):
+    """Raised for unsupported language code."""
+
+    def __init__(self, language: str) -> None:
+        super().__init__(
+            message="Invalid language",
+            details=f"Must be one of: {', '.join(sorted(VALID_LANGUAGES))}",
+        )
+
+
+class TranslationExistsError(CMSError):
+    """Raised when a translation already exists for the given language."""
+
+    def __init__(self, slug: str, language: str) -> None:
+        super().__init__(
+            message="Translation already exists",
+            details=f"Content '{slug}' already has a '{language}' translation",
         )
 
 
@@ -162,13 +193,27 @@ def validate_tags(tags: list | None) -> None:
             )
 
 
-async def _ensure_unique_slug(db: AsyncSession, slug: str, exclude_id: UUID | None = None) -> str:
-    """Ensure slug is unique, appending a number if needed."""
+def validate_language(language: str) -> None:
+    """Validate language code."""
+    if language not in VALID_LANGUAGES:
+        raise InvalidLanguageError(language)
+
+
+async def _ensure_unique_slug(
+    db: AsyncSession,
+    slug: str,
+    language: str = DEFAULT_LANGUAGE,
+    exclude_id: UUID | None = None,
+) -> str:
+    """Ensure slug is unique within the same language, appending a number if needed."""
     base_slug = slug
     counter = 1
 
     while True:
-        query = select(CMSContent.id).where(CMSContent.slug == slug)
+        query = select(CMSContent.id).where(
+            CMSContent.slug == slug,
+            CMSContent.language == language,
+        )
         if exclude_id:
             query = query.where(CMSContent.id != exclude_id)
         result = await db.execute(query)
@@ -194,6 +239,7 @@ async def create_content(
     tags: list | None = None,
     author_id: UUID | None = None,
     sort_order: int = 0,
+    language: str = DEFAULT_LANGUAGE,
     db: AsyncSession,
 ) -> CMSContent:
     """Create a new CMS content item (starts as draft).
@@ -201,15 +247,17 @@ async def create_content(
     Raises:
         CMSError: If validation fails.
         InvalidContentTypeError: If content type is invalid.
+        InvalidLanguageError: If language code is invalid.
     """
     validate_content_type(content_type)
     validate_title(title)
     validate_body(body)
     validate_summary(summary)
     validate_tags(tags)
+    validate_language(language)
 
     base_slug = generate_slug(title)
-    slug = await _ensure_unique_slug(db, base_slug)
+    slug = await _ensure_unique_slug(db, base_slug, language=language)
 
     content = CMSContent(
         content_type=content_type,
@@ -222,15 +270,18 @@ async def create_content(
         tags=tags,
         author_id=author_id,
         sort_order=sort_order,
+        language=language,
+        translation_status=TranslationStatus.ORIGINAL,
     )
 
     db.add(content)
     await db.flush()
 
     logger.info(
-        "CMS content created: type=%s slug=%s",
+        "CMS content created: type=%s slug=%s lang=%s",
         content_type,
         slug,
+        language,
     )
     return content
 
@@ -248,22 +299,52 @@ async def get_content_by_id(content_id: UUID, db: AsyncSession) -> CMSContent:
     return content
 
 
-async def get_content_by_slug(slug: str, db: AsyncSession) -> CMSContent:
-    """Get published content by slug (public endpoint).
+async def get_content_by_slug(
+    slug: str,
+    db: AsyncSession,
+    language: str | None = None,
+) -> tuple[CMSContent, bool]:
+    """Get published content by slug with language fallback.
+
+    Returns (content, language_fallback) where language_fallback is True
+    if the requested language was not available and the fallback language
+    was used instead.
 
     Raises:
         ContentNotFoundError: If not found or not published.
+        InvalidLanguageError: If language code is invalid.
     """
+    if language:
+        validate_language(language)
+
+    target_lang = language or DEFAULT_LANGUAGE
+
+    # Try requested language first
     result = await db.execute(
         select(CMSContent).where(
             CMSContent.slug == slug,
+            CMSContent.language == target_lang,
             CMSContent.status == ContentStatus.PUBLISHED,
         )
     )
     content = result.scalar_one_or_none()
-    if content is None:
-        raise ContentNotFoundError(slug)
-    return content
+    if content is not None:
+        return content, False
+
+    # Fallback to default language (Spanish) if different from requested
+    if target_lang != FALLBACK_LANGUAGE:
+        result = await db.execute(
+            select(CMSContent).where(
+                CMSContent.slug == slug,
+                CMSContent.language == FALLBACK_LANGUAGE,
+                CMSContent.status == ContentStatus.PUBLISHED,
+            )
+        )
+        content = result.scalar_one_or_none()
+        if content is not None:
+            return content, True
+
+    raise ContentNotFoundError(slug)
 
 
 async def list_content(
@@ -271,6 +352,7 @@ async def list_content(
     *,
     content_type: str | None = None,
     status: str | None = None,
+    language: str | None = None,
     limit: int = 50,
     offset: int = 0,
 ) -> tuple[list[CMSContent], int]:
@@ -290,6 +372,11 @@ async def list_content(
         query = query.where(CMSContent.status == status)
         count_query = count_query.where(CMSContent.status == status)
 
+    if language:
+        validate_language(language)
+        query = query.where(CMSContent.language == language)
+        count_query = count_query.where(CMSContent.language == language)
+
     query = query.order_by(CMSContent.sort_order.asc(), CMSContent.created_at.desc())
     query = query.limit(limit).offset(offset)
 
@@ -306,6 +393,7 @@ async def list_public_content(
     db: AsyncSession,
     *,
     content_type: str | None = None,
+    language: str | None = None,
     limit: int = 20,
     offset: int = 0,
 ) -> tuple[list[CMSContent], int]:
@@ -314,6 +402,7 @@ async def list_public_content(
         db,
         content_type=content_type,
         status=ContentStatus.PUBLISHED,
+        language=language or DEFAULT_LANGUAGE,
         limit=limit,
         offset=offset,
     )
@@ -420,3 +509,158 @@ async def delete_content(content_id: UUID, db: AsyncSession) -> None:
     await db.flush()
 
     logger.info("CMS content deleted: id=%s slug=%s", content_id, content.slug)
+
+
+# ---------------------------------------------------------------------------
+# Translation management
+# ---------------------------------------------------------------------------
+
+
+async def create_translation(
+    *,
+    source_content_id: UUID,
+    language: str,
+    title: str,
+    body: str,
+    summary: str | None = None,
+    meta_description: str | None = None,
+    author_id: UUID | None = None,
+    db: AsyncSession,
+) -> CMSContent:
+    """Create a translation of an existing content item.
+
+    Raises:
+        ContentNotFoundError: If source content not found.
+        InvalidLanguageError: If language code is invalid.
+        TranslationExistsError: If translation already exists for the language.
+        CMSError: If validation fails.
+    """
+    validate_language(language)
+    validate_title(title)
+    validate_body(body)
+    validate_summary(summary)
+
+    source = await get_content_by_id(source_content_id, db)
+
+    if language == source.language:
+        raise CMSError(
+            message="Cannot translate to same language",
+            details=f"Source content is already in '{language}'",
+        )
+
+    # Check if translation already exists for this slug + language
+    existing = await db.execute(
+        select(CMSContent.id).where(
+            CMSContent.slug == source.slug,
+            CMSContent.language == language,
+        )
+    )
+    if existing.scalar_one_or_none() is not None:
+        raise TranslationExistsError(source.slug, language)
+
+    translation = CMSContent(
+        content_type=source.content_type,
+        slug=source.slug,  # Same slug, different language
+        title=title,
+        body=body,
+        summary=summary,
+        featured_image_url=source.featured_image_url,
+        meta_description=meta_description,
+        tags=source.tags,
+        author_id=author_id,
+        sort_order=source.sort_order,
+        language=language,
+        translation_status=TranslationStatus.TRANSLATED,
+        source_content_id=source_content_id,
+    )
+
+    db.add(translation)
+    await db.flush()
+
+    logger.info(
+        "CMS translation created: slug=%s lang=%s source_id=%s",
+        source.slug,
+        language,
+        source_content_id,
+    )
+    return translation
+
+
+async def get_translation_status(
+    content_id: UUID,
+    db: AsyncSession,
+) -> dict:
+    """Get translation status for a content item and all its translations.
+
+    Returns dict with available languages, their statuses, and completion count.
+    """
+    content = await get_content_by_id(content_id, db)
+
+    # Find the source: either this content is the original, or follow source_content_id
+    source_id = content.source_content_id or content.id
+
+    # Get all translations sharing the same source (or the source itself)
+    result = await db.execute(
+        select(CMSContent).where(
+            (CMSContent.id == source_id) | (CMSContent.source_content_id == source_id)
+        )
+    )
+    all_versions = list(result.scalars().all())
+
+    languages: dict[str, dict] = {}
+    for version in all_versions:
+        languages[version.language] = {
+            "content_id": str(version.id),
+            "translation_status": version.translation_status,
+            "status": version.status,
+            "updated_at": str(version.updated_at),
+        }
+
+    total_languages = len(VALID_LANGUAGES)
+    completed = sum(
+        1
+        for lang_info in languages.values()
+        if lang_info["translation_status"]
+        in (TranslationStatus.ORIGINAL, TranslationStatus.TRANSLATED)
+    )
+
+    return {
+        "source_content_id": str(source_id),
+        "languages": languages,
+        "total_supported_languages": total_languages,
+        "completed_translations": completed,
+        "completion_label": f"{completed}/{total_languages} languages completed",
+    }
+
+
+async def mark_translations_outdated(
+    content_id: UUID,
+    db: AsyncSession,
+) -> int:
+    """Mark all translations of a content item as outdated.
+
+    Called when the source content is updated, so translators know
+    the translations need updating.
+
+    Returns the number of translations marked outdated.
+    """
+    result = await db.execute(
+        select(CMSContent).where(
+            CMSContent.source_content_id == content_id,
+            CMSContent.translation_status == TranslationStatus.TRANSLATED,
+        )
+    )
+    translations = list(result.scalars().all())
+
+    for translation in translations:
+        translation.translation_status = TranslationStatus.OUTDATED
+
+    if translations:
+        await db.flush()
+        logger.info(
+            "Marked %d translations as outdated for content_id=%s",
+            len(translations),
+            content_id,
+        )
+
+    return len(translations)

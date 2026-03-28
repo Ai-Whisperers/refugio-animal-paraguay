@@ -1,14 +1,16 @@
 """CMS content endpoints — CRUD for pages, blog posts, and announcements.
 
 Endpoints:
-  POST   /api/cms/content              -- create content (staff)
-  GET    /api/cms/content               -- list content (staff, all statuses)
-  GET    /api/cms/content/{id}          -- get content by ID (staff)
-  PUT    /api/cms/content/{id}          -- update content (staff)
-  POST   /api/cms/content/{id}/status   -- change status (staff)
-  DELETE /api/cms/content/{id}          -- delete content (staff)
-  GET    /api/public/cms/{slug}         -- public content by slug
-  GET    /api/public/cms                -- public content listing
+  POST   /api/cms/content                     -- create content (staff)
+  GET    /api/cms/content                      -- list content (staff, all statuses)
+  GET    /api/cms/content/{id}                 -- get content by ID (staff)
+  PUT    /api/cms/content/{id}                 -- update content (staff)
+  POST   /api/cms/content/{id}/status          -- change status (staff)
+  DELETE /api/cms/content/{id}                 -- delete content (staff)
+  POST   /api/cms/content/{id}/translate       -- create translation (staff)
+  GET    /api/cms/content/{id}/translations    -- get translation status (staff)
+  GET    /api/public/cms/{slug}                -- public content by slug (?lang=)
+  GET    /api/public/cms                       -- public content listing (?lang=)
 """
 
 import logging
@@ -25,15 +27,20 @@ from src.services.cms_service import (
     CMSError,
     ContentNotFoundError,
     InvalidContentTypeError,
+    InvalidLanguageError,
     InvalidStatusTransitionError,
     SlugConflictError,
+    TranslationExistsError,
     change_content_status,
     create_content,
+    create_translation,
     delete_content,
     get_content_by_id,
     get_content_by_slug,
+    get_translation_status,
     list_content,
     list_public_content,
+    mark_translations_outdated,
     update_content,
 )
 
@@ -68,6 +75,7 @@ class CMSCreateRequest(BaseModel):
     meta_description: str | None = Field(default=None, max_length=300)
     tags: list[str] | None = Field(default=None, max_length=20)
     sort_order: int = Field(default=0)
+    language: str = Field(default="es", max_length=5, description="Language code (es, en, de, nl)")
 
 
 class CMSUpdateRequest(BaseModel):
@@ -88,6 +96,16 @@ class CMSStatusRequest(BaseModel):
     status: str = Field(..., description="New status: draft, published, or archived")
 
 
+class CMSTranslationRequest(BaseModel):
+    """Request body for creating a translation."""
+
+    language: str = Field(..., max_length=5, description="Target language code (es, en, de, nl)")
+    title: str = Field(..., min_length=1, max_length=300, description="Translated title")
+    body: str = Field(..., min_length=1, description="Translated body")
+    summary: str | None = Field(default=None, max_length=500)
+    meta_description: str | None = Field(default=None, max_length=300)
+
+
 class CMSContentResponse(BaseModel):
     """Response schema for CMS content."""
 
@@ -103,6 +121,9 @@ class CMSContentResponse(BaseModel):
     tags: list | None
     author_id: UUID | None
     sort_order: int
+    language: str
+    translation_status: str
+    source_content_id: UUID | None
     published_at: str | None
     created_at: str
     updated_at: str
@@ -131,6 +152,8 @@ class CMSPublicResponse(BaseModel):
     featured_image_url: str | None
     meta_description: str | None
     tags: list | None
+    language: str
+    language_fallback: bool = False
     published_at: str | None
 
     model_config = {"from_attributes": True}
@@ -145,6 +168,16 @@ class CMSPublicListResponse(BaseModel):
     offset: int
 
 
+class CMSTranslationStatusResponse(BaseModel):
+    """Translation status for a content item."""
+
+    source_content_id: str
+    languages: dict
+    total_supported_languages: int
+    completed_translations: int
+    completion_label: str
+
+
 # ---------------------------------------------------------------------------
 # Staff endpoints
 # ---------------------------------------------------------------------------
@@ -157,12 +190,12 @@ def _handle_cms_error(exc: CMSError) -> HTTPException:
             status_code=status.HTTP_404_NOT_FOUND,
             detail={"error": "not_found", "message": exc.message, "details": exc.details},
         )
-    if isinstance(exc, SlugConflictError):
+    if isinstance(exc, (SlugConflictError, TranslationExistsError)):
         return HTTPException(
             status_code=status.HTTP_409_CONFLICT,
             detail={"error": "conflict", "message": exc.message, "details": exc.details},
         )
-    if isinstance(exc, InvalidContentTypeError):
+    if isinstance(exc, (InvalidContentTypeError, InvalidLanguageError)):
         return HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail={"error": "validation_error", "message": exc.message, "details": exc.details},
@@ -201,6 +234,7 @@ async def create_content_endpoint(
             tags=body.tags,
             author_id=staff_user.id,
             sort_order=body.sort_order,
+            language=body.language,
             db=db,
         )
     except CMSError as exc:
@@ -218,6 +252,7 @@ async def create_content_endpoint(
 async def list_content_endpoint(
     content_type: str | None = Query(None, description="Filter by content type"),
     content_status: str | None = Query(None, alias="status", description="Filter by status"),
+    language: str | None = Query(None, description="Filter by language (es, en, de, nl)"),
     limit: int = Query(50, ge=1, le=100),
     offset: int = Query(0, ge=0),
     _staff_user: User = Depends(require_staff),
@@ -229,6 +264,7 @@ async def list_content_endpoint(
             db,
             content_type=content_type,
             status=content_status,
+            language=language,
             limit=limit,
             offset=offset,
         )
@@ -298,6 +334,10 @@ async def update_content_endpoint(
     except CMSError as exc:
         raise _handle_cms_error(exc) from None
 
+    # Mark translations as outdated when source content changes
+    if body.title is not None or body.body is not None:
+        await mark_translations_outdated(content_id, db)
+
     await db.commit()
     return CMSContentResponse.model_validate(content)
 
@@ -349,6 +389,56 @@ async def delete_content_endpoint(
     await db.commit()
 
 
+@router.post(
+    "/content/{content_id}/translate",
+    response_model=CMSContentResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Create translation",
+)
+async def create_translation_endpoint(
+    content_id: UUID,
+    body: CMSTranslationRequest,
+    staff_user: User = Depends(require_staff),
+    db: AsyncSession = Depends(get_db),
+) -> CMSContentResponse:
+    """Create a translation of an existing content item."""
+    try:
+        translation = await create_translation(
+            source_content_id=content_id,
+            language=body.language,
+            title=body.title,
+            body=body.body,
+            summary=body.summary,
+            meta_description=body.meta_description,
+            author_id=staff_user.id,
+            db=db,
+        )
+    except CMSError as exc:
+        raise _handle_cms_error(exc) from None
+
+    await db.commit()
+    return CMSContentResponse.model_validate(translation)
+
+
+@router.get(
+    "/content/{content_id}/translations",
+    response_model=CMSTranslationStatusResponse,
+    summary="Get translation status",
+)
+async def get_translation_status_endpoint(
+    content_id: UUID,
+    _staff_user: User = Depends(require_staff),
+    db: AsyncSession = Depends(get_db),
+) -> CMSTranslationStatusResponse:
+    """Get translation status for a content item across all languages."""
+    try:
+        result = await get_translation_status(content_id, db)
+    except CMSError as exc:
+        raise _handle_cms_error(exc) from None
+
+    return CMSTranslationStatusResponse(**result)
+
+
 # ---------------------------------------------------------------------------
 # Public endpoints
 # ---------------------------------------------------------------------------
@@ -361,18 +451,18 @@ async def delete_content_endpoint(
 )
 async def get_public_content(
     slug: str,
+    lang: str | None = Query(None, description="Language code (es, en, de, nl)"),
     db: AsyncSession = Depends(get_db),
 ) -> CMSPublicResponse:
-    """Get published content by slug (public, no auth)."""
+    """Get published content by slug with language fallback (public, no auth)."""
     try:
-        content = await get_content_by_slug(slug, db)
-    except ContentNotFoundError:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail={"error": "not_found", "message": "Content not found"},
-        ) from None
+        content, is_fallback = await get_content_by_slug(slug, db, language=lang)
+    except CMSError as exc:
+        raise _handle_cms_error(exc) from None
 
-    return CMSPublicResponse.model_validate(content)
+    response = CMSPublicResponse.model_validate(content)
+    response.language_fallback = is_fallback
+    return response
 
 
 @public_router.get(
@@ -382,15 +472,17 @@ async def get_public_content(
 )
 async def list_public_content_endpoint(
     content_type: str | None = Query(None, description="Filter by content type"),
+    lang: str | None = Query(None, description="Language code (es, en, de, nl)"),
     limit: int = Query(20, ge=1, le=50),
     offset: int = Query(0, ge=0),
     db: AsyncSession = Depends(get_db),
 ) -> CMSPublicListResponse:
-    """List published content (public, no auth)."""
+    """List published content with language filter (public, no auth)."""
     try:
         items, total = await list_public_content(
             db,
             content_type=content_type,
+            language=lang,
             limit=limit,
             offset=offset,
         )
