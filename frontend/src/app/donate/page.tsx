@@ -9,6 +9,11 @@ import FeaturedCampaignBanner from "@/components/campaigns/FeaturedCampaignBanne
 export const metadata: Metadata = {
   title: `${DONATE.title} | ${SITE_TITLE}`,
   description: DONATE.metaDescription,
+  openGraph: {
+    title: `${DONATE.title} | ${SITE_TITLE}`,
+    description: DONATE.metaDescription,
+    url: "/donate",
+  },
 };
 
 export default function DonatePage() {

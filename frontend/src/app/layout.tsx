@@ -8,10 +8,26 @@ import { SITE_TITLE, SITE_DESCRIPTION, SKIP_LINK } from "@/lib/strings";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL ?? "https://refugioanimal.com.py";
+
 export const metadata: Metadata = {
   title: SITE_TITLE,
   description: SITE_DESCRIPTION,
   keywords: ["animal shelter", "Paraguay", "adoption", "rescue", "donate"],
+  metadataBase: new URL(BASE_URL),
+  openGraph: {
+    type: "website",
+    locale: "es_PY",
+    siteName: SITE_TITLE,
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+    url: BASE_URL,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+  },
 };
 
 export const viewport: Viewport = {

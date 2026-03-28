@@ -6,6 +6,11 @@ import { VOLUNTEER, SITE_TITLE } from "@/lib/strings";
 export const metadata: Metadata = {
   title: `${VOLUNTEER.title} | ${SITE_TITLE}`,
   description: VOLUNTEER.metaDescription,
+  openGraph: {
+    title: `${VOLUNTEER.title} | ${SITE_TITLE}`,
+    description: VOLUNTEER.metaDescription,
+    url: "/volunteer",
+  },
 };
 
 export default function VolunteerPage() {
