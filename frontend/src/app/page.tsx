@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Home, Heart, Users, MapPin, Clock, Phone, Mail, Star } from "lucide-react";
 import { HOME } from "@/lib/strings";
+import LiveStats from "@/components/LiveStats";
 
 export default function HomePage() {
   return (
@@ -40,35 +41,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="py-10 sm:py-16 px-4 bg-white">
-        <div className="max-w-5xl mx-auto grid grid-cols-3 gap-4 sm:gap-8 text-center">
-          <div className="rounded-xl p-4 sm:p-6 bg-primary-50">
-            <p className="text-2xl sm:text-4xl font-bold text-primary-600">
-              150+
-            </p>
-            <p className="text-gray-600 mt-2 text-xs sm:text-base font-medium">
-              {HOME.statsRescued}
-            </p>
-          </div>
-          <div className="rounded-xl p-4 sm:p-6 bg-orange-50">
-            <p className="text-2xl sm:text-4xl font-bold text-orange-600">
-              80+
-            </p>
-            <p className="text-gray-600 mt-2 text-xs sm:text-base font-medium">
-              {HOME.statsAdoptions}
-            </p>
-          </div>
-          <div className="rounded-xl p-4 sm:p-6 bg-secondary-50">
-            <p className="text-2xl sm:text-4xl font-bold text-secondary-600">
-              50+
-            </p>
-            <p className="text-gray-600 mt-2 text-xs sm:text-base font-medium">
-              {HOME.statsVolunteers}
-            </p>
-          </div>
-        </div>
-      </section>
+      {/* Stats Section — live data with count-up animation */}
+      <LiveStats />
 
       {/* How to Help Section */}
       <section className="py-10 sm:py-16 px-4 bg-gray-50">
