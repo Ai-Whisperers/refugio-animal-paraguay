@@ -4,8 +4,8 @@ Revision ID: 066
 Revises: 065
 """
 
-from alembic import op
 import sqlalchemy as sa
+from alembic import op
 
 revision = "066"
 down_revision = "065"

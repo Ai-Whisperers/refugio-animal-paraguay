@@ -13,6 +13,7 @@ from .community_need import CommunityNeed, NeedCategory, NeedStatus
 from .contact_submission import ContactFormType, ContactSubmission
 from .donation import CurrencyCode, Donation, DonationStatus, Donor, PaymentMethod
 from .fund_allocation import FundAllocation, FundCategory
+from .home_visit import HomeVisit, HomeVisitStatus
 from .in_kind_donation import InKindDonation, ItemType
 from .medical import (
     Diagnosis,
@@ -96,6 +97,8 @@ __all__ = [
     "Donor",
     "FundAllocation",
     "FundCategory",
+    "HomeVisit",
+    "HomeVisitStatus",
     "InKindDonation",
     "ItemType",
     "MedicalDocument",

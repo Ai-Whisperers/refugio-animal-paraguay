@@ -5,8 +5,8 @@ Revises: 036
 Create Date: 2026-03-28
 """
 
-from alembic import op
 import sqlalchemy as sa
+from alembic import op
 from sqlalchemy.dialects.postgresql import JSONB
 
 revision = "056"
