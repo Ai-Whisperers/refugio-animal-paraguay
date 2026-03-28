@@ -373,7 +373,7 @@ Week 3-4:
 | 5 | Donor leaderboard | RAP-529 | 3 | DONE (PR #214) | Fullstack | RAP-526 |
 | 6 | Castration drive scheduling | RAP-530 | 5 | READY | Fullstack | RAP-525 |
 | 7 | Post-campaign impact report | RAP-531 | 5 | READY | Fullstack | RAP-525 |
-| 8 | Social media sharing with auto-generated cards | RAP-532 | 2 | READY | Frontend | RAP-526 |
+| 8 | Social media sharing with auto-generated cards | RAP-532 | 2 | DONE (PR #215) | Frontend | RAP-526 |
 
 ### EPIC-81: Flexible Donation Targets (40 pts)
 
