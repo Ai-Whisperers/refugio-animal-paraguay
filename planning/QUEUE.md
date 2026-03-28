@@ -552,7 +552,7 @@ Week 3-4:
 | 1 | Educational article model and API | RAP-625 | 4 | DONE (PR #202) | Backend |
 | 2 | Education hub public page | RAP-626 | 5 | PR #273 | Frontend |
 | 3 | Article detail page with related articles | RAP-627 | 5 | PR #274 | Frontend |
-| 4 | Required pre-adoption reading enforcement | RAP-628 | 4 | READY | Fullstack |
+| 4 | Required pre-adoption reading enforcement | RAP-628 | 4 | PR #275 | Fullstack |
 | 5 | Sterilization awareness campaign page | RAP-629 | 4 | PR #272 | Frontend |
 | 6 | Video embed support | RAP-630 | 3 | PR #271 | Frontend |
 | 7 | Admin article editor with rich text | RAP-631 | 6 | READY | Fullstack |
