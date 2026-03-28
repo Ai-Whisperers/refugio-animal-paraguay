@@ -272,6 +272,7 @@ Week 3-4:
 | RAP-618 to RAP-624 | V15 | Sprint 15: EPIC-91 Transport Logistics |
 | RAP-625 to RAP-631 | V15 | Sprint 15: EPIC-92 Education Hub |
 | RAP-632 to RAP-639 | V16 | Sprint 16: EPIC-93 Analytics Platform |
+| RAP-640 to RAP-649 | V7 | Sprint 4: EPIC-36 Volunteer Registration (overflow IDs) |
 
 ---
 
@@ -590,7 +591,7 @@ Full details in [ROADMAP.md](ROADMAP.md). Each sprint has epic and story docs in
 | 1 | V4 | Staff Operations Launch (S1 done, S2+ pending) | 105 | EPIC 21-25 |
 | 2 | V5 | Veterinary & Medical Records | 105 | EPIC 26-30 |
 | 3 | V6 | EU Payment Integration | 112 | EPIC 31-35 |
-| 4 | V7 | Volunteer & Foster Programs | 99 | EPIC 36-40 |
+| 4 | V7 | Volunteer & Foster Programs | 99 | EPIC 36-40 | EPIC-36 S1 DONE (PR #301) |
 | 5 | V8 | Notifications & Communications | 102 | EPIC 41-45 |
 | 6 | V9 | GDPR, Security & Compliance | 87 | EPIC 46-50 |
 | 7 | V10 | Analytics & Reporting | 101 | EPIC 51-55 |

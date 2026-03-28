@@ -3,7 +3,7 @@ story: S1
 epic: EPIC-36
 ticket: RAP-175
 title: "Volunteer registration form (public)"
-status: planned
+status: done
 points: 5
 priority: P0
 track: Fullstack
