@@ -334,12 +334,12 @@ Week 3-4:
 |---|-------|--------|-----|--------|-------|------------|
 | 1 | Partner veterinary clinic registration model and API | RAP-507 | 5 | DONE (PR #158) | Backend | — |
 | 2 | Clinic service catalog with pricing | RAP-508 | 5 | DONE (PR #160) | Backend | RAP-507 |
-| 3 | Voucher purchase flow for donors | RAP-509 | 8 | IN REVIEW (PR #164) | Fullstack | RAP-508 |
+| 3 | Voucher purchase flow for donors | RAP-509 | 8 | DONE (PR #164) | Fullstack | RAP-508 |
 | 4 | VetVoucher model and lifecycle API | RAP-510 | 5 | DONE (PR #161) | Backend | RAP-507 |
-| 5 | Rescuer voucher wallet and claim flow | RAP-511 | 5 | IN REVIEW (PR #166) | Fullstack | RAP-510, RAP-500 |
-| 6 | Clinic redemption interface | RAP-512 | 5 | IN REVIEW (PR #163) | Fullstack | RAP-510 |
-| 7 | Donor transparency notifications | RAP-513 | 3 | IN REVIEW (PR #165) | Backend | RAP-509 |
-| 8 | Voucher expiry and refund policy | RAP-514 | 3 | IN REVIEW (PR #162) | Backend | RAP-510 |
+| 5 | Rescuer voucher wallet and claim flow | RAP-511 | 5 | DONE (PR #166) | Fullstack | RAP-510, RAP-500 |
+| 6 | Clinic redemption interface | RAP-512 | 5 | DONE (PR #163) | Fullstack | RAP-510 |
+| 7 | Donor transparency notifications | RAP-513 | 3 | DONE (PR #165) | Backend | RAP-509 |
+| 8 | Voucher expiry and refund policy | RAP-514 | 3 | DONE (PR #162) | Backend | RAP-510 |
 | 9 | Financial reconciliation dashboard | RAP-515 | 5 | READY | Fullstack | RAP-512 |
 | 10 | Public voucher statistics dashboard | RAP-516 | 3 | READY | Fullstack | RAP-515 |
 
@@ -347,14 +347,14 @@ Week 3-4:
 
 | # | Story | Ticket | Pts | Status | Track | Depends On |
 |---|-------|--------|-----|--------|-------|------------|
-| 1 | Configurable adoption requirements model | RAP-517 | 5 | IN PR #167 | Backend | — |
-| 2 | Pre-qualification questionnaire API | RAP-518 | 5 | IN PR #168 | Backend | RAP-517 |
+| 1 | Configurable adoption requirements model | RAP-517 | 5 | DONE (PR #167) | Backend | — |
+| 2 | Pre-qualification questionnaire API | RAP-518 | 5 | DONE (PR #168) | Backend | RAP-517 |
 | 3 | Pre-qualification form UI | RAP-519 | 8 | READY | Frontend | RAP-518 |
 | 4 | Qualification result page with alternatives | RAP-520 | 5 | READY | Frontend | RAP-519 |
 | 5 | Admin requirement configuration UI | RAP-521 | 5 | READY | Frontend | RAP-517 |
-| 6 | Smart matching algorithm | RAP-522 | 5 | READY | Backend | RAP-518 |
-| 7 | Pre-qualification analytics | RAP-523 | 3 | READY | Backend | RAP-518 |
-| 8 | Anti-gaming protection | RAP-524 | 2 | READY | Backend | RAP-518 |
+| 6 | Smart matching algorithm | RAP-522 | 5 | DONE (PR #173) | Backend | RAP-518 |
+| 7 | Pre-qualification analytics | RAP-523 | 3 | DONE (PR #174) | Backend | RAP-518 |
+| 8 | Anti-gaming protection | RAP-524 | 2 | DONE (PR #175) | Backend | RAP-518 |
 
 ---
 
@@ -366,9 +366,9 @@ Week 3-4:
 
 | # | Story | Ticket | Pts | Status | Track | Depends On |
 |---|-------|--------|-----|--------|-------|------------|
-| 1 | Castration campaign model and creation API | RAP-525 | 5 | IN PR #169 | Backend | — |
+| 1 | Castration campaign model and creation API | RAP-525 | 5 | DONE (in develop) | Backend | — |
 | 2 | Public castration campaign page with live counter | RAP-526 | 8 | READY | Fullstack | RAP-525 |
-| 3 | Integration with vet voucher system | RAP-527 | 5 | IN PR #170 | Backend | RAP-510 (EPIC-77) |
+| 3 | Integration with vet voucher system | RAP-527 | 5 | DONE (PR #170) | Backend | RAP-510 (EPIC-77) |
 | 4 | Photo gallery for completed castrations | RAP-528 | 5 | READY | Fullstack | RAP-525 |
 | 5 | Donor leaderboard | RAP-529 | 3 | READY | Fullstack | RAP-526 |
 | 6 | Castration drive scheduling | RAP-530 | 5 | READY | Fullstack | RAP-525 |
@@ -384,32 +384,32 @@ Week 3-4:
 | 3 | Rescuer support page | RAP-545 | 5 | READY | Fullstack | RAP-543, RAP-533 (EPIC-80) |
 | 4 | Clinic fund page | RAP-546 | 5 | READY | Fullstack | RAP-543, RAP-507 (EPIC-77) |
 | 5 | Need-specific donation | RAP-547 | 3 | READY | Fullstack | RAP-543 |
-| 6 | Donation allocation tracking API | RAP-548 | 5 | CONFLICTING (PR #172) | Backend | RAP-543 |
-| 7 | Impact notification system | RAP-549 | 5 | READY | Backend | RAP-548 |
+| 6 | Donation allocation tracking API | RAP-548 | 5 | DONE (PR #172) | Backend | RAP-543 |
+| 7 | Impact notification system | RAP-549 | 5 | DONE (PR #176) | Backend | RAP-548 |
 | 8 | Fund management dashboard | RAP-550 | 5 | READY | Fullstack | RAP-548 |
 
 ### EPIC-83: Photo Upload & Media Management (35 pts)
 
 | # | Story | Ticket | Pts | Status | Track |
 |---|-------|--------|-----|--------|-------|
-| 1 | Image upload endpoint with validation | RAP-559 | 5 | READY | Backend |
-| 2 | Image optimization pipeline | RAP-560 | 5 | READY | Backend |
-| 3 | Storage backend (local + S3 compatible) | RAP-561 | 5 | READY | Backend |
+| 1 | Image upload endpoint with validation | RAP-559 | 5 | DONE (PR #178) | Backend |
+| 2 | Image optimization pipeline | RAP-560 | 5 | DONE (PR #179) | Backend |
+| 3 | Storage backend (local + S3 compatible) | RAP-561 | 5 | DONE (PR #180) | Backend |
 | 4 | Animal photo gallery management UI | RAP-562 | 5 | READY | Frontend |
-| 5 | Medical document upload with validation | RAP-563 | 3 | READY | Backend |
+| 5 | Medical document upload with validation | RAP-563 | 3 | DONE (PR #181) | Backend |
 | 6 | Campaign and story image uploads | RAP-564 | 3 | READY | Fullstack |
-| 7 | Image CDN headers | RAP-565 | 3 | READY | Backend |
+| 7 | Image CDN headers | RAP-565 | 3 | DONE (PR #182) | Backend |
 
 ### EPIC-85: Real-Time Dashboard & Live Statistics (30 pts)
 
 | # | Story | Ticket | Pts | Status | Track |
 |---|-------|--------|-----|--------|-------|
-| 1 | Public statistics API | RAP-573 | 3 | READY | Backend |
+| 1 | Public statistics API | RAP-573 | 3 | DONE (PR #177) | Backend |
 | 2 | Homepage live statistics | RAP-574 | 3 | READY | Frontend |
 | 3 | Public impact page | RAP-575 | 5 | READY | Fullstack |
 | 4 | Castration counter widget | RAP-576 | 3 | READY | Fullstack |
 | 5 | Admin real-time activity feed | RAP-577 | 5 | READY | Fullstack |
-| 6 | Real-time donation notifications | RAP-578 | 5 | READY | Backend |
+| 6 | Real-time donation notifications | RAP-578 | 5 | DONE (PR #183) | Backend |
 | 7 | Campaign real-time progress | RAP-579 | 3 | READY | Frontend |
 
 ---
@@ -422,29 +422,29 @@ Week 3-4:
 
 | # | Story | Ticket | Pts | Status | Track | Depends On |
 |---|-------|--------|-----|--------|-------|------------|
-| 1 | Rescuer self-registration and profile model | RAP-533 | 5 | READY | Backend | RAP-500 (EPIC-76) |
+| 1 | Rescuer self-registration and profile model | RAP-533 | 5 | DONE (PR #184) | Backend | RAP-500 (EPIC-76) |
 | 2 | Rescuer profile page | RAP-534 | 8 | READY | Fullstack | RAP-533 |
 | 3 | Rescuer animal listing management | RAP-535 | 8 | READY | Fullstack | RAP-533 |
 | 4 | Rescuer campaign creation | RAP-536 | 5 | READY | Fullstack | RAP-534 |
 | 5 | Needs board | RAP-537 | 5 | READY | Fullstack | RAP-533 |
 | 6 | Community feed | RAP-538 | 5 | READY | Fullstack | RAP-534 |
 | 7 | Donor choice interface | RAP-539 | 5 | READY | Fullstack | RAP-543 (EPIC-81) |
-| 8 | Rescuer verification system | RAP-540 | 3 | READY | Backend | RAP-533 |
+| 8 | Rescuer verification system | RAP-540 | 3 | DONE (PR #185) | Backend | RAP-533 |
 | 9 | Admin moderation tools | RAP-541 | 5 | READY | Fullstack | RAP-533 |
-| 10 | Integration with vet voucher system | RAP-542 | 3 | READY | Backend | RAP-510 (EPIC-77) |
+| 10 | Integration with vet voucher system | RAP-542 | 3 | DONE (PR #186) | Backend | RAP-510 (EPIC-77) |
 
 ### EPIC-82: Content Management System (40 pts)
 
 | # | Story | Ticket | Pts | Status | Track |
 |---|-------|--------|-----|--------|-------|
-| 1 | CMS content model and API | RAP-551 | 5 | READY | Backend |
+| 1 | CMS content model and API | RAP-551 | 5 | DONE (PR #187) | Backend |
 | 2 | Homepage dynamic content | RAP-552 | 5 | READY | Fullstack |
 | 3 | Admin content editor | RAP-553 | 8 | READY | Frontend |
 | 4 | Success stories CRUD | RAP-554 | 5 | READY | Fullstack |
 | 5 | News/blog posts | RAP-555 | 5 | READY | Fullstack |
 | 6 | Featured animals on homepage | RAP-556 | 3 | READY | Fullstack |
 | 7 | Featured campaigns on homepage | RAP-557 | 3 | READY | Fullstack |
-| 8 | Multilingual content support | RAP-558 | 5 | READY | Backend |
+| 8 | Multilingual content support | RAP-558 | 5 | DONE (PR #188) | Backend |
 
 ### EPIC-84: Social Sharing & WhatsApp Deep Integration (30 pts)
 
