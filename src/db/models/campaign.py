@@ -108,6 +108,27 @@ class Campaign(Base):
         sa.ForeignKey("users.id", ondelete="SET NULL"),
         nullable=True,
     )
+    # Rescuer who owns this campaign (NULL for staff-created campaigns)
+    rescuer_id: Mapped[UUID | None] = mapped_column(
+        sa.UUID(as_uuid=True),
+        sa.ForeignKey("rescuer_profiles.id", ondelete="SET NULL"),
+        nullable=True,
+        index=True,
+    )
+    # Short motivational text shown on the campaign page
+    goal_message: Mapped[str | None] = mapped_column(sa.String(300), nullable=True)
+    # Animal UUIDs involved in this campaign
+    animal_ids: Mapped[list[UUID]] = mapped_column(
+        sa.ARRAY(sa.UUID(as_uuid=True)),
+        nullable=False,
+        server_default=sa.text("'{}'"),
+    )
+    # True when campaign was created by an unverified rescuer and needs admin review
+    requires_approval: Mapped[bool] = mapped_column(
+        sa.Boolean,
+        nullable=False,
+        server_default=sa.text("false"),
+    )
     created_at: Mapped[datetime] = mapped_column(
         sa.TIMESTAMP(timezone=True),
         nullable=False,
