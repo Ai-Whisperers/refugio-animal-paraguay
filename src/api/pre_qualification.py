@@ -16,6 +16,7 @@ from src.db.models.user import User
 from src.db.session import get_db
 from src.middleware.rate_limiter import limiter
 from src.schemas.error import RESOURCE_RESPONSES
+from src.services.anti_gaming_service import AntiGamingError, check_rate_limits
 from src.services.pre_qualification_service import (
     AnimalNotFoundError,
     PreQualificationResult,
@@ -91,6 +92,18 @@ async def pre_qualify(
     Returns qualification status, score (0-100), failed requirements,
     suggested alternative animals, and estimated wait time.
     """
+    # Anti-gaming check before processing
+    try:
+        await check_rate_limits(db, user_id=_current_user.id, animal_id=body.animal_id)
+    except AntiGamingError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail=exc.message,
+            headers=(
+                {"Retry-After": str(exc.retry_after_seconds)} if exc.retry_after_seconds else None
+            ),
+        ) from None
+
     try:
         result: PreQualificationResult = await pre_qualify_adopter(db, body.animal_id, body.answers)
     except AnimalNotFoundError:
