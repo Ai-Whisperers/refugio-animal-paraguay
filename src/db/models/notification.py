@@ -31,6 +31,9 @@ class NotificationType(enum.StrEnum):
     ANIMAL_INTAKE_COMPLETED = "animal_intake_completed"
     ANIMAL_STATUS_CHANGED = "animal_status_changed"
 
+    # Volunteer shift events
+    VOLUNTEER_SHIFT_REMINDER = "volunteer_shift_reminder"
+
     # System / administrative
     SYSTEM_ALERT = "system_alert"
     GDPR_REQUEST = "gdpr_request"

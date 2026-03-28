@@ -146,6 +146,10 @@ class ShiftSignup(Base):
         server_default=sa.func.now(),
     )
     notes: Mapped[str | None] = mapped_column(sa.String(500), nullable=True)
+    reminder_sent_at: Mapped[datetime | None] = mapped_column(
+        sa.TIMESTAMP(timezone=True),
+        nullable=True,
+    )
 
     __table_args__ = (
         sa.UniqueConstraint("shift_id", "volunteer_id", name="uq_shift_signup_volunteer"),
