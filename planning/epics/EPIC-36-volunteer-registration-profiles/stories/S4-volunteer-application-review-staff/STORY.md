@@ -1,9 +1,9 @@
 ---
 story: S4
 epic: EPIC-36
-ticket: RAP-178
+ticket: RAP-643
 title: "Volunteer application review (staff)"
-status: planned
+status: done
 points: 5
 priority: P1
 track: Frontend
