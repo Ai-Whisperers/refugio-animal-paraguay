@@ -18,6 +18,7 @@ from slowapi.errors import RateLimitExceeded
 
 from src.api.admin import router as admin_router
 from src.api.admin_campaigns import router as admin_campaigns_router
+from src.api.admin_fund_dashboard import router as admin_fund_dashboard_router
 from src.api.admin_castration_campaigns import router as admin_castration_campaigns_router
 from src.api.admin_sse import router as admin_sse_router
 from src.api.admin_voucher_finance import router as admin_voucher_finance_router
@@ -270,6 +271,7 @@ def create_app() -> FastAPI:
     application.include_router(tigo_money_router)
     application.include_router(webhooks_router)
     application.include_router(admin_campaigns_router)
+    application.include_router(admin_fund_dashboard_router)
     application.include_router(admin_castration_campaigns_router)
     application.include_router(admin_voucher_finance_router)
     application.include_router(campaign_voucher_integration_router)
