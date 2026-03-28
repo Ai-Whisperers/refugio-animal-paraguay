@@ -430,7 +430,7 @@ Week 3-4:
 | 6 | Community feed | RAP-538 | 5 | BLOCKED | Fullstack | RAP-534 |
 | 7 | Donor choice interface | RAP-539 | Donor choice interface | 5 | EPIC-80 | PR_CREATED | #290 |
 | 8 | Rescuer verification system | RAP-540 | 3 | DONE (PR #185) | Backend | RAP-533 |
-| 9 | Admin moderation tools | RAP-541 | 5 | READY | Fullstack | RAP-533 |
+| 9 | Admin moderation tools | RAP-541 | Admin moderation tools | 5 | EPIC-80 | PR_CREATED | #291 |
 | 10 | Integration with vet voucher system | RAP-542 | 3 | DONE (PR #186) | Backend | RAP-510 (EPIC-77) |
 
 ### EPIC-82: Content Management System (40 pts)
