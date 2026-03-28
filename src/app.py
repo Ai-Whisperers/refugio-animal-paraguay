@@ -61,6 +61,7 @@ from src.api.vaccinations import vaccination_router, vaccine_type_router
 from src.api.vet_clinics import router as vet_clinics_router
 from src.api.vet_referrals import referral_router
 from src.api.vet_visits import router as vet_visits_router
+from src.api.vet_vouchers import router as vet_vouchers_router
 from src.api.webhooks import router as webhooks_router
 from src.audit.middleware import AuditMiddleware
 from src.config import Settings, get_settings
@@ -216,6 +217,7 @@ def create_app() -> FastAPI:
     application.include_router(prescriptions_router)
     application.include_router(profile_router)
     application.include_router(vet_clinics_router)
+    application.include_router(vet_vouchers_router)
     application.include_router(user_roles_router)
 
     return application
