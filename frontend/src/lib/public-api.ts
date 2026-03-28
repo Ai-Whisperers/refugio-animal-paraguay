@@ -98,6 +98,7 @@ import type {
   CastrationDriveListResponse,
   DonationCreateRequest,
   DonationResponse,
+  ImpactReportResponse,
   DonorCreateRequest,
   DonorResponse,
   FundCategory,
@@ -466,5 +467,16 @@ export async function getDonorLeaderboard(
   if (campaignId) params.set("campaign_id", campaignId);
   return apiFetch<LeaderboardResponse>(
     `/public/leaderboard/donors?${params}`
+// --- Castration Impact Report ---
+
+/**
+ * Fetch the impact report for a castration campaign.
+ * GET /public/castration-campaigns/{campaignId}/report
+ */
+export async function getCastrationCampaignReport(
+  campaignId: string
+): Promise<ImpactReportResponse> {
+  return apiFetch<ImpactReportResponse>(
+    `/public/castration-campaigns/${campaignId}/report`
   );
 }
