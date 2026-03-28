@@ -382,7 +382,7 @@ Week 3-4:
 | 1 | Donation target type system | RAP-543 | 5 | DONE (PR #171) | Backend | — |
 | 2 | Animal sponsorship page | RAP-544 | 5 | IN_REVIEW (PR #233) | Fullstack | RAP-543 |
 | 3 | Rescuer support page | RAP-545 | 5 | IN_REVIEW (PR #234) | Fullstack | RAP-543, RAP-533 (EPIC-80) |
-| 4 | Clinic fund page | RAP-546 | 5 | READY | Fullstack | RAP-543, RAP-507 (EPIC-77) |
+| 4 | Clinic fund page | RAP-546 | 5 | IN_REVIEW (PR #235) | Fullstack | RAP-543, RAP-507 (EPIC-77) |
 | 5 | Need-specific donation | RAP-547 | 3 | IN_REVIEW (PR #232) | Fullstack | RAP-543 |
 | 6 | Donation allocation tracking API | RAP-548 | 5 | DONE (PR #172) | Backend | RAP-543 |
 | 7 | Impact notification system | RAP-549 | 5 | DONE (PR #176) | Backend | RAP-548 |
