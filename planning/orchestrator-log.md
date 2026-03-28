@@ -684,3 +684,12 @@
 - **Open PRs**: 2 remaining (both CONFLICTING — need manual resolution)
 - **Queue**: EPIC-38 S1-S4 DONE. EPIC-36 S1/S2/S4/S5 DONE, S3 BLOCKED. EPIC-37 S1/S2/S4/S5 DONE, S3 BLOCKED. 34 prior sprint entries corrected to DONE in QUEUE.md.
 - **Actions taken**: Stale lock removed; RAP-185 ticket marked COMPLETED; 5 local merged branches pruned
+
+### [2026-03-28 18:27] Worker Run — EPIC-39 S1 Complete
+- **Epic**: EPIC-39 — Foster Care Management (V7 Sprint 4)
+- **Stories completed**:
+  - RAP-190 (S1 P0): Foster family registration and approval — `FosterProfile` ORM model, Alembic migration 075, 6 REST endpoints (`POST /api/foster/apply`, `GET /api/foster/me`, `GET /api/foster/home-types`, `GET /api/foster/animal-types`, `GET /api/staff/foster`, `GET /api/staff/foster/{id}`, `PUT /api/staff/foster/{id}/review`)
+- **PRs created**: #316 (RAP-190)
+- **Duration**: ~1.5h (including context recovery from previous session cutoff)
+- **Quality**: ruff clean, black clean; 23 unit tests + 19 integration tests passing
+- **Notes**: EPIC-38 S5 (RAP-189, PR #315) was already done by a prior worker run — QUEUE.md corrected to reflect this. Alembic multi-head issue (duplicate revisions 037/038/039/066/070) prevented normal `alembic upgrade head`; migration 075 applied via raw SQL on test DB. Custom error middleware returns `{"message": ...}` not `{"detail": ...}` — integration tests updated to handle both formats. QUEUE.md on develop updated: EPIC-38 S5 DONE (PR #315), EPIC-39 S1 DONE (PR #316).
