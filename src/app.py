@@ -58,8 +58,10 @@ from src.api.medical_documents import router as medical_documents_router
 from src.api.medications import router as medications_router
 from src.api.notification_preferences import router as notification_preferences_router
 from src.api.notifications import router as notifications_router
+from src.api.og_image import router as og_image_router
 from src.api.password_reset import router as password_reset_router
 from src.api.phone_verification import router as phone_verification_router
+from src.api.pipeline_tracking import router as pipeline_tracking_router
 from src.api.portal import router as portal_router
 from src.api.pre_qualification import router as pre_qualification_router
 from src.api.pre_qualification_analytics import router as pre_qual_analytics_router
@@ -71,7 +73,6 @@ from src.api.public_campaigns import router as public_campaigns_router
 from src.api.public_contact import router as public_contact_router
 from src.api.public_register import router as public_register_router
 from src.api.public_statistics import router as public_statistics_router
-from src.api.og_image import router as og_image_router
 from src.api.referral_tracking import admin_router as referral_tracking_admin_router
 from src.api.referral_tracking import public_router as referral_tracking_public_router
 from src.api.rescuer_profiles import router as rescuer_profiles_router
@@ -87,6 +88,7 @@ from src.api.sponsorships import router as sponsorships_router
 from src.api.subscriptions import router as subscriptions_router
 from src.api.surgeries import surgery_router
 from src.api.tigo_money import router as tigo_money_router
+from src.api.transport import router as transport_router
 from src.api.user_roles import router as user_roles_router
 from src.api.vaccinations import vaccination_router, vaccine_type_router
 from src.api.vet_clinics import router as vet_clinics_router
@@ -295,6 +297,8 @@ def create_app() -> FastAPI:
     application.include_router(referral_tracking_public_router)
     application.include_router(referral_tracking_admin_router)
     application.include_router(emergencies_router)
+    application.include_router(pipeline_tracking_router)
+    application.include_router(transport_router)
 
     return application
 
