@@ -98,3 +98,34 @@ async def require_medical_staff(user: User = Depends(_get_current_user)) -> User
             detail="Medical staff access required",
         )
     return user
+
+
+async def require_verified_rescuer(
+    user: User = Depends(_get_current_user), db: AsyncSession = Depends(get_db)
+) -> User:
+    """Require a verified rescuer profile. Raises 403 otherwise.
+
+    Any authenticated user with a verified rescuer_profiles row may create
+    emergencies. Staff and admin are also allowed (they can act on behalf of
+    rescuers).
+    """
+    # Staff/admin bypass
+    if user.role in (UserRole.STAFF.value, UserRole.ADMIN.value):
+        return user
+
+    from sqlalchemy import select
+
+    from src.db.models.rescuer_profile import RescuerProfile
+
+    stmt = select(RescuerProfile).where(
+        RescuerProfile.user_id == user.id,
+        RescuerProfile.is_verified.is_(True),
+    )
+    result = await db.execute(stmt)
+    profile = result.scalar_one_or_none()
+    if profile is None:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Verified rescuer profile required",
+        )
+    return user

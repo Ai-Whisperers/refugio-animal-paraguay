@@ -100,6 +100,7 @@ from src.api.public_statistics import router as public_statistics_router
 from src.api.public_voucher_stats import router as public_voucher_stats_router
 from src.api.referral_tracking import admin_router as referral_tracking_admin_router
 from src.api.referral_tracking import public_router as referral_tracking_public_router
+from src.api.rescuer_emergencies import router as rescuer_emergencies_router
 from src.api.rescuer_profiles import router as rescuer_profiles_router
 from src.api.rescuer_verification import router as rescuer_verification_router
 from src.api.rescuer_voucher_integration import router as rescuer_voucher_integration_router
@@ -360,6 +361,7 @@ def create_app() -> FastAPI:
     application.include_router(community_needs_public_router)
     application.include_router(community_needs_admin_router)
     application.include_router(homepage_content_router)
+    application.include_router(rescuer_emergencies_router)
 
     return application
 
