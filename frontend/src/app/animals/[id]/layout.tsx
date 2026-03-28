@@ -1,34 +1,38 @@
 import type { Metadata } from "next";
 import { SITE_TITLE } from "@/lib/strings";
-import CampaignDetailClient from "./CampaignDetailClient";
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 const BASE_URL =
   process.env.NEXT_PUBLIC_BASE_URL ?? "https://refugioanimal.com.py";
 
-interface CampaignDetailPageProps {
+interface AnimalLayoutProps {
   params: Promise<{ id: string }>;
+  children: React.ReactNode;
 }
 
 export async function generateMetadata({
   params,
-}: CampaignDetailPageProps): Promise<Metadata> {
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
   const { id } = await params;
-  const fallbackTitle = `Campana | ${SITE_TITLE}`;
-  const fallbackDescription = "Apoya esta campana con tu donacion";
+  const fallbackTitle = `Animal | ${SITE_TITLE}`;
+  const fallbackDescription =
+    "Conoce a este animal que busca un hogar para siempre";
 
   try {
-    const res = await fetch(`${API_BASE_URL}/public/campaigns/${id}`, {
+    const res = await fetch(`${API_BASE_URL}/public/animals/${id}`, {
       next: { revalidate: 300 },
     });
     if (!res.ok) {
       return { title: fallbackTitle, description: fallbackDescription };
     }
-    const campaign = await res.json();
-    const title = `${campaign.title} | ${SITE_TITLE}`;
-    const description = campaign.description ?? fallbackDescription;
-    const ogImageUrl = campaign.image_url ?? undefined;
+    const animal = await res.json();
+    const title = `${animal.name} busca hogar | ${SITE_TITLE}`;
+    const description =
+      animal.description ?? `${animal.name} esta disponible para adopcion`;
+    const ogImageUrl = animal.primary_photo_url ?? undefined;
 
     return {
       title,
@@ -36,8 +40,10 @@ export async function generateMetadata({
       openGraph: {
         title,
         description,
-        url: `${BASE_URL}/donate/campaigns/${id}`,
-        images: ogImageUrl ? [{ url: ogImageUrl, width: 1200, height: 630 }] : undefined,
+        url: `${BASE_URL}/animals/${id}`,
+        images: ogImageUrl
+          ? [{ url: ogImageUrl, width: 1200, height: 630 }]
+          : undefined,
       },
       twitter: {
         card: "summary_large_image",
@@ -51,8 +57,8 @@ export async function generateMetadata({
   }
 }
 
-export default async function CampaignDetailPage({ params }: CampaignDetailPageProps) {
-  const { id } = await params;
-
-  return <CampaignDetailClient campaignId={id} />;
+export default async function AnimalDetailLayout({
+  children,
+}: AnimalLayoutProps) {
+  return <>{children}</>;
 }

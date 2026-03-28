@@ -6,6 +6,11 @@ import { ABOUT, SITE_TITLE } from "@/lib/strings";
 export const metadata: Metadata = {
   title: `${ABOUT.title} | ${SITE_TITLE}`,
   description: ABOUT.metaDescription,
+  openGraph: {
+    title: `${ABOUT.title} | ${SITE_TITLE}`,
+    description: ABOUT.metaDescription,
+    url: "/about",
+  },
 };
 
 export default function AboutPage() {

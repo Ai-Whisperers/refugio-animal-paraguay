@@ -6,6 +6,11 @@ import { FOSTER, SITE_TITLE } from "@/lib/strings";
 export const metadata: Metadata = {
   title: `${FOSTER.title} | ${SITE_TITLE}`,
   description: FOSTER.metaDescription,
+  openGraph: {
+    title: `${FOSTER.title} | ${SITE_TITLE}`,
+    description: FOSTER.metaDescription,
+    url: "/foster",
+  },
 };
 
 export default function FosterPage() {

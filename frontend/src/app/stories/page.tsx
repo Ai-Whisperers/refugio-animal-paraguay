@@ -6,6 +6,11 @@ import { SUCCESS_STORIES, SITE_TITLE } from "@/lib/strings";
 export const metadata: Metadata = {
   title: `${SUCCESS_STORIES.title} | ${SITE_TITLE}`,
   description: SUCCESS_STORIES.metaDescription,
+  openGraph: {
+    title: `${SUCCESS_STORIES.title} | ${SITE_TITLE}`,
+    description: SUCCESS_STORIES.metaDescription,
+    url: "/stories",
+  },
 };
 
 export default function SuccessStoriesPage() {
