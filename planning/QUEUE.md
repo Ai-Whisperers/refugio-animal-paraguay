@@ -494,7 +494,7 @@ Week 3-4:
 
 | # | Story | Ticket | Pts | Status | Track |
 |---|-------|--------|-----|--------|-------|
-| 1 | PWA manifest and service worker setup | RAP-596 | 5 | READY | Frontend |
+| 1 | PWA manifest and service worker setup | RAP-596 | 5 | PR #255 | Frontend |
 | 2 | Responsive design audit and fixes | RAP-597 | 6 | READY | Frontend |
 | 3 | Camera integration for forms | RAP-598 | 7 | READY | Fullstack |
 | 4 | Offline donation forms with IndexedDB | RAP-599 | 6 | READY | Fullstack |
