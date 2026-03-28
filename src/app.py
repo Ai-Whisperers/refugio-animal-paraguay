@@ -137,6 +137,7 @@ from src.api.vet_vouchers import router as vet_vouchers_router
 from src.api.voucher_expiry import router as voucher_expiry_router
 from src.api.voucher_notifications import router as voucher_notifications_router
 from src.api.voucher_purchase import router as voucher_purchase_router
+from src.api.push_subscriptions import router as push_subscriptions_router
 from src.api.webhooks import router as webhooks_router
 from src.audit.middleware import AuditMiddleware
 from src.config import Settings, get_settings
@@ -287,6 +288,7 @@ def create_app() -> FastAPI:
     application.include_router(subscriptions_router)
     application.include_router(tigo_money_router)
     application.include_router(webhooks_router)
+    application.include_router(push_subscriptions_router)
     application.include_router(admin_campaigns_router)
     application.include_router(admin_fund_dashboard_router)
     application.include_router(admin_castration_campaigns_router)
