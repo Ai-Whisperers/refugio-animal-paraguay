@@ -91,6 +91,7 @@ import type {
   AnimalGender,
   CampaignListResponse,
   CampaignPublic,
+  CastrationGalleryResponse,
   CampaignSocialProof,
   CastrationCampaignPublic,
   CastrationCampaignListResponse,
@@ -422,6 +423,18 @@ export async function getCastrationCampaignDrives(
   pageSize = 20,
   includePast = false
 ): Promise<CastrationDriveListResponse> {
+// --- Castration Campaign Gallery ---
+
+/**
+ * Fetch public gallery photos for a castration campaign.
+ * GET /public/castration-campaigns/{campaignId}/gallery
+ */
+export async function getCastrationCampaignGallery(
+  campaignId: string,
+  page = 1,
+  pageSize = 20,
+  photoType?: string
+): Promise<CastrationGalleryResponse> {
   const params = new URLSearchParams({
     page: String(page),
     page_size: String(pageSize),
@@ -429,5 +442,8 @@ export async function getCastrationCampaignDrives(
   if (includePast) params.set("include_past", "true");
   return apiFetch<CastrationDriveListResponse>(
     `/public/castration-campaigns/${campaignId}/drives?${params}`
+  if (photoType) params.set("photo_type", photoType);
+  return apiFetch<CastrationGalleryResponse>(
+    `/public/castration-campaigns/${campaignId}/gallery?${params}`
   );
 }
