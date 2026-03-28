@@ -23,6 +23,7 @@ import { SocialProofPanel } from "@/components/campaigns";
 import { DONATE } from "@/lib/strings";
 import { useCampaignPolling } from "@/hooks/useCampaignPolling";
 import WhatsAppShareCampaign from "@/components/WhatsAppShareCampaign";
+import ShareWidget from "@/components/ShareWidget";
 
 interface CampaignDetailClientProps {
   campaignId: string;
@@ -167,6 +168,10 @@ export default function CampaignDetailClient({
                 {campaign.title}
               </h1>
               <WhatsAppShareCampaign campaign={campaign} size="md" />
+              <ShareWidget
+                title={`${campaign.title} — Refugio Animal Paraguay`}
+                description={campaign.description}
+              />
             </div>
           </div>
 
