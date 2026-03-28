@@ -44,4 +44,4 @@ Volunteers are a core operational resource for Refugio Animal Paraguay. This tic
 ## Risks
 
 - Ticket ID collision (RAP-175 already used) → Used RAP-640
-- SQLAlchemy ORM `__new__` issue in unit tests → Used MagicMock(spec=Model) instead
+- SQLAlchemy ORM `__new__` issue in unit tests → Used MagicMock(spec=Model) instead>>>>>>> 550e560 (RAP-640: Add volunteer registration form, profile model, API, and staff review)

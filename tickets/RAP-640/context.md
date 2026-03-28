@@ -28,4 +28,4 @@ None.
 - Used RAP-640 instead of RAP-175 (ticket ID collision with UX sprint)
 - Used `MagicMock(spec=VolunteerProfile)` in unit tests (SQLAlchemy mapper constraint)
 - Skills and availability stored as JSON arrays (mirrors rescuer_profile.py pattern)
-- Re-application allowed for rejected/inactive status (idempotent for pending/approved)
+- Re-application allowed for rejected/inactive status (idempotent for pending/approved)>>>>>>> 550e560 (RAP-640: Add volunteer registration form, profile model, API, and staff review)
