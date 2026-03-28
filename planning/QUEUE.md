@@ -320,19 +320,19 @@ Week 3-4:
 
 | # | Story | Ticket | Pts | Status | Track |
 |---|-------|--------|-----|--------|-------|
-| 1 | Self-registration form | RAP-500 | 5 | IN REVIEW (PR #152) | Fullstack |
-| 2 | Email verification flow with token | RAP-501 | 3 | IN REVIEW (PR #153) | Backend |
-| 3 | Unified personal dashboard | RAP-502 | 8 | IN REVIEW (PR #154) | Fullstack |
-| 4 | Profile management page | RAP-503 | 5 | IN REVIEW (PR #155) | Fullstack |
-| 5 | Social login (Google OAuth) | RAP-504 | 5 | READY | Fullstack |
-| 6 | WhatsApp-based phone verification | RAP-505 | 5 | IN REVIEW (PR #156) | Backend |
-| 7 | Role self-assignment | RAP-506 | 4 | IN REVIEW (PR #157) | Fullstack |
+| 1 | Self-registration form | RAP-500 | 5 | DONE (PR #152) | Fullstack |
+| 2 | Email verification flow with token | RAP-501 | 3 | DONE (PR #153) | Backend |
+| 3 | Unified personal dashboard | RAP-502 | 8 | DONE (PR #154) | Fullstack |
+| 4 | Profile management page | RAP-503 | 5 | DONE (PR #155) | Fullstack |
+| 5 | Social login (Google OAuth) | RAP-504 | 5 | IN PROGRESS | Fullstack |
+| 6 | WhatsApp-based phone verification | RAP-505 | 5 | DONE (PR #156) | Backend |
+| 7 | Role self-assignment | RAP-506 | 4 | DONE (PR #157) | Fullstack |
 
 ### EPIC-77: Veterinary Voucher & Direct Clinic Donation (50 pts)
 
 | # | Story | Ticket | Pts | Status | Track | Depends On |
 |---|-------|--------|-----|--------|-------|------------|
-| 1 | Partner veterinary clinic registration model and API | RAP-507 | 5 | IN REVIEW (PR #158) | Backend | — |
+| 1 | Partner veterinary clinic registration model and API | RAP-507 | 5 | DONE (PR #158) | Backend | — |
 | 2 | Clinic service catalog with pricing | RAP-508 | 5 | READY | Backend | RAP-507 |
 | 3 | Voucher purchase flow for donors | RAP-509 | 8 | READY | Fullstack | RAP-508 |
 | 4 | VetVoucher model and lifecycle API | RAP-510 | 5 | READY | Backend | RAP-507 |

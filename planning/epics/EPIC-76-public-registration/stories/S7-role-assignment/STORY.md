@@ -3,7 +3,7 @@ story: S7
 epic: EPIC-76
 ticket: RAP-506
 title: "Role self-assignment"
-status: ready
+status: done
 points: 4
 priority: P2
 track: Fullstack

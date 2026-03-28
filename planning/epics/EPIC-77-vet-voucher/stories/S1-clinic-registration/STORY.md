@@ -3,7 +3,7 @@ story: S1
 epic: EPIC-77
 ticket: RAP-507
 title: "Partner veterinary clinic registration model and API"
-status: ready
+status: done
 points: 5
 priority: P0
 track: Backend

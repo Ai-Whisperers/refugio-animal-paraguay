@@ -3,7 +3,7 @@ story: S3
 epic: EPIC-76
 ticket: RAP-502
 title: "Unified personal dashboard"
-status: ready
+status: done
 points: 8
 priority: P0
 track: Fullstack

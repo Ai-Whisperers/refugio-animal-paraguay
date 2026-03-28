@@ -3,7 +3,7 @@ story: S5
 epic: EPIC-76
 ticket: RAP-504
 title: "Social login (Google OAuth)"
-status: ready
+status: in_progress
 points: 5
 priority: P1
 track: Fullstack
