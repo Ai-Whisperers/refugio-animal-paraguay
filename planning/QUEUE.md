@@ -507,7 +507,7 @@ Week 3-4:
 
 | # | Story | Ticket | Pts | Status | Track |
 |---|-------|--------|-----|--------|-------|
-| 1 | Expense recording system | RAP-604 | 6 | READY | Fullstack |
+| 1 | Expense recording system | RAP-604 | 6 | PR #262 | Fullstack |
 | 2 | Expense management UI with receipts | RAP-605 | 5 | READY | Frontend |
 | 3 | Financial transparency dashboard | RAP-606 | 7 | READY | Fullstack |
 | 4 | Campaign-specific financial reports | RAP-607 | 5 | READY | Fullstack |
