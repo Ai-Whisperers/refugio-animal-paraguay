@@ -184,12 +184,12 @@ async def get_donation_trending(
         period_expr = func.date_trunc("week", Donation.created_at)
         format_fn = lambda d: (
             d.strftime("%Y-W%V") if hasattr(d, "strftime") else str(d)
-        )  # noqa: E731
+        )
     else:  # monthly
         period_expr = func.date_trunc("month", Donation.created_at)
         format_fn = lambda d: (
             d.strftime("%Y-%m") if hasattr(d, "strftime") else str(d)
-        )  # noqa: E731
+        )
 
     stmt = (
         select(

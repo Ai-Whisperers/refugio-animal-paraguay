@@ -70,6 +70,8 @@ from src.api.gdpr import router as gdpr_router
 from src.api.gdpr_export import router as gdpr_export_router
 from src.api.google_oauth import router as google_oauth_router
 from src.api.health import router as health_router
+from src.api.home_visits import admin_router as home_visits_admin_router
+from src.api.home_visits import public_router as home_visits_public_router
 from src.api.homepage_content import router as homepage_content_router
 from src.api.impact_emails import router as impact_emails_router
 from src.api.impact_reports import router as impact_reports_router
@@ -378,6 +380,8 @@ def create_app() -> FastAPI:
     application.include_router(public_emergencies_router)
     application.include_router(trial_admin_router)
     application.include_router(trial_public_router)
+    application.include_router(home_visits_admin_router)
+    application.include_router(home_visits_public_router)
 
     return application
 
