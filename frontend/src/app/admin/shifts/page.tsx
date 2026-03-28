@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   Calendar,
   ChevronLeft,
@@ -12,6 +13,7 @@ import {
   RefreshCw,
   X,
   ArrowLeft,
+  ChevronRight as ChevronRightSm,
 } from "lucide-react";
 import { isAuthenticated } from "@/lib/auth";
 import { api, ApiClientError } from "@/lib/api";
@@ -140,7 +142,10 @@ interface ShiftCardProps {
 function ShiftCard({ shift }: ShiftCardProps) {
   const slotsLeft = shift.capacity - shift.slots_filled;
   return (
-    <div className="rounded-lg border border-gray-200 bg-white p-3 shadow-sm hover:shadow-md transition-shadow">
+    <Link
+      href={`/admin/shifts/${shift.id}`}
+      className="block rounded-lg border border-gray-200 bg-white p-3 shadow-sm hover:shadow-md transition-shadow hover:border-emerald-300"
+    >
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
           {shift.title && (
@@ -176,7 +181,7 @@ function ShiftCard({ shift }: ShiftCardProps) {
       {shift.location && (
         <p className="mt-1 truncate text-xs text-gray-400">{shift.location}</p>
       )}
-    </div>
+    </Link>
   );
 }
 

@@ -1,15 +1,18 @@
-"""Volunteer shift scheduling API (RAP-180).
+"""Volunteer shift scheduling API (RAP-180, RAP-183).
 
 Staff can create and manage shifts with time slots and capacity.
+Staff can also record volunteer attendance (RAP-183).
 Volunteers can view available shifts.
 
 Endpoints:
-    POST   /api/shifts                    -- create shift (staff only)
-    GET    /api/shifts                    -- list shifts (authenticated)
-    GET    /api/shifts/{id}               -- get shift detail (authenticated)
-    PATCH  /api/shifts/{id}               -- update shift (staff only)
-    DELETE /api/shifts/{id}               -- cancel/delete shift (staff only)
-    GET    /api/shifts/roles              -- list valid roles
+    POST   /api/shifts                              -- create shift (staff only)
+    GET    /api/shifts                              -- list shifts (authenticated)
+    GET    /api/shifts/{id}                         -- get shift detail (authenticated)
+    PATCH  /api/shifts/{id}                         -- update shift (staff only)
+    DELETE /api/shifts/{id}                         -- cancel/delete shift (staff only)
+    GET    /api/shifts/roles                        -- list valid roles
+    GET    /api/shifts/{id}/signups                 -- list signups for shift (staff)
+    PATCH  /api/shifts/{id}/signups/{signup_id}     -- update attendance (staff)
 """
 
 import logging
@@ -30,6 +33,7 @@ from src.db.models.shift import (
     VALID_SHIFT_STATUSES,
     Shift,
     ShiftRole,
+    ShiftSignup,
     ShiftStatus,
 )
 from src.db.models.user import User
@@ -140,6 +144,20 @@ class ShiftRolesResponse(BaseModel):
     """Available shift role options."""
 
     roles: list[str]
+
+
+class ShiftSignupResponse(BaseModel):
+    """A volunteer's signup record for a shift."""
+
+    id: UUID
+    shift_id: UUID
+    volunteer_id: UUID
+    confirmed: bool
+    attended: bool | None = None
+    signed_up_at: datetime
+    notes: str | None = None
+
+    model_config = {"from_attributes": True}
 
 
 # ---------------------------------------------------------------------------
@@ -346,3 +364,105 @@ async def delete_shift(
     logger.info(
         "Shift deleted", extra={"shift_id": str(shift_id), "staff_id": str(current_user.id)}
     )
+
+
+# ---------------------------------------------------------------------------
+# Endpoints — Attendance tracking (RAP-183, staff only)
+# ---------------------------------------------------------------------------
+
+
+class ShiftSignupListResponse(BaseModel):
+    """All signups for a given shift."""
+
+    items: list[ShiftSignupResponse]
+    total: int
+
+
+class AttendanceUpdateRequest(BaseModel):
+    """Payload for marking a volunteer's attendance."""
+
+    attended: bool | None = Field(
+        ...,
+        description="true = attended, false = no-show, null = clear/unknown",
+    )
+    notes: str | None = Field(None, max_length=500, description="Optional staff note")
+
+
+@staff_router.get("/api/shifts/{shift_id}/signups", response_model=ShiftSignupListResponse)
+async def list_shift_signups(
+    shift_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    _staff: User = Depends(require_staff),
+) -> ShiftSignupListResponse:
+    """List all volunteer signups for a shift. Staff only."""
+    result = await db.execute(select(Shift).where(Shift.id == shift_id))
+    if result.scalar_one_or_none() is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Shift {shift_id} not found",
+        )
+
+    signup_result = await db.execute(
+        select(ShiftSignup)
+        .where(ShiftSignup.shift_id == shift_id)
+        .order_by(ShiftSignup.signed_up_at)
+    )
+    signups = signup_result.scalars().all()
+    return ShiftSignupListResponse(
+        items=[ShiftSignupResponse.model_validate(s) for s in signups],
+        total=len(signups),
+    )
+
+
+@staff_router.patch(
+    "/api/shifts/{shift_id}/signups/{signup_id}",
+    response_model=ShiftSignupResponse,
+)
+async def update_signup_attendance(
+    shift_id: UUID,
+    signup_id: UUID,
+    body: AttendanceUpdateRequest,
+    db: AsyncSession = Depends(get_db),
+    current_staff: User = Depends(require_staff),
+) -> ShiftSignupResponse:
+    """Mark a volunteer as attended or no-show for a shift. Staff only.
+
+    The shift does not need to be in 'completed' status — staff can record
+    attendance for any past shift. Notes are optional.
+    """
+    shift_result = await db.execute(select(Shift).where(Shift.id == shift_id))
+    if shift_result.scalar_one_or_none() is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Shift {shift_id} not found",
+        )
+
+    signup_result = await db.execute(
+        select(ShiftSignup).where(
+            ShiftSignup.id == signup_id,
+            ShiftSignup.shift_id == shift_id,
+        )
+    )
+    signup = signup_result.scalar_one_or_none()
+    if signup is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Signup {signup_id} not found for shift {shift_id}",
+        )
+
+    signup.attended = body.attended
+    if body.notes is not None:
+        signup.notes = body.notes
+
+    await db.commit()
+    await db.refresh(signup)
+    logger.info(
+        "Attendance updated",
+        extra={
+            "shift_id": str(shift_id),
+            "signup_id": str(signup_id),
+            "attended": body.attended,
+            "staff_id": str(current_staff.id),
+        },
+    )
+    return ShiftSignupResponse.model_validate(signup)
