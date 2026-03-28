@@ -96,6 +96,7 @@ from src.api.smart_matching import router as smart_matching_router
 from src.api.sponsorships import router as sponsorships_router
 from src.api.subscriptions import router as subscriptions_router
 from src.api.surgeries import surgery_router
+from src.api.survey_distribution import router as survey_distribution_router
 from src.api.tigo_money import router as tigo_money_router
 from src.api.transport import router as transport_router
 from src.api.user_roles import router as user_roles_router
@@ -316,6 +317,7 @@ def create_app() -> FastAPI:
     application.include_router(adoption_success_router)
     application.include_router(transport_router)
 
+    application.include_router(survey_distribution_router)
     application.include_router(impact_emails_router)
     application.include_router(vet_transport_router)
     application.include_router(driver_reimbursement_router)
