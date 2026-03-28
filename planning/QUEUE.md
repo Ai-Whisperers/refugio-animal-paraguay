@@ -380,13 +380,13 @@ Week 3-4:
 | # | Story | Ticket | Pts | Status | Track | Depends On |
 |---|-------|--------|-----|--------|-------|------------|
 | 1 | Donation target type system | RAP-543 | 5 | DONE (PR #171) | Backend | — |
-| 2 | Animal sponsorship page | RAP-544 | 5 | IN_REVIEW (PR #233) | Fullstack | RAP-543 |
-| 3 | Rescuer support page | RAP-545 | 5 | IN_REVIEW (PR #234) | Fullstack | RAP-543, RAP-533 (EPIC-80) |
-| 4 | Clinic fund page | RAP-546 | 5 | IN_REVIEW (PR #235) | Fullstack | RAP-543, RAP-507 (EPIC-77) |
-| 5 | Need-specific donation | RAP-547 | 3 | IN_REVIEW (PR #232) | Fullstack | RAP-543 |
+| 2 | Animal sponsorship page | RAP-544 | 5 | DONE (PR #233) | Fullstack | RAP-543 |
+| 3 | Rescuer support page | RAP-545 | 5 | DONE (PR #234) | Fullstack | RAP-543, RAP-533 (EPIC-80) |
+| 4 | Clinic fund page | RAP-546 | 5 | DONE (PR #235) | Fullstack | RAP-543, RAP-507 (EPIC-77) |
+| 5 | Need-specific donation | RAP-547 | 3 | DONE (PR #232) | Fullstack | RAP-543 |
 | 6 | Donation allocation tracking API | RAP-548 | 5 | DONE (PR #172) | Backend | RAP-543 |
 | 7 | Impact notification system | RAP-549 | 5 | DONE (PR #176) | Backend | RAP-548 |
-| 8 | Fund management dashboard | RAP-550 | 5 | IN_REVIEW (PR #236) | Fullstack | RAP-548 |
+| 8 | Fund management dashboard | RAP-550 | 5 | DONE (PR #236) | Fullstack | RAP-548 |
 
 ### EPIC-83: Photo Upload & Media Management (35 pts)
 
@@ -438,22 +438,22 @@ Week 3-4:
 | # | Story | Ticket | Pts | Status | Track |
 |---|-------|--------|-----|--------|-------|
 | 1 | CMS content model and API | RAP-551 | 5 | DONE (PR #187) | Backend |
-| 2 | Homepage dynamic content | RAP-552 | 5 | IN_REVIEW (PR #241) | Fullstack |
+| 2 | Homepage dynamic content | RAP-552 | 5 | DONE (PR #241) | Fullstack |
 | 3 | Admin content editor | RAP-553 | 8 | READY | Frontend |
 | 4 | Success stories CRUD | RAP-554 | 5 | READY | Fullstack |
 | 5 | News/blog posts | RAP-555 | 5 | READY | Fullstack |
-| 6 | Featured animals on homepage | RAP-556 | 3 | IN_REVIEW (PR #237) | Fullstack |
-| 7 | Featured campaigns on homepage | RAP-557 | 3 | IN_REVIEW (PR #238) | Fullstack |
+| 6 | Featured animals on homepage | RAP-556 | 3 | DONE (PR #237) | Fullstack |
+| 7 | Featured campaigns on homepage | RAP-557 | 3 | DONE (PR #238) | Fullstack |
 | 8 | Multilingual content support | RAP-558 | 5 | DONE (PR #188) | Backend |
 
 ### EPIC-84: Social Sharing & WhatsApp Deep Integration (30 pts)
 
 | # | Story | Ticket | Pts | Status | Track |
 |---|-------|--------|-----|--------|-------|
-| 1 | Open Graph meta tags for all public pages | RAP-566 | 5 | IN_REVIEW (PR #240) | Frontend |
+| 1 | Open Graph meta tags for all public pages | RAP-566 | 5 | DONE (PR #240) | Frontend |
 | 2 | WhatsApp share buttons on animal cards | RAP-567 | 3 | IN_REVIEW (PR #226) | Frontend |
 | 3 | WhatsApp share for campaigns | RAP-568 | 3 | IN_REVIEW (PR #228) | Frontend |
-| 4 | Social media share buttons (Facebook, Instagram, Twitter) | RAP-569 | 3 | IN_REVIEW (PR #239) | Frontend |
+| 4 | Social media share buttons (Facebook, Instagram, Twitter) | RAP-569 | 3 | DONE (PR #239) | Frontend |
 | 5 | Share tracking analytics | RAP-570 | 5 | DONE (PR #189) | Backend |
 | 6 | Referral tracking | RAP-571 | 5 | DONE (on develop) | Backend |
 | 7 | Auto-generated social media cards | RAP-572 | 3 | DONE | Backend |
