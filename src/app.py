@@ -83,6 +83,7 @@ from src.api.vet_referrals import referral_router
 from src.api.vet_visits import router as vet_visits_router
 from src.api.vet_vouchers import router as vet_vouchers_router
 from src.api.voucher_expiry import router as voucher_expiry_router
+from src.api.voucher_purchase import router as voucher_purchase_router
 from src.api.webhooks import router as webhooks_router
 from src.audit.middleware import AuditMiddleware
 from src.config import Settings, get_settings
@@ -250,6 +251,7 @@ def create_app() -> FastAPI:
     application.include_router(prescriptions_router)
     application.include_router(profile_router)
     application.include_router(vet_clinics_router)
+    application.include_router(clinic_services_router)
     application.include_router(vet_vouchers_router)
     application.include_router(rescuer_vouchers_router)
     application.include_router(rescuer_profiles_router)
@@ -257,6 +259,7 @@ def create_app() -> FastAPI:
     application.include_router(voucher_expiry_router)
     application.include_router(vet_vouchers_router)
     application.include_router(clinic_redemption_router)
+    application.include_router(voucher_purchase_router)
     application.include_router(user_roles_router)
     application.include_router(pre_qualification_router)
     application.include_router(smart_matching_router)
