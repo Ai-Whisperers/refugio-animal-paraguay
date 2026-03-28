@@ -324,7 +324,7 @@ Week 3-4:
 | 2 | Email verification flow with token | RAP-501 | 3 | DONE (PR #153) | Backend |
 | 3 | Unified personal dashboard | RAP-502 | 8 | DONE (PR #154) | Fullstack |
 | 4 | Profile management page | RAP-503 | 5 | DONE (PR #155) | Fullstack |
-| 5 | Social login (Google OAuth) | RAP-504 | 5 | IN PROGRESS | Fullstack |
+| 5 | Social login (Google OAuth) | RAP-504 | 5 | DONE (PR #159) | Fullstack |
 | 6 | WhatsApp-based phone verification | RAP-505 | 5 | DONE (PR #156) | Backend |
 | 7 | Role self-assignment | RAP-506 | 4 | DONE (PR #157) | Fullstack |
 
