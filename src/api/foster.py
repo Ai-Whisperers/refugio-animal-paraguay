@@ -1,17 +1,24 @@
-"""Foster family registration, approval, and placement matching API (RAP-190, RAP-191).
+"""Foster family registration, approval, placement matching, and check-in API (RAP-190, RAP-191, RAP-192).
 
 Any authenticated user can apply to become a foster family.
-Staff can list applications, approve/reject them, and use the placement matching
-endpoints to find the best foster family for a given animal (or vice-versa).
+Staff can list applications, approve/reject them, use the placement matching
+endpoints to find the best foster family for a given animal (or vice-versa),
+and manage periodic welfare check-ins.
 
 Endpoints:
-    POST /api/foster/apply                       -- submit foster application (authenticated)
-    GET  /api/foster/me                          -- get own foster profile (authenticated)
-    GET  /api/staff/foster                       -- list all applications (staff only)
-    GET  /api/staff/foster/{id}                  -- get one application (staff only)
-    PUT  /api/staff/foster/{id}/review           -- approve/reject application (staff only)
-    GET  /api/staff/foster/match/{animal_id}     -- ranked foster families for an animal (staff only)
-    GET  /api/staff/foster/{id}/matches          -- ranked animals for a foster family (staff only)
+    POST /api/foster/apply                                    -- submit foster application (authenticated)
+    GET  /api/foster/me                                       -- get own foster profile (authenticated)
+    GET  /api/staff/foster                                    -- list all applications (staff only)
+    GET  /api/staff/foster/{id}                               -- get one application (staff only)
+    PUT  /api/staff/foster/{id}/review                        -- approve/reject application (staff only)
+    GET  /api/staff/foster/match/{animal_id}                  -- ranked foster families for an animal (staff only)
+    GET  /api/staff/foster/{id}/matches                       -- ranked animals for a foster family (staff only)
+    POST /api/staff/foster/placements/{placement_id}/check-ins           -- schedule a check-in (staff only)
+    GET  /api/staff/foster/placements/{placement_id}/check-ins           -- list check-ins for placement (staff only)
+    PUT  /api/staff/foster/check-ins/{check_in_id}/complete              -- complete a check-in (staff only)
+    PUT  /api/staff/foster/check-ins/{check_in_id}/cancel                -- cancel a check-in (staff only)
+    POST /api/staff/foster/check-ins/{check_in_id}/remind                -- log reminder dispatch (staff only)
+    GET  /api/staff/foster/check-ins/upcoming                            -- upcoming/overdue check-ins (staff only)
 """
 
 import logging
@@ -25,6 +32,15 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.auth.dependencies import _get_current_user as get_current_user
 from src.auth.dependencies import require_staff
+from src.db.models.foster_check_in import (
+    CHECK_IN_NOTES_MAX_LENGTH,
+    DEFAULT_INTERVAL_DAYS,
+    MAX_INTERVAL_DAYS,
+    MIN_INTERVAL_DAYS,
+    CheckInStatus,
+    CheckInType,
+    FosterCheckIn,
+)
 from src.db.models.foster_profile import (
     ANIMAL_TYPE_PREFERENCE_VALUES,
     FOSTER_MOTIVATION_MAX_LENGTH,
@@ -36,6 +52,15 @@ from src.db.models.foster_profile import (
 )
 from src.db.models.user import User
 from src.db.session import get_db
+from src.services.foster_check_in_service import (
+    UPCOMING_WINDOW_DAYS,
+    cancel_check_in,
+    complete_check_in,
+    create_check_in,
+    list_check_ins_for_placement,
+    list_upcoming_check_ins,
+    record_reminder_sent,
+)
 from src.services.foster_placement_service import (
     DEFAULT_LIMIT,
     MAX_LIMIT,
@@ -430,8 +455,298 @@ async def match_animals_for_foster(
 
 
 # ---------------------------------------------------------------------------
+# Check-in Schemas (RAP-192)
+# ---------------------------------------------------------------------------
+
+
+class CheckInResponse(BaseModel):
+    """Foster check-in record."""
+
+    id: UUID
+    foster_placement_id: UUID
+    check_in_type: str
+    status: str
+    scheduled_at: datetime
+    completed_at: datetime | None
+    notes: str | None
+    cancellation_reason: str | None
+    interval_days: int
+    reminder_sent_at: datetime | None
+    created_by: UUID | None
+    created_at: datetime
+    updated_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+class CheckInListResponse(BaseModel):
+    """Paginated list of check-ins."""
+
+    items: list[CheckInResponse]
+    total: int
+    page: int
+    page_size: int
+
+
+class CreateCheckInRequest(BaseModel):
+    """Staff payload to schedule a check-in."""
+
+    scheduled_at: datetime = Field(
+        ...,
+        description="When the check-in should occur (ISO 8601 datetime with timezone)",
+    )
+    check_in_type: CheckInType = Field(
+        default=CheckInType.SCHEDULED,
+        description="Whether this is a routine scheduled or unscheduled check-in",
+    )
+    interval_days: int = Field(
+        default=DEFAULT_INTERVAL_DAYS,
+        ge=MIN_INTERVAL_DAYS,
+        le=MAX_INTERVAL_DAYS,
+        description="Days until the next check-in should be auto-scheduled after completion",
+    )
+
+
+class CompleteCheckInRequest(BaseModel):
+    """Staff payload to mark a check-in as completed."""
+
+    notes: str | None = Field(
+        None,
+        max_length=CHECK_IN_NOTES_MAX_LENGTH,
+        description="Staff notes from the check-in call or visit",
+    )
+    auto_schedule_next: bool = Field(
+        default=True,
+        description="Automatically schedule the next check-in based on interval_days",
+    )
+
+
+class CancelCheckInRequest(BaseModel):
+    """Staff payload to cancel a pending check-in."""
+
+    reason: str | None = Field(
+        None,
+        max_length=500,
+        description="Optional cancellation reason",
+    )
+
+
+# ---------------------------------------------------------------------------
+# Endpoints — Check-in schedule (staff only, RAP-192)
+# ---------------------------------------------------------------------------
+
+
+@staff_router.post(
+    "/api/staff/foster/placements/{placement_id}/check-ins",
+    response_model=CheckInResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Schedule a foster check-in",
+)
+async def schedule_foster_check_in(
+    placement_id: UUID,
+    body: CreateCheckInRequest,
+    db: AsyncSession = Depends(get_db),
+    current_staff: User = Depends(require_staff),
+) -> CheckInResponse:
+    """Schedule a welfare check-in for an active foster placement.
+
+    Returns 404 if the placement is not found or has already ended.
+    Staff only.
+    """
+    try:
+        check_in = await create_check_in(
+            db,
+            placement_id=placement_id,
+            scheduled_at=body.scheduled_at,
+            check_in_type=body.check_in_type,
+            interval_days=body.interval_days,
+            created_by=current_staff.id,
+        )
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
+    return _to_check_in_response(check_in)
+
+
+@staff_router.get(
+    "/api/staff/foster/placements/{placement_id}/check-ins",
+    response_model=CheckInListResponse,
+    summary="List check-ins for a foster placement",
+)
+async def list_placement_check_ins(
+    placement_id: UUID,
+    check_in_status: CheckInStatus | None = Query(
+        None, alias="status", description="Filter by status"
+    ),
+    page: int = Query(1, ge=1),
+    page_size: int = Query(DEFAULT_PAGE_SIZE, ge=1, le=MAX_PAGE_SIZE),
+    db: AsyncSession = Depends(get_db),
+    _staff: object = Depends(require_staff),
+) -> CheckInListResponse:
+    """Return paginated check-ins for a specific foster placement. Staff only."""
+    items, total = await list_check_ins_for_placement(
+        db,
+        placement_id,
+        status_filter=check_in_status,
+        page=page,
+        page_size=page_size,
+    )
+    return CheckInListResponse(
+        items=[_to_check_in_response(ci) for ci in items],
+        total=total,
+        page=page,
+        page_size=page_size,
+    )
+
+
+@staff_router.get(
+    "/api/staff/foster/check-ins/upcoming",
+    response_model=CheckInListResponse,
+    summary="List upcoming and overdue foster check-ins",
+)
+async def list_upcoming_foster_check_ins(
+    days_ahead: int = Query(
+        UPCOMING_WINDOW_DAYS, ge=1, le=90, description="Look-ahead window in days"
+    ),
+    include_overdue: bool = Query(True, description="Include overdue (past-due) pending check-ins"),
+    page: int = Query(1, ge=1),
+    page_size: int = Query(DEFAULT_PAGE_SIZE, ge=1, le=MAX_PAGE_SIZE),
+    db: AsyncSession = Depends(get_db),
+    _staff: object = Depends(require_staff),
+) -> CheckInListResponse:
+    """Return pending check-ins due within `days_ahead` days (and overdue ones if requested).
+
+    Useful for a staff dashboard showing what check-ins are coming up or missed.
+    Staff only.
+    """
+    items, total = await list_upcoming_check_ins(
+        db,
+        days_ahead=days_ahead,
+        include_overdue=include_overdue,
+        page=page,
+        page_size=page_size,
+    )
+    return CheckInListResponse(
+        items=[_to_check_in_response(ci) for ci in items],
+        total=total,
+        page=page,
+        page_size=page_size,
+    )
+
+
+@staff_router.put(
+    "/api/staff/foster/check-ins/{check_in_id}/complete",
+    response_model=CheckInResponse,
+    summary="Complete a foster check-in",
+)
+async def complete_foster_check_in(
+    check_in_id: UUID,
+    body: CompleteCheckInRequest,
+    db: AsyncSession = Depends(get_db),
+    _staff: object = Depends(require_staff),
+) -> CheckInResponse:
+    """Mark a pending check-in as completed with optional staff notes.
+
+    If auto_schedule_next is True, automatically creates the next check-in
+    based on the interval_days stored on this check-in.
+
+    Returns 404 if not found.
+    Returns 422 if the check-in is not in pending status.
+    Staff only.
+    """
+    try:
+        check_in = await complete_check_in(
+            db,
+            check_in_id,
+            notes=body.notes,
+            auto_schedule_next=body.auto_schedule_next,
+        )
+    except ValueError as exc:
+        error_msg = str(exc)
+        if "not found" in error_msg:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=error_msg) from exc
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=error_msg
+        ) from exc
+    return _to_check_in_response(check_in)
+
+
+@staff_router.put(
+    "/api/staff/foster/check-ins/{check_in_id}/cancel",
+    response_model=CheckInResponse,
+    summary="Cancel a foster check-in",
+)
+async def cancel_foster_check_in(
+    check_in_id: UUID,
+    body: CancelCheckInRequest,
+    db: AsyncSession = Depends(get_db),
+    _staff: object = Depends(require_staff),
+) -> CheckInResponse:
+    """Cancel a pending check-in.
+
+    Returns 404 if not found.
+    Returns 422 if the check-in is not in pending status.
+    Staff only.
+    """
+    try:
+        check_in = await cancel_check_in(db, check_in_id, reason=body.reason)
+    except ValueError as exc:
+        error_msg = str(exc)
+        if "not found" in error_msg:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=error_msg) from exc
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=error_msg
+        ) from exc
+    return _to_check_in_response(check_in)
+
+
+@staff_router.post(
+    "/api/staff/foster/check-ins/{check_in_id}/remind",
+    response_model=CheckInResponse,
+    summary="Log reminder dispatch for a foster check-in",
+)
+async def send_foster_check_in_reminder(
+    check_in_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    _staff: object = Depends(require_staff),
+) -> CheckInResponse:
+    """Record that a reminder was dispatched for this check-in.
+
+    Updates reminder_sent_at timestamp.  Actual notification delivery is
+    handled by the notification service layer and is outside this endpoint's
+    scope.
+
+    Returns 404 if not found.
+    Staff only.
+    """
+    try:
+        check_in = await record_reminder_sent(db, check_in_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
+    return _to_check_in_response(check_in)
+
+
+# ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
+
+
+def _to_check_in_response(check_in: FosterCheckIn) -> CheckInResponse:
+    """Convert ORM FosterCheckIn to CheckInResponse schema."""
+    return CheckInResponse(
+        id=check_in.id,
+        foster_placement_id=check_in.foster_placement_id,
+        check_in_type=check_in.check_in_type,
+        status=check_in.status,
+        scheduled_at=check_in.scheduled_at,
+        completed_at=check_in.completed_at,
+        notes=check_in.notes,
+        cancellation_reason=check_in.cancellation_reason,
+        interval_days=check_in.interval_days,
+        reminder_sent_at=check_in.reminder_sent_at,
+        created_by=check_in.created_by,
+        created_at=check_in.created_at,
+        updated_at=check_in.updated_at,
+    )
 
 
 def _to_response(profile: FosterProfile) -> FosterProfileResponse:
