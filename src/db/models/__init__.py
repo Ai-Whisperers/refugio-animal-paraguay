@@ -12,6 +12,7 @@ from .castration_photo import CastrationPhoto
 from .community_need import CommunityNeed, NeedCategory, NeedStatus
 from .contact_submission import ContactFormType, ContactSubmission
 from .donation import CurrencyCode, Donation, DonationStatus, Donor, PaymentMethod
+from .foster_check_in import CheckInStatus, CheckInType, FosterCheckIn
 from .foster_placement import FosterPlacement
 from .foster_profile import AnimalTypePreference, FosterProfile, FosterStatus, HomeType
 from .fund_allocation import FundAllocation, FundCategory
@@ -98,6 +99,9 @@ __all__ = [
     "Donation",
     "DonationStatus",
     "Donor",
+    "CheckInStatus",
+    "CheckInType",
+    "FosterCheckIn",
     "FosterPlacement",
     "FosterProfile",
     "FosterStatus",
