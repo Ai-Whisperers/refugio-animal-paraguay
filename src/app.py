@@ -31,6 +31,7 @@ from src.api.adoption_requirements import (
     public_router as adoption_req_public_router,
 )
 from src.api.adoption_success import router as adoption_success_router
+from src.api.animal_intake_outcome import router as animal_intake_outcome_router
 from src.api.animal_updates import router as animal_updates_router
 from src.api.animals import router as animals_router
 from src.api.annual_reports import router as annual_reports_router
@@ -430,6 +431,7 @@ def create_app() -> FastAPI:
     application.include_router(transport_request_router)
     application.include_router(predictive_analytics_router)
     application.include_router(request_matching_router)
+    application.include_router(animal_intake_outcome_router)
 
     application.include_router(community_engagement_analytics_router)
     application.include_router(volunteer_driver_router)
