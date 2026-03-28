@@ -567,7 +567,7 @@ Week 3-4:
 
 | # | Story | Ticket | Pts | Status | Track |
 |---|-------|--------|-----|--------|-------|
-| 1 | Executive KPI dashboard | RAP-632 | 7 | READY | Fullstack |
+| 1 | Executive KPI dashboard | RAP-632 | 7 | PR #288 | Fullstack |
 | 2 | Animal intake/outcome analytics | RAP-633 | 6 | PR #287 | Fullstack |
 | 3 | Donation analytics and trends | RAP-634 | 5 | PR #280 | Fullstack |
 | 4 | Donor analytics and retention | RAP-635 | 5 | PR #281 | Fullstack |
