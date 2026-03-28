@@ -55,7 +55,12 @@ from src.api.cms import public_router as cms_public_router
 from src.api.cms import router as cms_router
 from src.api.community_engagement_analytics import router as community_engagement_analytics_router
 from src.api.community_needs import admin_router as community_needs_admin_router
-from src.api.community_needs import public_router as community_needs_public_router
+from src.api.community_needs import (
+    public_router as community_needs_public_router,
+)
+from src.api.community_needs import (
+    rescuer_router as community_needs_rescuer_router,
+)
 from src.api.consents import router as consents_router
 from src.api.diagnoses import diagnosis_router, treatment_router
 from src.api.donation_allocations import allocation_router, expense_router
@@ -434,6 +439,8 @@ def create_app() -> FastAPI:
     application.include_router(request_matching_router)
     application.include_router(animal_intake_outcome_router)
     application.include_router(executive_kpi_dashboard_router)
+    application.include_router(community_needs_public_router)
+    application.include_router(community_needs_rescuer_router)
 
     application.include_router(community_engagement_analytics_router)
     application.include_router(volunteer_driver_router)
