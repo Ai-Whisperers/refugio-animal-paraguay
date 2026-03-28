@@ -3,7 +3,7 @@ story: S7
 epic: EPIC-88
 ticket: RAP-602
 title: "App-like bottom navigation bar"
-status: ready
+status: done
 points: 4
 priority: P0
 track: Frontend

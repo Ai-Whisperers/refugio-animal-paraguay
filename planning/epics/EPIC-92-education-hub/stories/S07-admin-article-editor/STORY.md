@@ -3,7 +3,7 @@ story: S7
 epic: EPIC-92
 ticket: RAP-631
 title: "Admin article editor with rich text"
-status: ready
+status: done
 points: 6
 priority: P0
 track: Fullstack

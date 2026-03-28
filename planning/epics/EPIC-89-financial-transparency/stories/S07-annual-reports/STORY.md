@@ -3,7 +3,7 @@ story: S7
 epic: EPIC-89
 ticket: RAP-610
 title: "Annual financial report generation"
-status: ready
+status: done
 points: 3
 priority: P0
 track: Backend

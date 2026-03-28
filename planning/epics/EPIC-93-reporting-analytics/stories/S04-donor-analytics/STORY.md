@@ -3,7 +3,7 @@ story: S4
 epic: EPIC-93
 ticket: RAP-635
 title: "Donor analytics and retention"
-status: ready
+status: done
 points: 5
 priority: P0
 track: Fullstack

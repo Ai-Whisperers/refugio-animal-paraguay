@@ -3,7 +3,7 @@ story: S5
 epic: EPIC-92
 ticket: RAP-629
 title: "Sterilization awareness campaign page"
-status: ready
+status: done
 points: 4
 priority: P0
 track: Frontend

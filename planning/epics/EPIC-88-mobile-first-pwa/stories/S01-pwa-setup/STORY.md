@@ -3,7 +3,7 @@ story: S1
 epic: EPIC-88
 ticket: RAP-596
 title: "PWA manifest and service worker setup"
-status: ready
+status: done
 points: 5
 priority: P0
 track: Frontend

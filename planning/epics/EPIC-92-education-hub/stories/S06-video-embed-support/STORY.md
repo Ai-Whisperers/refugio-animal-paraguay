@@ -3,7 +3,7 @@ story: S6
 epic: EPIC-92
 ticket: RAP-630
 title: "Video embed support"
-status: ready
+status: done
 points: 3
 priority: P0
 track: Frontend

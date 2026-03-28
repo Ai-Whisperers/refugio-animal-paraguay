@@ -3,7 +3,7 @@ story: S5
 epic: EPIC-90
 ticket: RAP-616
 title: "Community feature request board"
-status: ready
+status: done
 points: 3
 priority: P0
 track: Frontend

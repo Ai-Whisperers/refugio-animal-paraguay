@@ -3,7 +3,7 @@ story: S4
 epic: EPIC-92
 ticket: RAP-628
 title: "Required pre-adoption reading enforcement"
-status: ready
+status: done
 points: 4
 priority: P0
 track: Fullstack
