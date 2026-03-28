@@ -40,6 +40,7 @@ from .sponsorship import (
     SponsorshipTierLevel,
 )
 from .subscription import Subscription, SubscriptionInterval, SubscriptionStatus
+from .success_story import SuccessStory
 from .surgery import (
     AnesthesiaType,
     PostOpCheck,
@@ -117,6 +118,7 @@ __all__ = [
     "Subscription",
     "SubscriptionInterval",
     "SubscriptionStatus",
+    "SuccessStory",
     "Surgery",
     "SurgeryOutcome",
     "SurgeryStatus",
