@@ -4,7 +4,7 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { X, ChevronLeft, ChevronRight, MessageCircle, ArrowLeft, ClipboardCheck } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, MessageCircle, ArrowLeft, ClipboardCheck, Heart } from "lucide-react";
 import type { Animal } from "@/types/api";
 import { getAnimalPublic } from "@/lib/public-api";
 import { STATUS_LABELS, statusBadgeClass, calculateAge } from "@/lib/animal-utils";
@@ -258,6 +258,13 @@ export default function AnimalDetailPage() {
                 <MessageCircle className="h-5 w-5" />
                 {ANIMAL_DETAIL.askAbout(animal.name)}
               </a>
+              <Link
+                href={`/animals/${animal.id}/sponsor`}
+                className="inline-flex items-center justify-center gap-2 bg-pink-500 text-white px-6 py-3 rounded-lg font-medium hover:bg-pink-600 transition-colors"
+              >
+                <Heart className="h-5 w-5" />
+                {ANIMAL_DETAIL.sponsorAnimal(animal.name)}
+              </Link>
               <Link
                 href="/animals"
                 className="inline-flex items-center justify-center bg-gray-100 text-gray-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-200 transition-colors"
