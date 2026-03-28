@@ -141,6 +141,8 @@ from src.api.rescuer_animals import (
 from src.api.rescuer_animals import (
     public_router as rescuer_animals_public_router,
 )
+from src.api.rescuer_campaigns import portal_router as rescuer_campaigns_portal_router
+from src.api.rescuer_campaigns import public_router as rescuer_campaigns_public_router
 from src.api.rescuer_directory import router as rescuer_directory_router
 from src.api.rescuer_emergencies import router as rescuer_emergencies_router
 from src.api.rescuer_profile import router as rescuer_profile_router
@@ -433,6 +435,8 @@ def create_app() -> FastAPI:
     application.include_router(community_needs_public_router)
     application.include_router(community_feed_router)
     application.include_router(homepage_content_router)
+    application.include_router(rescuer_campaigns_portal_router)
+    application.include_router(rescuer_campaigns_public_router)
     application.include_router(rescuer_emergencies_router)
     application.include_router(public_emergencies_router)
     application.include_router(trial_admin_router)
