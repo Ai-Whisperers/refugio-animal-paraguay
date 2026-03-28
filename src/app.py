@@ -23,6 +23,7 @@ from src.api.admin_fund_dashboard import router as admin_fund_dashboard_router
 from src.api.admin_sse import router as admin_sse_router
 from src.api.admin_voucher_finance import router as admin_voucher_finance_router
 from src.api.adopters import router as adopters_router
+from src.api.expense_approval import router as expense_approval_router
 from src.api.adoption_requests import router as adoption_requests_router
 from src.api.adoption_requirements import (
     admin_router as adoption_req_admin_router,
@@ -341,6 +342,7 @@ def create_app() -> FastAPI:
     application.include_router(queued_donations_router)
     application.include_router(media_upload_router)
     application.include_router(expense_router)
+    application.include_router(expense_approval_router)
     application.include_router(allocation_router)
     application.include_router(pre_qual_analytics_router)
     application.include_router(vet_documents_router)
