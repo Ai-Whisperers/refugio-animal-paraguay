@@ -46,6 +46,7 @@ from src.api.google_oauth import router as google_oauth_router
 from src.api.health import router as health_router
 from src.api.impact_reports import router as impact_reports_router
 from src.api.in_kind_donations import router as in_kind_donations_router
+from src.api.media_upload import router as media_upload_router
 from src.api.medical_documents import router as medical_documents_router
 from src.api.medications import router as medications_router
 from src.api.notification_preferences import router as notification_preferences_router
@@ -249,6 +250,7 @@ def create_app() -> FastAPI:
     application.include_router(pre_qualification_router)
     application.include_router(smart_matching_router)
     application.include_router(public_statistics_router)
+    application.include_router(media_upload_router)
 
     return application
 
