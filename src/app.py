@@ -23,7 +23,6 @@ from src.api.admin_fund_dashboard import router as admin_fund_dashboard_router
 from src.api.admin_sse import router as admin_sse_router
 from src.api.admin_voucher_finance import router as admin_voucher_finance_router
 from src.api.adopters import router as adopters_router
-from src.api.expense_approval import router as expense_approval_router
 from src.api.adoption_requests import router as adoption_requests_router
 from src.api.adoption_requirements import (
     admin_router as adoption_req_admin_router,
@@ -65,6 +64,7 @@ from src.api.educational_article import public_router as article_public_router
 from src.api.email_verification import router as email_verification_router
 from src.api.emergencies import router as emergencies_router
 from src.api.emergency_donations import router as emergency_donations_router
+from src.api.expense_approval import router as expense_approval_router
 from src.api.financial_stats import router as financial_stats_router
 from src.api.follow_ups import router as follow_ups_router
 from src.api.followup_automation import admin_router as followup_auto_admin_router
@@ -109,9 +109,11 @@ from src.api.public_sponsorships import router as public_sponsorships_router
 from src.api.public_statistics import router as public_statistics_router
 from src.api.public_survey import router as public_survey_router
 from src.api.public_voucher_stats import router as public_voucher_stats_router
+from src.api.push_subscriptions import router as push_subscriptions_router
 from src.api.queued_donations import router as queued_donations_router
 from src.api.referral_tracking import admin_router as referral_tracking_admin_router
 from src.api.referral_tracking import public_router as referral_tracking_public_router
+from src.api.report_export import router as report_export_router
 from src.api.rescuer_emergencies import router as rescuer_emergencies_router
 from src.api.rescuer_profiles import router as rescuer_profiles_router
 from src.api.rescuer_verification import router as rescuer_verification_router
@@ -144,7 +146,6 @@ from src.api.vet_vouchers import router as vet_vouchers_router
 from src.api.voucher_expiry import router as voucher_expiry_router
 from src.api.voucher_notifications import router as voucher_notifications_router
 from src.api.voucher_purchase import router as voucher_purchase_router
-from src.api.push_subscriptions import router as push_subscriptions_router
 from src.api.webhooks import router as webhooks_router
 from src.api.pre_adoption_reading import router as pre_adoption_reading_router
 from src.api.article_editor import admin_router as article_editor_admin_router
@@ -408,6 +409,7 @@ def create_app() -> FastAPI:
     application.include_router(article_editor_public_router)
     application.include_router(trip_tracking_router)
     application.include_router(vet_analytics_router)
+    application.include_router(report_export_router)
 
     return application
 
