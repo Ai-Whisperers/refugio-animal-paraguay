@@ -18,6 +18,7 @@ from slowapi.errors import RateLimitExceeded
 
 from src.api.admin import router as admin_router
 from src.api.admin_campaigns import router as admin_campaigns_router
+from src.api.admin_castration_campaigns import router as admin_castration_campaigns_router
 from src.api.adopters import router as adopters_router
 from src.api.adoption_requests import router as adoption_requests_router
 from src.api.adoption_requirements import (
@@ -30,6 +31,7 @@ from src.api.animal_updates import router as animal_updates_router
 from src.api.animals import router as animals_router
 from src.api.appointments import router as appointments_router
 from src.api.auth import router as auth_router
+from src.api.campaign_voucher_integration import router as campaign_voucher_integration_router
 from src.api.consents import router as consents_router
 from src.api.diagnoses import diagnosis_router, treatment_router
 from src.api.donations import router as donations_router
@@ -69,6 +71,7 @@ from src.api.vaccinations import vaccination_router, vaccine_type_router
 from src.api.vet_clinics import router as vet_clinics_router
 from src.api.vet_referrals import referral_router
 from src.api.vet_visits import router as vet_visits_router
+from src.api.vet_vouchers import router as vet_vouchers_router
 from src.api.webhooks import router as webhooks_router
 from src.audit.middleware import AuditMiddleware
 from src.config import Settings, get_settings
@@ -204,6 +207,8 @@ def create_app() -> FastAPI:
     application.include_router(tigo_money_router)
     application.include_router(webhooks_router)
     application.include_router(admin_campaigns_router)
+    application.include_router(admin_castration_campaigns_router)
+    application.include_router(campaign_voucher_integration_router)
     application.include_router(consents_router)
     application.include_router(notifications_router)
     application.include_router(gdpr_export_router)
@@ -226,6 +231,7 @@ def create_app() -> FastAPI:
     application.include_router(prescriptions_router)
     application.include_router(profile_router)
     application.include_router(vet_clinics_router)
+    application.include_router(vet_vouchers_router)
     application.include_router(user_roles_router)
     application.include_router(pre_qualification_router)
     application.include_router(smart_matching_router)
