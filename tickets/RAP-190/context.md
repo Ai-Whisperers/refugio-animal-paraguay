@@ -1,23 +1,19 @@
 # RAP-190 Context
 
-## STATUS: ACTIVE
+## STATUS: COMPLETED
 **Last updated**: 2026-03-28
 
 ## Current Focus
-Implementing FosterProfile model, migration, and API endpoints
+Done — PR #316 open for review
 
 ## Technical State
-- User model already has FOSTER role (UserRole.FOSTER = "foster")
-- Volunteer registration pattern at src/db/models/volunteer_profile.py + src/api/volunteer.py
-- Last alembic migration: 074_create_tasks_table.py (down_revision = "073")
-- App registers routers in src/app.py around line 480
+- FosterProfile model: src/db/models/foster_profile.py
+- Migration 075: src/db/alembic/versions/075_create_foster_profiles_table.py
+- API: src/api/foster.py (public_router + staff_router)
+- Tests: 23 unit + 19 integration, all passing
 
 ## Next Steps
-1. Create FosterProfile model
-2. Create migration 075
-3. Create foster API
-4. Register in app.py
-5. Write tests
+None — ticket complete
 
 ## Blockers
 None
