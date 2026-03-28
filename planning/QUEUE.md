@@ -428,7 +428,7 @@ Week 3-4:
 | 4 | Rescuer campaign creation | RAP-536 | 5 | BLOCKED | Fullstack | RAP-534 |
 | 5 | Needs board | RAP-537 | 5 | PR #289 | Fullstack | RAP-533 |
 | 6 | Community feed | RAP-538 | 5 | BLOCKED | Fullstack | RAP-534 |
-| 7 | Donor choice interface | RAP-539 | 5 | READY | Fullstack | RAP-543 (EPIC-81) |
+| 7 | Donor choice interface | RAP-539 | Donor choice interface | 5 | EPIC-80 | PR_CREATED | #290 |
 | 8 | Rescuer verification system | RAP-540 | 3 | DONE (PR #185) | Backend | RAP-533 |
 | 9 | Admin moderation tools | RAP-541 | 5 | READY | Fullstack | RAP-533 |
 | 10 | Integration with vet voucher system | RAP-542 | 3 | DONE (PR #186) | Backend | RAP-510 (EPIC-77) |
