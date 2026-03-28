@@ -23,8 +23,6 @@ from src.api.admin_fund_dashboard import router as admin_fund_dashboard_router
 from src.api.admin_sse import router as admin_sse_router
 from src.api.admin_voucher_finance import router as admin_voucher_finance_router
 from src.api.adopters import router as adopters_router
-from src.api.expense_crud import router as expense_crud_router
-from src.api.annual_reports import router as annual_reports_router
 from src.api.adoption_requests import router as adoption_requests_router
 from src.api.adoption_requirements import (
     admin_router as adoption_req_admin_router,
@@ -35,7 +33,10 @@ from src.api.adoption_requirements import (
 from src.api.adoption_success import router as adoption_success_router
 from src.api.animal_updates import router as animal_updates_router
 from src.api.animals import router as animals_router
+from src.api.annual_reports import router as annual_reports_router
 from src.api.appointments import router as appointments_router
+from src.api.article_editor import admin_router as article_editor_admin_router
+from src.api.article_editor import public_router as article_editor_public_router
 from src.api.auth import router as auth_router
 from src.api.blog_posts import admin_router as blog_admin_router
 from src.api.blog_posts import public_router as blog_public_router
@@ -69,8 +70,9 @@ from src.api.email_verification import router as email_verification_router
 from src.api.emergencies import router as emergencies_router
 from src.api.emergency_donations import router as emergency_donations_router
 from src.api.expense_approval import router as expense_approval_router
-from src.api.financial_stats import router as financial_stats_router
+from src.api.expense_crud import router as expense_crud_router
 from src.api.feature_requests import router as feature_requests_router
+from src.api.financial_stats import router as financial_stats_router
 from src.api.follow_ups import router as follow_ups_router
 from src.api.followup_automation import admin_router as followup_auto_admin_router
 from src.api.followup_automation import public_router as followup_auto_public_router
@@ -96,8 +98,10 @@ from src.api.password_reset import router as password_reset_router
 from src.api.phone_verification import router as phone_verification_router
 from src.api.pipeline_tracking import router as pipeline_tracking_router
 from src.api.portal import router as portal_router
+from src.api.pre_adoption_reading import router as pre_adoption_reading_router
 from src.api.pre_qualification import router as pre_qualification_router
 from src.api.pre_qualification_analytics import router as pre_qual_analytics_router
+from src.api.predictive_analytics import router as predictive_analytics_router
 from src.api.prescriptions import router as prescriptions_router
 from src.api.profile import router as profile_router
 from src.api.public import router as public_router
@@ -134,16 +138,18 @@ from src.api.subscriptions import router as subscriptions_router
 from src.api.success_stories import admin_router as stories_admin_router
 from src.api.success_stories import public_router as stories_public_router
 from src.api.surgeries import surgery_router
-from src.api.survey_analytics import router as survey_analytics_router
 from src.api.survey_admin import router as survey_admin_router
+from src.api.survey_analytics import router as survey_analytics_router
 from src.api.survey_distribution import router as survey_distribution_router
 from src.api.tigo_money import router as tigo_money_router
 from src.api.transport import router as transport_router
 from src.api.transport_request import router as transport_request_router
 from src.api.trial_periods import admin_router as trial_admin_router
 from src.api.trial_periods import public_router as trial_public_router
+from src.api.trip_tracking import router as trip_tracking_router
 from src.api.user_roles import router as user_roles_router
 from src.api.vaccinations import vaccination_router, vaccine_type_router
+from src.api.vet_analytics import router as vet_analytics_router
 from src.api.vet_clinics import router as vet_clinics_router
 from src.api.vet_documents import router as vet_documents_router
 from src.api.vet_referrals import referral_router
@@ -154,11 +160,6 @@ from src.api.voucher_expiry import router as voucher_expiry_router
 from src.api.voucher_notifications import router as voucher_notifications_router
 from src.api.voucher_purchase import router as voucher_purchase_router
 from src.api.webhooks import router as webhooks_router
-from src.api.pre_adoption_reading import router as pre_adoption_reading_router
-from src.api.article_editor import admin_router as article_editor_admin_router
-from src.api.article_editor import public_router as article_editor_public_router
-from src.api.trip_tracking import router as trip_tracking_router
-from src.api.vet_analytics import router as vet_analytics_router
 from src.audit.middleware import AuditMiddleware
 from src.config import Settings, get_settings
 from src.db.session import dispose_engine, init_engine
@@ -424,6 +425,7 @@ def create_app() -> FastAPI:
     application.include_router(donation_analytics_router)
     application.include_router(donor_retention_analytics_router)
     application.include_router(transport_request_router)
+    application.include_router(predictive_analytics_router)
 
     return application
 
