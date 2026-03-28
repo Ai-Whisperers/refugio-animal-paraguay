@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, Megaphone, Save } from "lucide-react";
 import { isAuthenticated } from "@/lib/auth";
 import { api, ApiClientError } from "@/lib/api";
+import ImageUploader from "@/components/admin/ImageUploader";
 
 // --- Labels (Spanish) ---
 const LABEL_PAGE_TITLE = "Nueva Campana";
@@ -367,24 +368,12 @@ export default function NewCampaignPage() {
             </div>
           </div>
 
-          {/* Image URL */}
-          <div>
-            <label
-              htmlFor="image_url"
-              className="mb-1 block text-sm font-medium text-warm-text-primary"
-            >
-              URL de Imagen
-            </label>
-            <input
-              id="image_url"
-              name="image_url"
-              type="url"
-              value={form.image_url}
-              onChange={handleChange}
-              className="w-full rounded-lg border border-warm-border bg-warm-surface px-3 py-2 text-sm text-warm-text-primary focus:border-primary-500 focus:outline-none focus:ring-1 focus:ring-primary-500"
-              placeholder="https://ejemplo.com/imagen.jpg"
-            />
-          </div>
+          {/* Campaign Image */}
+          <ImageUploader
+            label="Imagen de Campana"
+            value={form.image_url}
+            onChange={(url) => setForm((prev) => ({ ...prev, image_url: url }))}
+          />
 
           {/* Toggles */}
           <div className="space-y-3">
