@@ -11,6 +11,7 @@ import { STATUS_LABELS, statusBadgeClass, calculateAge } from "@/lib/animal-util
 import { ANIMAL_DETAIL, COMMON, SPECIES_LABELS, formatDate } from "@/lib/strings";
 import AnimalPlaceholder from "@/components/AnimalPlaceholder";
 import WhatsAppShareButton from "@/components/WhatsAppShareButton";
+import ShareWidget from "@/components/ShareWidget";
 
 const WHATSAPP_BASE = "https://wa.me/595981000000";
 
@@ -199,6 +200,11 @@ export default function AnimalDetailPage() {
                 birthDate={animal.birth_date}
                 animalId={animal.id}
                 size="md"
+              />
+              <ShareWidget
+                title={`${animal.name} busca hogar — Refugio Animal Paraguay`}
+                description={animal.description ?? undefined}
+                url={typeof window !== "undefined" ? window.location.href : undefined}
               />
             </div>
 
