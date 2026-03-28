@@ -71,6 +71,7 @@ from src.api.educational_article import public_router as article_public_router
 from src.api.email_verification import router as email_verification_router
 from src.api.emergencies import router as emergencies_router
 from src.api.emergency_donations import router as emergency_donations_router
+from src.api.executive_kpi_dashboard import router as executive_kpi_dashboard_router
 from src.api.expense_approval import router as expense_approval_router
 from src.api.expense_crud import router as expense_crud_router
 from src.api.feature_requests import router as feature_requests_router
@@ -432,6 +433,7 @@ def create_app() -> FastAPI:
     application.include_router(predictive_analytics_router)
     application.include_router(request_matching_router)
     application.include_router(animal_intake_outcome_router)
+    application.include_router(executive_kpi_dashboard_router)
 
     application.include_router(community_engagement_analytics_router)
     application.include_router(volunteer_driver_router)
