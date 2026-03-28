@@ -20,6 +20,7 @@ import {
   Stethoscope,
   ClipboardList,
   Calendar,
+  FileText,
 } from "lucide-react";
 import { useState } from "react";
 import { clearAccessToken, getCurrentUserRole } from "@/lib/auth";
@@ -99,6 +100,11 @@ const NAV_ITEMS: NavItem[] = [
     label: "Panel Veterinario",
     href: "/admin/vet-dashboard",
     icon: Stethoscope,
+  },
+  {
+    label: "Contenido",
+    href: "/admin/content",
+    icon: FileText,
   },
   {
     label: "Usuarios",
