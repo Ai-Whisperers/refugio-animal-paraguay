@@ -656,3 +656,13 @@
 - **Tickets**: current.md empty; no orphaned ACTIVE tickets found
 - **Branches**: feature/RAP-180 + feature/RAP-181 deleted (remote + local); feature/RAP-642 kept (open conflicting PR)
 - **Actions taken**: Merged PRs #306 and #307, deleted remote branches, pruned local merged branches, updated QUEUE.md
+
+### [2026-03-28 22:15] Worker Run — EPIC-37 P1+P2 Stories Complete
+- **Epic**: EPIC-37 — Shift Scheduling System (V7 Sprint 4)
+- **Stories completed**:
+  - RAP-183 (S4 P1): Attendance tracking and no-show flags — `GET /api/shifts/{id}/signups` + `PATCH /api/shifts/{id}/signups/{signup_id}`, admin shift detail page with attendance controls
+  - RAP-184 (S5 P2): Shift reminder notifications — `POST /api/shifts/reminders/send`, in-app reminder service with `reminder_sent_at` idempotency, migration 073
+- **PRs created**: #309 (RAP-183), #310 (RAP-184)
+- **Duration**: ~1.5h total (including context resume from previous session)
+- **Quality**: ruff clean, black clean; 20 unit tests + 18 integration tests passing across both stories
+- **Notes**: EPIC-37 is now fully implemented (all 5 stories done, PRs #306-#310). RAP-183 branch is based on develop (not RAP-182), so `ShiftSignupResponse` is re-declared independently — PRs may need rebase when merging. QUEUE.md updated on develop: EPIC-37 S1-S5 all DONE.
