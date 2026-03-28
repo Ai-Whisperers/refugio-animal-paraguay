@@ -43,11 +43,11 @@ from src.api.castration_photos import public_router as castration_photos_public_
 from src.api.castration_report import admin_router as castration_report_admin_router
 from src.api.castration_report import public_router as castration_report_public_router
 from src.api.clinic_redemption import router as clinic_redemption_router
-from src.api.community_needs import admin_router as community_needs_admin_router
-from src.api.community_needs import public_router as community_needs_public_router
 from src.api.clinic_services import router as clinic_services_router
 from src.api.cms import public_router as cms_public_router
 from src.api.cms import router as cms_router
+from src.api.community_needs import admin_router as community_needs_admin_router
+from src.api.community_needs import public_router as community_needs_public_router
 from src.api.consents import router as consents_router
 from src.api.diagnoses import diagnosis_router, treatment_router
 from src.api.donation_allocations import allocation_router, expense_router
@@ -69,6 +69,7 @@ from src.api.gdpr import router as gdpr_router
 from src.api.gdpr_export import router as gdpr_export_router
 from src.api.google_oauth import router as google_oauth_router
 from src.api.health import router as health_router
+from src.api.homepage_content import router as homepage_content_router
 from src.api.impact_emails import router as impact_emails_router
 from src.api.impact_reports import router as impact_reports_router
 from src.api.in_kind_donations import router as in_kind_donations_router
@@ -360,6 +361,7 @@ def create_app() -> FastAPI:
     application.include_router(castration_report_public_router)
     application.include_router(community_needs_public_router)
     application.include_router(community_needs_admin_router)
+    application.include_router(homepage_content_router)
 
     return application
 
