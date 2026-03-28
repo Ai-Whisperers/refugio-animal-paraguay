@@ -150,6 +150,7 @@ from src.api.pre_adoption_reading import router as pre_adoption_reading_router
 from src.api.article_editor import admin_router as article_editor_admin_router
 from src.api.article_editor import public_router as article_editor_public_router
 from src.api.trip_tracking import router as trip_tracking_router
+from src.api.vet_analytics import router as vet_analytics_router
 from src.audit.middleware import AuditMiddleware
 from src.config import Settings, get_settings
 from src.db.session import dispose_engine, init_engine
@@ -406,6 +407,7 @@ def create_app() -> FastAPI:
     application.include_router(article_editor_admin_router)
     application.include_router(article_editor_public_router)
     application.include_router(trip_tracking_router)
+    application.include_router(vet_analytics_router)
 
     return application
 
