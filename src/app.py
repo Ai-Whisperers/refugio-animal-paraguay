@@ -57,6 +57,7 @@ from src.api.password_reset import router as password_reset_router
 from src.api.phone_verification import router as phone_verification_router
 from src.api.portal import router as portal_router
 from src.api.pre_qualification import router as pre_qualification_router
+from src.api.pre_qualification_analytics import router as pre_qual_analytics_router
 from src.api.prescriptions import router as prescriptions_router
 from src.api.profile import router as profile_router
 from src.api.public import router as public_router
@@ -260,6 +261,7 @@ def create_app() -> FastAPI:
     application.include_router(media_upload_router)
     application.include_router(expense_router)
     application.include_router(allocation_router)
+    application.include_router(pre_qual_analytics_router)
 
     return application
 

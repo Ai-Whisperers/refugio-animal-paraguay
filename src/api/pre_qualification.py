@@ -17,6 +17,7 @@ from src.db.session import get_db
 from src.middleware.rate_limiter import limiter
 from src.schemas.error import RESOURCE_RESPONSES
 from src.services.anti_gaming_service import AntiGamingError, check_rate_limits
+from src.services.pre_qualification_analytics_service import record_attempt
 from src.services.pre_qualification_service import (
     AnimalNotFoundError,
     PreQualificationResult,
@@ -111,6 +112,12 @@ async def pre_qualify(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Animal {body.animal_id} not found or not available for adoption.",
         ) from None
+
+    # Record attempt for analytics (non-blocking — log and continue on failure)
+    try:
+        await record_attempt(db, animal_id=body.animal_id, result=result, user_id=_current_user.id)
+    except Exception:
+        logger.warning("Failed to record pre-qualification attempt", exc_info=True)
 
     return PreQualifyResponse(
         qualified=result.qualified,
