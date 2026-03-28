@@ -341,7 +341,7 @@ Week 3-4:
 | 7 | Donor transparency notifications | RAP-513 | 3 | DONE (PR #165) | Backend | RAP-509 |
 | 8 | Voucher expiry and refund policy | RAP-514 | 3 | DONE (PR #162) | Backend | RAP-510 |
 | 9 | Financial reconciliation dashboard | RAP-515 | 5 | DONE (PR #207) | Fullstack | RAP-512 |
-| 10 | Public voucher statistics dashboard | RAP-516 | 3 | READY | Fullstack | RAP-515 |
+| 10 | Public voucher statistics dashboard | RAP-516 | 3 | DONE (PR #208) | Fullstack | RAP-515 |
 
 ### EPIC-78: Adoption Pre-Qualification & Smart Matching (38 pts)
 
