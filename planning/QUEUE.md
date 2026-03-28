@@ -550,7 +550,7 @@ Week 3-4:
 | # | Story | Ticket | Pts | Status | Track |
 |---|-------|--------|-----|--------|-------|
 | 1 | Educational article model and API | RAP-625 | 4 | DONE (PR #202) | Backend |
-| 2 | Education hub public page | RAP-626 | 5 | READY | Frontend |
+| 2 | Education hub public page | RAP-626 | 5 | PR #273 | Frontend |
 | 3 | Article detail page with related articles | RAP-627 | 5 | READY | Frontend |
 | 4 | Required pre-adoption reading enforcement | RAP-628 | 4 | READY | Fullstack |
 | 5 | Sterilization awareness campaign page | RAP-629 | 4 | PR #272 | Frontend |
