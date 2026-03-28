@@ -453,7 +453,7 @@ Week 3-4:
 | 1 | Open Graph meta tags for all public pages | RAP-566 | 5 | READY | Frontend |
 | 2 | WhatsApp share buttons on animal cards | RAP-567 | 3 | IN_REVIEW (PR #226) | Frontend |
 | 3 | WhatsApp share for campaigns | RAP-568 | 3 | IN_REVIEW (PR #228) | Frontend |
-| 4 | Social media share buttons (Facebook, Instagram, Twitter) | RAP-569 | 3 | READY | Frontend |
+| 4 | Social media share buttons (Facebook, Instagram, Twitter) | RAP-569 | 3 | IN_REVIEW (PR #239) | Frontend |
 | 5 | Share tracking analytics | RAP-570 | 5 | DONE (PR #189) | Backend |
 | 6 | Referral tracking | RAP-571 | 5 | DONE (on develop) | Backend |
 | 7 | Auto-generated social media cards | RAP-572 | 3 | DONE | Backend |
