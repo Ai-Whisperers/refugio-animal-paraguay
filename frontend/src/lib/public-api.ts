@@ -193,6 +193,7 @@ export async function submitAdoptionApplication(
 /** Query parameters for filtering campaign listings. */
 export interface CampaignListParams {
   category?: FundCategory;
+  featured?: boolean;
   page?: number;
   page_size?: number;
 }
@@ -205,6 +206,8 @@ export async function listCampaignsPublic(
 ): Promise<CampaignListResponse> {
   const searchParams = new URLSearchParams();
   if (params.category) searchParams.set("category", params.category);
+  if (params.featured !== undefined)
+    searchParams.set("featured", String(params.featured));
   if (params.page !== undefined)
     searchParams.set("page", String(params.page));
   if (params.page_size !== undefined)
