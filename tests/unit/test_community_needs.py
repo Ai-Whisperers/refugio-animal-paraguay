@@ -1,237 +1,368 @@
-"""Unit tests for community needs API and model."""
-
-from datetime import UTC, datetime
-from unittest.mock import AsyncMock, MagicMock
-from uuid import uuid4
+"""Tests for community needs board API."""
 
 import pytest
-from src.db.models.community_need import CommunityNeed, NeedCategory, NeedStatus
-
-# --- Model tests ---
-
-
-class TestCommunityNeedModel:
-    """Tests for CommunityNeed ORM model."""
-
-    def test_need_status_values(self) -> None:
-        assert NeedStatus.OPEN == "open"
-        assert NeedStatus.FULFILLED == "fulfilled"
-        assert NeedStatus.CANCELLED == "cancelled"
-
-    def test_need_category_values(self) -> None:
-        assert NeedCategory.MEDICAL == "medical"
-        assert NeedCategory.FOOD == "food"
-        assert NeedCategory.SHELTER == "shelter"
-        assert NeedCategory.TRANSPORT == "transport"
-        assert NeedCategory.SUPPLIES == "supplies"
-        assert NeedCategory.OTHER == "other"
-
-    def test_all_categories_are_six(self) -> None:
-        assert len(NeedCategory) == 6
-
-
-# --- Response helper tests ---
+from fastapi import HTTPException
+from src.api.community_needs import (
+    NEED_TYPE_LABELS_ES,
+    STATUS_LABELS_ES,
+    URGENCY_LABELS_ES,
+    ContactMethod,
+    NeedCreateRequest,
+    NeedStatus,
+    NeedStatusUpdate,
+    NeedType,
+    RespondRequest,
+    UrgencyLevel,
+    _reset_store,
+    create_need,
+    get_community_need,
+    list_community_needs,
+    list_rescuer_needs,
+    public_router,
+    rescuer_router,
+    respond_to_need,
+    update_need_status,
+)
 
 
-class TestNeedResponse:
-    """Tests for the _to_response helper."""
+@pytest.fixture(autouse=True)
+def _clean_store() -> None:
+    """Reset store before each test."""
+    _reset_store()
 
-    def _make_need(self, **overrides: object) -> CommunityNeed:
-        defaults = {
-            "id": uuid4(),
-            "title": "Alimento para 20 perros",
-            "description": "Necesitamos 50kg de alimento",
-            "category": NeedCategory.FOOD,
-            "status": NeedStatus.OPEN,
-            "estimated_cost_cents": 10000,
-            "current_raised_cents": 5000,
-            "currency": "USD",
-            "donor_count": 3,
-            "creator_id": uuid4(),
-            "image_url": None,
-            "created_at": datetime(2026, 3, 28, tzinfo=UTC),
-            "updated_at": datetime(2026, 3, 28, tzinfo=UTC),
+
+def _sample_request(**kwargs: object) -> NeedCreateRequest:
+    """Create a sample need request."""
+    defaults = {
+        "title": "Alimento urgente para 10 perros",
+        "description": "Necesitamos alimento para 10 perros rescatados",
+        "need_type": NeedType.FOOD,
+        "urgency": UrgencyLevel.HIGH,
+        "location": "Asuncion Centro",
+        "contact_method": ContactMethod.WHATSAPP,
+        "contact_info": "+595981123456",
+    }
+    defaults.update(kwargs)
+    return NeedCreateRequest(**defaults)
+
+
+# ---------------------------------------------------------------------------
+# Enum tests
+# ---------------------------------------------------------------------------
+
+
+class TestEnums:
+    """Verify enum members and labels."""
+
+    def test_need_type_members(self) -> None:
+        assert len(NeedType) == 6
+
+    def test_urgency_members(self) -> None:
+        assert len(UrgencyLevel) == 4
+
+    def test_need_status_members(self) -> None:
+        assert set(NeedStatus) == {
+            NeedStatus.OPEN,
+            NeedStatus.FULFILLED,
+            NeedStatus.CANCELLED,
         }
-        defaults.update(overrides)
-        need = MagicMock(spec=CommunityNeed)
-        for key, value in defaults.items():
-            setattr(need, key, value)
-        return need
 
-    def test_progress_percent_calculation(self) -> None:
-        from src.api.community_needs import _to_response
+    def test_contact_method_members(self) -> None:
+        assert len(ContactMethod) == 3
 
-        need = self._make_need(estimated_cost_cents=10000, current_raised_cents=2500)
-        response = _to_response(need)
-        assert response.progress_percent == 25.0
+    def test_need_type_labels_cover_all(self) -> None:
+        for nt in NeedType:
+            assert nt.value in NEED_TYPE_LABELS_ES
 
-    def test_progress_percent_zero_cost(self) -> None:
-        from src.api.community_needs import _to_response
+    def test_urgency_labels_cover_all(self) -> None:
+        for u in UrgencyLevel:
+            assert u.value in URGENCY_LABELS_ES
 
-        need = self._make_need(estimated_cost_cents=0, current_raised_cents=0)
-        # Avoid division by zero — should be 0%
-        response = _to_response(need)
-        assert response.progress_percent == 0.0
-
-    def test_progress_percent_capped_at_100(self) -> None:
-        from src.api.community_needs import _to_response
-
-        need = self._make_need(estimated_cost_cents=5000, current_raised_cents=7500)
-        response = _to_response(need)
-        assert response.progress_percent == 100.0
-
-    def test_progress_percent_full(self) -> None:
-        from src.api.community_needs import _to_response
-
-        need = self._make_need(estimated_cost_cents=10000, current_raised_cents=10000)
-        response = _to_response(need)
-        assert response.progress_percent == 100.0
-
-    def test_response_includes_all_fields(self) -> None:
-        from src.api.community_needs import _to_response
-
-        need_id = uuid4()
-        creator_id = uuid4()
-        need = self._make_need(
-            id=need_id,
-            title="Test need",
-            description="Test desc",
-            category=NeedCategory.MEDICAL,
-            status=NeedStatus.OPEN,
-            estimated_cost_cents=5000,
-            current_raised_cents=1000,
-            currency="EUR",
-            donor_count=2,
-            creator_id=creator_id,
-            image_url="https://example.com/img.jpg",
-        )
-        response = _to_response(need)
-        assert response.id == need_id
-        assert response.title == "Test need"
-        assert response.category == "medical"
-        assert response.currency == "EUR"
-        assert response.donor_count == 2
-        assert response.image_url == "https://example.com/img.jpg"
-        assert response.progress_percent == 20.0
+    def test_status_labels_cover_all(self) -> None:
+        for s in NeedStatus:
+            assert s.value in STATUS_LABELS_ES
 
 
-# --- Target validation tests ---
+# ---------------------------------------------------------------------------
+# Router config tests
+# ---------------------------------------------------------------------------
 
 
-class TestNeedTargetValidation:
-    """Tests for the need target validator."""
+class TestRouterConfig:
+    """Verify router setup."""
+
+    def test_public_router_prefix(self) -> None:
+        assert public_router.prefix == "/api/community/needs"
+
+    def test_rescuer_router_prefix(self) -> None:
+        assert rescuer_router.prefix == "/api/portal/rescuer/needs"
+
+    def test_public_router_tags(self) -> None:
+        assert "community-needs" in public_router.tags
+
+    def test_rescuer_router_tags(self) -> None:
+        assert "rescuer-needs" in rescuer_router.tags
+
+
+# ---------------------------------------------------------------------------
+# Create need tests
+# ---------------------------------------------------------------------------
+
+
+class TestCreateNeed:
+    """Test POST /api/portal/rescuer/needs."""
 
     @pytest.mark.asyncio
-    async def test_validates_existing_open_need(self) -> None:
-        from src.services.donation_target_service import _validate_need_target
-
-        need_id = uuid4()
-        need = MagicMock(spec=CommunityNeed)
-        need.status = NeedStatus.OPEN
-
-        db = AsyncMock()
-        db.get.return_value = need
-
-        # Should not raise
-        await _validate_need_target(db, need_id)
-        db.get.assert_awaited_once_with(CommunityNeed, need_id)
+    async def test_create_success(self) -> None:
+        req = _sample_request()
+        result = await create_need(req)
+        assert result.id
+        assert result.title == req.title
+        assert result.status == NeedStatus.OPEN
 
     @pytest.mark.asyncio
-    async def test_raises_for_missing_need(self) -> None:
-        from src.services.donation_target_service import (
-            InvalidTargetError,
-            _validate_need_target,
-        )
-
-        db = AsyncMock()
-        db.get.return_value = None
-
-        with pytest.raises(InvalidTargetError, match="not found"):
-            await _validate_need_target(db, uuid4())
+    async def test_creates_with_uuid(self) -> None:
+        req = _sample_request()
+        result = await create_need(req)
+        assert len(result.id) == 36  # UUID format
 
     @pytest.mark.asyncio
-    async def test_raises_for_fulfilled_need(self) -> None:
-        from src.services.donation_target_service import (
-            TargetNotActiveError,
-            _validate_need_target,
-        )
-
-        need = MagicMock(spec=CommunityNeed)
-        need.status = NeedStatus.FULFILLED
-
-        db = AsyncMock()
-        db.get.return_value = need
-
-        with pytest.raises(TargetNotActiveError, match="not open"):
-            await _validate_need_target(db, uuid4())
+    async def test_labels_populated(self) -> None:
+        req = _sample_request()
+        result = await create_need(req)
+        assert result.need_type_label == "Alimento"
+        assert result.urgency_label == "Alta"
+        assert result.status_label == "Abierto"
 
     @pytest.mark.asyncio
-    async def test_raises_for_cancelled_need(self) -> None:
-        from src.services.donation_target_service import (
-            TargetNotActiveError,
-            _validate_need_target,
+    async def test_optional_cost(self) -> None:
+        req = _sample_request(estimated_cost_pyg=500000)
+        result = await create_need(req)
+        assert result.estimated_cost_pyg == 500000
+
+    @pytest.mark.asyncio
+    async def test_responses_count_zero(self) -> None:
+        req = _sample_request()
+        result = await create_need(req)
+        assert result.responses_count == 0
+
+
+# ---------------------------------------------------------------------------
+# List needs tests
+# ---------------------------------------------------------------------------
+
+
+class TestListCommunityNeeds:
+    """Test GET /api/community/needs."""
+
+    @pytest.mark.asyncio
+    async def test_empty_list(self) -> None:
+        result = await list_community_needs(
+            need_type=None, urgency=None, location=None, page=1, page_size=20
         )
+        assert result.total == 0
+        assert len(result.needs) == 0
 
-        need = MagicMock(spec=CommunityNeed)
-        need.status = NeedStatus.CANCELLED
-
-        db = AsyncMock()
-        db.get.return_value = need
-
-        with pytest.raises(TargetNotActiveError, match="not open"):
-            await _validate_need_target(db, uuid4())
-
-
-# --- Schema validation tests ---
-
-
-class TestNeedSchemas:
-    """Tests for request/response schema validation."""
-
-    def test_create_request_valid(self) -> None:
-        from src.api.community_needs import NeedCreateRequest
-
-        req = NeedCreateRequest(
-            title="Alimento urgente",
-            description="Necesitamos comida",
-            category=NeedCategory.FOOD,
-            estimated_cost_cents=5000,
-            currency="USD",
+    @pytest.mark.asyncio
+    async def test_returns_created_need(self) -> None:
+        await create_need(_sample_request())
+        result = await list_community_needs(
+            need_type=None, urgency=None, location=None, page=1, page_size=20
         )
-        assert req.title == "Alimento urgente"
-        assert req.estimated_cost_cents == 5000
+        assert result.total == 1
 
-    def test_create_request_rejects_zero_cost(self) -> None:
-        from pydantic import ValidationError
-        from src.api.community_needs import NeedCreateRequest
+    @pytest.mark.asyncio
+    async def test_filter_by_type(self) -> None:
+        await create_need(_sample_request(need_type=NeedType.FOOD))
+        await create_need(_sample_request(need_type=NeedType.MEDICAL))
+        result = await list_community_needs(
+            need_type=NeedType.FOOD, urgency=None, location=None, page=1, page_size=20
+        )
+        assert result.total == 1
+        assert result.needs[0].need_type == NeedType.FOOD
 
-        with pytest.raises(ValidationError):
-            NeedCreateRequest(
-                title="Test",
-                description="Test desc",
-                estimated_cost_cents=0,
-            )
+    @pytest.mark.asyncio
+    async def test_filter_by_urgency(self) -> None:
+        await create_need(_sample_request(urgency=UrgencyLevel.CRITICAL))
+        await create_need(_sample_request(urgency=UrgencyLevel.LOW))
+        result = await list_community_needs(
+            need_type=None, urgency=UrgencyLevel.CRITICAL, location=None, page=1, page_size=20
+        )
+        assert result.total == 1
 
-    def test_create_request_rejects_empty_title(self) -> None:
-        from pydantic import ValidationError
-        from src.api.community_needs import NeedCreateRequest
+    @pytest.mark.asyncio
+    async def test_filter_by_location(self) -> None:
+        await create_need(_sample_request(location="Asuncion Centro"))
+        await create_need(_sample_request(location="San Lorenzo"))
+        result = await list_community_needs(
+            need_type=None, urgency=None, location="Asuncion", page=1, page_size=20
+        )
+        assert result.total == 1
 
-        with pytest.raises(ValidationError):
-            NeedCreateRequest(
-                title="",
-                description="Test desc",
-                estimated_cost_cents=1000,
-            )
+    @pytest.mark.asyncio
+    async def test_urgency_ordering(self) -> None:
+        await create_need(_sample_request(urgency=UrgencyLevel.LOW, title="Low"))
+        await create_need(_sample_request(urgency=UrgencyLevel.CRITICAL, title="Critical"))
+        result = await list_community_needs(
+            need_type=None, urgency=None, location=None, page=1, page_size=20
+        )
+        assert result.needs[0].urgency == UrgencyLevel.CRITICAL
 
-    def test_update_request_partial(self) -> None:
-        from src.api.community_needs import NeedUpdateRequest
+    @pytest.mark.asyncio
+    async def test_excludes_fulfilled(self) -> None:
+        req = _sample_request()
+        need = await create_need(req)
+        await update_need_status(need.id, NeedStatusUpdate(status=NeedStatus.FULFILLED))
+        result = await list_community_needs(
+            need_type=None, urgency=None, location=None, page=1, page_size=20
+        )
+        assert result.total == 0
 
-        req = NeedUpdateRequest(title="New title")
-        dumped = req.model_dump(exclude_unset=True)
-        assert dumped == {"title": "New title"}
+    @pytest.mark.asyncio
+    async def test_pagination(self) -> None:
+        for i in range(5):
+            await create_need(_sample_request(title=f"Need {i}"))
+        result = await list_community_needs(
+            need_type=None, urgency=None, location=None, page=1, page_size=2
+        )
+        assert result.total == 5
+        assert len(result.needs) == 2
 
-    def test_update_request_status_change(self) -> None:
-        from src.api.community_needs import NeedUpdateRequest
 
-        req = NeedUpdateRequest(status=NeedStatus.FULFILLED)
-        assert req.status == NeedStatus.FULFILLED
+# ---------------------------------------------------------------------------
+# Get need detail tests
+# ---------------------------------------------------------------------------
+
+
+class TestGetCommunityNeed:
+    """Test GET /api/community/needs/{need_id}."""
+
+    @pytest.mark.asyncio
+    async def test_get_existing(self) -> None:
+        need = await create_need(_sample_request())
+        result = await get_community_need(need.id)
+        assert result.id == need.id
+
+    @pytest.mark.asyncio
+    async def test_not_found(self) -> None:
+        with pytest.raises(HTTPException):
+            await get_community_need("nonexistent")
+
+
+# ---------------------------------------------------------------------------
+# Respond to need tests
+# ---------------------------------------------------------------------------
+
+
+class TestRespondToNeed:
+    """Test POST /api/community/needs/{need_id}/respond."""
+
+    @pytest.mark.asyncio
+    async def test_respond_success(self) -> None:
+        need = await create_need(_sample_request())
+        req = RespondRequest(
+            responder_name="Juan",
+            message="Tengo alimento disponible",
+            contact_info="+595981999999",
+        )
+        result = await respond_to_need(need.id, req)
+        assert result.response_id
+        assert result.need_id == need.id
+
+    @pytest.mark.asyncio
+    async def test_respond_increments_count(self) -> None:
+        need = await create_need(_sample_request())
+        req = RespondRequest(
+            responder_name="Juan",
+            message="Puedo ayudar",
+            contact_info="juan@email.com",
+        )
+        await respond_to_need(need.id, req)
+        detail = await get_community_need(need.id)
+        assert detail.responses_count == 1
+
+    @pytest.mark.asyncio
+    async def test_respond_to_nonexistent(self) -> None:
+        req = RespondRequest(
+            responder_name="Juan",
+            message="Test",
+            contact_info="test@test.com",
+        )
+        with pytest.raises(HTTPException):
+            await respond_to_need("nonexistent", req)
+
+    @pytest.mark.asyncio
+    async def test_respond_to_fulfilled_fails(self) -> None:
+        need = await create_need(_sample_request())
+        await update_need_status(need.id, NeedStatusUpdate(status=NeedStatus.FULFILLED))
+        req = RespondRequest(
+            responder_name="Juan",
+            message="Test",
+            contact_info="test@test.com",
+        )
+        with pytest.raises(HTTPException):
+            await respond_to_need(need.id, req)
+
+
+# ---------------------------------------------------------------------------
+# Update status tests
+# ---------------------------------------------------------------------------
+
+
+class TestUpdateNeedStatus:
+    """Test PUT /api/portal/rescuer/needs/{need_id}."""
+
+    @pytest.mark.asyncio
+    async def test_mark_fulfilled(self) -> None:
+        need = await create_need(_sample_request())
+        result = await update_need_status(need.id, NeedStatusUpdate(status=NeedStatus.FULFILLED))
+        assert result.status == NeedStatus.FULFILLED
+
+    @pytest.mark.asyncio
+    async def test_mark_cancelled(self) -> None:
+        need = await create_need(_sample_request())
+        result = await update_need_status(need.id, NeedStatusUpdate(status=NeedStatus.CANCELLED))
+        assert result.status == NeedStatus.CANCELLED
+
+    @pytest.mark.asyncio
+    async def test_update_nonexistent(self) -> None:
+        with pytest.raises(HTTPException):
+            await update_need_status("nonexistent", NeedStatusUpdate(status=NeedStatus.FULFILLED))
+
+
+# ---------------------------------------------------------------------------
+# Rescuer list tests
+# ---------------------------------------------------------------------------
+
+
+class TestListRescuerNeeds:
+    """Test GET /api/portal/rescuer/needs."""
+
+    @pytest.mark.asyncio
+    async def test_empty_list(self) -> None:
+        result = await list_rescuer_needs(page=1, page_size=20)
+        assert result.total == 0
+
+    @pytest.mark.asyncio
+    async def test_returns_own_needs(self) -> None:
+        await create_need(_sample_request())
+        result = await list_rescuer_needs(page=1, page_size=20)
+        assert result.total == 1
+
+
+# ---------------------------------------------------------------------------
+# Frontend file assertions
+# ---------------------------------------------------------------------------
+
+
+class TestFrontendFile:
+    """Verify frontend page exists."""
+
+    def test_page_file_exists(self) -> None:
+        from pathlib import Path
+
+        page = Path("frontend/src/app/community/needs/page.tsx")
+        assert page.exists(), "Frontend page must exist"
+        content = page.read_text()
+        assert "CommunityNeedsPage" in content
+        assert "Necesidades de la comunidad" in content
