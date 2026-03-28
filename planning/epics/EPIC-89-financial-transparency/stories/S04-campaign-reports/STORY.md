@@ -3,7 +3,7 @@ story: S4
 epic: EPIC-89
 ticket: RAP-607
 title: "Campaign-specific financial reports"
-status: ready
+status: done
 points: 5
 priority: P0
 track: Fullstack

@@ -3,7 +3,7 @@ story: S8
 epic: EPIC-93
 ticket: RAP-639
 title: "Predictive analytics and forecasting"
-status: ready
+status: done
 points: 5
 priority: P0
 track: Backend

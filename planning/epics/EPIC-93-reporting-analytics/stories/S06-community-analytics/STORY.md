@@ -3,7 +3,7 @@ story: S6
 epic: EPIC-93
 ticket: RAP-637
 title: "Community engagement analytics"
-status: ready
+status: done
 points: 5
 priority: P0
 track: Fullstack

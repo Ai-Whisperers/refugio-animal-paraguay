@@ -3,7 +3,7 @@ story: S7
 epic: EPIC-80
 ticket: RAP-539
 title: "Donor choice interface"
-status: ready
+status: done
 points: 5
 priority: P1
 track: Fullstack

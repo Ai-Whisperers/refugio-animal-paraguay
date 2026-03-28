@@ -3,7 +3,7 @@ story: S3
 epic: EPIC-90
 ticket: RAP-614
 title: "Public survey response collection"
-status: ready
+status: done
 points: 4
 priority: P0
 track: Fullstack

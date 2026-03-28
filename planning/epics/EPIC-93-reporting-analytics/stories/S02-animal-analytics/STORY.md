@@ -3,7 +3,7 @@ story: S2
 epic: EPIC-93
 ticket: RAP-633
 title: "Animal intake/outcome analytics"
-status: ready
+status: done
 points: 6
 priority: P0
 track: Fullstack

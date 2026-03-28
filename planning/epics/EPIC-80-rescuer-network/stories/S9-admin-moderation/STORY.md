@@ -3,7 +3,7 @@ story: S9
 epic: EPIC-80
 ticket: RAP-541
 title: "Admin moderation tools"
-status: ready
+status: done
 points: 5
 priority: P2
 track: Fullstack

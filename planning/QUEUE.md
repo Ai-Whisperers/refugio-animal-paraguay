@@ -423,14 +423,14 @@ Week 3-4:
 | # | Story | Ticket | Pts | Status | Track | Depends On |
 |---|-------|--------|-----|--------|-------|------------|
 | 1 | Rescuer self-registration and profile model | RAP-533 | 5 | DONE (PR #184) | Backend | RAP-500 (EPIC-76) |
-| 2 | Rescuer profile page | RAP-534 | Rescuer profile page | 8 | EPIC-80 | PR_CREATED | #292 |
-| 3 | Rescuer animal listing management | RAP-535 | Rescuer animal listing management | 8 | EPIC-80 | PR_CREATED | #293 |
-| 4 | Rescuer campaign creation | RAP-536 | 5 | BLOCKED | Fullstack | RAP-534 | Rescuer profile page | 8 | EPIC-80 | PR_CREATED | #292 |
-| 5 | Needs board | RAP-537 | 5 | PR #289 | Fullstack | RAP-533 |
-| 6 | Community feed | RAP-538 | 5 | BLOCKED | Fullstack | RAP-534 | Rescuer profile page | 8 | EPIC-80 | PR_CREATED | #292 |
-| 7 | Donor choice interface | RAP-539 | Donor choice interface | 5 | EPIC-80 | PR_CREATED | #290 |
+| 2 | Rescuer profile page | RAP-534 | Rescuer profile page | 8 | EPIC-80 | DONE (PR #292) |
+| 3 | Rescuer animal listing management | RAP-535 | Rescuer animal listing management | 8 | EPIC-80 | DONE (PR #293) |
+| 4 | Rescuer campaign creation | RAP-536 | 5 | BLOCKED | Fullstack | RAP-534 | Rescuer profile page | 8 | EPIC-80 | DONE (PR #292) |
+| 5 | Needs board | RAP-537 | 5 | DONE (PR #289) | Fullstack | RAP-533 |
+| 6 | Community feed | RAP-538 | 5 | BLOCKED | Fullstack | RAP-534 | Rescuer profile page | 8 | EPIC-80 | DONE (PR #292) |
+| 7 | Donor choice interface | RAP-539 | Donor choice interface | 5 | EPIC-80 | DONE (PR #290) |
 | 8 | Rescuer verification system | RAP-540 | 3 | DONE (PR #185) | Backend | RAP-533 |
-| 9 | Admin moderation tools | RAP-541 | Admin moderation tools | 5 | EPIC-80 | PR_CREATED | #291 |
+| 9 | Admin moderation tools | RAP-541 | Admin moderation tools | 5 | EPIC-80 | DONE (PR #291) |
 | 10 | Integration with vet voucher system | RAP-542 | 3 | DONE (PR #186) | Backend | RAP-510 (EPIC-77) |
 
 ### EPIC-82: Content Management System (40 pts)
@@ -539,8 +539,8 @@ Week 3-4:
 |---|-------|--------|-----|--------|-------|
 | 1 | Transport request model and API | RAP-618 | 4 | DONE | Backend |
 | 2 | Transport request creation form | RAP-619 | 5 | PR #282 | Fullstack |
-| 3 | Volunteer driver registration | RAP-620 | 5 | PR #283 | Fullstack |
-| 4 | Intelligent request matching and notification | RAP-621 | 6 | PR #286 | Fullstack |
+| 3 | Volunteer driver registration | RAP-620 | 5 | DONE (PR #283) | Fullstack |
+| 4 | Intelligent request matching and notification | RAP-621 | 6 | DONE (PR #286) | Fullstack |
 | 5 | Real-time trip tracking with photos | RAP-622 | 4 | PR #277 | Fullstack |
 | 6 | Integration with vet appointments | RAP-623 | 3 | PR #204 | Backend |
 | 7 | Driver reimbursement tracking | RAP-624 | 2 | PR #203 | Backend |
@@ -567,14 +567,14 @@ Week 3-4:
 
 | # | Story | Ticket | Pts | Status | Track |
 |---|-------|--------|-----|--------|-------|
-| 1 | Executive KPI dashboard | RAP-632 | 7 | PR #288 | Fullstack |
-| 2 | Animal intake/outcome analytics | RAP-633 | 6 | PR #287 | Fullstack |
+| 1 | Executive KPI dashboard | RAP-632 | 7 | DONE (PR #288) | Fullstack |
+| 2 | Animal intake/outcome analytics | RAP-633 | 6 | DONE (PR #287) | Fullstack |
 | 3 | Donation analytics and trends | RAP-634 | 5 | PR #280 | Fullstack |
 | 4 | Donor analytics and retention | RAP-635 | 5 | PR #281 | Fullstack |
 | 5 | Veterinary care analytics | RAP-636 | 4 | PR #278 | Fullstack |
-| 6 | Community engagement analytics | RAP-637 | 5 | PR #284 | Fullstack |
+| 6 | Community engagement analytics | RAP-637 | 5 | DONE (PR #284) | Fullstack |
 | 7 | Exportable reports (PDF/CSV) | RAP-638 | 4 | PR #279 | Fullstack |
-| 8 | Predictive analytics and forecasting | RAP-639 | 5 | PR #285 | Backend |
+| 8 | Predictive analytics and forecasting | RAP-639 | 5 | DONE (PR #285) | Backend |
 
 ---
 
