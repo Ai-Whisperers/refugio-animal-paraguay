@@ -418,3 +418,103 @@ class TestBuildProfileResponseRAP641:
         user = self._make_user()
         result = _build_profile_response(profile, user)
         assert result["languages_spoken"] == []
+
+
+# ---------------------------------------------------------------------------
+# RAP-643: get_volunteer_profile_by_id endpoint
+# ---------------------------------------------------------------------------
+
+
+class TestGetVolunteerProfileById:
+    """Unit tests for the GET /api/staff/volunteers/{id} endpoint (RAP-643)."""
+
+    def _make_profile(self, **overrides):
+        from datetime import UTC, datetime
+        from unittest.mock import MagicMock
+
+        profile = MagicMock(spec=VolunteerProfile)
+        profile.id = overrides.get("id", uuid4())
+        profile.user_id = overrides.get("user_id", uuid4())
+        profile.motivation = overrides.get("motivation", "Quiero ayudar.")
+        profile.bio = overrides.get("bio")
+        profile.skills = overrides.get("skills", ["animal_care"])
+        profile.availability = overrides.get("availability", ["flexible"])
+        profile.hours_per_week = overrides.get("hours_per_week", 10)
+        profile.languages_spoken = overrides.get("languages_spoken", ["Español"])
+        profile.emergency_contact_name = overrides.get("emergency_contact_name", "Maria")
+        profile.emergency_contact_phone = overrides.get("emergency_contact_phone", "+595999000")
+        profile.status = overrides.get("status", VolunteerStatus.PENDING)
+        profile.rejection_reason = overrides.get("rejection_reason")
+        profile.total_hours_logged = overrides.get("total_hours_logged", 0)
+        profile.created_at = overrides.get("created_at", datetime.now(UTC))
+        return profile
+
+    def test_build_profile_response_includes_all_required_fields(self):
+        """Returned dict contains all fields expected by VolunteerProfileResponse."""
+        from unittest.mock import MagicMock
+
+        from src.db.models.user import User
+
+        profile = self._make_profile()
+        user = MagicMock(spec=User)
+        user.id = uuid4()
+        user.full_name = "Ana Garcia"
+        user.email = "ana@example.com"
+
+        result = _build_profile_response(profile, user)
+
+        required_fields = {
+            "id",
+            "user_id",
+            "full_name",
+            "email",
+            "motivation",
+            "bio",
+            "skills",
+            "availability",
+            "hours_per_week",
+            "languages_spoken",
+            "emergency_contact_name",
+            "emergency_contact_phone",
+            "status",
+            "rejection_reason",
+            "total_hours_logged",
+            "created_at",
+        }
+        assert required_fields.issubset(result.keys())
+
+    def test_build_profile_response_status_matches_profile(self):
+        """Status in response matches the profile's status."""
+        from unittest.mock import MagicMock
+
+        from src.db.models.user import User
+
+        profile = self._make_profile(status=VolunteerStatus.APPROVED)
+        user = MagicMock(spec=User)
+        user.id = uuid4()
+        user.full_name = "Jose Lopez"
+        user.email = "jose@example.com"
+
+        result = _build_profile_response(profile, user)
+
+        assert result["status"] == VolunteerStatus.APPROVED
+
+    def test_build_profile_response_rejected_includes_reason(self):
+        """Rejection reason is preserved for rejected applications."""
+        from unittest.mock import MagicMock
+
+        from src.db.models.user import User
+
+        reason = "No cumple con los requisitos minimos de experiencia."
+        profile = self._make_profile(
+            status=VolunteerStatus.REJECTED,
+            rejection_reason=reason,
+        )
+        user = MagicMock(spec=User)
+        user.id = uuid4()
+        user.full_name = "Pedro Ruiz"
+        user.email = "pedro@example.com"
+
+        result = _build_profile_response(profile, user)
+
+        assert result["rejection_reason"] == reason

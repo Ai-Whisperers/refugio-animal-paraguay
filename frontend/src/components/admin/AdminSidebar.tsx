@@ -21,6 +21,7 @@ import {
   ClipboardList,
   Calendar,
   FileText,
+  UserCheck,
 } from "lucide-react";
 import { useState } from "react";
 import { clearAccessToken, getCurrentUserRole } from "@/lib/auth";
@@ -100,6 +101,11 @@ const NAV_ITEMS: NavItem[] = [
     label: "Panel Veterinario",
     href: "/admin/vet-dashboard",
     icon: Stethoscope,
+  },
+  {
+    label: "Voluntarios",
+    href: "/admin/volunteers",
+    icon: UserCheck,
   },
   {
     label: "Contenido",
