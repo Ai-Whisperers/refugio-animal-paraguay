@@ -366,7 +366,7 @@ Week 3-4:
 
 | # | Story | Ticket | Pts | Status | Track | Depends On |
 |---|-------|--------|-----|--------|-------|------------|
-| 1 | Castration campaign model and creation API | RAP-525 | 5 | READY | Backend | — |
+| 1 | Castration campaign model and creation API | RAP-525 | 5 | IN PR #169 | Backend | — |
 | 2 | Public castration campaign page with live counter | RAP-526 | 8 | READY | Fullstack | RAP-525 |
 | 3 | Integration with vet voucher system | RAP-527 | 5 | READY | Backend | RAP-510 (EPIC-77) |
 | 4 | Photo gallery for completed castrations | RAP-528 | 5 | READY | Fullstack | RAP-525 |
