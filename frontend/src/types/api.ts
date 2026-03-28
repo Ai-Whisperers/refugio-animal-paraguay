@@ -776,6 +776,24 @@ export interface CastrationGalleryResponse {
   total: number;
   page: number;
   page_size: number;
+// --- Donor Leaderboard ---
+
+export interface LeaderboardEntry {
+  rank: number;
+  donor_id: string | null;
+  display_name: string;
+  country: string | null;
+  total_donated_cents: number;
+  currency: CurrencyCode;
+  donation_count: number;
+  is_anonymous: boolean;
+}
+
+export interface LeaderboardResponse {
+  items: LeaderboardEntry[];
+  total_donors: number;
+  total_raised_cents: number;
+  currency: CurrencyCode;
 }
 
 // --- API Error ---
