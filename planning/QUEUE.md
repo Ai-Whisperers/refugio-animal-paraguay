@@ -574,7 +574,7 @@ Week 3-4:
 | 5 | Veterinary care analytics | RAP-636 | 4 | PR #278 | Fullstack |
 | 6 | Community engagement analytics | RAP-637 | 5 | PR #284 | Fullstack |
 | 7 | Exportable reports (PDF/CSV) | RAP-638 | 4 | PR #279 | Fullstack |
-| 8 | Predictive analytics and forecasting | RAP-639 | 5 | READY | Backend |
+| 8 | Predictive analytics and forecasting | RAP-639 | 5 | PR #285 | Backend |
 
 ---
 
