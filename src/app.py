@@ -101,6 +101,7 @@ from src.api.portal import router as portal_router
 from src.api.pre_adoption_reading import router as pre_adoption_reading_router
 from src.api.pre_qualification import router as pre_qualification_router
 from src.api.pre_qualification_analytics import router as pre_qual_analytics_router
+from src.api.predictive_analytics import router as predictive_analytics_router
 from src.api.prescriptions import router as prescriptions_router
 from src.api.profile import router as profile_router
 from src.api.public import router as public_router
@@ -425,6 +426,7 @@ def create_app() -> FastAPI:
     application.include_router(donation_analytics_router)
     application.include_router(donor_retention_analytics_router)
     application.include_router(transport_request_router)
+    application.include_router(predictive_analytics_router)
 
     application.include_router(volunteer_driver_router)
     return application
