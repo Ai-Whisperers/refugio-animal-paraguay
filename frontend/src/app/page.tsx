@@ -6,10 +6,14 @@ import FeaturedAnimals from "@/components/FeaturedAnimals";
 import FeaturedCampaigns from "@/components/FeaturedCampaigns";
 import HomeTeam from "@/components/HomeTeam";
 import HomeTestimonials from "@/components/HomeTestimonials";
+import EmergencyBanner from "@/components/EmergencyBanner";
 
 export default function HomePage() {
   return (
     <div>
+      {/* Emergency Banner — auto-hides when no active emergency */}
+      <EmergencyBanner />
+
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-primary-50 to-orange-50 py-12 sm:py-16 md:py-20 px-4 relative overflow-hidden">
         {/* Decorative background element */}
