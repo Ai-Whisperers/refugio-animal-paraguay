@@ -439,7 +439,7 @@ Week 3-4:
 |---|-------|--------|-----|--------|-------|
 | 1 | CMS content model and API | RAP-551 | 5 | DONE (PR #187) | Backend |
 | 2 | Homepage dynamic content | RAP-552 | 5 | DONE (PR #241) | Fullstack |
-| 3 | Admin content editor | RAP-553 | 8 | READY | Frontend |
+| 3 | Admin content editor | RAP-553 | 8 | PR #249 | Frontend |
 | 4 | Success stories CRUD | RAP-554 | 5 | PR #246 | Fullstack |
 | 5 | News/blog posts | RAP-555 | 5 | PR #247 | Fullstack |
 | 6 | Featured animals on homepage | RAP-556 | 3 | DONE (PR #237) | Fullstack |
