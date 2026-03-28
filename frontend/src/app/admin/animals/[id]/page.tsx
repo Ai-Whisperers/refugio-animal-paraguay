@@ -11,6 +11,7 @@ import {
   Calendar,
   Info,
   Stethoscope,
+  Settings2,
 } from "lucide-react";
 import { isAuthenticated } from "@/lib/auth";
 import { api, ApiClientError } from "@/lib/api";
@@ -29,6 +30,7 @@ const LABEL_RETRY = "Reintentar";
 const LABEL_BACK = "Volver a la lista";
 const LABEL_EDIT = "Editar";
 const LABEL_VET_NOTES = "Notas Veterinarias";
+const LABEL_REQUIREMENTS = "Requisitos";
 const LABEL_CHANGE_STATUS = "Cambiar Estado";
 const LABEL_TAB_INFO = "Informacion";
 const LABEL_TAB_MEDICAL = "Historial Medico";
@@ -221,6 +223,13 @@ export default function AnimalDetailPage() {
           >
             <Stethoscope className="h-4 w-4" />
             {LABEL_VET_NOTES}
+          </button>
+          <button
+            onClick={() => router.push(`/admin/animals/${animalId}/requirements`)}
+            className="flex items-center gap-1.5 rounded-lg border border-warm-border bg-white px-3 py-1.5 text-sm font-medium text-warm-text-secondary transition-colors hover:bg-warm-bg hover:text-warm-text-primary"
+          >
+            <Settings2 className="h-4 w-4" />
+            {LABEL_REQUIREMENTS}
           </button>
           <button
             onClick={() => router.push(`/admin/animals/${animalId}/edit`)}
