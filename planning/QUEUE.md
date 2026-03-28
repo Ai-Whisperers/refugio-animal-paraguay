@@ -513,7 +513,7 @@ Week 3-4:
 | 4 | Campaign-specific financial reports | RAP-607 | 5 | READY | Fullstack |
 | 5 | Donor impact summaries | RAP-608 | 6 | READY | Fullstack |
 | 6 | Automated monthly impact emails | RAP-609 | 4 | DONE (PR #206) | Backend |
-| 7 | Annual financial report generation | RAP-610 | 3 | READY | Backend |
+| 7 | Annual financial report generation | RAP-610 | 3 | PR #261 | Backend |
 | 8 | Expense approval workflow | RAP-611 | 2 | PR #260 | Fullstack |
 
 ---
