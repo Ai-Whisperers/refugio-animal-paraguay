@@ -124,6 +124,7 @@ from src.api.queued_donations import router as queued_donations_router
 from src.api.referral_tracking import admin_router as referral_tracking_admin_router
 from src.api.referral_tracking import public_router as referral_tracking_public_router
 from src.api.report_export import router as report_export_router
+from src.api.request_matching import router as request_matching_router
 from src.api.rescuer_emergencies import router as rescuer_emergencies_router
 from src.api.rescuer_profiles import router as rescuer_profiles_router
 from src.api.rescuer_verification import router as rescuer_verification_router
@@ -428,6 +429,7 @@ def create_app() -> FastAPI:
     application.include_router(donor_retention_analytics_router)
     application.include_router(transport_request_router)
     application.include_router(predictive_analytics_router)
+    application.include_router(request_matching_router)
 
     application.include_router(community_engagement_analytics_router)
     application.include_router(volunteer_driver_router)
