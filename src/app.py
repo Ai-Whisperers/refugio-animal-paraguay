@@ -61,6 +61,7 @@ from src.api.educational_article import admin_router as article_admin_router
 from src.api.educational_article import public_router as article_public_router
 from src.api.email_verification import router as email_verification_router
 from src.api.emergencies import router as emergencies_router
+from src.api.emergency_donations import router as emergency_donations_router
 from src.api.follow_ups import router as follow_ups_router
 from src.api.followup_automation import admin_router as followup_auto_admin_router
 from src.api.followup_automation import public_router as followup_auto_public_router
@@ -345,6 +346,7 @@ def create_app() -> FastAPI:
     application.include_router(referral_tracking_public_router)
     application.include_router(referral_tracking_admin_router)
     application.include_router(emergencies_router)
+    application.include_router(emergency_donations_router)
     application.include_router(pipeline_tracking_router)
     application.include_router(transport_router)
     application.include_router(followup_auto_admin_router)

@@ -213,3 +213,26 @@ async def validate_donation_target(
     validator = _TARGET_VALIDATORS.get(DonationTargetType(target_type))
     if validator is not None and target_id is not None:
         await validator(db, target_id)
+
+
+async def _validate_emergency_target(db: AsyncSession, target_id: UUID) -> None:
+    """Validate that an emergency case exists and is accepting donations."""
+    from src.db.models.emergency_case import EmergencyCase
+
+    case_obj = await db.get(EmergencyCase, target_id)
+    if case_obj is None:
+        raise InvalidTargetError(
+            target_type=DonationTargetType.EMERGENCY,
+            target_id=target_id,
+            reason=f"Emergency case {target_id} not found",
+        )
+    if case_obj.status not in ("active", "funded"):
+        raise TargetNotActiveError(
+            target_type=DonationTargetType.EMERGENCY,
+            target_id=target_id,
+            reason=f"Emergency case {target_id} is not accepting donations (status: {case_obj.status})",
+        )
+
+
+# Register emergency validator (defined above)
+_TARGET_VALIDATORS[DonationTargetType.EMERGENCY] = _validate_emergency_target
