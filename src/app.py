@@ -76,6 +76,8 @@ from src.api.rescuer_voucher_integration import router as rescuer_voucher_integr
 from src.api.rescuer_vouchers import router as rescuer_vouchers_router
 from src.api.sepa import router as sepa_router
 from src.api.sessions import router as sessions_router
+from src.api.share_tracking import admin_router as share_admin_router
+from src.api.share_tracking import public_router as share_public_router
 from src.api.smart_matching import router as smart_matching_router
 from src.api.sponsorships import router as sponsorships_router
 from src.api.subscriptions import router as subscriptions_router
@@ -282,6 +284,8 @@ def create_app() -> FastAPI:
     application.include_router(media_serve_router)
     application.include_router(cms_router)
     application.include_router(cms_public_router)
+    application.include_router(share_public_router)
+    application.include_router(share_admin_router)
 
     return application
 
