@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Home, Heart, Users, MapPin, Clock, Phone, Mail, Star } from "lucide-react";
 import { HOME } from "@/lib/strings";
 import LiveStats from "@/components/LiveStats";
+import FeaturedAnimals from "@/components/FeaturedAnimals";
 
 export default function HomePage() {
   return (
@@ -43,6 +44,9 @@ export default function HomePage() {
 
       {/* Stats Section — live data with count-up animation */}
       <LiveStats />
+
+      {/* Featured Animals Carousel */}
+      <FeaturedAnimals />
 
       {/* How to Help Section */}
       <section className="py-10 sm:py-16 px-4 bg-gray-50">

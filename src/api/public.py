@@ -65,6 +65,10 @@ async def list_available_animals(
         max_length=255,
         description="Search by animal name (partial, case-insensitive)",
     ),
+    featured: bool | None = Query(
+        default=None,
+        description="Filter to featured animals only (for homepage carousel)",
+    ),
     page: int = Query(default=1, ge=1, description="Page number (1-based)"),
     page_size: int = Query(
         default=DEFAULT_PAGE_SIZE, ge=1, le=MAX_PAGE_SIZE, description="Items per page"
@@ -104,6 +108,8 @@ async def list_available_animals(
         )
     if search is not None and search.strip():
         base_query = base_query.where(Animal.name.ilike(f"%{search.strip()}%"))
+    if featured is not None:
+        base_query = base_query.where(Animal.is_featured.is_(featured))
 
     # Count total matching records
     count_query = select(func.count()).select_from(base_query.subquery())

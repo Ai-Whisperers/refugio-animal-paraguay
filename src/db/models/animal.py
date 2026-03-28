@@ -106,6 +106,13 @@ class Animal(Base):
     birth_date: Mapped[date | None] = mapped_column(sa.Date, nullable=True)
     description: Mapped[str | None] = mapped_column(sa.Text, nullable=True)
     primary_photo_url: Mapped[str | None] = mapped_column(sa.Text, nullable=True)
+    is_featured: Mapped[bool] = mapped_column(
+        sa.Boolean,
+        nullable=False,
+        server_default=sa.false(),
+        index=True,
+        comment="Displayed in homepage featured carousel when True",
+    )
     created_at: Mapped[datetime] = mapped_column(
         sa.TIMESTAMP(timezone=True),
         nullable=False,
