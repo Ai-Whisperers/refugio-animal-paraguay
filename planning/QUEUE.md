@@ -349,7 +349,7 @@ Week 3-4:
 |---|-------|--------|-----|--------|-------|------------|
 | 1 | Configurable adoption requirements model | RAP-517 | 5 | DONE (PR #167) | Backend | — |
 | 2 | Pre-qualification questionnaire API | RAP-518 | 5 | DONE (PR #168) | Backend | RAP-517 |
-| 3 | Pre-qualification form UI | RAP-519 | 8 | READY | Frontend | RAP-518 |
+| 3 | Pre-qualification form UI | RAP-519 | 8 | DONE (PR #209) | Frontend | RAP-518 |
 | 4 | Qualification result page with alternatives | RAP-520 | 5 | READY | Frontend | RAP-519 |
 | 5 | Admin requirement configuration UI | RAP-521 | 5 | READY | Frontend | RAP-517 |
 | 6 | Smart matching algorithm | RAP-522 | 5 | DONE (PR #173) | Backend | RAP-518 |
