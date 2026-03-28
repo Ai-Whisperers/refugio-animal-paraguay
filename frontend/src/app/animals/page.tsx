@@ -11,6 +11,7 @@ import { calculateAge } from "@/lib/animal-utils";
 import { ANIMALS_LIST, SPECIES_LABELS } from "@/lib/strings";
 import AnimalPlaceholder from "@/components/AnimalPlaceholder";
 import AnimalCardSkeleton from "@/components/AnimalCardSkeleton";
+import WhatsAppShareButton from "@/components/WhatsAppShareButton";
 
 // --- Filter option types ---
 
@@ -320,50 +321,64 @@ function AnimalsPageContent() {
         <>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {animals.map((animal) => (
-              <Link
+              <div
                 key={animal.id}
-                href={`/animals/${animal.id}`}
-                className="group bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
+                className="group relative bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
               >
-                {/* Photo with overlay badge */}
-                <div className="relative aspect-[4/3] overflow-hidden">
-                  {animal.primary_photo_url ? (
-                    <Image
-                      src={animal.primary_photo_url}
-                      alt={animal.name}
-                      fill
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                      className="object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                  ) : (
-                    <AnimalPlaceholder species={animal.species} />
-                  )}
-                  {/* All public animals are available — no status badge needed */}
-                </div>
-
-                {/* Info */}
-                <div className="p-4">
-                  <h3 className="text-lg font-semibold text-gray-900 group-hover:text-[#E8622A] transition-colors mb-1">
-                    {animal.name}
-                  </h3>
-                  <p className="text-sm text-gray-500">
-                    {SPECIES_LABELS[animal.species] ?? animal.species}
-                    {animal.birth_date && (
-                      <span className="ml-2 text-gray-400">
-                        {calculateAge(animal.birth_date)}
-                      </span>
+                <Link
+                  href={`/animals/${animal.id}`}
+                  className="block"
+                >
+                  {/* Photo with overlay badge */}
+                  <div className="relative aspect-[4/3] overflow-hidden">
+                    {animal.primary_photo_url ? (
+                      <Image
+                        src={animal.primary_photo_url}
+                        alt={animal.name}
+                        fill
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                        className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    ) : (
+                      <AnimalPlaceholder species={animal.species} />
                     )}
-                  </p>
-                  {animal.description && (
-                    <p className="text-sm text-gray-400 mt-2 line-clamp-2">
-                      {animal.description}
+                  </div>
+
+                  {/* Info */}
+                  <div className="p-4">
+                    <h3 className="text-lg font-semibold text-gray-900 group-hover:text-[#E8622A] transition-colors mb-1">
+                      {animal.name}
+                    </h3>
+                    <p className="text-sm text-gray-500">
+                      {SPECIES_LABELS[animal.species] ?? animal.species}
+                      {animal.birth_date && (
+                        <span className="ml-2 text-gray-400">
+                          {calculateAge(animal.birth_date)}
+                        </span>
+                      )}
                     </p>
-                  )}
-                  <p className="text-sm font-medium text-[#E8622A] mt-3 group-hover:underline">
-                    {ANIMALS_LIST.meetAnimal(animal.name)}
-                  </p>
+                    {animal.description && (
+                      <p className="text-sm text-gray-400 mt-2 line-clamp-2">
+                        {animal.description}
+                      </p>
+                    )}
+                    <p className="text-sm font-medium text-[#E8622A] mt-3 group-hover:underline">
+                      {ANIMALS_LIST.meetAnimal(animal.name)}
+                    </p>
+                  </div>
+                </Link>
+
+                {/* WhatsApp share button — bottom right of card */}
+                <div className="absolute bottom-4 right-4 z-10">
+                  <WhatsAppShareButton
+                    animalName={animal.name}
+                    species={animal.species}
+                    birthDate={animal.birth_date}
+                    animalId={animal.id}
+                    size="sm"
+                  />
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
 
