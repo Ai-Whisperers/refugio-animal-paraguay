@@ -3,7 +3,7 @@ story: S5
 epic: EPIC-39
 ticket: RAP-194
 title: "Foster supply request and tracking"
-status: planned
+status: ready
 points: 3
 priority: P2
 track: Fullstack

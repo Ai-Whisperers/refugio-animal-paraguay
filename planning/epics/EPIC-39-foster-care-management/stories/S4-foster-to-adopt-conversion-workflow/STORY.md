@@ -3,7 +3,7 @@ story: S4
 epic: EPIC-39
 ticket: RAP-193
 title: "Foster-to-adopt conversion workflow"
-status: planned
+status: ready
 points: 3
 priority: P1
 track: Backend
