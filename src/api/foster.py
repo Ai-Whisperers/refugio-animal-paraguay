@@ -1,13 +1,17 @@
-"""Foster family registration and approval API (RAP-190).
+"""Foster family registration, approval, and placement matching API (RAP-190, RAP-191).
 
 Any authenticated user can apply to become a foster family.
-Staff can list applications and approve or reject them.
+Staff can list applications, approve/reject them, and use the placement matching
+endpoints to find the best foster family for a given animal (or vice-versa).
 
 Endpoints:
-    POST /api/foster/apply               -- submit foster application (authenticated)
-    GET  /api/foster/me                  -- get own foster profile (authenticated)
-    GET  /api/staff/foster               -- list all applications (staff only)
-    PUT  /api/staff/foster/{id}/review   -- approve/reject application (staff only)
+    POST /api/foster/apply                       -- submit foster application (authenticated)
+    GET  /api/foster/me                          -- get own foster profile (authenticated)
+    GET  /api/staff/foster                       -- list all applications (staff only)
+    GET  /api/staff/foster/{id}                  -- get one application (staff only)
+    PUT  /api/staff/foster/{id}/review           -- approve/reject application (staff only)
+    GET  /api/staff/foster/match/{animal_id}     -- ranked foster families for an animal (staff only)
+    GET  /api/staff/foster/{id}/matches          -- ranked animals for a foster family (staff only)
 """
 
 import logging
@@ -32,6 +36,12 @@ from src.db.models.foster_profile import (
 )
 from src.db.models.user import User
 from src.db.session import get_db
+from src.services.foster_placement_service import (
+    DEFAULT_LIMIT,
+    MAX_LIMIT,
+    find_animal_matches_for_foster,
+    find_foster_matches_for_animal,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -368,6 +378,55 @@ async def review_foster_application(
         },
     )
     return _to_response(profile)
+
+
+# ---------------------------------------------------------------------------
+# Endpoints — Placement matching (staff only, RAP-191)
+# ---------------------------------------------------------------------------
+
+
+@staff_router.get(
+    "/api/staff/foster/match/{animal_id}",
+    summary="Find best foster families for an animal",
+)
+async def match_foster_for_animal(
+    animal_id: UUID,
+    limit: int = Query(DEFAULT_LIMIT, ge=1, le=MAX_LIMIT, description="Max results to return"),
+    offset: int = Query(0, ge=0, description="Pagination offset"),
+    db: AsyncSession = Depends(get_db),
+    _staff: object = Depends(require_staff),
+) -> dict:
+    """Return approved foster families ranked by compatibility with the given animal.
+
+    Families at maximum capacity are excluded.  The response includes a
+    match_score (0-100), human-readable why_match and why_not lists, and
+    remaining capacity for each family.
+
+    Staff only.
+    """
+    return await find_foster_matches_for_animal(db, animal_id, limit=limit, offset=offset)
+
+
+@staff_router.get(
+    "/api/staff/foster/{profile_id}/matches",
+    summary="Find best animals for a foster family",
+)
+async def match_animals_for_foster(
+    profile_id: UUID,
+    limit: int = Query(DEFAULT_LIMIT, ge=1, le=MAX_LIMIT, description="Max results to return"),
+    offset: int = Query(0, ge=0, description="Pagination offset"),
+    db: AsyncSession = Depends(get_db),
+    _staff: object = Depends(require_staff),
+) -> dict:
+    """Return fosterable animals ranked by compatibility with the given foster family.
+
+    Only animals with fosterable statuses (intake, quarantine, available,
+    under_treatment) are considered.  Returns an empty list if the family is
+    at capacity or not in approved status.
+
+    Staff only.
+    """
+    return await find_animal_matches_for_foster(db, profile_id, limit=limit, offset=offset)
 
 
 # ---------------------------------------------------------------------------
