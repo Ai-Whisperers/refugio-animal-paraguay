@@ -22,6 +22,7 @@ import {
   Calendar,
   FileText,
   UserCheck,
+  CheckSquare,
 } from "lucide-react";
 import { useState } from "react";
 import { clearAccessToken, getCurrentUserRole } from "@/lib/auth";
@@ -111,6 +112,11 @@ const NAV_ITEMS: NavItem[] = [
     label: "Turnos",
     href: "/admin/shifts",
     icon: Calendar,
+  },
+  {
+    label: "Tareas",
+    href: "/admin/tasks",
+    icon: CheckSquare,
   },
   {
     label: "Contenido",
