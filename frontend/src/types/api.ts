@@ -965,6 +965,52 @@ export interface ClinicFundResponse {
   message: string;
 }
 
+// --- Volunteer Applications (Staff) ---
+
+export type VolunteerStatus = "pending" | "approved" | "rejected" | "inactive";
+
+export interface VolunteerListItem {
+  id: string;
+  user_id: string;
+  full_name: string | null;
+  email: string;
+  status: VolunteerStatus;
+  skills: string[];
+  hours_per_week: number | null;
+  created_at: string;
+}
+
+export interface PaginatedVolunteerList {
+  items: VolunteerListItem[];
+  total: number;
+  page: number;
+  page_size: number;
+}
+
+export interface VolunteerProfileResponse {
+  id: string;
+  user_id: string;
+  full_name: string | null;
+  email: string;
+  motivation: string;
+  bio: string | null;
+  skills: string[];
+  availability: string[];
+  hours_per_week: number | null;
+  languages_spoken: string[];
+  emergency_contact_name: string | null;
+  emergency_contact_phone: string | null;
+  status: VolunteerStatus;
+  rejection_reason: string | null;
+  total_hours_logged: number;
+  created_at: string;
+}
+
+export interface VolunteerReviewRequest {
+  decision: VolunteerStatus;
+  rejection_reason?: string | null;
+}
+
 // --- API Error ---
 
 export interface ApiError {

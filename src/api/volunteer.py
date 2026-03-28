@@ -492,6 +492,29 @@ async def review_volunteer_application(
     return _build_profile_response(profile, volunteer_user)
 
 
+@staff_router.get(
+    "/{volunteer_id}",
+    response_model=VolunteerProfileResponse,
+    summary="Get a volunteer profile by ID (staff only)",
+)
+async def get_volunteer_profile_by_id(
+    volunteer_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    _: User = Depends(require_staff),
+) -> Any:
+    """Return full volunteer profile for a given volunteer ID."""
+    result = await db.execute(select(VolunteerProfile).where(VolunteerProfile.id == volunteer_id))
+    profile = result.scalar_one_or_none()
+    if profile is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Volunteer application not found.",
+        )
+    user_result = await db.execute(select(User).where(User.id == profile.user_id))
+    volunteer_user = user_result.scalar_one_or_none()
+    return _build_profile_response(profile, volunteer_user)
+
+
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
