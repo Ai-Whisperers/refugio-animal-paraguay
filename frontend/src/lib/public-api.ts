@@ -415,7 +415,6 @@ export async function getCastrationCampaignPublic(
   );
 }
 
-<<<<<<< HEAD
 // --- Castration Drives ---
 
 /**
@@ -428,6 +427,16 @@ export async function getCastrationCampaignDrives(
   pageSize = 20,
   includePast = false
 ): Promise<CastrationDriveListResponse> {
+  const params = new URLSearchParams({
+    page: String(page),
+    page_size: String(pageSize),
+  });
+  if (includePast) params.set("include_past", "true");
+  return apiFetch<CastrationDriveListResponse>(
+    `/public/castration-campaigns/${campaignId}/drives?${params}`
+  );
+}
+
 // --- Castration Campaign Gallery ---
 
 /**
@@ -444,12 +453,12 @@ export async function getCastrationCampaignGallery(
     page: String(page),
     page_size: String(pageSize),
   });
-  if (includePast) params.set("include_past", "true");
-  return apiFetch<CastrationDriveListResponse>(
-    `/public/castration-campaigns/${campaignId}/drives?${params}`
   if (photoType) params.set("photo_type", photoType);
   return apiFetch<CastrationGalleryResponse>(
     `/public/castration-campaigns/${campaignId}/gallery?${params}`
+  );
+}
+
 // --- Donor Leaderboard ---
 
 /**
@@ -470,6 +479,9 @@ export async function getDonorLeaderboard(
   if (campaignId) params.set("campaign_id", campaignId);
   return apiFetch<LeaderboardResponse>(
     `/public/leaderboard/donors?${params}`
+  );
+}
+
 // --- Castration Impact Report ---
 
 /**
@@ -482,8 +494,7 @@ export async function getCastrationCampaignReport(
   return apiFetch<ImpactReportResponse>(
     `/public/castration-campaigns/${campaignId}/report`
   );
-=======
->>>>>>> ee334d0 (RAP-576: Add reusable CastrationCounter widget)
+}
 // --- Public Statistics ---
 
 /**
