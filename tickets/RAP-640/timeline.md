@@ -8,4 +8,4 @@
 | 2026-03-28 08:00 | Next.js frontend form complete | ~1h |
 | 2026-03-28 09:00 | Unit tests complete (25 passing) | ~1h |
 | 2026-03-28 10:00 | Quality gates passed, PR #301 created | ~30m |
-| 2026-03-28 11:27 | Ticket closed — COMPLETED | — |
+| 2026-03-28 11:27 | Ticket closed — COMPLETED | — |>>>>>>> 550e560 (RAP-640: Add volunteer registration form, profile model, API, and staff review)
