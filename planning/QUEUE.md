@@ -591,7 +591,7 @@ Full details in [ROADMAP.md](ROADMAP.md). Each sprint has epic and story docs in
 | 1 | V4 | Staff Operations Launch (S1 done, S2+ pending) | 105 | EPIC 21-25 |
 | 2 | V5 | Veterinary & Medical Records | 105 | EPIC 26-30 |
 | 3 | V6 | EU Payment Integration | 112 | EPIC 31-35 |
-| 4 | V7 | Volunteer & Foster Programs | 99 | EPIC 36-40 | EPIC-36: S1 DONE (PR #301), S2 DONE (PR #302), S3 BLOCKED (PR #303 conflict), S4 DONE (PR #304), S5 DONE (PR #305). EPIC-37: S1 DONE (PR #306), S2 DONE (PR #307), S3 BLOCKED (PR #308 conflict), S4 DONE (PR #309), S5 DONE (PR #310). EPIC-38: S1 DONE (PR #311), S2 DONE (PR #312), S3 DONE (PR #313), S4 DONE (PR #314), S5 planned. |
+| 4 | V7 | Volunteer & Foster Programs | 99 | EPIC 36-40 | EPIC-36: S1 DONE (PR #301), S2 DONE (PR #302), S3 BLOCKED (PR #303 conflict), S4 DONE (PR #304), S5 DONE (PR #305). EPIC-37: S1 DONE (PR #306), S2 DONE (PR #307), S3 BLOCKED (PR #308 conflict), S4 DONE (PR #309), S5 DONE (PR #310). EPIC-38: S1 DONE (PR #311), S2 DONE (PR #312), S3 DONE (PR #313), S4 DONE (PR #314), S5 DONE (PR #315). EPIC-39: S1 in progress. |
 | 5 | V8 | Notifications & Communications | 102 | EPIC 41-45 |
 | 6 | V9 | GDPR, Security & Compliance | 87 | EPIC 46-50 |
 | 7 | V10 | Analytics & Reporting | 101 | EPIC 51-55 |
