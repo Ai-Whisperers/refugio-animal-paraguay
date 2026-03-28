@@ -303,8 +303,9 @@ class TestGetContentBySlug:
         result.scalar_one_or_none.return_value = mock_content
         db.execute.return_value = result
 
-        found = await get_content_by_slug("about-us", db)
+        found, is_fallback = await get_content_by_slug("about-us", db)
         assert found.slug == "about-us"
+        assert is_fallback is False
 
     @pytest.mark.asyncio()
     async def test_raises_not_found_for_missing_slug(self) -> None:
