@@ -3,7 +3,7 @@ story: S3
 epic: EPIC-34
 ticket: RAP-167
 title: "ANBI compliance documentation"
-status: planned
+status: done
 points: 3
 priority: P1
 track: Backend
