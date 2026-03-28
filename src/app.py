@@ -28,6 +28,7 @@ from src.api.adoption_requirements import (
 from src.api.adoption_requirements import (
     public_router as adoption_req_public_router,
 )
+from src.api.adoption_success import router as adoption_success_router
 from src.api.animal_updates import router as animal_updates_router
 from src.api.animals import router as animals_router
 from src.api.appointments import router as appointments_router
@@ -303,6 +304,7 @@ def create_app() -> FastAPI:
     application.include_router(transport_router)
     application.include_router(followup_auto_admin_router)
     application.include_router(followup_auto_public_router)
+    application.include_router(adoption_success_router)
 
     return application
 
