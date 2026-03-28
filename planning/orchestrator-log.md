@@ -5,6 +5,20 @@
 ---
 
 ## 2026-03 (March)
+### [2026-03-28 10:52] Worker Run — EPIC-80 Rescuer Network (S4 + S6)
+- **Stories completed**: 2 — RAP-536 (Rescuer campaign creation, S4) and RAP-538 (Community feed, S6)
+- **PRs opened**: #299 (RAP-536), #300 (RAP-538), both targeting develop
+- **Epic**: EPIC-80 Community Rescuer Network — ALL 10 stories DONE
+- **Tests added**: 15 unit + 8 integration (RAP-536), 27 unit + 8 integration (RAP-538) = 58 new tests
+- **New services**: `rescuer_campaign_service.py`, `community_feed_service.py`
+- **New APIs**: `rescuer_campaigns.py` (portal + public routers), `community_feed.py`
+- **Migration**: 070 (rescuer_id, goal_message, animal_ids, requires_approval added to campaigns)
+- **Frontend**: rescuer portal campaigns page, public campaign detail page, public /community feed page
+- **Bug fix**: Removed missing `community_needs_admin_router` import from app.py (was causing 113 unit test import errors)
+- **Quality gates**: ruff clean, 27/27 unit tests pass for RAP-538, 15/15 unit tests pass for RAP-536
+- **QUEUE.md + STORY.md**: RAP-536 and RAP-538 marked DONE on develop
+- **Resumption note**: Session resumed from compacted context. RAP-536 was complete (PR #299 opened), needed QUEUE.md update + RAP-538 implementation.
+
 ### [2026-03-28 13:27] Worker Run — EPIC-34 Tax Receipt & Compliance
 - **Stories completed**: 3 — RAP-167 (ANBI compliance docs), RAP-168 (donor tax ID BSN/TIN secure storage), RAP-169 (batch receipt generation and email)
 - **PRs opened**: #296 (RAP-167), #297 (RAP-168), #298 (RAP-169), all targeting develop
