@@ -877,6 +877,25 @@ export interface ImpactResponse {
   last_updated: string;
 }
 
+// --- Sponsorship Tiers ---
+
+export type SponsorshipTierLevel = "bronze" | "silver" | "gold";
+export type SponsorshipFrequency = "monthly" | "annual";
+export type SponsorshipStatus = "active" | "paused" | "cancelled" | "completed";
+
+export interface SponsorshipTierResponse {
+  id: string;
+  level: SponsorshipTierLevel;
+  name: string;
+  amount_cents: number;
+  currency: string;
+  benefits: Record<string, unknown> | null;
+  active: boolean;
+  display_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
 // --- API Error ---
 
 export interface ApiError {

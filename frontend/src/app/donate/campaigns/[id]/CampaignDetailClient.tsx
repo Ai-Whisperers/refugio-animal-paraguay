@@ -39,6 +39,7 @@ const S = {
   donations: "donaciones",
   reached: "alcanzado",
   progressUpdate: "Progreso actualizado",
+  impactTitle: "Impacto de esta campana",
 } as const;
 
 export default function CampaignDetailClient({
@@ -189,7 +190,7 @@ export default function CampaignDetailClient({
           {campaign.impact_story && (
             <div className="bg-gray-50 rounded-xl p-6">
               <h2 className="text-lg font-semibold text-gray-900 mb-3">
-                Impacto de esta campana
+                {S.impactTitle}
               </h2>
               <p className="text-gray-600 leading-relaxed whitespace-pre-line">
                 {campaign.impact_story}
