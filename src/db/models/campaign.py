@@ -96,6 +96,12 @@ class Campaign(Base):
         nullable=False,
         server_default=sa.text("true"),
     )
+    # Whether this campaign is linked to an emergency case
+    is_emergency: Mapped[bool] = mapped_column(
+        sa.Boolean,
+        nullable=False,
+        server_default=sa.text("false"),
+    )
     # Staff member who created the campaign
     created_by_id: Mapped[UUID | None] = mapped_column(
         sa.UUID(as_uuid=True),
