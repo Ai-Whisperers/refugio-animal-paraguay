@@ -3,7 +3,7 @@ story: S4
 epic: EPIC-37
 ticket: RAP-183
 title: "Attendance tracking and no-show flags"
-status: planned
+status: done
 points: 3
 priority: P1
 track: Fullstack
