@@ -500,7 +500,7 @@ Week 3-4:
 | 4 | Offline donation forms with IndexedDB | RAP-599 | 6 | READY | Fullstack |
 | 5 | Web push notifications | RAP-600 | 6 | READY | Fullstack |
 | 6 | Touch-friendly admin interface | RAP-601 | 4 | READY | Frontend |
-| 7 | App-like bottom navigation bar | RAP-602 | 4 | READY | Frontend |
+| 7 | App-like bottom navigation bar | RAP-602 | 4 | PR #253 | Frontend |
 | 8 | Performance optimization and bundling | RAP-603 | 3 | PR #252 | Fullstack |
 
 ### EPIC-89: Financial Transparency & Impact Reporting (38 pts)
