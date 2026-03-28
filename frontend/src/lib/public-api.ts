@@ -99,6 +99,7 @@ import type {
   DonationCreateRequest,
   DonationResponse,
   ImpactReportResponse,
+  ImpactResponse,
   DonorCreateRequest,
   DonorResponse,
   FundCategory,
@@ -503,4 +504,12 @@ export async function getCastrationCampaignReport(
  */
 export async function getPublicStatistics(): Promise<PublicStatisticsResponse> {
   return apiFetch<PublicStatisticsResponse>("/api/stats/public");
+}
+
+/**
+ * Fetch public impact statistics (monthly aggregates, cached 1 hour).
+ * GET /api/stats/impact
+ */
+export async function getImpactStatistics(): Promise<ImpactResponse> {
+  return apiFetch<ImpactResponse>("/api/stats/impact");
 }

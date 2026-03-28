@@ -857,6 +857,26 @@ export interface PublicStatisticsResponse {
   last_updated: string;
 }
 
+// --- Impact statistics ---
+
+export interface MonthlyImpactItem {
+  year: number;
+  month: number;
+  animals_rescued: number;
+  adoptions_completed: number;
+  castrations_performed: number;
+  donations_total_cents: number;
+}
+
+export interface ImpactResponse {
+  total_animals_rescued: number;
+  total_adopted: number;
+  total_castrated: number;
+  total_donations_cents: number;
+  months: MonthlyImpactItem[];
+  last_updated: string;
+}
+
 // --- API Error ---
 
 export interface ApiError {
