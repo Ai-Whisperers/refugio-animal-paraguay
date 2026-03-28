@@ -92,6 +92,7 @@ from src.api.public_campaigns import router as public_campaigns_router
 from src.api.public_castration_campaigns import router as public_castration_campaigns_router
 from src.api.public_clinic_fund import router as public_clinic_fund_router
 from src.api.public_contact import router as public_contact_router
+from src.api.public_emergencies import router as public_emergencies_router
 from src.api.public_impact import router as public_impact_router
 from src.api.public_register import router as public_register_router
 from src.api.public_rescuer_support import router as public_rescuer_support_router
@@ -362,6 +363,7 @@ def create_app() -> FastAPI:
     application.include_router(community_needs_admin_router)
     application.include_router(homepage_content_router)
     application.include_router(rescuer_emergencies_router)
+    application.include_router(public_emergencies_router)
 
     return application
 
