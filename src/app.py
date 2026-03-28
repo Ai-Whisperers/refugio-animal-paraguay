@@ -20,6 +20,7 @@ from src.api.admin import router as admin_router
 from src.api.admin_campaigns import router as admin_campaigns_router
 from src.api.admin_castration_campaigns import router as admin_castration_campaigns_router
 from src.api.admin_fund_dashboard import router as admin_fund_dashboard_router
+from src.api.admin_moderation import router as admin_moderation_router
 from src.api.admin_sse import router as admin_sse_router
 from src.api.admin_voucher_finance import router as admin_voucher_finance_router
 from src.api.adopters import router as adopters_router
@@ -443,6 +444,7 @@ def create_app() -> FastAPI:
     application.include_router(community_needs_public_router)
     application.include_router(community_needs_rescuer_router)
     application.include_router(rescuer_directory_router)
+    application.include_router(admin_moderation_router)
 
     application.include_router(community_engagement_analytics_router)
     application.include_router(volunteer_driver_router)
