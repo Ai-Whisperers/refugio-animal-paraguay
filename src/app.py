@@ -55,6 +55,7 @@ from src.api.sponsorships import router as sponsorships_router
 from src.api.subscriptions import router as subscriptions_router
 from src.api.surgeries import surgery_router
 from src.api.tigo_money import router as tigo_money_router
+from src.api.user_roles import router as user_roles_router
 from src.api.vaccinations import vaccination_router, vaccine_type_router
 from src.api.vet_clinics import router as vet_clinics_router
 from src.api.vet_referrals import referral_router
@@ -213,6 +214,7 @@ def create_app() -> FastAPI:
     application.include_router(prescriptions_router)
     application.include_router(profile_router)
     application.include_router(vet_clinics_router)
+    application.include_router(user_roles_router)
 
     return application
 
