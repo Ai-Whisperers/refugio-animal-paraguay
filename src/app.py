@@ -102,6 +102,7 @@ from src.api.vaccinations import vaccination_router, vaccine_type_router
 from src.api.vet_clinics import router as vet_clinics_router
 from src.api.vet_documents import router as vet_documents_router
 from src.api.vet_referrals import referral_router
+from src.api.vet_transport import router as vet_transport_router
 from src.api.vet_visits import router as vet_visits_router
 from src.api.vet_vouchers import router as vet_vouchers_router
 from src.api.voucher_expiry import router as voucher_expiry_router
@@ -314,6 +315,7 @@ def create_app() -> FastAPI:
     application.include_router(adoption_success_router)
     application.include_router(transport_router)
 
+    application.include_router(vet_transport_router)
     application.include_router(driver_reimbursement_router)
     application.include_router(article_admin_router)
     application.include_router(article_public_router)
