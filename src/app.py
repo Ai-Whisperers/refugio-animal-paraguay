@@ -20,6 +20,12 @@ from src.api.admin import router as admin_router
 from src.api.admin_campaigns import router as admin_campaigns_router
 from src.api.adopters import router as adopters_router
 from src.api.adoption_requests import router as adoption_requests_router
+from src.api.adoption_requirements import (
+    admin_router as adoption_req_admin_router,
+)
+from src.api.adoption_requirements import (
+    public_router as adoption_req_public_router,
+)
 from src.api.animal_updates import router as animal_updates_router
 from src.api.animals import router as animals_router
 from src.api.appointments import router as appointments_router
@@ -183,6 +189,8 @@ def create_app() -> FastAPI:
     application.include_router(in_kind_donations_router)
     application.include_router(fund_allocations_router)
     application.include_router(admin_router)
+    application.include_router(adoption_req_admin_router)
+    application.include_router(adoption_req_public_router)
     application.include_router(public_router)
     application.include_router(public_adoption_router)
     application.include_router(public_campaigns_router)
