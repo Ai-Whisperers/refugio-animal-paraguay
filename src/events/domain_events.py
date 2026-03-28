@@ -106,6 +106,40 @@ def create_adoption_status_changed(
     )
 
 
+class DonationAllocated(DomainEvent):
+    """Published when a donation is allocated to an expense."""
+
+    event_type: EventType = EventType.DONATION_ALLOCATED
+    aggregate_type: str = "donation"
+
+
+def create_donation_allocated(
+    aggregate_id: UUID,
+    donation_id: UUID,
+    expense_id: UUID,
+    amount_cents: int,
+    currency: str,
+    expense_description: str,
+    donor_id: UUID | None = None,
+    donor_email: str | None = None,
+    actor_id: UUID | None = None,
+) -> DonationAllocated:
+    """Factory for DonationAllocated events with typed payload."""
+    return DonationAllocated(
+        payload={
+            "donation_id": str(donation_id),
+            "expense_id": str(expense_id),
+            "amount_cents": amount_cents,
+            "currency": currency,
+            "expense_description": expense_description,
+            "donor_id": str(donor_id) if donor_id else None,
+            "donor_email": donor_email,
+        },
+        aggregate_id=aggregate_id,
+        actor_id=actor_id,
+    )
+
+
 def create_donation_received(
     aggregate_id: UUID,
     amount: str,
