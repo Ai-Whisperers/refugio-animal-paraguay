@@ -179,6 +179,7 @@ from src.api.vet_referrals import referral_router
 from src.api.vet_transport import router as vet_transport_router
 from src.api.vet_visits import router as vet_visits_router
 from src.api.vet_vouchers import router as vet_vouchers_router
+from src.api.shift_reminders import router as shift_reminders_router
 from src.api.shifts import public_router as shifts_public_router
 from src.api.shifts import staff_router as shifts_staff_router
 from src.api.volunteer import public_router as volunteer_public_router
@@ -473,6 +474,7 @@ def create_app() -> FastAPI:
     application.include_router(community_engagement_analytics_router)
     application.include_router(shifts_public_router)
     application.include_router(shifts_staff_router)
+    application.include_router(shift_reminders_router)
     application.include_router(volunteer_public_router)
     application.include_router(volunteer_staff_router)
     application.include_router(volunteer_driver_router)
