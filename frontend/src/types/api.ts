@@ -642,6 +642,49 @@ export interface SimplePreferences {
   inapp_enabled: boolean;
 }
 
+// --- Pre-Qualification ---
+
+export interface PreQualifyQuestion {
+  id: string;
+  requirement_type: string;
+  value: Record<string, unknown>;
+  is_mandatory: boolean;
+  animal_id: string | null;
+  human_readable_description: string;
+}
+
+export interface PreQualifyQuestionsResponse {
+  animal_id: string;
+  questions: PreQualifyQuestion[];
+}
+
+export interface PreQualifyRequest {
+  animal_id: string;
+  answers: Record<string, Record<string, unknown>>;
+}
+
+export interface FailedRequirement {
+  requirement_type: string;
+  message: string;
+  is_mandatory: boolean;
+}
+
+export interface SuggestedAnimal {
+  id: string;
+  name: string;
+  species: string;
+  photo_url: string | null;
+  match_score: number;
+}
+
+export interface PreQualifyResult {
+  qualified: boolean;
+  score: number;
+  failed_requirements: FailedRequirement[];
+  suggested_animals: SuggestedAnimal[];
+  estimated_wait_time: string;
+}
+
 // --- API Error ---
 
 export interface ApiError {

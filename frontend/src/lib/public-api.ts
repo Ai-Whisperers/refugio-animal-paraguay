@@ -98,6 +98,9 @@ import type {
   DonorResponse,
   FundCategory,
   PaginatedAnimalListResponse,
+  PreQualifyQuestionsResponse,
+  PreQualifyRequest,
+  PreQualifyResult,
   PublicAdoptionApplicationCreate,
   PublicAdoptionApplicationResponse,
   StripeIntentResponse,
@@ -351,4 +354,31 @@ export async function updateSubscription(
     data,
     NO_AUTH
   );
+}
+
+// --- Pre-Qualification ---
+
+/**
+ * Fetch pre-qualification questions for an animal.
+ * GET /api/animals/{animalId}/pre-qualify (requires auth — staff token).
+ */
+export async function getPreQualifyQuestions(
+  animalId: string
+): Promise<PreQualifyQuestionsResponse> {
+  return apiFetch<PreQualifyQuestionsResponse>(
+    `/api/animals/${animalId}/pre-qualify`
+  );
+}
+
+/**
+ * Submit pre-qualification answers and get result.
+ * POST /api/adoption/pre-qualify (requires auth — staff token).
+ */
+export async function submitPreQualification(
+  data: PreQualifyRequest
+): Promise<PreQualifyResult> {
+  return apiFetch<PreQualifyResult>("/api/adoption/pre-qualify", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
 }
