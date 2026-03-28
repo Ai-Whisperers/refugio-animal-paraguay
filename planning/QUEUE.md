@@ -591,7 +591,7 @@ Full details in [ROADMAP.md](ROADMAP.md). Each sprint has epic and story docs in
 | 1 | V4 | Staff Operations Launch (S1 done, S2+ pending) | 105 | EPIC 21-25 |
 | 2 | V5 | Veterinary & Medical Records | 105 | EPIC 26-30 |
 | 3 | V6 | EU Payment Integration | 112 | EPIC 31-35 |
-| 4 | V7 | Volunteer & Foster Programs | 99 | EPIC 36-40 | EPIC-36 S1 DONE (PR #301), S2 DONE (PR #302), S3 CONFLICTING (PR #303 open — conflicts in volunteer.py) |
+| 4 | V7 | Volunteer & Foster Programs | 99 | EPIC 36-40 | EPIC-36 S1 DONE (PR #301), S2 DONE (PR #302), S3 DONE (PR #303), S4 DONE (PR #304), S5 READY |
 | 5 | V8 | Notifications & Communications | 102 | EPIC 41-45 |
 | 6 | V9 | GDPR, Security & Compliance | 87 | EPIC 46-50 |
 | 7 | V10 | Analytics & Reporting | 101 | EPIC 51-55 |
