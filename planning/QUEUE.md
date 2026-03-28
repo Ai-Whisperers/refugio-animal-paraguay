@@ -450,7 +450,7 @@ Week 3-4:
 
 | # | Story | Ticket | Pts | Status | Track |
 |---|-------|--------|-----|--------|-------|
-| 1 | Open Graph meta tags for all public pages | RAP-566 | 5 | READY | Frontend |
+| 1 | Open Graph meta tags for all public pages | RAP-566 | 5 | IN_REVIEW (PR #240) | Frontend |
 | 2 | WhatsApp share buttons on animal cards | RAP-567 | 3 | IN_REVIEW (PR #226) | Frontend |
 | 3 | WhatsApp share for campaigns | RAP-568 | 3 | IN_REVIEW (PR #228) | Frontend |
 | 4 | Social media share buttons (Facebook, Instagram, Twitter) | RAP-569 | 3 | IN_REVIEW (PR #239) | Frontend |
