@@ -254,6 +254,7 @@ def create_app() -> FastAPI:
     application.include_router(rescuer_profiles_router)
     application.include_router(clinic_services_router)
     application.include_router(voucher_expiry_router)
+    application.include_router(vet_vouchers_router)
     application.include_router(user_roles_router)
     application.include_router(pre_qualification_router)
     application.include_router(smart_matching_router)
