@@ -127,6 +127,7 @@ from src.api.subscriptions import router as subscriptions_router
 from src.api.success_stories import admin_router as stories_admin_router
 from src.api.success_stories import public_router as stories_public_router
 from src.api.surgeries import surgery_router
+from src.api.survey_analytics import router as survey_analytics_router
 from src.api.survey_distribution import router as survey_distribution_router
 from src.api.tigo_money import router as tigo_money_router
 from src.api.transport import router as transport_router
@@ -373,6 +374,7 @@ def create_app() -> FastAPI:
 
     application.include_router(stories_admin_router)
     application.include_router(stories_public_router)
+    application.include_router(survey_analytics_router)
     application.include_router(survey_distribution_router)
     application.include_router(impact_emails_router)
     application.include_router(vet_transport_router)
