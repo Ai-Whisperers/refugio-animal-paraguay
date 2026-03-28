@@ -339,7 +339,7 @@ Week 3-4:
 | 5 | Rescuer voucher wallet and claim flow | RAP-511 | 5 | READY | Fullstack | RAP-510, RAP-500 |
 | 6 | Clinic redemption interface | RAP-512 | 5 | READY | Fullstack | RAP-510 |
 | 7 | Donor transparency notifications | RAP-513 | 3 | READY | Backend | RAP-509 |
-| 8 | Voucher expiry and refund policy | RAP-514 | 3 | READY | Backend | RAP-510 |
+| 8 | Voucher expiry and refund policy | RAP-514 | 3 | IN REVIEW (PR #162) | Backend | RAP-510 |
 | 9 | Financial reconciliation dashboard | RAP-515 | 5 | READY | Fullstack | RAP-512 |
 | 10 | Public voucher statistics dashboard | RAP-516 | 3 | READY | Fullstack | RAP-515 |
 
