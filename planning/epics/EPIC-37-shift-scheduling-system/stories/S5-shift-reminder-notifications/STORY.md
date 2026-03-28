@@ -3,7 +3,7 @@ story: S5
 epic: EPIC-37
 ticket: RAP-184
 title: "Shift reminder notifications"
-status: planned
+status: done
 points: 3
 priority: P2
 track: Backend
