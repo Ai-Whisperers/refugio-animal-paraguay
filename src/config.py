@@ -223,6 +223,16 @@ class Settings(BaseSettings):
         ),
     )
 
+    # Donor tax ID encryption
+    donor_tax_id_encryption_key: str = Field(
+        default="",
+        description=(
+            "Fernet encryption key for donor BSN/TIN storage. "
+            "Generate with: python3 -c 'from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())'. "
+            "Required in production when storing donor tax IDs."
+        ),
+    )
+
     @property
     def allowed_origins_list(self) -> list[str]:
         """Parse ALLOWED_ORIGINS into a list of origin strings."""
