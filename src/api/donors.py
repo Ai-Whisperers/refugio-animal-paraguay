@@ -9,6 +9,7 @@ Endpoints:
 
 import csv
 import io
+from datetime import UTC
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -252,6 +253,84 @@ async def list_donors(
 
     return response
 
+
+
+@router.get("/{donor_id}/annual-summary/{year}")
+async def get_donor_annual_summary(
+    donor_id: UUID,
+    year: int,
+    db: AsyncSession = Depends(get_db),
+    _: User = Depends(require_staff),
+) -> StreamingResponse:
+    """Generate an annual donation summary PDF for a donor (staff only).
+
+    Returns a PDF listing all completed donations in the given calendar year,
+    with totals per currency and EU/Dutch tax deductibility guidance.
+    """
+    from datetime import datetime
+
+    from sqlalchemy import extract
+
+    from src.db.models.donation import DonationStatus
+    from src.services.annual_donation_summary_service import (
+        AnnualDonationSummaryGenerator,
+        AnnualSummaryData,
+        DonationLineItem,
+    )
+
+    donor = await db.get(Donor, donor_id)
+    if donor is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Donor not found")
+
+    # Fetch all completed donations for this donor in the given year
+    stmt = (
+        select(Donation)
+        .where(Donation.donor_id == donor_id)
+        .where(Donation.status == DonationStatus.COMPLETED.value)
+        .where(extract("year", Donation.created_at) == year)
+        .order_by(Donation.created_at.asc())
+    )
+    result = await db.execute(stmt)
+    db_donations = list(result.scalars().all())
+
+    line_items = [
+        DonationLineItem(
+            donation_id=d.id,
+            date=d.created_at,
+            amount_cents=d.amount_cents,
+            currency=d.currency,
+            payment_method=d.payment_method,
+            fund_category=d.fund_category,
+            receipt_number=d.receipt_number,
+        )
+        for d in db_donations
+    ]
+
+    # Compute totals per currency
+    totals: dict[str, int] = {}
+    for item in line_items:
+        totals[item.currency] = totals.get(item.currency, 0) + item.amount_cents
+
+    summary_data = AnnualSummaryData(
+        donor_id=donor.id,
+        donor_name=donor.full_name,
+        donor_email=donor.email,
+        donor_country=donor.country,
+        year=year,
+        donations=line_items,
+        totals_by_currency=totals,
+        generated_at=datetime.now(UTC),
+    )
+
+    generator = AnnualDonationSummaryGenerator()
+    pdf_bytes = generator.generate_bytes(summary_data)
+
+    filename = f"annual-summary-{year}-{str(donor_id)[:8]}.pdf"
+    return StreamingResponse(
+        iter([pdf_bytes]),
+        media_type="application/pdf",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
 
 @router.get("/{donor_id}", response_model=DonorResponse)
 async def get_donor(
