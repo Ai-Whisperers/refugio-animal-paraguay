@@ -22,6 +22,7 @@ import DonationForm from "@/components/DonationForm";
 import { SocialProofPanel } from "@/components/campaigns";
 import { DONATE } from "@/lib/strings";
 import { useCampaignPolling } from "@/hooks/useCampaignPolling";
+import WhatsAppShareCampaign from "@/components/WhatsAppShareCampaign";
 
 interface CampaignDetailClientProps {
   campaignId: string;
@@ -155,14 +156,17 @@ export default function CampaignDetailClient({
           {/* Campaign Header */}
           <CampaignHero campaign={campaign} />
 
-          {/* Category + Title */}
+          {/* Category + Title + WhatsApp Share */}
           <div>
             <span className="inline-block text-xs font-medium text-primary-700 bg-primary-50 rounded-full px-2.5 py-0.5 mb-2">
               {getCategoryLabel(campaign.fund_category)}
             </span>
-            <h1 className="text-2xl sm:text-3xl font-heading font-bold text-gray-900">
-              {campaign.title}
-            </h1>
+            <div className="flex items-center gap-3">
+              <h1 className="text-2xl sm:text-3xl font-heading font-bold text-gray-900">
+                {campaign.title}
+              </h1>
+              <WhatsAppShareCampaign campaign={campaign} size="md" />
+            </div>
           </div>
 
           {/* Progress Section with animation */}
