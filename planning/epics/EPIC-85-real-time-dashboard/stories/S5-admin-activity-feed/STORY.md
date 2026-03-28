@@ -3,7 +3,7 @@ story: S5
 epic: EPIC-85
 ticket: RAP-577
 title: "Admin real-time activity feed"
-status: ready
+status: done
 points: 5
 priority: P1
 track: Fullstack
