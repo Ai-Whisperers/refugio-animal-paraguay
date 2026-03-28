@@ -541,7 +541,7 @@ Week 3-4:
 | 2 | Transport request creation form | RAP-619 | 5 | READY | Fullstack |
 | 3 | Volunteer driver registration | RAP-620 | 5 | READY | Fullstack |
 | 4 | Intelligent request matching and notification | RAP-621 | 6 | READY | Fullstack |
-| 5 | Real-time trip tracking with photos | RAP-622 | 4 | READY | Fullstack |
+| 5 | Real-time trip tracking with photos | RAP-622 | 4 | PR #277 | Fullstack |
 | 6 | Integration with vet appointments | RAP-623 | 3 | PR #204 | Backend |
 | 7 | Driver reimbursement tracking | RAP-624 | 2 | PR #203 | Backend |
 
