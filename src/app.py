@@ -35,6 +35,8 @@ from src.api.auth import router as auth_router
 from src.api.campaign_voucher_integration import router as campaign_voucher_integration_router
 from src.api.clinic_redemption import router as clinic_redemption_router
 from src.api.clinic_services import router as clinic_services_router
+from src.api.cms import public_router as cms_public_router
+from src.api.cms import router as cms_router
 from src.api.consents import router as consents_router
 from src.api.diagnoses import diagnosis_router, treatment_router
 from src.api.donation_allocations import allocation_router, expense_router
@@ -278,6 +280,8 @@ def create_app() -> FastAPI:
     application.include_router(pre_qual_analytics_router)
     application.include_router(vet_documents_router)
     application.include_router(media_serve_router)
+    application.include_router(cms_router)
+    application.include_router(cms_public_router)
 
     return application
 
