@@ -1,4 +1,4 @@
-"""Volunteer task assignment and tracking API (RAP-185).
+"""Volunteer task assignment and tracking API (RAP-185, RAP-189).
 
 Staff can create, update, and delete tasks. All authenticated users can view tasks.
 Tasks can be assigned to volunteers, linked to animals, and tracked through completion.
@@ -11,10 +11,11 @@ Endpoints:
     DELETE /api/tasks/{id}               -- delete task (staff only)
     GET    /api/tasks/categories         -- list valid categories
     GET    /api/tasks/priorities         -- list valid priorities
+    GET    /api/tasks/summary/daily      -- daily summary report (RAP-189)
 """
 
 import logging
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime, timedelta
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -128,6 +129,21 @@ class TaskPrioritiesResponse(BaseModel):
     priorities: list[str]
 
 
+class DailyTaskSummary(BaseModel):
+    """Daily operational summary of task counts and completion metrics (RAP-189)."""
+
+    report_date: str  # ISO date YYYY-MM-DD
+    total: int
+    pending: int
+    in_progress: int
+    completed: int
+    cancelled: int
+    overdue: int
+    completion_rate: float
+    by_category: dict[str, int]
+    by_priority: dict[str, int]
+
+
 # ---------------------------------------------------------------------------
 # Endpoints — Public (read-only, authenticated)
 # ---------------------------------------------------------------------------
@@ -144,6 +160,80 @@ async def list_task_priorities() -> TaskPrioritiesResponse:
     """Return all valid task priority values."""
     priority_order = ["urgent", "high", "medium", "low"]
     return TaskPrioritiesResponse(priorities=priority_order)
+
+
+@public_router.get("/api/tasks/summary/daily", response_model=DailyTaskSummary)
+async def daily_task_summary(
+    report_date: str | None = Query(
+        None,
+        pattern=r"^\d{4}-\d{2}-\d{2}$",
+        description="Date in YYYY-MM-DD format (defaults to today)",
+    ),
+    db: AsyncSession = Depends(get_db),
+    _user: object = Depends(get_current_user),
+) -> DailyTaskSummary:
+    """Return a daily operational summary of task counts and completion metrics.
+
+    Counts are scoped to tasks created on or before the end of report_date.
+    A task is overdue when its due_date has passed and it is not completed or cancelled.
+    """
+    try:
+        target_date: date = (
+            date.fromisoformat(report_date) if report_date else datetime.now(UTC).date()
+        )
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=f"Invalid date format: {report_date!r}. Expected YYYY-MM-DD.",
+        ) from exc
+
+    # End of the target day in UTC — tasks due before this are eligible for overdue
+    end_of_day = datetime(
+        target_date.year, target_date.month, target_date.day, 23, 59, 59, tzinfo=UTC
+    ) + timedelta(seconds=1)
+
+    result = await db.execute(select(Task))
+    all_tasks = result.scalars().all()
+
+    pending_count = sum(1 for t in all_tasks if t.status == TaskStatus.PENDING.value)
+    in_progress_count = sum(1 for t in all_tasks if t.status == TaskStatus.IN_PROGRESS.value)
+    completed_count = sum(1 for t in all_tasks if t.status == TaskStatus.COMPLETED.value)
+    cancelled_count = sum(1 for t in all_tasks if t.status == TaskStatus.CANCELLED.value)
+    total_count = len(all_tasks)
+
+    non_terminal_statuses = {TaskStatus.COMPLETED.value, TaskStatus.CANCELLED.value}
+    overdue_count = sum(
+        1
+        for t in all_tasks
+        if t.status not in non_terminal_statuses
+        and t.due_date is not None
+        and (t.due_date.replace(tzinfo=UTC) if t.due_date.tzinfo is None else t.due_date)
+        < end_of_day
+        and (t.due_date.replace(tzinfo=UTC) if t.due_date.tzinfo is None else t.due_date)
+        < datetime.now(UTC)
+    )
+
+    denominator = total_count - cancelled_count
+    completion_rate = completed_count / denominator if denominator > 0 else 0.0
+
+    by_category: dict[str, int] = {}
+    by_priority: dict[str, int] = {}
+    for t in all_tasks:
+        by_category[t.category] = by_category.get(t.category, 0) + 1
+        by_priority[t.priority] = by_priority.get(t.priority, 0) + 1
+
+    return DailyTaskSummary(
+        report_date=target_date.isoformat(),
+        total=total_count,
+        pending=pending_count,
+        in_progress=in_progress_count,
+        completed=completed_count,
+        cancelled=cancelled_count,
+        overdue=overdue_count,
+        completion_rate=completion_rate,
+        by_category=by_category,
+        by_priority=by_priority,
+    )
 
 
 @public_router.get("/api/tasks", response_model=TaskListResponse)
