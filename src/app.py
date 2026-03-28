@@ -54,6 +54,7 @@ from src.api.community_needs import public_router as community_needs_public_rout
 from src.api.consents import router as consents_router
 from src.api.diagnoses import diagnosis_router, treatment_router
 from src.api.donation_allocations import allocation_router, expense_router
+from src.api.donation_analytics import router as donation_analytics_router
 from src.api.donations import router as donations_router
 from src.api.donor_impact import router as donor_impact_router
 from src.api.donor_leaderboard import router as donor_leaderboard_router
@@ -410,6 +411,7 @@ def create_app() -> FastAPI:
     application.include_router(trip_tracking_router)
     application.include_router(vet_analytics_router)
     application.include_router(report_export_router)
+    application.include_router(donation_analytics_router)
 
     return application
 
