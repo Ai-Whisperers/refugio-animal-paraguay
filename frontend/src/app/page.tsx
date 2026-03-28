@@ -1,9 +1,11 @@
 import Link from "next/link";
-import { Home, Heart, Users, MapPin, Clock, Phone, Mail, Star } from "lucide-react";
+import { Home, Heart, Users, MapPin, Clock, Phone, Mail } from "lucide-react";
 import { HOME } from "@/lib/strings";
 import LiveStats from "@/components/LiveStats";
 import FeaturedAnimals from "@/components/FeaturedAnimals";
 import FeaturedCampaigns from "@/components/FeaturedCampaigns";
+import HomeTeam from "@/components/HomeTeam";
+import HomeTestimonials from "@/components/HomeTestimonials";
 
 export default function HomePage() {
   return (
@@ -124,11 +126,10 @@ export default function HomePage() {
                   {member.name}
                 </h3>
                 <p className="text-sm text-gray-600 mt-1">{member.role}</p>
-              </div>
             ))}
-          </div>
-        </div>
       </section>
+      {/* Trust Team Section — dynamic from CMS with fallback */}
+      <HomeTeam />
 
       {/* Location/Contact Trust Section */}
       <section className="py-10 sm:py-16 px-4 bg-gray-50">
@@ -177,37 +178,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Social Proof Section */}
-      <section className="py-10 sm:py-16 px-4 bg-white">
-        <div className="max-w-5xl mx-auto">
-          <h2 className="text-2xl sm:text-3xl font-heading font-bold text-center text-gray-900 mb-8 sm:mb-12">
-            {HOME.socialProofTitle}
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8">
-            {HOME.testimonials.map((testimonial, idx) => (
-              <div
-                key={idx}
-                className="bg-gradient-to-br from-primary-50 to-orange-50 rounded-xl p-6 sm:p-8"
-              >
-                <div className="flex gap-1 mb-4">
-                  {[...Array(5)].map((_: unknown, i: number) => (
-                    <Star key={i} className="h-5 w-5 text-orange-400 fill-orange-400" aria-hidden="true" />
-                  ))}
-                </div>
-                <p className="text-gray-700 italic mb-4 leading-relaxed">
-                  &quot;{testimonial.quote}&quot;
-                </p>
-                <div className="border-t border-primary-200 pt-4">
-                  <p className="font-semibold text-gray-900">
-                    {testimonial.name}
-                  </p>
-                  <p className="text-sm text-gray-600">{testimonial.animal}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* Social Proof Section — dynamic from CMS with fallback */}
+      <HomeTestimonials />
 
       {/* Footer CTA Section */}
       <section className="bg-gradient-to-br from-primary-600 to-orange-600 py-12 sm:py-16 px-4">

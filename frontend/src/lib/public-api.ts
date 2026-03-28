@@ -542,36 +542,51 @@ export async function listClinicsPublic(
   if (city) params.set("city", city);
   return apiFetch<PublicClinicListResponse>(`/public/clinics?${params}`);
 }
-
-/**
  * Fetch a single clinic with services (public, no auth).
  * GET /public/clinics/{clinicId}
- */
 export async function getClinicPublic(
   clinicId: string
 ): Promise<PublicClinicDetail> {
   return apiFetch<PublicClinicDetail>(`/public/clinics/${clinicId}`);
-}
-
-/**
  * Fetch funding stats for a clinic (public, no auth).
  * GET /public/clinics/{clinicId}/stats
- */
 export async function getClinicFundingStats(
-  clinicId: string
 ): Promise<ClinicFundingStats> {
   return apiFetch<ClinicFundingStats>(`/public/clinics/${clinicId}/stats`);
-}
-
-/**
  * Create a clinic-targeted donation (public, no auth).
  * POST /public/clinic-fund
- */
 export async function createClinicFundDonation(
   data: ClinicFundRequest
 ): Promise<ClinicFundResponse> {
   return apiFetch<ClinicFundResponse>("/public/clinic-fund", {
     method: "POST",
     body: JSON.stringify(data),
-  });
+// ---------------------------------------------------------------------------
+// Homepage dynamic content
+export interface HomepageTeamMember {
+  name: string;
+  role: string;
+  image_url?: string | null;
+export interface HomepageTeamResponse {
+  items: HomepageTeamMember[];
+  source: "cms" | "default";
+export interface HomepageTestimonial {
+  quote: string;
+  animal: string;
+export interface HomepageTestimonialResponse {
+  items: HomepageTestimonial[];
+ * Fetch homepage team members from CMS.
+ * GET /api/public/content/homepage/team
+export async function getHomepageTeam(
+  lang = "es"
+): Promise<HomepageTeamResponse> {
+  return apiFetch<HomepageTeamResponse>(
+    `/api/public/content/homepage/team?lang=${lang}`
+  );
+ * Fetch homepage testimonials from CMS.
+ * GET /api/public/content/homepage/testimonials
+export async function getHomepageTestimonials(
+): Promise<HomepageTestimonialResponse> {
+  return apiFetch<HomepageTestimonialResponse>(
+    `/api/public/content/homepage/testimonials?lang=${lang}`
 }
