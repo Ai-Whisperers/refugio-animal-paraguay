@@ -19,6 +19,7 @@ class DonationTargetType(enum.StrEnum):
     CLINIC = "clinic"
     CAMPAIGN = "campaign"
     NEED = "need"
+    EMERGENCY = "emergency"
 
 
 class CurrencyCode(enum.StrEnum):
