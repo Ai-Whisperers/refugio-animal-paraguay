@@ -1,14 +1,16 @@
-"""Volunteer registration and profile API (RAP-640).
+"""Volunteer registration and profile API (RAP-640, RAP-641).
 
 Public endpoint for volunteers to apply and view their profile.
 Staff endpoint to list and review volunteer applications.
 
 Endpoints:
-    POST /api/volunteers/apply            -- submit volunteer application
-    GET  /api/volunteers/me               -- get own volunteer profile
-    PUT  /api/volunteers/me               -- update own volunteer profile
-    GET  /api/staff/volunteers            -- list all applications (staff only)
-    PUT  /api/staff/volunteers/{id}/review -- approve/reject application (staff only)
+    POST /api/volunteers/apply               -- submit volunteer application
+    GET  /api/volunteers/me                  -- get own volunteer profile
+    PUT  /api/volunteers/me                  -- update own volunteer profile (pending/inactive only)
+    PUT  /api/volunteers/profile             -- update skills/availability/bio (any active volunteer)
+    GET  /api/volunteers/profile/options     -- get available skill and availability options
+    GET  /api/staff/volunteers               -- list all applications (staff only)
+    PUT  /api/staff/volunteers/{id}/review   -- approve/reject application (staff only)
 """
 
 import logging
@@ -25,6 +27,8 @@ from src.auth.dependencies import _get_current_user as get_current_user
 from src.auth.dependencies import require_staff
 from src.db.models.user import User
 from src.db.models.volunteer_profile import (
+    VOLUNTEER_SKILL_OPTIONS,
+    VolunteerAvailability,
     VolunteerProfile,
     VolunteerStatus,
 )
@@ -88,9 +92,11 @@ class VolunteerProfileResponse(BaseModel):
     full_name: str | None
     email: str
     motivation: str
+    bio: str | None
     skills: list[str]
     availability: list[str]
     hours_per_week: int | None
+    languages_spoken: list[str]
     emergency_contact_name: str | None
     emergency_contact_phone: str | None
     status: str
@@ -99,6 +105,23 @@ class VolunteerProfileResponse(BaseModel):
     created_at: datetime
 
     model_config = {"from_attributes": True}
+
+
+class VolunteerProfileUpdateRequest(BaseModel):
+    """Payload for updating skills, availability, and bio (available for approved volunteers)."""
+
+    bio: str | None = Field(None, max_length=500, description="Short volunteer bio")
+    skills: list[str] | None = Field(None, description="Skill tags from available options")
+    availability: list[str] | None = Field(None, description="Availability windows")
+    hours_per_week: int | None = Field(None, ge=1, le=40, description="Estimated hours per week")
+    languages_spoken: list[str] | None = Field(None, description="Languages spoken by volunteer")
+
+
+class VolunteerProfileOptions(BaseModel):
+    """Available options for skills and availability selection."""
+
+    skills: list[str]
+    availability: list[str]
 
 
 class VolunteerUpdateRequest(BaseModel):
@@ -286,6 +309,70 @@ async def update_my_volunteer_profile(
     return _build_profile_response(profile, current_user)
 
 
+@public_router.put(
+    "/profile",
+    response_model=VolunteerProfileResponse,
+    summary="Update volunteer skills, availability and bio",
+)
+async def update_volunteer_profile(
+    payload: VolunteerProfileUpdateRequest,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> Any:
+    """Update volunteer skills, availability, bio and languages.
+
+    Available to volunteers in any non-rejected status (pending, approved, inactive).
+    Unlike PUT /me, this endpoint allows approved volunteers to update their own profile
+    for the fields that don't require staff involvement.
+    """
+    result = await db.execute(
+        select(VolunteerProfile).where(VolunteerProfile.user_id == current_user.id)
+    )
+    profile = result.scalar_one_or_none()
+    if profile is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No volunteer profile found. Submit an application first.",
+        )
+    if profile.status == VolunteerStatus.REJECTED:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Rejected volunteer profiles cannot be updated. Submit a new application.",
+        )
+
+    if payload.bio is not None:
+        profile.bio = payload.bio
+    if payload.skills is not None:
+        profile.skills = payload.skills
+    if payload.availability is not None:
+        profile.availability = payload.availability
+    if payload.hours_per_week is not None:
+        profile.hours_per_week = payload.hours_per_week
+    if payload.languages_spoken is not None:
+        profile.languages_spoken = payload.languages_spoken
+
+    await db.flush()
+    await db.refresh(profile)
+    logger.info(
+        "Volunteer profile (skills/availability) updated: user_id=%s",
+        str(current_user.id)[:8] + "...",
+    )
+    return _build_profile_response(profile, current_user)
+
+
+@public_router.get(
+    "/profile/options",
+    response_model=VolunteerProfileOptions,
+    summary="Get available skill and availability options",
+)
+async def get_volunteer_profile_options() -> VolunteerProfileOptions:
+    """Return the available skill tags and availability windows for profile forms."""
+    return VolunteerProfileOptions(
+        skills=sorted(VOLUNTEER_SKILL_OPTIONS),
+        availability=[a.value for a in VolunteerAvailability],
+    )
+
+
 # ---------------------------------------------------------------------------
 # Staff router
 # ---------------------------------------------------------------------------
@@ -418,9 +505,11 @@ def _build_profile_response(profile: VolunteerProfile, user: User | None) -> dic
         "full_name": user.full_name if user else None,
         "email": user.email if user else "",
         "motivation": profile.motivation,
+        "bio": profile.bio,
         "skills": profile.skills or [],
         "availability": profile.availability or [],
         "hours_per_week": profile.hours_per_week,
+        "languages_spoken": profile.languages_spoken or [],
         "emergency_contact_name": profile.emergency_contact_name,
         "emergency_contact_phone": profile.emergency_contact_phone,
         "status": profile.status,
