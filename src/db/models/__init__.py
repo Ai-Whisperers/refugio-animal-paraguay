@@ -5,6 +5,7 @@ from .adopter import Adopter
 from .adoption_request import AdoptionRequest, AdoptionRequestStatus
 from .animal import Animal, AnimalGender, AnimalPhoto, AnimalSize, AnimalSpecies, AnimalStatus
 from .audit_log import AuditAction, AuditLog
+from .blog_post import BlogPost
 from .campaign import Campaign, CampaignDonation, CampaignStatus
 from .castration_drive import CastrationDrive
 from .castration_photo import CastrationPhoto
@@ -73,6 +74,7 @@ __all__ = [
     "AnimalStatus",
     "AuditAction",
     "AuditLog",
+    "BlogPost",
     "Campaign",
     "CampaignDonation",
     "CampaignStatus",

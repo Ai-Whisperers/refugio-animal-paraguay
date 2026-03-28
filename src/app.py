@@ -35,6 +35,8 @@ from src.api.animal_updates import router as animal_updates_router
 from src.api.animals import router as animals_router
 from src.api.appointments import router as appointments_router
 from src.api.auth import router as auth_router
+from src.api.blog_posts import admin_router as blog_admin_router
+from src.api.blog_posts import public_router as blog_public_router
 from src.api.campaign_voucher_integration import router as campaign_voucher_integration_router
 from src.api.castration_drives import admin_router as castration_drives_admin_router
 from src.api.castration_drives import public_router as castration_drives_public_router
@@ -250,6 +252,8 @@ def create_app() -> FastAPI:
 
     # --- Routers ---
     application.include_router(health_router)
+    application.include_router(blog_admin_router)
+    application.include_router(blog_public_router)
     application.include_router(auth_router)
     application.include_router(google_oauth_router)
     application.include_router(password_reset_router)
