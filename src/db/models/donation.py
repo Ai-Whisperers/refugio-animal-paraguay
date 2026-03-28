@@ -92,6 +92,15 @@ class Donor(Base):
         sa.TIMESTAMP(timezone=True),
         nullable=True,
     )
+    # Encrypted donor tax identification number (BSN, TIN, etc.)
+    # Encrypted at rest using Fernet symmetric encryption; key stored in env.
+    # GDPR: constitutes sensitive personal data — access limited to staff with explicit need.
+    tax_id_encrypted: Mapped[str | None] = mapped_column(sa.Text, nullable=True)
+    tax_id_type: Mapped[str | None] = mapped_column(
+        sa.String(10),
+        nullable=True,
+        comment="Tax ID type identifier: BSN, TIN, CPF, etc.",
+    )
     created_at: Mapped[datetime] = mapped_column(
         sa.TIMESTAMP(timezone=True),
         nullable=False,
