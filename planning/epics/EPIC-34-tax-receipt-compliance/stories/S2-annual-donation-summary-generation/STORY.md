@@ -3,7 +3,7 @@ story: S2
 epic: EPIC-34
 ticket: RAP-166
 title: "Annual donation summary generation"
-status: planned
+status: done
 points: 5
 priority: P1
 track: Backend
