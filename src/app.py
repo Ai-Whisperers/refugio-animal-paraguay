@@ -38,6 +38,7 @@ from src.api.appointments import router as appointments_router
 from src.api.auth import router as auth_router
 from src.api.blog_posts import admin_router as blog_admin_router
 from src.api.blog_posts import public_router as blog_public_router
+from src.api.campaign_finance import router as campaign_finance_router
 from src.api.campaign_voucher_integration import router as campaign_voucher_integration_router
 from src.api.castration_drives import admin_router as castration_drives_admin_router
 from src.api.castration_drives import public_router as castration_drives_public_router
@@ -296,6 +297,7 @@ def create_app() -> FastAPI:
     application.include_router(admin_fund_dashboard_router)
     application.include_router(admin_castration_campaigns_router)
     application.include_router(admin_voucher_finance_router)
+    application.include_router(campaign_finance_router)
     application.include_router(campaign_voucher_integration_router)
     application.include_router(consents_router)
     application.include_router(notifications_router)
