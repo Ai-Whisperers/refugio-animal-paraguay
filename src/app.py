@@ -147,6 +147,8 @@ from src.api.voucher_purchase import router as voucher_purchase_router
 from src.api.push_subscriptions import router as push_subscriptions_router
 from src.api.webhooks import router as webhooks_router
 from src.api.pre_adoption_reading import router as pre_adoption_reading_router
+from src.api.article_editor import admin_router as article_editor_admin_router
+from src.api.article_editor import public_router as article_editor_public_router
 from src.audit.middleware import AuditMiddleware
 from src.config import Settings, get_settings
 from src.db.session import dispose_engine, init_engine
@@ -400,6 +402,8 @@ def create_app() -> FastAPI:
     application.include_router(home_visits_admin_router)
     application.include_router(home_visits_public_router)
     application.include_router(pre_adoption_reading_router)
+    application.include_router(article_editor_admin_router)
+    application.include_router(article_editor_public_router)
 
     return application
 
