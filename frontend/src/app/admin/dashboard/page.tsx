@@ -1,339 +1,335 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
-import { useRouter } from "next/navigation";
-import {
-  PawPrint,
-  Heart,
-  DollarSign,
-  Users,
-  TrendingUp,
-  AlertCircle,
-  Loader2,
-} from "lucide-react";
-import { isAuthenticated, getAccessToken, decodeToken } from "@/lib/auth";
-import { api } from "@/lib/api";
-import type { UserRole } from "@/types/api";
-import ActivityFeed from "@/components/ActivityFeed";
+import { useEffect, useState } from "react";
 
-// -- Spanish labels --
-const LABEL_DASHBOARD = "Panel de Administracion";
-const LABEL_WELCOME_PREFIX = "Bienvenido";
-const LABEL_LOADING = "Cargando datos del panel...";
-const LABEL_ERROR = "Error al cargar datos";
-const LABEL_RETRY = "Reintentar";
-const LABEL_TOTAL_ANIMALS = "Total de Animales";
-const LABEL_PENDING_ADOPTIONS = "Adopciones Pendientes";
-const LABEL_DONATIONS_MONTH = "Donaciones del Mes";
-const LABEL_TOTAL_DONATIONS = "Total de Donaciones";
-const LABEL_QUICK_LINKS = "Accesos Rapidos";
-const LABEL_VIEW_ANIMALS = "Ver Animales";
-const LABEL_VIEW_ADOPTIONS = "Ver Adopciones";
-const LABEL_VIEW_DONATIONS = "Ver Donaciones";
-const LABEL_VIEW_DONORS = "Ver Donantes";
+// -- Types ---------------------------------------------------------------
 
-// -- Types for API responses --
-interface AnimalListItem {
+interface KPIMetric {
   id: string;
   name: string;
+  category: string;
+  value: number;
+  unit: string;
+  target: number | null;
+  previous_value: number | null;
+  trend: string;
+  trend_pct: number;
   status: string;
 }
 
-interface StatusBreakdown {
-  pending: number;
-  approved: number;
-  rejected: number;
-  cancelled: number;
+interface KPIDashboard {
+  period_days: number;
+  generated_at: string;
+  kpis: KPIMetric[];
+  summary: {
+    total_kpis: number;
+    on_track: number;
+    approaching: number;
+    at_risk: number;
+    health_score: number;
+  };
 }
 
-interface AdoptionAnalytics {
-  total_requests: number;
-  avg_time_to_decision_hours: number | null;
-  approval_rate_percent: number | null;
-  requests_last_7_days: number;
-  requests_last_30_days: number;
-  status_breakdown: StatusBreakdown;
-}
-
-interface CurrencyBreakdown {
-  currency: string;
-  count: number;
-  total_amount_cents: number;
-}
-
-interface DonationStats {
-  total_donations: number;
-  by_currency: CurrencyBreakdown[];
-  date_from: string | null;
-  date_to: string | null;
-}
-
-interface DashboardData {
-  totalAnimals: number;
-  pendingAdoptions: number;
-  donationsThisMonth: number;
-  donationAmounts: CurrencyBreakdown[];
-}
-
-function formatCurrency(amountCents: number, currency: string): string {
-  const amount = currency === "PYG" ? amountCents : amountCents / 100;
-  if (currency === "PYG") {
-    return `${amount.toLocaleString("es-PY")} PYG`;
-  }
-  if (currency === "EUR") {
-    return `${amount.toLocaleString("de-DE", { minimumFractionDigits: 2 })} EUR`;
-  }
-  return `${amount.toLocaleString("en-US", { minimumFractionDigits: 2 })} ${currency}`;
-}
-
-function getMonthDateRange(): { dateFrom: string; dateTo: string } {
-  const now = new Date();
-  const firstDay = new Date(now.getFullYear(), now.getMonth(), 1);
-  const dateFrom = firstDay.toISOString();
-  const dateTo = now.toISOString();
-  return { dateFrom, dateTo };
-}
-
-interface KpiCardProps {
+interface DashboardAlert {
+  id: string;
+  severity: string;
   title: string;
-  value: string | number;
-  subtitle?: string;
-  icon: React.ComponentType<{ className?: string }>;
-  color: string;
+  message: string;
+  category: string;
+  action_url: string | null;
 }
 
-function KpiCard({ title, value, subtitle, icon: Icon, color }: KpiCardProps) {
+interface AlertsResponse {
+  alerts: DashboardAlert[];
+  total: number;
+  critical_count: number;
+  warning_count: number;
+}
+
+interface PerformanceScore {
+  metric: string;
+  actual: number;
+  target: number;
+  score: number;
+  grade: string;
+}
+
+interface PerformanceScorecard {
+  scores: PerformanceScore[];
+  overall_score: number;
+  overall_grade: string;
+}
+
+// -- Helpers -------------------------------------------------------------
+
+const API_BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+
+async function fetchJSON<T>(path: string): Promise<T> {
+  const res = await fetch(`${API_BASE}${path}`);
+  if (!res.ok) throw new Error(`API error ${res.status}`);
+  return res.json() as Promise<T>;
+}
+
+function formatValue(value: number, unit: string): string {
+  if (unit === "PYG") return new Intl.NumberFormat("es-PY").format(value) + " PYG";
+  if (unit === "EUR") return new Intl.NumberFormat("de-DE").format(value) + " EUR";
+  if (unit === "%") return value + "%";
+  return new Intl.NumberFormat("es-PY").format(value) + " " + unit;
+}
+
+function statusColor(status: string): string {
+  switch (status) {
+    case "on_track": return "bg-green-100 text-green-800";
+    case "approaching": return "bg-yellow-100 text-yellow-800";
+    case "at_risk": return "bg-red-100 text-red-800";
+    default: return "bg-gray-100 text-gray-600";
+  }
+}
+
+function trendIcon(trend: string, pct: number): string {
+  if (trend === "up") return pct >= 0 ? "\u2191" : "\u2193";
+  if (trend === "down") return pct <= 0 ? "\u2193" : "\u2191";
+  return "\u2194";
+}
+
+function severityColor(severity: string): string {
+  switch (severity) {
+    case "critical": return "border-red-500 bg-red-50";
+    case "warning": return "border-yellow-500 bg-yellow-50";
+    default: return "border-blue-500 bg-blue-50";
+  }
+}
+
+function gradeColor(grade: string): string {
+  if (grade.startsWith("A")) return "text-green-600";
+  if (grade === "B") return "text-yellow-600";
+  return "text-red-600";
+}
+
+// -- Sub-components ------------------------------------------------------
+
+function LoadingSkeleton() {
   return (
-    <div className="rounded-xl border border-warm-border bg-warm-surface p-6 transition-shadow hover:shadow-md">
-      <div className="flex items-start justify-between">
-        <div>
-          <p className="text-sm font-medium text-warm-text-tertiary">{title}</p>
-          <p className="mt-2 text-3xl font-bold text-warm-text-primary">{value}</p>
-          {subtitle && (
-            <p className="mt-1 text-sm text-warm-text-secondary">{subtitle}</p>
-          )}
-        </div>
-        <div className={`rounded-lg p-3 ${color}`}>
-          <Icon className="h-6 w-6 text-white" />
-        </div>
+    <div className="space-y-6 animate-pulse" aria-busy="true" aria-label="Cargando dashboard">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="h-24 bg-gray-200 rounded-xl" />
+        ))}
+      </div>
+      {[1, 2].map((i) => (
+        <div key={i} className="h-48 bg-gray-200 rounded-xl" />
+      ))}
+    </div>
+  );
+}
+
+function HealthSummary({ summary }: { summary: KPIDashboard["summary"] }) {
+  return (
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+      <div className="bg-white rounded-xl border border-gray-200 p-4 text-center">
+        <p className="text-3xl font-bold text-[var(--color-primary)]">{summary.health_score}%</p>
+        <p className="text-sm text-gray-500">Salud general</p>
+      </div>
+      <div className="bg-white rounded-xl border border-gray-200 p-4 text-center">
+        <p className="text-3xl font-bold text-green-600">{summary.on_track}</p>
+        <p className="text-sm text-gray-500">En meta</p>
+      </div>
+      <div className="bg-white rounded-xl border border-gray-200 p-4 text-center">
+        <p className="text-3xl font-bold text-yellow-600">{summary.approaching}</p>
+        <p className="text-sm text-gray-500">Acercandose</p>
+      </div>
+      <div className="bg-white rounded-xl border border-gray-200 p-4 text-center">
+        <p className="text-3xl font-bold text-red-600">{summary.at_risk}</p>
+        <p className="text-sm text-gray-500">En riesgo</p>
       </div>
     </div>
   );
 }
 
-export default function AdminDashboardPage() {
-  const router = useRouter();
-  const [isChecking, setIsChecking] = useState(true);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [userRole, setUserRole] = useState<UserRole | null>(null);
-  const [data, setData] = useState<DashboardData | null>(null);
-
-  const fetchDashboardData = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const { dateFrom, dateTo } = getMonthDateRange();
-
-      const [animals, adoptionAnalytics, donationStats] = await Promise.all([
-        api.get<AnimalListItem[]>("/animals?limit=1&offset=0").catch(() => [] as AnimalListItem[]),
-        api.get<AdoptionAnalytics>("/adoption-requests/analytics").catch(() => null),
-        api.get<DonationStats>(
-          `/donations/stats?date_from=${encodeURIComponent(dateFrom)}&date_to=${encodeURIComponent(dateTo)}`
-        ).catch(() => null),
-      ]);
-
-      // For animal count, we need total. The list endpoint returns a list,
-      // so we fetch with a large limit to count. For MVP, use a separate count approach.
-      // Since we don't have a count endpoint, fetch all IDs with minimal data.
-      let totalAnimals = animals.length;
-      if (totalAnimals === 1) {
-        // We got limit=1, try fetching actual count
-        const allAnimals = await api.get<AnimalListItem[]>("/animals?limit=100&offset=0").catch(() => []);
-        totalAnimals = allAnimals.length;
-      }
-
-      setData({
-        totalAnimals,
-        pendingAdoptions: adoptionAnalytics?.status_breakdown?.pending ?? 0,
-        donationsThisMonth: donationStats?.total_donations ?? 0,
-        donationAmounts: donationStats?.by_currency ?? [],
-      });
-    } catch {
-      setError(LABEL_ERROR);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (!isAuthenticated()) {
-      router.replace("/admin/login?expired=true");
-      return;
-    }
-
-    const token = getAccessToken();
-    if (token) {
-      const payload = decodeToken(token);
-      if (payload) {
-        setUserRole(payload.role);
-      }
-    }
-    setIsChecking(false);
-    fetchDashboardData();
-  }, [router, fetchDashboardData]);
-
-  if (isChecking) {
-    return (
-      <div className="flex min-h-[50vh] items-center justify-center">
-        <Loader2 className="h-6 w-6 animate-spin text-primary-500" />
-        <p className="ml-2 text-warm-text-secondary">{LABEL_LOADING}</p>
-      </div>
-    );
-  }
-
-  const donationSubtitle =
-    data?.donationAmounts && data.donationAmounts.length > 0
-      ? data.donationAmounts.map((c) => formatCurrency(c.total_amount_cents, c.currency)).join(" | ")
-      : undefined;
-
+function KPICard({ kpi }: { kpi: KPIMetric }) {
   return (
-    <div>
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-warm-text-primary">{LABEL_DASHBOARD}</h1>
-        <p className="mt-1 text-warm-text-secondary">
-          {LABEL_WELCOME_PREFIX}
-          {userRole && (
-            <span className="ml-2 inline-flex rounded-full bg-primary-100 px-2.5 py-0.5 text-xs font-medium text-primary-700 capitalize">
-              {userRole}
+    <div className="bg-white rounded-xl border border-gray-200 p-4">
+      <div className="flex items-start justify-between mb-2">
+        <p className="text-sm font-medium text-gray-600">{kpi.name}</p>
+        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${statusColor(kpi.status)}`}>
+          {kpi.status === "on_track" ? "En meta" : kpi.status === "approaching" ? "Acercandose" : "En riesgo"}
+        </span>
+      </div>
+      <p className="text-2xl font-bold text-gray-900">{formatValue(kpi.value, kpi.unit)}</p>
+      <div className="flex items-center justify-between mt-2">
+        <span className={`text-sm ${kpi.trend_pct >= 0 ? "text-green-600" : "text-red-600"}`}>
+          {trendIcon(kpi.trend, kpi.trend_pct)} {Math.abs(kpi.trend_pct)}%
+        </span>
+        {kpi.target && (
+          <span className="text-xs text-gray-400">Meta: {formatValue(kpi.target, kpi.unit)}</span>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function AlertsList({ alerts }: { alerts: AlertsResponse }) {
+  return (
+    <section className="bg-white rounded-xl border border-gray-200 p-6">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg font-semibold text-gray-900">Alertas activas</h2>
+        <div className="flex gap-2 text-sm">
+          {alerts.critical_count > 0 && (
+            <span className="px-2 py-1 bg-red-100 text-red-800 rounded-full font-medium">
+              {alerts.critical_count} criticas
             </span>
           )}
-        </p>
+          {alerts.warning_count > 0 && (
+            <span className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full font-medium">
+              {alerts.warning_count} advertencias
+            </span>
+          )}
+        </div>
       </div>
-
-      {/* Error state */}
-      {error && (
-        <div className="mb-6 flex items-center gap-3 rounded-lg border border-red-200 bg-red-50 p-4">
-          <AlertCircle className="h-5 w-5 text-red-500" />
-          <p className="flex-1 text-sm text-red-700">{error}</p>
-          <button
-            onClick={fetchDashboardData}
-            className="rounded-lg bg-red-100 px-3 py-1.5 text-sm font-medium text-red-700 hover:bg-red-200 transition-colors"
-          >
-            {LABEL_RETRY}
-          </button>
-        </div>
-      )}
-
-      {/* KPI Cards */}
-      {isLoading ? (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <div
-              key={i}
-              className="h-32 animate-pulse rounded-xl border border-warm-border bg-warm-surface"
-            />
-          ))}
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <KpiCard
-            title={LABEL_TOTAL_ANIMALS}
-            value={data?.totalAnimals ?? 0}
-            icon={PawPrint}
-            color="bg-blue-500"
-          />
-          <KpiCard
-            title={LABEL_PENDING_ADOPTIONS}
-            value={data?.pendingAdoptions ?? 0}
-            icon={Heart}
-            color="bg-pink-500"
-          />
-          <KpiCard
-            title={LABEL_DONATIONS_MONTH}
-            value={data?.donationsThisMonth ?? 0}
-            subtitle={donationSubtitle}
-            icon={DollarSign}
-            color="bg-green-500"
-          />
-          <KpiCard
-            title={LABEL_TOTAL_DONATIONS}
-            value={
-              data?.donationAmounts && data.donationAmounts.length > 0
-                ? data.donationAmounts.map((c) => formatCurrency(c.total_amount_cents, c.currency)).join(" | ")
-                : "0"
-            }
-            subtitle={LABEL_DONATIONS_MONTH}
-            icon={TrendingUp}
-            color="bg-purple-500"
-          />
-        </div>
-      )}
-
-      {/* Activity Feed + Quick Links side by side on large screens */}
-      <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Activity Feed — takes 2/3 */}
-        <div className="lg:col-span-2">
-          <ActivityFeed />
-        </div>
-
-        {/* Quick Links — takes 1/3 */}
-        <div>
-          <h2 className="mb-4 text-lg font-semibold text-warm-text-primary">{LABEL_QUICK_LINKS}</h2>
-          <div className="grid grid-cols-1 gap-3">
-            <QuickLink
-              label={LABEL_VIEW_ANIMALS}
-              href="/admin/animals"
-              icon={PawPrint}
-              description="Gestionar registro de animales"
-            />
-            <QuickLink
-              label={LABEL_VIEW_ADOPTIONS}
-              href="/admin/adoptions"
-              icon={Heart}
-              description="Revisar solicitudes de adopcion"
-            />
-            <QuickLink
-              label={LABEL_VIEW_DONATIONS}
-              href="/admin/donations"
-              icon={DollarSign}
-              description="Historial de donaciones"
-            />
-            <QuickLink
-              label={LABEL_VIEW_DONORS}
-              href="/admin/donors"
-              icon={Users}
-              description="Perfiles de donantes"
-            />
+      <div className="space-y-3">
+        {alerts.alerts.map((alert) => (
+          <div key={alert.id} className={`border-l-4 rounded-r-lg p-3 ${severityColor(alert.severity)}`}>
+            <p className="font-medium text-gray-900 text-sm">{alert.title}</p>
+            <p className="text-sm text-gray-600 mt-1">{alert.message}</p>
           </div>
-        </div>
+        ))}
       </div>
-    </div>
+    </section>
   );
 }
 
-interface QuickLinkProps {
-  label: string;
-  href: string;
-  icon: React.ComponentType<{ className?: string }>;
-  description: string;
+function ScorecardSection({ scorecard }: { scorecard: PerformanceScorecard }) {
+  return (
+    <section className="bg-white rounded-xl border border-gray-200 p-6">
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg font-semibold text-gray-900">Scorecard de rendimiento</h2>
+        <div className="text-center">
+          <span className={`text-2xl font-bold ${gradeColor(scorecard.overall_grade)}`}>
+            {scorecard.overall_grade}
+          </span>
+          <p className="text-xs text-gray-500">{scorecard.overall_score}%</p>
+        </div>
+      </div>
+      <div className="space-y-3">
+        {scorecard.scores.map((s) => (
+          <div key={s.metric} className="flex items-center gap-4">
+            <div className="flex-1">
+              <div className="flex justify-between text-sm mb-1">
+                <span className="text-gray-700">{s.metric}</span>
+                <span className={`font-medium ${gradeColor(s.grade)}`}>{s.grade}</span>
+              </div>
+              <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-[var(--color-primary)] rounded-full transition-all"
+                  style={{ width: `${Math.min(s.score, 100)}%` }}
+                />
+              </div>
+              <div className="flex justify-between text-xs text-gray-400 mt-1">
+                <span>Actual: {s.actual}</span>
+                <span>Meta: {s.target}</span>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
 }
 
-function QuickLink({ label, href, icon: Icon, description }: QuickLinkProps) {
-  const router = useRouter();
+// -- Main page -----------------------------------------------------------
+
+export default function ExecutiveDashboardPage() {
+  const [period, setPeriod] = useState(30);
+  const [dashboard, setDashboard] = useState<KPIDashboard | null>(null);
+  const [alerts, setAlerts] = useState<AlertsResponse | null>(null);
+  const [scorecard, setScorecard] = useState<PerformanceScorecard | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setLoading(true);
+    const q = `?period_days=${period}`;
+    Promise.all([
+      fetchJSON<KPIDashboard>(`/api/admin/dashboard/kpis${q}`),
+      fetchJSON<AlertsResponse>("/api/admin/dashboard/alerts"),
+      fetchJSON<PerformanceScorecard>(`/api/admin/dashboard/performance${q}`),
+    ])
+      .then(([d, a, s]) => {
+        setDashboard(d);
+        setAlerts(a);
+        setScorecard(s);
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, [period]);
+
+  const periodOptions = [
+    { label: "30 dias", value: 30 },
+    { label: "90 dias", value: 90 },
+    { label: "1 ano", value: 365 },
+  ];
+
+  const categories = ["animals", "financial", "community", "operations"];
+  const categoryLabels: Record<string, string> = {
+    animals: "Animales",
+    financial: "Financiero",
+    community: "Comunidad",
+    operations: "Operaciones",
+  };
+
   return (
-    <button
-      onClick={() => router.push(href)}
-      className="group flex items-start gap-4 rounded-lg border border-warm-border bg-warm-surface p-4 text-left transition-all hover:border-primary-300 hover:shadow-md"
-    >
-      <div className="rounded-lg bg-primary-50 p-2.5 group-hover:bg-primary-100 transition-colors">
-        <Icon className="h-5 w-5 text-primary-600" />
+    <div className="max-w-6xl mx-auto px-4 py-8">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Dashboard ejecutivo</h1>
+          <p className="text-gray-500 mt-1">Indicadores clave de rendimiento del refugio</p>
+        </div>
+        <div className="flex gap-2">
+          {periodOptions.map((opt) => (
+            <button
+              key={opt.value}
+              onClick={() => setPeriod(opt.value)}
+              className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                period === opt.value
+                  ? "bg-[var(--color-primary)] text-white"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
       </div>
-      <div>
-        <p className="font-medium text-warm-text-primary">{label}</p>
-        <p className="mt-0.5 text-sm text-warm-text-secondary">{description}</p>
-      </div>
-    </button>
+
+      {loading ? (
+        <LoadingSkeleton />
+      ) : (
+        <div className="space-y-6">
+          {dashboard && <HealthSummary summary={dashboard.summary} />}
+
+          {dashboard &&
+            categories.map((cat) => {
+              const catKpis = dashboard.kpis.filter((k) => k.category === cat);
+              if (catKpis.length === 0) return null;
+              return (
+                <div key={cat}>
+                  <h2 className="text-lg font-semibold text-gray-900 mb-3">
+                    {categoryLabels[cat]}
+                  </h2>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {catKpis.map((kpi) => (
+                      <KPICard key={kpi.id} kpi={kpi} />
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {alerts && <AlertsList alerts={alerts} />}
+            {scorecard && <ScorecardSection scorecard={scorecard} />}
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
