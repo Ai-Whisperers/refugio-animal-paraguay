@@ -555,7 +555,7 @@ Week 3-4:
 | 4 | Required pre-adoption reading enforcement | RAP-628 | 4 | PR #275 | Fullstack |
 | 5 | Sterilization awareness campaign page | RAP-629 | 4 | PR #272 | Frontend |
 | 6 | Video embed support | RAP-630 | 3 | PR #271 | Frontend |
-| 7 | Admin article editor with rich text | RAP-631 | 6 | READY | Fullstack |
+| 7 | Admin article editor with rich text | RAP-631 | 6 | PR #276 | Fullstack |
 
 ---
 
