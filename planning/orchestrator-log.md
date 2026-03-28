@@ -568,3 +568,12 @@
 - **Tickets**: current.md empty, RAP-536/538/640 all COMPLETED. No orphaned ACTIVE tickets.
 - **Branches**: 6 local feature branches deleted, remote pruned — only develop + main remain.
 - **Actions taken**: Merged 4 PRs, rebased 3 conflicting branches, updated STORY.md for RAP-536
+
+### [2026-03-28 14:30] Autonomous Worker Run — EPIC-36 S2 Complete
+- **Epic**: EPIC-36 — Volunteer Registration & Profiles
+- **Stories completed**: RAP-641
+- **PRs created**: #302 (feature/RAP-641-volunteer-profile-skills-availability)
+- **Duration**: ~30m
+- **Quality**: ruff clean | black clean | 37 unit tests passing | 9 integration tests added
+- **Changes**: Model extended (bio + languages_spoken), migration 072, new PUT /api/volunteers/profile + GET /api/volunteers/profile/options endpoints, /volunteer/profile frontend page
+- **Notes**: 31 pre-existing unit test failures in develop baseline — unchanged. S1 (RAP-640) already had skills/availability in model; S2 added bio, languages, approved-volunteer editing, and profile page.
