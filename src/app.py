@@ -35,6 +35,7 @@ from src.api.auth import router as auth_router
 from src.api.campaign_voucher_integration import router as campaign_voucher_integration_router
 from src.api.consents import router as consents_router
 from src.api.diagnoses import diagnosis_router, treatment_router
+from src.api.donation_allocations import allocation_router, expense_router
 from src.api.donations import router as donations_router
 from src.api.donors import router as donors_router
 from src.api.email_verification import router as email_verification_router
@@ -253,6 +254,8 @@ def create_app() -> FastAPI:
     application.include_router(smart_matching_router)
     application.include_router(public_statistics_router)
     application.include_router(media_upload_router)
+    application.include_router(expense_router)
+    application.include_router(allocation_router)
 
     return application
 
