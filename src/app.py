@@ -305,6 +305,7 @@ def create_app() -> FastAPI:
     application.include_router(followup_auto_admin_router)
     application.include_router(followup_auto_public_router)
     application.include_router(adoption_success_router)
+    application.include_router(transport_router)
 
     return application
 
