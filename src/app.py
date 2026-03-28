@@ -18,6 +18,7 @@ from slowapi.errors import RateLimitExceeded
 
 from src.api.admin import router as admin_router
 from src.api.admin_campaigns import router as admin_campaigns_router
+from src.api.admin_castration_campaigns import router as admin_castration_campaigns_router
 from src.api.adopters import router as adopters_router
 from src.api.adoption_requests import router as adoption_requests_router
 from src.api.animal_updates import router as animal_updates_router
@@ -195,6 +196,7 @@ def create_app() -> FastAPI:
     application.include_router(tigo_money_router)
     application.include_router(webhooks_router)
     application.include_router(admin_campaigns_router)
+    application.include_router(admin_castration_campaigns_router)
     application.include_router(consents_router)
     application.include_router(notifications_router)
     application.include_router(gdpr_export_router)
