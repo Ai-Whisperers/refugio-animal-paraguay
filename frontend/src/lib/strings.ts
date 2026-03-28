@@ -145,6 +145,7 @@ export const ANIMAL_DETAIL = {
   arrived: "Llego al refugio",
   about: (name: string) => `Sobre ${name}`,
   applyToAdopt: (name: string) => `Solicitar adopcion de ${name}`,
+  preQualify: "Verificar compatibilidad",
   notAvailable: "Este animal no esta disponible para adopcion actualmente",
   breadcrumbAnimals: "Animales",
   wantToAdopt: (name: string) => `Quiero adoptar a ${name}`,
@@ -604,4 +605,85 @@ export const SUBSCRIPTION_MANAGE = {
   notFoundMessage: "No se encontro una suscripcion con ese ID. Verifica el ID e intenta de nuevo.",
   monthly: "Mensual",
   yearly: "Anual",
+} as const;
+
+// --- Pre-Qualification Form ---
+export const PRE_QUALIFY = {
+  breadcrumb: "Pre-calificacion",
+  title: "Verifica tu compatibilidad",
+  subtitle: (name: string) =>
+    `Responde algunas preguntas para saber si sos el hogar ideal para ${name}.`,
+  progressLabel: (pct: number) => `${pct}% completado`,
+  mandatoryBadge: "Requerido",
+  optionalBadge: "Opcional",
+  submitButton: "Verificar mi calificacion",
+  submitting: "Verificando...",
+  loadingQuestions: "Cargando preguntas...",
+  noQuestions: "Este animal no tiene requisitos especificos de adopcion. Podes aplicar directamente.",
+  applyDirectly: "Solicitar adopcion",
+  // Field labels by requirement_type
+  fieldLabels: {
+    yard_required: "Patio o jardin",
+    no_children_under: "Edad del hijo/a mas joven",
+    experience_required: "Experiencia con mascotas",
+    home_type: "Tipo de vivienda",
+    max_hours_alone: "Horas solo/a por dia (maximo)",
+    other_pets_ok: "Otras mascotas en casa",
+    housing_status: "Situacion de vivienda",
+    income_requirement: "Ingreso mensual disponible",
+  } as Record<string, string>,
+  // Help text by requirement_type
+  fieldHelp: {
+    yard_required: "Algunos animales necesitan espacio al aire libre para ejercitarse.",
+    no_children_under: "Ciertos animales no son recomendables para hogares con ninos muy pequenos.",
+    experience_required: "Algunos animales necesitan un dueno con experiencia previa.",
+    home_type: "Selecciona el tipo de vivienda donde vivira el animal.",
+    max_hours_alone: "Los animales necesitan compania. Indica cuantas horas estara solo como maximo.",
+    other_pets_ok: "Indica si tenes otras mascotas que conviviran con el animal.",
+    housing_status: "Indica si sos propietario o inquilino de tu vivienda.",
+    income_requirement: "Asegura que podes cubrir los gastos veterinarios y de alimentacion.",
+  } as Record<string, string>,
+  // Radio/dropdown options
+  yardOptions: {
+    yes: "Si, tengo patio/jardin",
+    no: "No, departamento u otro",
+    can_arrange: "Puedo conseguir acceso a uno",
+  },
+  experienceOptions: {
+    none: "Sin experiencia",
+    some: "Algo de experiencia",
+    experienced: "Muy experimentado/a",
+  },
+  homeTypeOptions: {
+    apartment: "Departamento",
+    house: "Casa",
+    farm: "Chacra/finca",
+    townhouse: "Duplex/adosada",
+  },
+  housingStatusOptions: {
+    own: "Propietario/a",
+    rent: "Inquilino/a",
+  },
+  petOptions: {
+    cats: "Gatos",
+    dogs: "Perros",
+    rabbits: "Conejos",
+    birds: "Aves",
+    other: "Otros",
+  },
+  noChildren: "No tengo hijos",
+  noPets: "No tengo mascotas",
+  hoursLabel: (hours: number) => `${hours} hora${hours !== 1 ? "s" : ""}`,
+  currencyPlaceholder: "Monto en EUR",
+  // Validation
+  fieldRequired: "Este campo es obligatorio.",
+  ageRange: "La edad debe ser entre 0 y 18.",
+  amountPositive: "El monto debe ser mayor a 0.",
+  hoursRange: "Las horas deben ser entre 0 y 24.",
+  // Error states
+  loadError: "No se pudieron cargar las preguntas. Intenta de nuevo.",
+  submitError: "Ocurrio un error al verificar. Intenta de nuevo.",
+  retryButton: "Reintentar",
+  // Back navigation
+  backToAnimal: (name: string) => `Volver a ${name}`,
 } as const;

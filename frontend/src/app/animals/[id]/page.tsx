@@ -4,7 +4,7 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { X, ChevronLeft, ChevronRight, MessageCircle, ArrowLeft } from "lucide-react";
+import { X, ChevronLeft, ChevronRight, MessageCircle, ArrowLeft, ClipboardCheck } from "lucide-react";
 import type { Animal } from "@/types/api";
 import { getAnimalPublic } from "@/lib/public-api";
 import { STATUS_LABELS, statusBadgeClass, calculateAge } from "@/lib/animal-utils";
@@ -219,12 +219,21 @@ export default function AnimalDetailPage() {
             {/* Action Buttons */}
             <div ref={ctaRef} className="flex flex-col sm:flex-row gap-3">
               {isAvailable ? (
-                <Link
-                  href={`/animals/${animal.id}/apply`}
-                  className="inline-flex items-center justify-center bg-[#E8622A] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#d4571f] transition-colors"
-                >
-                  {ANIMAL_DETAIL.applyToAdopt(animal.name)}
-                </Link>
+                <>
+                  <Link
+                    href={`/animals/${animal.id}/apply`}
+                    className="inline-flex items-center justify-center bg-[#E8622A] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#d4571f] transition-colors"
+                  >
+                    {ANIMAL_DETAIL.applyToAdopt(animal.name)}
+                  </Link>
+                  <Link
+                    href={`/animals/${animal.id}/pre-qualify`}
+                    className="inline-flex items-center justify-center gap-2 bg-white text-[#E8622A] border border-[#E8622A] px-6 py-3 rounded-lg font-medium hover:bg-orange-50 transition-colors"
+                  >
+                    <ClipboardCheck className="h-4 w-4" />
+                    {ANIMAL_DETAIL.preQualify}
+                  </Link>
+                </>
               ) : (
                 <div className="px-6 py-3 bg-gray-100 text-gray-500 rounded-lg text-center font-medium">
                   {ANIMAL_DETAIL.notAvailable}
