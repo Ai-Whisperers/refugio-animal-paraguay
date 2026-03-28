@@ -62,6 +62,7 @@ from src.api.educational_article import public_router as article_public_router
 from src.api.email_verification import router as email_verification_router
 from src.api.emergencies import router as emergencies_router
 from src.api.emergency_donations import router as emergency_donations_router
+from src.api.financial_stats import router as financial_stats_router
 from src.api.follow_ups import router as follow_ups_router
 from src.api.followup_automation import admin_router as followup_auto_admin_router
 from src.api.followup_automation import public_router as followup_auto_public_router
@@ -296,6 +297,7 @@ def create_app() -> FastAPI:
     application.include_router(notifications_router)
     application.include_router(gdpr_export_router)
     application.include_router(notification_preferences_router)
+    application.include_router(financial_stats_router)
     application.include_router(follow_ups_router)
     application.include_router(gdpr_router)
     application.include_router(impact_reports_router)
