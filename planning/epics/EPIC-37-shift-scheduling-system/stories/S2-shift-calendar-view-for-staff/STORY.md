@@ -3,7 +3,7 @@ story: S2
 epic: EPIC-37
 ticket: RAP-181
 title: "Shift calendar view for staff"
-status: planned
+status: done
 points: 5
 priority: P0
 track: Frontend
