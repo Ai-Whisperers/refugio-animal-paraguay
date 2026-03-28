@@ -371,7 +371,7 @@ Week 3-4:
 | 3 | Integration with vet voucher system | RAP-527 | 5 | DONE (PR #170) | Backend | RAP-510 (EPIC-77) |
 | 4 | Photo gallery for completed castrations | RAP-528 | 5 | DONE (PR #213) | Fullstack | RAP-525 |
 | 5 | Donor leaderboard | RAP-529 | 3 | DONE (PR #214) | Fullstack | RAP-526 |
-| 6 | Castration drive scheduling | RAP-530 | 5 | READY | Fullstack | RAP-525 |
+| 6 | Castration drive scheduling | RAP-530 | 5 | DONE (PR #216) | Fullstack | RAP-525 |
 | 7 | Post-campaign impact report | RAP-531 | 5 | READY | Fullstack | RAP-525 |
 | 8 | Social media sharing with auto-generated cards | RAP-532 | 2 | DONE (PR #215) | Frontend | RAP-526 |
 
