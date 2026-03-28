@@ -39,6 +39,11 @@ from src.schemas.donation import (
     StripeIntentResponse,
 )
 from src.schemas.error import PAYMENT_RESPONSES
+from src.services.donation_target_service import (
+    InvalidTargetError,
+    TargetNotActiveError,
+    validate_donation_target,
+)
 
 router = APIRouter(prefix="/donations", tags=["donations"], responses=PAYMENT_RESPONSES)
 
@@ -56,6 +61,8 @@ _CSV_HEADERS = [
     "payment_method",
     "status",
     "fund_category",
+    "target_type",
+    "target_id",
     "is_recurring",
     "recurring_interval",
     "receipt_number",
@@ -86,6 +93,8 @@ def _apply_common_filters(
     payment_method: str | None,
     date_from: datetime | None,
     date_to: datetime | None,
+    target_type: str | None = None,
+    target_id: UUID | None = None,
 ) -> object:
     """Apply the shared set of donation filter predicates to a select statement."""
     if currency is not None:
@@ -102,6 +111,10 @@ def _apply_common_filters(
         stmt = stmt.where(Donation.created_at >= date_from)  # type: ignore[union-attr]
     if date_to is not None:
         stmt = stmt.where(Donation.created_at <= date_to)  # type: ignore[union-attr]
+    if target_type is not None:
+        stmt = stmt.where(Donation.target_type == target_type)  # type: ignore[union-attr]
+    if target_id is not None:
+        stmt = stmt.where(Donation.target_id == target_id)  # type: ignore[union-attr]
     return stmt
 
 
@@ -115,6 +128,8 @@ def _donation_to_csv_row(d: Donation) -> list[str]:
         d.payment_method,
         d.status,
         d.fund_category or "",
+        d.target_type or "general",
+        str(d.target_id) if d.target_id else "",
         str(d.is_recurring),
         d.recurring_interval or "",
         d.receipt_number or "",
@@ -165,11 +180,27 @@ async def create_donation(
                 detail=f"Maximum donation for this campaign is {campaign.max_donation_cents} cents",
             )
 
+    # Validate donation target if specified
+    try:
+        await validate_donation_target(db, payload.target_type.value, payload.target_id)
+    except InvalidTargetError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=exc.message,
+        ) from None
+    except TargetNotActiveError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=exc.message,
+        ) from None
+
     donation = Donation(
         donor_id=payload.donor_id,
         amount_cents=payload.amount_cents,
         currency=payload.currency.value,
         payment_method=payload.payment_method.value,
+        target_type=payload.target_type.value,
+        target_id=payload.target_id,
         notes=payload.notes,
     )
     db.add(donation)
@@ -379,6 +410,8 @@ async def export_donations_csv(
     payment_method: str | None = Query(default=None),
     date_from: datetime | None = Query(default=None),
     date_to: datetime | None = Query(default=None),
+    target_type: str | None = Query(default=None),
+    target_id: UUID | None = Query(default=None),
     db: AsyncSession = Depends(get_db),
     _: User = Depends(require_staff),
 ) -> StreamingResponse:
@@ -397,6 +430,8 @@ async def export_donations_csv(
         payment_method=payment_method,
         date_from=date_from,
         date_to=date_to,
+        target_type=target_type,
+        target_id=target_id,
     )
     stmt = stmt.order_by(Donation.created_at.desc())  # type: ignore[union-attr]
     result = await db.execute(stmt)
@@ -426,6 +461,8 @@ async def list_donations(
     payment_method: str | None = Query(default=None),
     date_from: datetime | None = Query(default=None),
     date_to: datetime | None = Query(default=None),
+    target_type: str | None = Query(default=None),
+    target_id: UUID | None = Query(default=None),
     limit: int = Query(default=20, ge=1, le=100),
     offset: int = Query(default=0, ge=0),
     db: AsyncSession = Depends(get_db),
@@ -442,6 +479,8 @@ async def list_donations(
         payment_method=payment_method,
         date_from=date_from,
         date_to=date_to,
+        target_type=target_type,
+        target_id=target_id,
     )
     stmt = stmt.order_by(Donation.created_at.desc()).limit(limit).offset(offset)  # type: ignore[union-attr]
     result = await db.execute(stmt)
