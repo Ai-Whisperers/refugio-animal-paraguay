@@ -351,7 +351,7 @@ Week 3-4:
 | 2 | Pre-qualification questionnaire API | RAP-518 | 5 | DONE (PR #168) | Backend | RAP-517 |
 | 3 | Pre-qualification form UI | RAP-519 | 8 | DONE (PR #209) | Frontend | RAP-518 |
 | 4 | Qualification result page with alternatives | RAP-520 | 5 | READY | Frontend | RAP-519 |
-| 5 | Admin requirement configuration UI | RAP-521 | 5 | READY | Frontend | RAP-517 |
+| 5 | Admin requirement configuration UI | RAP-521 | 5 | DONE (PR #210) | Frontend | RAP-517 |
 | 6 | Smart matching algorithm | RAP-522 | 5 | DONE (PR #173) | Backend | RAP-518 |
 | 7 | Pre-qualification analytics | RAP-523 | 3 | DONE (PR #174) | Backend | RAP-518 |
 | 8 | Anti-gaming protection | RAP-524 | 2 | DONE (PR #175) | Backend | RAP-518 |
