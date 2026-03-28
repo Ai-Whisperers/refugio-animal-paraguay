@@ -89,6 +89,7 @@ from src.api.profile import router as profile_router
 from src.api.public import router as public_router
 from src.api.public_adoption import router as public_adoption_router
 from src.api.public_campaigns import router as public_campaigns_router
+from src.api.public_clinic_fund import router as public_clinic_fund_router
 from src.api.public_castration_campaigns import router as public_castration_campaigns_router
 from src.api.public_contact import router as public_contact_router
 from src.api.public_impact import router as public_impact_router
@@ -315,6 +316,7 @@ def create_app() -> FastAPI:
     application.include_router(pre_qualification_router)
     application.include_router(smart_matching_router)
     application.include_router(public_statistics_router)
+    application.include_router(public_clinic_fund_router)
     application.include_router(public_rescuer_support_router)
     application.include_router(public_sponsorships_router)
     application.include_router(public_impact_router)
