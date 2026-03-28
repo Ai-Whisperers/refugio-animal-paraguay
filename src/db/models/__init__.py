@@ -40,6 +40,7 @@ from .sponsorship import (
     SponsorshipTierLevel,
 )
 from .subscription import Subscription, SubscriptionInterval, SubscriptionStatus
+from .success_story import SuccessStory
 from .surgery import (
     AnesthesiaType,
     PostOpCheck,
@@ -78,8 +79,6 @@ __all__ = [
     "CastrationDrive",
     "CastrationPhoto",
     "CommunityNeed",
-    "NeedCategory",
-    "NeedStatus",
     "ConsentMethod",
     "ConsentStatus",
     "ConsentType",
@@ -100,6 +99,8 @@ __all__ = [
     "Medication",
     "MedicationFrequency",
     "MedicationStatus",
+    "NeedCategory",
+    "NeedStatus",
     "Notification",
     "NotificationChannel",
     "NotificationPreference",
@@ -117,6 +118,7 @@ __all__ = [
     "Subscription",
     "SubscriptionInterval",
     "SubscriptionStatus",
+    "SuccessStory",
     "Surgery",
     "SurgeryOutcome",
     "SurgeryStatus",
