@@ -28,6 +28,7 @@ class EventType(enum.StrEnum):
     # Donation domain
     DONATION_RECEIVED = "donation.received"
     DONATION_REFUNDED = "donation.refunded"
+    DONATION_ALLOCATED = "donation.allocated"
 
     # Medical domain
     MEDICAL_ALERT_CREATED = "medical.alert_created"
