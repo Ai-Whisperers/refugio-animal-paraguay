@@ -485,7 +485,7 @@ Week 3-4:
 | 2 | Pipeline status tracking API | RAP-589 | 5 | DONE | Backend |
 | 3 | Adoption pipeline board UI | RAP-590 | 8 | READY | Frontend |
 | 4 | Home visit scheduling | RAP-591 | 5 | READY | Fullstack |
-| 5 | Trial period management | RAP-592 | 5 | READY | Fullstack |
+| 5 | Trial period management | RAP-592 | 5 | PR #248 | Fullstack |
 | 6 | Post-adoption follow-up automation | RAP-593 | 5 | DONE | Backend |
 | 7 | Return/exchange management | RAP-594 | 3 | DONE | Backend |
 | 8 | Adoption success scoring | RAP-595 | 5 | DONE | Backend |
