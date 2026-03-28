@@ -96,6 +96,7 @@ import type {
   CastrationCampaignListResponse,
   DonationCreateRequest,
   DonationResponse,
+  ImpactReportResponse,
   DonorCreateRequest,
   DonorResponse,
   FundCategory,
@@ -406,5 +407,19 @@ export async function getCastrationCampaignPublic(
   return api.get<CastrationCampaignPublic>(
     `/public/castration-campaigns/${campaignId}`,
     NO_AUTH
+  );
+}
+
+// --- Castration Impact Report ---
+
+/**
+ * Fetch the impact report for a castration campaign.
+ * GET /public/castration-campaigns/{campaignId}/report
+ */
+export async function getCastrationCampaignReport(
+  campaignId: string
+): Promise<ImpactReportResponse> {
+  return apiFetch<ImpactReportResponse>(
+    `/public/castration-campaigns/${campaignId}/report`
   );
 }

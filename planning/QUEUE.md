@@ -407,7 +407,7 @@ Week 3-4:
 | 1 | Public statistics API | RAP-573 | 3 | DONE (PR #177) | Backend |
 | 2 | Homepage live statistics | RAP-574 | 3 | DONE (PR #218) | Frontend |
 | 3 | Public impact page | RAP-575 | 5 | READY | Fullstack |
-| 4 | Castration counter widget | RAP-576 | 3 | READY | Fullstack |
+| 4 | Castration counter widget | RAP-576 | 3 | DONE (PR #219) | Fullstack |
 | 5 | Admin real-time activity feed | RAP-577 | 5 | READY | Fullstack |
 | 6 | Real-time donation notifications | RAP-578 | 5 | DONE (PR #183) | Backend |
 | 7 | Campaign real-time progress | RAP-579 | 3 | READY | Frontend |
