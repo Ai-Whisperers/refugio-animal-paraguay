@@ -425,9 +425,9 @@ Week 3-4:
 | 1 | Rescuer self-registration and profile model | RAP-533 | 5 | DONE (PR #184) | Backend | RAP-500 (EPIC-76) |
 | 2 | Rescuer profile page | RAP-534 | 8 | READY | Fullstack | RAP-533 |
 | 3 | Rescuer animal listing management | RAP-535 | 8 | READY | Fullstack | RAP-533 |
-| 4 | Rescuer campaign creation | RAP-536 | 5 | READY | Fullstack | RAP-534 |
+| 4 | Rescuer campaign creation | RAP-536 | 5 | BLOCKED | Fullstack | RAP-534 |
 | 5 | Needs board | RAP-537 | 5 | READY | Fullstack | RAP-533 |
-| 6 | Community feed | RAP-538 | 5 | READY | Fullstack | RAP-534 |
+| 6 | Community feed | RAP-538 | 5 | BLOCKED | Fullstack | RAP-534 |
 | 7 | Donor choice interface | RAP-539 | 5 | READY | Fullstack | RAP-543 (EPIC-81) |
 | 8 | Rescuer verification system | RAP-540 | 3 | DONE (PR #185) | Backend | RAP-533 |
 | 9 | Admin moderation tools | RAP-541 | 5 | READY | Fullstack | RAP-533 |
@@ -495,26 +495,26 @@ Week 3-4:
 | # | Story | Ticket | Pts | Status | Track |
 |---|-------|--------|-----|--------|-------|
 | 1 | PWA manifest and service worker setup | RAP-596 | 5 | PR #255 | Frontend |
-| 2 | Responsive design audit and fixes | RAP-597 | 6 | PR #256 | Frontend |
-| 3 | Camera integration for forms | RAP-598 | 7 | PR #259 | Fullstack |
-| 4 | Offline donation forms with IndexedDB | RAP-599 | 6 | PR #258 | Fullstack |
-| 5 | Web push notifications | RAP-600 | 6 | PR #257 | Fullstack |
-| 6 | Touch-friendly admin interface | RAP-601 | 4 | PR #254 | Frontend |
+| 2 | Responsive design audit and fixes | RAP-597 | 6 | DONE (PR #256) | Frontend |
+| 3 | Camera integration for forms | RAP-598 | 7 | DONE (PR #259) | Fullstack |
+| 4 | Offline donation forms with IndexedDB | RAP-599 | 6 | DONE (PR #258) | Fullstack |
+| 5 | Web push notifications | RAP-600 | 6 | DONE (PR #257) | Fullstack |
+| 6 | Touch-friendly admin interface | RAP-601 | 4 | DONE (PR #254) | Frontend |
 | 7 | App-like bottom navigation bar | RAP-602 | 4 | PR #253 | Frontend |
-| 8 | Performance optimization and bundling | RAP-603 | 3 | PR #252 | Fullstack |
+| 8 | Performance optimization and bundling | RAP-603 | 3 | DONE (PR #252) | Fullstack |
 
 ### EPIC-89: Financial Transparency & Impact Reporting (38 pts)
 
 | # | Story | Ticket | Pts | Status | Track |
 |---|-------|--------|-----|--------|-------|
 | 1 | Expense recording system | RAP-604 | 6 | PR #262 | Fullstack |
-| 2 | Expense management UI with receipts | RAP-605 | 5 | PR #263 | Frontend |
-| 3 | Financial transparency dashboard | RAP-606 | 7 | PR #264 | Fullstack |
-| 4 | Campaign-specific financial reports | RAP-607 | 5 | PR #265 | Fullstack |
-| 5 | Donor impact summaries | RAP-608 | 6 | PR #266 | Fullstack |
+| 2 | Expense management UI with receipts | RAP-605 | 5 | DONE (PR #263) | Frontend |
+| 3 | Financial transparency dashboard | RAP-606 | 7 | DONE (PR #264) | Fullstack |
+| 4 | Campaign-specific financial reports | RAP-607 | 5 | DONE (PR #265) | Fullstack |
+| 5 | Donor impact summaries | RAP-608 | 6 | DONE (PR #266) | Fullstack |
 | 6 | Automated monthly impact emails | RAP-609 | 4 | DONE (PR #206) | Backend |
 | 7 | Annual financial report generation | RAP-610 | 3 | PR #261 | Backend |
-| 8 | Expense approval workflow | RAP-611 | 2 | PR #260 | Fullstack |
+| 8 | Expense approval workflow | RAP-611 | 2 | DONE (PR #260) | Fullstack |
 
 ---
 
@@ -528,7 +528,7 @@ Week 3-4:
 |---|-------|--------|-----|--------|-------|
 | 1 | Survey model with question types | RAP-612 | 5 | DONE | Backend |
 | 2 | Admin survey creation form | RAP-613 | 6 | READY | Fullstack |
-| 3 | Public survey response collection | RAP-614 | 4 | PR #268 | Fullstack |
+| 3 | Public survey response collection | RAP-614 | 4 | DONE (PR #268) | Fullstack |
 | 4 | Survey results analytics dashboard | RAP-615 | 5 | READY | Fullstack |
 | 5 | Community feature request board | RAP-616 | 3 | PR #267 | Frontend |
 | 6 | Survey distribution via WhatsApp/email | RAP-617 | 3 | PR #205 | Backend |
@@ -549,7 +549,7 @@ Week 3-4:
 
 | # | Story | Ticket | Pts | Status | Track |
 |---|-------|--------|-----|--------|-------|
-| 1 | Educational article model and API | RAP-625 | 4 | PR #202 | Backend |
+| 1 | Educational article model and API | RAP-625 | 4 | DONE (PR #202) | Backend |
 | 2 | Education hub public page | RAP-626 | 5 | READY | Frontend |
 | 3 | Article detail page with related articles | RAP-627 | 5 | READY | Frontend |
 | 4 | Required pre-adoption reading enforcement | RAP-628 | 4 | READY | Fullstack |
