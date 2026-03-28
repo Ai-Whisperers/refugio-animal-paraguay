@@ -425,7 +425,7 @@ Week 3-4:
 | 1 | Rescuer self-registration and profile model | RAP-533 | 5 | DONE (PR #184) | Backend | RAP-500 (EPIC-76) |
 | 2 | Rescuer profile page | RAP-534 | Rescuer profile page | 8 | EPIC-80 | DONE (PR #292) |
 | 3 | Rescuer animal listing management | RAP-535 | Rescuer animal listing management | 8 | EPIC-80 | DONE (PR #293) |
-| 4 | Rescuer campaign creation | RAP-536 | 5 | BLOCKED | Fullstack | RAP-534 | Rescuer profile page | 8 | EPIC-80 | DONE (PR #292) |
+| 4 | Rescuer campaign creation | RAP-536 | 5 | DONE (PR #299) | Fullstack | RAP-534 | Rescuer profile page | 8 | EPIC-80 | DONE (PR #292) |
 | 5 | Needs board | RAP-537 | 5 | DONE (PR #289) | Fullstack | RAP-533 |
 | 6 | Community feed | RAP-538 | 5 | BLOCKED | Fullstack | RAP-534 | Rescuer profile page | 8 | EPIC-80 | DONE (PR #292) |
 | 7 | Donor choice interface | RAP-539 | Donor choice interface | 5 | EPIC-80 | DONE (PR #290) |
