@@ -310,3 +310,100 @@ async def test_delete_nonexistent_task_returns_404(client: AsyncClient) -> None:
     """Deleting a non-existent task returns 404."""
     resp = await client.delete(f"/api/tasks/{uuid.uuid4()}")
     assert resp.status_code == 404
+
+
+# ---------------------------------------------------------------------------
+# GET /api/tasks/summary/daily  (RAP-189)
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+@pytest.mark.integration
+async def test_daily_summary_empty(client: AsyncClient) -> None:
+    """Daily summary returns zeros when no tasks exist."""
+    resp = await client.get("/api/tasks/summary/daily")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["total"] == 0
+    assert data["pending"] == 0
+    assert data["in_progress"] == 0
+    assert data["completed"] == 0
+    assert data["cancelled"] == 0
+    assert data["overdue"] == 0
+    assert data["completion_rate"] == 0.0
+    assert data["by_category"] == {}
+    assert data["by_priority"] == {}
+    assert "report_date" in data
+
+
+@pytest.mark.asyncio
+@pytest.mark.integration
+async def test_daily_summary_counts_tasks(client: AsyncClient) -> None:
+    """Daily summary correctly counts tasks by status."""
+    r1 = await client.post("/api/tasks", json={"title": "Task A", "category": "feeding", "priority": "high"})
+    assert r1.status_code == 201
+    r2 = await client.post("/api/tasks", json={"title": "Task B", "category": "cleaning", "priority": "medium"})
+    assert r2.status_code == 201
+    r3 = await client.post("/api/tasks", json={"title": "Task C", "category": "feeding", "priority": "low"})
+    assert r3.status_code == 201
+
+    await client.patch(f"/api/tasks/{r2.json()['id']}", json={"status": "in_progress"})
+    await client.patch(f"/api/tasks/{r3.json()['id']}", json={"status": "completed"})
+
+    resp = await client.get("/api/tasks/summary/daily")
+    assert resp.status_code == 200
+    data = resp.json()
+
+    assert data["total"] == 3
+    assert data["pending"] == 1
+    assert data["in_progress"] == 1
+    assert data["completed"] == 1
+    assert data["cancelled"] == 0
+    assert pytest.approx(data["completion_rate"], abs=1e-3) == 1 / 3
+
+
+@pytest.mark.asyncio
+@pytest.mark.integration
+async def test_daily_summary_by_category(client: AsyncClient) -> None:
+    """Daily summary aggregates task counts by category."""
+    await client.post("/api/tasks", json={"title": "Feed 1", "category": "feeding"})
+    await client.post("/api/tasks", json={"title": "Feed 2", "category": "feeding"})
+    await client.post("/api/tasks", json={"title": "Clean 1", "category": "cleaning"})
+
+    resp = await client.get("/api/tasks/summary/daily")
+    assert resp.status_code == 200
+    data = resp.json()
+    assert data["by_category"]["feeding"] == 2
+    assert data["by_category"]["cleaning"] == 1
+
+
+@pytest.mark.asyncio
+@pytest.mark.integration
+async def test_daily_summary_overdue_count(client: AsyncClient) -> None:
+    """Daily summary counts overdue non-completed tasks."""
+    past_due = "2020-01-01T00:00:00Z"
+    future_due = "2099-01-01T00:00:00Z"
+
+    await client.post("/api/tasks", json={"title": "Overdue task", "due_date": past_due})
+    await client.post("/api/tasks", json={"title": "Future task", "due_date": future_due})
+
+    resp = await client.get("/api/tasks/summary/daily")
+    data = resp.json()
+    assert data["overdue"] == 1
+
+
+@pytest.mark.asyncio
+@pytest.mark.integration
+async def test_daily_summary_with_explicit_date(client: AsyncClient) -> None:
+    """Daily summary accepts an explicit report_date query param."""
+    resp = await client.get("/api/tasks/summary/daily?report_date=2026-03-28")
+    assert resp.status_code == 200
+    assert resp.json()["report_date"] == "2026-03-28"
+
+
+@pytest.mark.asyncio
+@pytest.mark.integration
+async def test_daily_summary_invalid_date_returns_422(client: AsyncClient) -> None:
+    """Invalid date format returns 422."""
+    resp = await client.get("/api/tasks/summary/daily?report_date=not-a-date")
+    assert resp.status_code == 422
