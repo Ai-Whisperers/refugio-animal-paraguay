@@ -1059,6 +1059,68 @@ export interface ShiftCreateRequest {
   location?: string | null;
 }
 
+// --- Tasks ---
+
+export type TaskStatus = "pending" | "in_progress" | "completed" | "cancelled";
+
+export type TaskCategory =
+  | "feeding"
+  | "cleaning"
+  | "walking"
+  | "socialization"
+  | "veterinary_assistance"
+  | "transport"
+  | "admin"
+  | "other";
+
+export type TaskPriority = "low" | "medium" | "high" | "urgent";
+
+export interface Task {
+  id: string;
+  created_by: string;
+  assigned_to: string | null;
+  title: string;
+  description: string | null;
+  category: TaskCategory;
+  priority: TaskPriority;
+  status: TaskStatus;
+  due_date: string | null; // ISO datetime
+  completed_at: string | null; // ISO datetime
+  completion_notes: string | null;
+  animal_id: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TaskListResponse {
+  items: Task[];
+  total: number;
+  page: number;
+  page_size: number;
+}
+
+export interface TaskCreateRequest {
+  title: string;
+  description?: string | null;
+  category?: TaskCategory;
+  priority?: TaskPriority;
+  assigned_to?: string | null;
+  due_date?: string | null;
+  animal_id?: string | null;
+}
+
+export interface TaskUpdateRequest {
+  title?: string | null;
+  description?: string | null;
+  category?: TaskCategory | null;
+  priority?: TaskPriority | null;
+  status?: TaskStatus | null;
+  assigned_to?: string | null;
+  due_date?: string | null;
+  animal_id?: string | null;
+  completion_notes?: string | null;
+}
+
 // --- API Error ---
 
 export interface ApiError {
