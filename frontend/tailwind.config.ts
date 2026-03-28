@@ -76,6 +76,15 @@ const config: Config = {
         sans: ["Inter", "system-ui", "-apple-system", "sans-serif"],
         heading: ["Inter", "system-ui", "-apple-system", "sans-serif"],
       },
+      keyframes: {
+        fadeIn: {
+          "0%": { opacity: "0", transform: "translateY(-4px)" },
+          "100%": { opacity: "1", transform: "translateY(0)" },
+        },
+      },
+      animation: {
+        fadeIn: "fadeIn 0.3s ease-out",
+      },
     },
   },
   plugins: [],

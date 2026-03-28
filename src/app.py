@@ -129,6 +129,7 @@ from src.middleware.error_handler import register_exception_handlers
 from src.middleware.logging_middleware import RequestLoggingMiddleware
 from src.middleware.rate_limiter import configure_limiter, limiter
 from src.middleware.request_id import RequestIDMiddleware
+from src.notifications.activity_sse_handlers import ActivitySSEHandlers
 from src.notifications.donation_sse_handlers import DonationSSEHandlers
 from src.notifications.handlers import NotificationHandlers
 from src.notifications.in_app_handlers import InAppNotificationHandlers
@@ -171,6 +172,10 @@ async def lifespan(application: FastAPI) -> AsyncGenerator[None, None]:
     # Register SSE handlers for real-time admin dashboard notifications
     donation_sse_handlers = DonationSSEHandlers(sse_manager)
     donation_sse_handlers.register(event_bus)
+
+    # Register activity feed SSE handlers (broadcasts all events to admin feed)
+    activity_sse_handlers = ActivitySSEHandlers(sse_manager)
+    activity_sse_handlers.register(event_bus)
 
     # Attach SEPA notification service for webhook handlers
     application.state.sepa_notifier = SepaNotificationService(email_service, renderer)

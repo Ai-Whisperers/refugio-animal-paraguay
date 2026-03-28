@@ -14,6 +14,7 @@ import {
 import { isAuthenticated, getAccessToken, decodeToken } from "@/lib/auth";
 import { api } from "@/lib/api";
 import type { UserRole } from "@/types/api";
+import ActivityFeed from "@/components/ActivityFeed";
 
 // -- Spanish labels --
 const LABEL_DASHBOARD = "Panel de Administracion";
@@ -270,34 +271,42 @@ export default function AdminDashboardPage() {
         </div>
       )}
 
-      {/* Quick Links */}
-      <div className="mt-8">
-        <h2 className="mb-4 text-lg font-semibold text-warm-text-primary">{LABEL_QUICK_LINKS}</h2>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <QuickLink
-            label={LABEL_VIEW_ANIMALS}
-            href="/admin/animals"
-            icon={PawPrint}
-            description="Gestionar registro de animales"
-          />
-          <QuickLink
-            label={LABEL_VIEW_ADOPTIONS}
-            href="/admin/adoptions"
-            icon={Heart}
-            description="Revisar solicitudes de adopcion"
-          />
-          <QuickLink
-            label={LABEL_VIEW_DONATIONS}
-            href="/admin/donations"
-            icon={DollarSign}
-            description="Historial de donaciones"
-          />
-          <QuickLink
-            label={LABEL_VIEW_DONORS}
-            href="/admin/donors"
-            icon={Users}
-            description="Perfiles de donantes"
-          />
+      {/* Activity Feed + Quick Links side by side on large screens */}
+      <div className="mt-8 grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Activity Feed — takes 2/3 */}
+        <div className="lg:col-span-2">
+          <ActivityFeed />
+        </div>
+
+        {/* Quick Links — takes 1/3 */}
+        <div>
+          <h2 className="mb-4 text-lg font-semibold text-warm-text-primary">{LABEL_QUICK_LINKS}</h2>
+          <div className="grid grid-cols-1 gap-3">
+            <QuickLink
+              label={LABEL_VIEW_ANIMALS}
+              href="/admin/animals"
+              icon={PawPrint}
+              description="Gestionar registro de animales"
+            />
+            <QuickLink
+              label={LABEL_VIEW_ADOPTIONS}
+              href="/admin/adoptions"
+              icon={Heart}
+              description="Revisar solicitudes de adopcion"
+            />
+            <QuickLink
+              label={LABEL_VIEW_DONATIONS}
+              href="/admin/donations"
+              icon={DollarSign}
+              description="Historial de donaciones"
+            />
+            <QuickLink
+              label={LABEL_VIEW_DONORS}
+              href="/admin/donors"
+              icon={Users}
+              description="Perfiles de donantes"
+            />
+          </div>
         </div>
       </div>
     </div>
