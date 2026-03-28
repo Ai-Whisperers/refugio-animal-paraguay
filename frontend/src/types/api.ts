@@ -794,6 +794,46 @@ export interface LeaderboardResponse {
   total_donors: number;
   total_raised_cents: number;
   currency: CurrencyCode;
+// --- Castration Impact Report ---
+
+export interface ClinicContribution {
+  clinic_id: string;
+  clinic_name: string;
+  drives_hosted: number;
+}
+
+export interface DrivesSummary {
+  total_drives: number;
+  completed_drives: number;
+  total_registered: number;
+  total_completed: number;
+}
+
+export interface PhotoSummary {
+  total_photos: number;
+  before_count: number;
+  after_count: number;
+  recovery_count: number;
+  featured_urls: string[];
+}
+
+export interface ImpactReportResponse {
+  campaign_id: string;
+  title: string;
+  description: string;
+  target_area: string;
+  start_date: string;
+  end_date: string;
+  status: string;
+  is_complete: boolean;
+  target_count: number;
+  completed_count: number;
+  progress_percent: number;
+  campaign_duration_days: number;
+  clinics: ClinicContribution[];
+  total_clinics: number;
+  drives: DrivesSummary;
+  photos: PhotoSummary;
 }
 
 // --- API Error ---
