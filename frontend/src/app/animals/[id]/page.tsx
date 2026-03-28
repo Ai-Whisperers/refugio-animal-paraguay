@@ -10,6 +10,7 @@ import { getAnimalPublic } from "@/lib/public-api";
 import { STATUS_LABELS, statusBadgeClass, calculateAge } from "@/lib/animal-utils";
 import { ANIMAL_DETAIL, COMMON, SPECIES_LABELS, formatDate } from "@/lib/strings";
 import AnimalPlaceholder from "@/components/AnimalPlaceholder";
+import WhatsAppShareButton from "@/components/WhatsAppShareButton";
 
 const WHATSAPP_BASE = "https://wa.me/595981000000";
 
@@ -188,9 +189,18 @@ export default function AnimalDetailPage() {
 
           {/* Info Section */}
           <div className="p-6 md:p-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">
-              {animal.name}
-            </h1>
+            <div className="flex items-center gap-3 mb-4">
+              <h1 className="text-3xl font-bold text-gray-900">
+                {animal.name}
+              </h1>
+              <WhatsAppShareButton
+                animalName={animal.name}
+                species={animal.species}
+                birthDate={animal.birth_date}
+                animalId={animal.id}
+                size="md"
+              />
+            </div>
 
             {/* Details Grid */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
