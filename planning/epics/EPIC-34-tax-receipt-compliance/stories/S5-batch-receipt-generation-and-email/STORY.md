@@ -3,7 +3,7 @@ story: S5
 epic: EPIC-34
 ticket: RAP-169
 title: "Batch receipt generation and email"
-status: planned
+status: done
 points: 5
 priority: P2
 track: Backend
