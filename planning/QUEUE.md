@@ -438,7 +438,7 @@ Week 3-4:
 | # | Story | Ticket | Pts | Status | Track |
 |---|-------|--------|-----|--------|-------|
 | 1 | CMS content model and API | RAP-551 | 5 | DONE (PR #187) | Backend |
-| 2 | Homepage dynamic content | RAP-552 | 5 | READY | Fullstack |
+| 2 | Homepage dynamic content | RAP-552 | 5 | IN_REVIEW (PR #241) | Fullstack |
 | 3 | Admin content editor | RAP-553 | 8 | READY | Frontend |
 | 4 | Success stories CRUD | RAP-554 | 5 | READY | Fullstack |
 | 5 | News/blog posts | RAP-555 | 5 | READY | Fullstack |
