@@ -250,6 +250,7 @@ def create_app() -> FastAPI:
     application.include_router(prescriptions_router)
     application.include_router(profile_router)
     application.include_router(vet_clinics_router)
+    application.include_router(clinic_services_router)
     application.include_router(vet_vouchers_router)
     application.include_router(rescuer_vouchers_router)
     application.include_router(rescuer_profiles_router)
