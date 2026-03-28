@@ -58,6 +58,7 @@ from src.api.donation_analytics import router as donation_analytics_router
 from src.api.donations import router as donations_router
 from src.api.donor_impact import router as donor_impact_router
 from src.api.donor_leaderboard import router as donor_leaderboard_router
+from src.api.donor_retention_analytics import router as donor_retention_analytics_router
 from src.api.donors import router as donors_router
 from src.api.driver_reimbursement import router as driver_reimbursement_router
 from src.api.educational_article import admin_router as article_admin_router
@@ -412,6 +413,7 @@ def create_app() -> FastAPI:
     application.include_router(vet_analytics_router)
     application.include_router(report_export_router)
     application.include_router(donation_analytics_router)
+    application.include_router(donor_retention_analytics_router)
 
     return application
 
