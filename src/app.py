@@ -42,6 +42,8 @@ from src.api.castration_photos import public_router as castration_photos_public_
 from src.api.castration_report import admin_router as castration_report_admin_router
 from src.api.castration_report import public_router as castration_report_public_router
 from src.api.clinic_redemption import router as clinic_redemption_router
+from src.api.community_needs import admin_router as community_needs_admin_router
+from src.api.community_needs import public_router as community_needs_public_router
 from src.api.clinic_services import router as clinic_services_router
 from src.api.cms import public_router as cms_public_router
 from src.api.cms import router as cms_router
@@ -346,6 +348,8 @@ def create_app() -> FastAPI:
     application.include_router(donor_leaderboard_router)
     application.include_router(castration_report_admin_router)
     application.include_router(castration_report_public_router)
+    application.include_router(community_needs_public_router)
+    application.include_router(community_needs_admin_router)
 
     return application
 

@@ -163,17 +163,22 @@ async def _validate_rescuer_target(db: AsyncSession, target_id: UUID) -> None:
 
 
 async def _validate_need_target(db: AsyncSession, target_id: UUID) -> None:
-    """Validate that a need target exists.
+    """Validate that a community need target exists and is open for donations."""
+    from src.db.models.community_need import CommunityNeed, NeedStatus
 
-    Note: Need model may not exist yet (EPIC-80). This is a forward-looking
-    validation stub. For now, accepts any valid UUID to allow future integration.
-    """
-    # Needs model will be added in a future story. For now, we log a warning
-    # and allow it through to avoid blocking the target type system.
-    logger.warning(
-        "Need target validation is a stub — need %s accepted without verification",
-        target_id,
-    )
+    need = await db.get(CommunityNeed, target_id)
+    if need is None:
+        raise InvalidTargetError(
+            target_type=DonationTargetType.NEED,
+            target_id=target_id,
+            reason=f"Community need {target_id} not found",
+        )
+    if need.status != NeedStatus.OPEN:
+        raise TargetNotActiveError(
+            target_type=DonationTargetType.NEED,
+            target_id=target_id,
+            reason=f"Community need {target_id} is not open (status: {need.status})",
+        )
 
 
 # Map of target types to their validation functions
