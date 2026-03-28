@@ -442,7 +442,7 @@ Week 3-4:
 | 3 | Admin content editor | RAP-553 | 8 | READY | Frontend |
 | 4 | Success stories CRUD | RAP-554 | 5 | READY | Fullstack |
 | 5 | News/blog posts | RAP-555 | 5 | READY | Fullstack |
-| 6 | Featured animals on homepage | RAP-556 | 3 | READY | Fullstack |
+| 6 | Featured animals on homepage | RAP-556 | 3 | IN_REVIEW (PR #237) | Fullstack |
 | 7 | Featured campaigns on homepage | RAP-557 | 3 | READY | Fullstack |
 | 8 | Multilingual content support | RAP-558 | 5 | DONE (PR #188) | Backend |
 
