@@ -108,6 +108,7 @@ import type {
   PreQualifyRequest,
   PreQualifyResult,
   PublicAdoptionApplicationCreate,
+  PublicStatisticsResponse,
   PublicAdoptionApplicationResponse,
   StripeIntentResponse,
   SubscriptionCreateRequest,
@@ -479,4 +480,12 @@ export async function getCastrationCampaignReport(
   return apiFetch<ImpactReportResponse>(
     `/public/castration-campaigns/${campaignId}/report`
   );
+// --- Public Statistics ---
+
+/**
+ * Fetch public shelter statistics (cached 5 min).
+ * GET /api/stats/public
+ */
+export async function getPublicStatistics(): Promise<PublicStatisticsResponse> {
+  return apiFetch<PublicStatisticsResponse>("/api/stats/public");
 }
