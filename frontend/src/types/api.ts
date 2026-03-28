@@ -834,6 +834,7 @@ export interface ImpactReportResponse {
   total_clinics: number;
   drives: DrivesSummary;
   photos: PhotoSummary;
+
 // --- Public Statistics ---
 
 export interface PublicStatisticsResponse {

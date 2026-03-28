@@ -110,6 +110,7 @@ import type {
   PublicAdoptionApplicationCreate,
   PublicStatisticsResponse,
   PublicAdoptionApplicationResponse,
+  PublicStatisticsResponse,
   StripeIntentResponse,
   SubscriptionCreateRequest,
   SubscriptionDetailResponse,
@@ -414,6 +415,7 @@ export async function getCastrationCampaignPublic(
   );
 }
 
+<<<<<<< HEAD
 // --- Castration Drives ---
 
 /**
@@ -480,6 +482,8 @@ export async function getCastrationCampaignReport(
   return apiFetch<ImpactReportResponse>(
     `/public/castration-campaigns/${campaignId}/report`
   );
+=======
+>>>>>>> ee334d0 (RAP-576: Add reusable CastrationCounter widget)
 // --- Public Statistics ---
 
 /**
