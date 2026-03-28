@@ -386,7 +386,7 @@ Week 3-4:
 | 5 | Need-specific donation | RAP-547 | 3 | IN_REVIEW (PR #232) | Fullstack | RAP-543 |
 | 6 | Donation allocation tracking API | RAP-548 | 5 | DONE (PR #172) | Backend | RAP-543 |
 | 7 | Impact notification system | RAP-549 | 5 | DONE (PR #176) | Backend | RAP-548 |
-| 8 | Fund management dashboard | RAP-550 | 5 | READY | Fullstack | RAP-548 |
+| 8 | Fund management dashboard | RAP-550 | 5 | IN_REVIEW (PR #236) | Fullstack | RAP-548 |
 
 ### EPIC-83: Photo Upload & Media Management (35 pts)
 
