@@ -486,8 +486,8 @@ Week 3-4:
 | 3 | Adoption pipeline board UI | RAP-590 | 8 | READY | Frontend |
 | 4 | Home visit scheduling | RAP-591 | 5 | READY | Fullstack |
 | 5 | Trial period management | RAP-592 | 5 | READY | Fullstack |
-| 6 | Post-adoption follow-up automation | RAP-593 | 5 | IN PR #TBD | Backend |
-| 7 | Return/exchange management | RAP-594 | 3 | READY | Backend |
+| 6 | Post-adoption follow-up automation | RAP-593 | 5 | DONE | Backend |
+| 7 | Return/exchange management | RAP-594 | 3 | IN PR #198 | Backend |
 | 8 | Adoption success scoring | RAP-595 | 5 | READY | Backend |
 
 ### EPIC-88: Mobile-First PWA (41 pts)
@@ -537,7 +537,7 @@ Week 3-4:
 
 | # | Story | Ticket | Pts | Status | Track |
 |---|-------|--------|-----|--------|-------|
-| 1 | Transport request model and API | RAP-618 | 4 | READY | Backend |
+| 1 | Transport request model and API | RAP-618 | 4 | IN PR #201 | Backend |
 | 2 | Transport request creation form | RAP-619 | 5 | READY | Fullstack |
 | 3 | Volunteer driver registration | RAP-620 | 5 | READY | Fullstack |
 | 4 | Intelligent request matching and notification | RAP-621 | 6 | READY | Fullstack |
