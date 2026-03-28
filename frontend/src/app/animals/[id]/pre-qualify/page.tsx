@@ -27,6 +27,7 @@ import AnimalPlaceholder from "@/components/AnimalPlaceholder";
 
 // --- Constants ---
 const STORAGE_KEY_PREFIX = "refugio_prequal_";
+const RESULT_STORAGE_KEY = "refugio_prequal_result_";
 const MAX_CHILD_AGE = 18;
 const MAX_HOURS_ALONE = 24;
 
@@ -554,8 +555,19 @@ export default function PreQualifyPage() {
         animal_id: animal.id,
         answers,
       });
+      // Store result in sessionStorage for the dedicated result page
+      try {
+        sessionStorage.setItem(
+          `${RESULT_STORAGE_KEY}${params.id}`,
+          JSON.stringify(qualResult)
+        );
+      } catch {
+        // sessionStorage unavailable — fall back to inline result
+      }
       setResult(qualResult);
       clearSavedValues(params.id);
+      // Navigate to dedicated result page
+      router.push(`/animals/${params.id}/pre-qualify/result`);
     } catch (err) {
       setSubmitError(
         err instanceof Error ? err.message : PRE_QUALIFY.submitError
