@@ -685,6 +685,42 @@ export interface PreQualifyResult {
   estimated_wait_time: string;
 }
 
+// --- Castration Photos ---
+
+export type CastrationPhotoType = "before" | "after" | "recovery";
+
+export interface CastrationPhoto {
+  id: string;
+  vet_voucher_id: string;
+  campaign_id: string;
+  photo_url: string;
+  photo_type: CastrationPhotoType;
+  animal_name: string;
+  animal_species: string | null;
+  notes: string | null;
+  public_consent: boolean;
+  is_featured: boolean;
+  uploaded_by_clinic_id: string | null;
+  uploaded_at: string;
+}
+
+export interface CastrationPhotoPublic {
+  id: string;
+  photo_url: string;
+  photo_type: CastrationPhotoType;
+  animal_name: string;
+  animal_species: string | null;
+  is_featured: boolean;
+  uploaded_at: string;
+}
+
+export interface CastrationGalleryResponse {
+  items: CastrationPhotoPublic[];
+  total: number;
+  page: number;
+  page_size: number;
+}
+
 // --- API Error ---
 
 export interface ApiError {

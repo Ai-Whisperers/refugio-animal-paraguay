@@ -91,6 +91,7 @@ import type {
   AnimalGender,
   CampaignListResponse,
   CampaignPublic,
+  CastrationGalleryResponse,
   CampaignSocialProof,
   DonationCreateRequest,
   DonationResponse,
@@ -381,4 +382,26 @@ export async function submitPreQualification(
     method: "POST",
     body: JSON.stringify(data),
   });
+}
+
+// --- Castration Campaign Gallery ---
+
+/**
+ * Fetch public gallery photos for a castration campaign.
+ * GET /public/castration-campaigns/{campaignId}/gallery
+ */
+export async function getCastrationCampaignGallery(
+  campaignId: string,
+  page = 1,
+  pageSize = 20,
+  photoType?: string
+): Promise<CastrationGalleryResponse> {
+  const params = new URLSearchParams({
+    page: String(page),
+    page_size: String(pageSize),
+  });
+  if (photoType) params.set("photo_type", photoType);
+  return apiFetch<CastrationGalleryResponse>(
+    `/public/castration-campaigns/${campaignId}/gallery?${params}`
+  );
 }

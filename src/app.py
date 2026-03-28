@@ -35,6 +35,8 @@ from src.api.animals import router as animals_router
 from src.api.appointments import router as appointments_router
 from src.api.auth import router as auth_router
 from src.api.campaign_voucher_integration import router as campaign_voucher_integration_router
+from src.api.castration_photos import admin_router as castration_photos_admin_router
+from src.api.castration_photos import public_router as castration_photos_public_router
 from src.api.clinic_redemption import router as clinic_redemption_router
 from src.api.clinic_services import router as clinic_services_router
 from src.api.cms import public_router as cms_public_router
@@ -323,6 +325,8 @@ def create_app() -> FastAPI:
     application.include_router(driver_reimbursement_router)
     application.include_router(article_admin_router)
     application.include_router(article_public_router)
+    application.include_router(castration_photos_admin_router)
+    application.include_router(castration_photos_public_router)
 
     return application
 
