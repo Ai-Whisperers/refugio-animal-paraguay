@@ -619,3 +619,11 @@
 - **Tickets**: current.md empty, no orphaned ACTIVE tickets
 - **Branches**: local feature/RAP-643 deleted; remote feature/RAP-643 deleted; feature/RAP-642 kept (open conflicting PR)
 - **Actions taken**: Merged PR #304, attempted rebase of #303 (failed), updated QUEUE.md + 2 STORY.md files, pruned branches
+
+### [2026-03-28 14:20] Worker Run — RAP-179 Complete
+- **Epic**: EPIC-36 — Volunteer Registration & Profiles (S5)
+- **Story**: RAP-179 — S5: Volunteer directory for staff
+- **PR created**: #305
+- **Duration**: ~35m
+- **Quality**: Vitest 24/24 new tests passing; ruff/black/pytest issues all pre-existing (0 new failures introduced)
+- **Notes**: useEffect deps fix applied — removed `router` from deps to prevent repeated API calls in test env; skill tags appear in both filter dropdown and card which required `getAllByText` in one test

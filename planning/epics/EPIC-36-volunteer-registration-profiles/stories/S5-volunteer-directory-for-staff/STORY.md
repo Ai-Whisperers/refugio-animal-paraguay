@@ -3,7 +3,7 @@ story: S5
 epic: EPIC-36
 ticket: RAP-179
 title: "Volunteer directory for staff"
-status: planned
+status: done
 points: 3
 priority: P2
 track: Frontend
