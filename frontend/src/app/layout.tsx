@@ -4,6 +4,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import WhatsAppFab from "@/components/WhatsAppFab";
+import WebVitals from "@/components/WebVitals";
 import { SITE_TITLE, SITE_DESCRIPTION, SKIP_LINK } from "@/lib/strings";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -55,6 +56,7 @@ export default function RootLayout({
         </main>
         <Footer />
         <WhatsAppFab />
+        <WebVitals />
       </body>
     </html>
   );

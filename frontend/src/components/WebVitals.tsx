@@ -6,7 +6,7 @@ import { useEffect } from "react";
  * Core Web Vitals reporter.
  *
  * Logs LCP, FID, CLS, TTFB, and INP to console in development
- * and can be extended to send to an analytics endpoint in production.
+ * and sends metrics to analytics endpoint in production.
  */
 
 interface WebVitalMetric {
@@ -71,7 +71,7 @@ export default function WebVitals() {
       onTTFB(handler);
       onINP(handler);
     }).catch(() => {
-      // web-vitals not installed — skip silently
+      // web-vitals not available -- skip silently
     });
   }, []);
 
