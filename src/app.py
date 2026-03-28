@@ -121,6 +121,8 @@ from src.api.surgeries import surgery_router
 from src.api.survey_distribution import router as survey_distribution_router
 from src.api.tigo_money import router as tigo_money_router
 from src.api.transport import router as transport_router
+from src.api.trial_periods import admin_router as trial_admin_router
+from src.api.trial_periods import public_router as trial_public_router
 from src.api.user_roles import router as user_roles_router
 from src.api.vaccinations import vaccination_router, vaccine_type_router
 from src.api.vet_clinics import router as vet_clinics_router
@@ -372,6 +374,8 @@ def create_app() -> FastAPI:
     application.include_router(homepage_content_router)
     application.include_router(rescuer_emergencies_router)
     application.include_router(public_emergencies_router)
+    application.include_router(trial_admin_router)
+    application.include_router(trial_public_router)
 
     return application
 

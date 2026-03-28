@@ -51,6 +51,7 @@ from .surgery import (
     SurgeryStatus,
     SurgeryType,
 )
+from .trial_period import TrialCheckIn, TrialPeriod, TrialStatus
 from .user import User, UserRole
 from .user_consent import ConsentMethod, ConsentStatus, ConsentType, UserConsent
 from .vaccination import Vaccination, VaccinationSchedule, VaccinationStatus, VaccineType
@@ -128,6 +129,9 @@ __all__ = [
     "TokenType",
     "Treatment",
     "TreatmentStatus",
+    "TrialCheckIn",
+    "TrialPeriod",
+    "TrialStatus",
     "User",
     "UserConsent",
     "UserRole",
