@@ -334,7 +334,7 @@ Week 3-4:
 |---|-------|--------|-----|--------|-------|------------|
 | 1 | Partner veterinary clinic registration model and API | RAP-507 | 5 | DONE (PR #158) | Backend | — |
 | 2 | Clinic service catalog with pricing | RAP-508 | 5 | DONE (PR #160) | Backend | RAP-507 |
-| 3 | Voucher purchase flow for donors | RAP-509 | 8 | READY | Fullstack | RAP-508 |
+| 3 | Voucher purchase flow for donors | RAP-509 | 8 | IN REVIEW (PR #164) | Fullstack | RAP-508 |
 | 4 | VetVoucher model and lifecycle API | RAP-510 | 5 | DONE (PR #161) | Backend | RAP-507 |
 | 5 | Rescuer voucher wallet and claim flow | RAP-511 | 5 | READY | Fullstack | RAP-510, RAP-500 |
 | 6 | Clinic redemption interface | RAP-512 | 5 | IN REVIEW (PR #163) | Fullstack | RAP-510 |
