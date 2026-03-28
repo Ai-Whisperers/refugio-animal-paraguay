@@ -72,6 +72,8 @@ async def _resolve_card_data(
         return await _resolve_animal(entity_id, db)
     if card_type == "campaign":
         return await _resolve_campaign(entity_id, db)
+    if card_type == "castration-campaign":
+        return await _resolve_castration_campaign(entity_id, db)
     if card_type == "story":
         return await _resolve_story(entity_id, db)
     if card_type == "blog":
@@ -147,4 +149,26 @@ async def _resolve_blog(entity_id: UUID, db: AsyncSession) -> CardData:
         title=content.title or "Blog Post",
         author=content.author if hasattr(content, "author") else None,
         date_text=date_text,
+    )
+
+
+async def _resolve_castration_campaign(entity_id: UUID, db: AsyncSession) -> CardData:
+    """Resolve castration campaign data for OG card."""
+    from src.db.models.castration_campaign import CastrationCampaign
+
+    result = await db.execute(select(CastrationCampaign).where(CastrationCampaign.id == entity_id))
+    campaign = result.scalar_one_or_none()
+    if campaign is None:
+        return CardData(title="Campana no encontrada", cta_text="Visitar Refugio")
+
+    goal = campaign.target_count or 0
+    completed = campaign.completed_count or 0
+    pct = (completed / goal * 100) if goal > 0 else 0.0
+
+    return CardData(
+        title=campaign.title or "Campana de Castracion",
+        subtitle=campaign.description[:120] if campaign.description else None,
+        cta_text="Apoya esta campana!",
+        progress_pct=round(pct, 1),
+        progress_text=f"{completed} / {goal} animales ({pct:.0f}%)",
     )
