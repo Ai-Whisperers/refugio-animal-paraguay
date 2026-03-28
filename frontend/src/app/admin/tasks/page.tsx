@@ -13,6 +13,7 @@ import {
   ChevronDown,
   UserPlus,
   User,
+  ClipboardCheck,
 } from "lucide-react";
 import { isAuthenticated } from "@/lib/auth";
 import { api, ApiClientError } from "@/lib/api";
@@ -42,6 +43,7 @@ const LABEL_FILTER_ALL = "Todas las categorías";
 const LABEL_FILTER_PRIORITY = "Todas las prioridades";
 const LABEL_UNASSIGNED = "Sin asignar";
 const LABEL_REASSIGN = "Reasignar";
+const LABEL_COMPLETE = "Completar";
 
 const STATUS_COLUMNS: { status: TaskStatus; label: string; color: string; headerBg: string }[] = [
   {
@@ -144,14 +146,15 @@ interface TaskCardProps {
   volunteers: VolunteerListItem[];
   onStatusChange: (taskId: string, newStatus: TaskStatus) => Promise<void>;
   onReassign: (task: Task) => void;
+  onComplete: (task: Task) => void;
 }
 
-function TaskCard({ task, volunteers, onStatusChange, onReassign }: TaskCardProps) {
+function TaskCard({ task, volunteers, onStatusChange, onReassign, onComplete }: TaskCardProps) {
   const [updating, setUpdating] = useState(false);
 
-  const nextStatusOptions = STATUS_COLUMNS.filter((col) => col.status !== task.status).map(
-    (col) => ({ status: col.status, label: col.label })
-  );
+  const nextStatusOptions = STATUS_COLUMNS.filter(
+    (col) => col.status !== task.status && col.status !== "completed"
+  ).map((col) => ({ status: col.status, label: col.label }));
 
   async function handleStatusChange(newStatus: TaskStatus) {
     setUpdating(true);
@@ -236,34 +239,58 @@ function TaskCard({ task, volunteers, onStatusChange, onReassign }: TaskCardProp
         </div>
       )}
 
-      {/* Status change dropdown */}
+      {/* Status change dropdown + complete button */}
       {task.status !== "completed" && task.status !== "cancelled" && (
-        <div className="relative mt-2.5">
-          <select
+        <div className="mt-2.5 flex gap-1.5">
+          {/* Move to non-completed statuses */}
+          {nextStatusOptions.length > 0 && (
+            <div className="relative flex-1">
+              <select
+                disabled={updating}
+                value=""
+                onChange={(e) => {
+                  if (e.target.value) handleStatusChange(e.target.value as TaskStatus);
+                }}
+                className="w-full appearance-none rounded border border-gray-200 bg-gray-50 py-1 pl-2 pr-6 text-xs text-gray-600 hover:bg-gray-100 disabled:opacity-50 cursor-pointer"
+                aria-label="Cambiar estado"
+              >
+                <option value="" disabled>
+                  {updating ? "..." : "Mover a..."}
+                </option>
+                {nextStatusOptions.map((opt) => (
+                  <option key={opt.status} value={opt.status}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="pointer-events-none absolute right-1.5 top-1/2 h-3 w-3 -translate-y-1/2 text-gray-400" />
+            </div>
+          )}
+          {/* Complete button — opens notes modal */}
+          <button
+            onClick={() => onComplete(task)}
             disabled={updating}
-            value=""
-            onChange={(e) => {
-              if (e.target.value) handleStatusChange(e.target.value as TaskStatus);
-            }}
-            className="w-full appearance-none rounded border border-gray-200 bg-gray-50 py-1 pl-2 pr-6 text-xs text-gray-600 hover:bg-gray-100 disabled:opacity-50 cursor-pointer"
-            aria-label="Cambiar estado"
+            className="flex shrink-0 items-center gap-1 rounded border border-green-200 bg-green-50 px-2 py-1 text-xs font-medium text-green-700 hover:bg-green-100 disabled:opacity-50"
+            title={LABEL_COMPLETE}
           >
-            <option value="" disabled>
-              {updating ? "Actualizando..." : "Mover a..."}
-            </option>
-            {nextStatusOptions.map((opt) => (
-              <option key={opt.status} value={opt.status}>
-                {opt.label}
-              </option>
-            ))}
-          </select>
-          <ChevronDown className="pointer-events-none absolute right-1.5 top-1/2 h-3 w-3 -translate-y-1/2 text-gray-400" />
+            <ClipboardCheck className="h-3 w-3" />
+            {LABEL_COMPLETE}
+          </button>
         </div>
       )}
 
-      {/* Completion timestamp */}
-      {task.completed_at && (
-        <p className="mt-1.5 text-xs text-green-600">Completado: {fmtDate(task.completed_at)}</p>
+      {/* Completion timestamp + notes */}
+      {task.status === "completed" && (
+        <div className="mt-1.5 space-y-0.5">
+          {task.completed_at && (
+            <p className="text-xs text-green-600">Completado: {fmtDate(task.completed_at)}</p>
+          )}
+          {task.completion_notes && (
+            <p className="rounded bg-green-50 px-2 py-1 text-xs text-green-700 italic line-clamp-3">
+              {task.completion_notes}
+            </p>
+          )}
+        </div>
       )}
     </div>
   );
@@ -378,6 +405,102 @@ function AssignModal({ task, volunteers, onClose, onAssigned }: AssignModalProps
               className="flex-1 rounded-lg bg-emerald-600 py-2 text-sm font-semibold text-white hover:bg-emerald-700 disabled:opacity-50"
             >
               {saving ? "Guardando..." : "Guardar"}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Complete Task Modal
+// ---------------------------------------------------------------------------
+
+interface CompleteTaskModalProps {
+  task: Task;
+  onClose: () => void;
+  onCompleted: (taskId: string, notes: string | null) => Promise<void>;
+}
+
+function CompleteTaskModal({ task, onClose, onCompleted }: CompleteTaskModalProps) {
+  const [notes, setNotes] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setError(null);
+    setSaving(true);
+    try {
+      await onCompleted(task.id, notes.trim() || null);
+      onClose();
+    } catch (err) {
+      if (err instanceof ApiClientError) {
+        setError(err.detail || "Error al completar la tarea");
+      } else {
+        setError("Error inesperado");
+      }
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+      <div className="w-full max-w-sm rounded-xl bg-white p-6 shadow-xl">
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-base font-semibold text-gray-800">Completar tarea</h2>
+          <button
+            onClick={onClose}
+            className="rounded-full p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+            aria-label="Cerrar"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
+
+        <p className="mb-3 text-xs text-gray-500 line-clamp-2">
+          <span className="font-medium text-gray-700">{task.title}</span>
+        </p>
+
+        {error && (
+          <div className="mb-3 flex items-start gap-2 rounded-lg bg-red-50 p-3 text-sm text-red-700">
+            <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+            {error}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Notas de cierre (opcional)
+            </label>
+            <textarea
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              rows={3}
+              maxLength={2000}
+              placeholder="Describe cómo se completó la tarea, observaciones, etc."
+              className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-emerald-500 focus:outline-none"
+            />
+            <p className="mt-0.5 text-right text-xs text-gray-400">{notes.length}/2000</p>
+          </div>
+
+          <div className="flex gap-3 pt-1">
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex-1 rounded-lg border border-gray-300 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            >
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              disabled={saving}
+              className="flex-1 rounded-lg bg-green-600 py-2 text-sm font-semibold text-white hover:bg-green-700 disabled:opacity-50"
+            >
+              {saving ? "Guardando..." : "Marcar completa"}
             </button>
           </div>
         </form>
@@ -580,6 +703,7 @@ export default function TasksPage() {
   const [error, setError] = useState<string | null>(null);
   const [showCreate, setShowCreate] = useState(false);
   const [reassignTask, setReassignTask] = useState<Task | null>(null);
+  const [completeTask, setCompleteTask] = useState<Task | null>(null);
   const [filterCategory, setFilterCategory] = useState<TaskCategory | "">("");
   const [filterPriority, setFilterPriority] = useState<TaskPriority | "">("");
 
@@ -653,6 +777,25 @@ export default function TasksPage() {
     await api.patch(`/api/tasks/${taskId}`, { assigned_to: userId });
     setTasks((prev) =>
       prev.map((t) => (t.id === taskId ? { ...t, assigned_to: userId } : t))
+    );
+  }
+
+  async function handleComplete(taskId: string, notes: string | null) {
+    await api.patch(`/api/tasks/${taskId}`, {
+      status: "completed",
+      completion_notes: notes,
+    });
+    setTasks((prev) =>
+      prev.map((t) =>
+        t.id === taskId
+          ? {
+              ...t,
+              status: "completed" as TaskStatus,
+              completed_at: new Date().toISOString(),
+              completion_notes: notes,
+            }
+          : t
+      )
     );
   }
 
@@ -801,6 +944,7 @@ export default function TasksPage() {
                           volunteers={volunteers}
                           onStatusChange={handleStatusChange}
                           onReassign={setReassignTask}
+                          onComplete={setCompleteTask}
                         />
                       ))
                     )}
@@ -828,6 +972,15 @@ export default function TasksPage() {
           volunteers={volunteers}
           onClose={() => setReassignTask(null)}
           onAssigned={handleAssign}
+        />
+      )}
+
+      {/* Complete modal */}
+      {completeTask && (
+        <CompleteTaskModal
+          task={completeTask}
+          onClose={() => setCompleteTask(null)}
+          onCompleted={handleComplete}
         />
       )}
     </div>

@@ -3,7 +3,7 @@ story: S4
 epic: EPIC-38
 ticket: RAP-188
 title: "Task completion tracking with notes"
-status: planned
+status: done
 points: 3
 priority: P1
 track: Fullstack
