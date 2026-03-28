@@ -92,6 +92,8 @@ import type {
   CampaignListResponse,
   CampaignPublic,
   CampaignSocialProof,
+  CastrationCampaignPublic,
+  CastrationCampaignListResponse,
   DonationCreateRequest,
   DonationResponse,
   DonorCreateRequest,
@@ -381,4 +383,28 @@ export async function submitPreQualification(
     method: "POST",
     body: JSON.stringify(data),
   });
+}
+
+// --- Castration Campaigns (public) ---
+
+/**
+ * Fetch list of public castration campaigns (active + completed).
+ */
+export async function listCastrationCampaignsPublic(): Promise<CastrationCampaignListResponse> {
+  return api.get<CastrationCampaignListResponse>(
+    "/public/castration-campaigns",
+    NO_AUTH
+  );
+}
+
+/**
+ * Fetch a single castration campaign by ID (public).
+ */
+export async function getCastrationCampaignPublic(
+  campaignId: string
+): Promise<CastrationCampaignPublic> {
+  return api.get<CastrationCampaignPublic>(
+    `/public/castration-campaigns/${campaignId}`,
+    NO_AUTH
+  );
 }

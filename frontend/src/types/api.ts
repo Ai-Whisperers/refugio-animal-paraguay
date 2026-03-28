@@ -685,6 +685,38 @@ export interface PreQualifyResult {
   estimated_wait_time: string;
 }
 
+// --- Castration Campaigns ---
+
+export interface CastrationClinicPublic {
+  id: string;
+  name: string;
+  city: string;
+  department: string | null;
+  latitude: number | null;
+  longitude: number | null;
+}
+
+export interface CastrationCampaignPublic {
+  id: string;
+  title: string;
+  description: string;
+  goal_message: string | null;
+  target_count: number;
+  completed_count: number;
+  progress_percent: number;
+  target_area: string;
+  start_date: string;
+  end_date: string;
+  status: string;
+  partner_clinics: CastrationClinicPublic[];
+  created_at: string;
+}
+
+export interface CastrationCampaignListResponse {
+  items: CastrationCampaignPublic[];
+  total: number;
+}
+
 // --- API Error ---
 
 export interface ApiError {
