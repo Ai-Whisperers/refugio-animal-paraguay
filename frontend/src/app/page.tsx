@@ -3,6 +3,7 @@ import { Home, Heart, Users, MapPin, Clock, Phone, Mail, Star } from "lucide-rea
 import { HOME } from "@/lib/strings";
 import LiveStats from "@/components/LiveStats";
 import FeaturedAnimals from "@/components/FeaturedAnimals";
+import FeaturedCampaigns from "@/components/FeaturedCampaigns";
 
 export default function HomePage() {
   return (
@@ -100,6 +101,9 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Featured Campaigns */}
+      <FeaturedCampaigns />
 
       {/* Trust Team Section */}
       <section className="py-10 sm:py-16 px-4 bg-white">
