@@ -5,6 +5,18 @@
 ---
 
 ## 2026-03 (March)
+### [2026-03-28 13:27] Worker Run — EPIC-34 Tax Receipt & Compliance
+- **Stories completed**: 3 — RAP-167 (ANBI compliance docs), RAP-168 (donor tax ID BSN/TIN secure storage), RAP-169 (batch receipt generation and email)
+- **PRs opened**: #296 (RAP-167), #297 (RAP-168), #298 (RAP-169), all targeting develop
+- **Epic**: EPIC-34 Tax Receipt & Compliance — ALL 5 stories done (S1-S5)
+- **Tests added**: 25 (RAP-167 ANBI compliance), 27 (RAP-168 tax ID service), 13 (RAP-169 batch receipts) = 65 new unit tests
+- **New services**: `anbi_compliance_service.py`, `donor_tax_id_service.py`, `batch_receipt_service.py`
+- **New APIs**: `anbi_compliance.py`, `donor_tax_id.py`, `batch_receipts.py`
+- **Migration**: 070 (donor tax_id_encrypted + tax_id_type columns)
+- **Quality gates**: ruff + black + pytest — all clean for each PR
+- **STORY.md updates**: S3/S4/S5 marked done on develop
+- **Resumption note**: Continued from previous session that had completed RAP-165 (EU tax receipt PDF) and RAP-166 (annual donation summary), and was mid-way through RAP-167
+
 
 ### [2026-03-28 10:13] Work Checker Run
 - **PRs merged**: 13 total — #283 (RAP-620 volunteer driver), #285 (RAP-639 predictive analytics), #284 (RAP-637 community engagement analytics), #286 (RAP-621 request matching), #287 (RAP-633 animal analytics), #288 (RAP-632 exec KPI dashboard), #289 (RAP-537 needs board), #290 (RAP-539 donor directory), #291 (RAP-541 admin moderation), #292 (RAP-534 rescuer profile), #293 (RAP-535 rescuer animals), #294 (RAP-165 EU tax receipt), #295 (RAP-166 annual summary)
