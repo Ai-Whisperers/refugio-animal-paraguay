@@ -1121,6 +1121,23 @@ export interface TaskUpdateRequest {
   completion_notes?: string | null;
 }
 
+// --- Shift Signup (RAP-182) ---
+
+export interface ShiftSignup {
+  id: string;
+  shift_id: string;
+  volunteer_id: string;
+  confirmed: boolean;
+  attended: boolean | null;
+  signed_up_at: string;
+  notes: string | null;
+}
+
+export interface MySignupsResponse {
+  items: ShiftSignup[];
+  total: number;
+}
+
 // --- API Error ---
 
 export interface ApiError {

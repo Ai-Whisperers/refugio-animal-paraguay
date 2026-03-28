@@ -1,16 +1,19 @@
-"""Volunteer shift scheduling API (RAP-180, RAP-183).
+"""Volunteer shift scheduling API (RAP-180, RAP-182, RAP-183).
 
 Staff can create and manage shifts with time slots and capacity.
 Staff can also record volunteer attendance (RAP-183).
-Volunteers can view available shifts.
+Volunteers can view available shifts and self-signup (RAP-182).
 
 Endpoints:
     POST   /api/shifts                              -- create shift (staff only)
     GET    /api/shifts                              -- list shifts (authenticated)
+    GET    /api/shifts/roles                        -- list valid roles
+    GET    /api/shifts/my-signups                   -- volunteer's own signups
     GET    /api/shifts/{id}                         -- get shift detail (authenticated)
     PATCH  /api/shifts/{id}                         -- update shift (staff only)
     DELETE /api/shifts/{id}                         -- cancel/delete shift (staff only)
-    GET    /api/shifts/roles                        -- list valid roles
+    POST   /api/shifts/{id}/signup                  -- volunteer signs up for shift
+    DELETE /api/shifts/{id}/signup                  -- volunteer cancels their signup
     GET    /api/shifts/{id}/signups                 -- list signups for shift (staff)
     PATCH  /api/shifts/{id}/signups/{signup_id}     -- update attendance (staff)
 """
@@ -19,6 +22,7 @@ import logging
 from datetime import date, datetime, time
 from uuid import UUID
 
+import sqlalchemy as sa
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel, Field, model_validator
 from sqlalchemy import and_, func, select
@@ -160,6 +164,13 @@ class ShiftSignupResponse(BaseModel):
     model_config = {"from_attributes": True}
 
 
+class MySignupsResponse(BaseModel):
+    """List of the authenticated volunteer's shift signups."""
+
+    items: list[ShiftSignupResponse]
+    total: int
+
+
 # ---------------------------------------------------------------------------
 # Endpoints — Public (read-only, authenticated)
 # ---------------------------------------------------------------------------
@@ -240,6 +251,156 @@ async def get_shift(
             detail=f"Shift {shift_id} not found",
         )
     return ShiftResponse.model_validate(shift)
+
+
+# ---------------------------------------------------------------------------
+# Endpoints — Volunteer self-signup (RAP-182, authenticated)
+# ---------------------------------------------------------------------------
+
+SIGNUP_BLOCKED_STATUSES = {ShiftStatus.CANCELLED.value, ShiftStatus.COMPLETED.value}
+
+
+@public_router.get("/api/shifts/my-signups", response_model=MySignupsResponse)
+async def get_my_signups(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> MySignupsResponse:
+    """Return all shift signups for the authenticated user."""
+    stmt = select(ShiftSignup).where(ShiftSignup.volunteer_id == current_user.id)
+    result = await db.execute(stmt)
+    signups = result.scalars().all()
+    return MySignupsResponse(
+        items=[ShiftSignupResponse.model_validate(s) for s in signups],
+        total=len(signups),
+    )
+
+
+@public_router.post(
+    "/api/shifts/{shift_id}/signup",
+    response_model=ShiftSignupResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+async def signup_for_shift(
+    shift_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> ShiftSignupResponse:
+    """Volunteer signs up for an open shift.
+
+    Rules:
+    - Shift must be open (not full, cancelled, or completed)
+    - Volunteer cannot sign up more than once for the same shift
+    - slots_filled increments atomically; shift transitions to full if capacity reached
+    """
+    result = await db.execute(select(Shift).where(Shift.id == shift_id))
+    shift = result.scalar_one_or_none()
+    if shift is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Shift {shift_id} not found",
+        )
+
+    if shift.status in SIGNUP_BLOCKED_STATUSES:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f"Cannot sign up for a {shift.status} shift",
+        )
+
+    if shift.status == ShiftStatus.FULL.value:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Shift is full — no more spots available",
+        )
+
+    existing = await db.execute(
+        select(ShiftSignup).where(
+            ShiftSignup.shift_id == shift_id,
+            ShiftSignup.volunteer_id == current_user.id,
+        )
+    )
+    if existing.scalar_one_or_none() is not None:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Already signed up for this shift",
+        )
+
+    signup = ShiftSignup(shift_id=shift_id, volunteer_id=current_user.id)
+    db.add(signup)
+
+    # Atomic increment — checked by DB constraint (slots_filled <= capacity)
+    await db.execute(
+        sa.update(Shift).where(Shift.id == shift_id).values(slots_filled=Shift.slots_filled + 1)
+    )
+    await db.refresh(shift)
+
+    if shift.slots_filled >= shift.capacity:
+        shift.status = ShiftStatus.FULL.value
+
+    await db.commit()
+    await db.refresh(signup)
+    logger.info(
+        "Volunteer signed up for shift",
+        extra={"shift_id": str(shift_id), "volunteer_id": str(current_user.id)},
+    )
+    return ShiftSignupResponse.model_validate(signup)
+
+
+@public_router.delete("/api/shifts/{shift_id}/signup", status_code=status.HTTP_204_NO_CONTENT)
+async def cancel_shift_signup(
+    shift_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> None:
+    """Volunteer cancels their own signup for a shift.
+
+    Rules:
+    - Volunteer can only cancel their own signup
+    - Cannot cancel if shift is completed
+    - slots_filled decrements; shift transitions back to open if it was full
+    """
+    result = await db.execute(select(Shift).where(Shift.id == shift_id))
+    shift = result.scalar_one_or_none()
+    if shift is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Shift {shift_id} not found",
+        )
+
+    if shift.status == ShiftStatus.COMPLETED.value:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Cannot cancel signup for a completed shift",
+        )
+
+    signup_result = await db.execute(
+        select(ShiftSignup).where(
+            ShiftSignup.shift_id == shift_id,
+            ShiftSignup.volunteer_id == current_user.id,
+        )
+    )
+    signup = signup_result.scalar_one_or_none()
+    if signup is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No signup found for this shift",
+        )
+
+    await db.delete(signup)
+    await db.execute(
+        sa.update(Shift)
+        .where(Shift.id == shift_id)
+        .values(slots_filled=sa.func.greatest(Shift.slots_filled - 1, 0))
+    )
+    await db.refresh(shift)
+
+    if shift.status == ShiftStatus.FULL.value and shift.slots_filled < shift.capacity:
+        shift.status = ShiftStatus.OPEN.value
+
+    await db.commit()
+    logger.info(
+        "Volunteer cancelled shift signup",
+        extra={"shift_id": str(shift_id), "volunteer_id": str(current_user.id)},
+    )
 
 
 # ---------------------------------------------------------------------------
