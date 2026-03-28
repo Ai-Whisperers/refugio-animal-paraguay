@@ -10,6 +10,17 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from ..base import Base
 
 
+class DonationTargetType(enum.StrEnum):
+    """Donation target types — determines where a donation is directed."""
+
+    GENERAL = "general"
+    ANIMAL = "animal"
+    RESCUER = "rescuer"
+    CLINIC = "clinic"
+    CAMPAIGN = "campaign"
+    NEED = "need"
+
+
 class CurrencyCode(enum.StrEnum):
     """Supported currencies — must match chk_donations_currency CHECK constraint exactly."""
 
@@ -178,6 +189,19 @@ class Donation(Base):
         sa.String(20),
         nullable=True,
         index=True,
+    )
+    # Flexible donation target: where the donation is directed
+    target_type: Mapped[str] = mapped_column(
+        sa.String(20),
+        nullable=False,
+        server_default="general",
+        index=True,
+    )
+    # UUID of the target entity (animal, rescuer, clinic, campaign, need)
+    # NULL when target_type is 'general'
+    target_id: Mapped[UUID | None] = mapped_column(
+        sa.UUID(as_uuid=True),
+        nullable=True,
     )
     notes: Mapped[str | None] = mapped_column(sa.Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(

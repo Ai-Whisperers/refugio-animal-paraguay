@@ -5,7 +5,13 @@ from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field
 
-from src.db.models.donation import CurrencyCode, DonationStatus, PaymentMethod, RecurringInterval
+from src.db.models.donation import (
+    CurrencyCode,
+    DonationStatus,
+    DonationTargetType,
+    PaymentMethod,
+    RecurringInterval,
+)
 
 
 class CurrencyBreakdown(BaseModel):
@@ -86,6 +92,9 @@ class DonationCreate(BaseModel):
     amount_cents: int = Field(..., gt=0)
     currency: CurrencyCode = CurrencyCode.EUR
     payment_method: PaymentMethod = PaymentMethod.STRIPE
+    # Flexible donation target: where the donation is directed
+    target_type: DonationTargetType = DonationTargetType.GENERAL
+    target_id: UUID | None = None
     notes: str | None = None
 
 
@@ -118,6 +127,8 @@ class DonationResponse(BaseModel):
     recurring_interval: RecurringInterval | None = None
     status: DonationStatus
     fund_category: str | None = None
+    target_type: DonationTargetType = DonationTargetType.GENERAL
+    target_id: UUID | None = None
     receipt_number: str | None
     notes: str | None
     created_at: datetime
