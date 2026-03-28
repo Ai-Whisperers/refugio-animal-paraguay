@@ -59,6 +59,7 @@ from src.api.public_contact import router as public_contact_router
 from src.api.public_register import router as public_register_router
 from src.api.sepa import router as sepa_router
 from src.api.sessions import router as sessions_router
+from src.api.smart_matching import router as smart_matching_router
 from src.api.sponsorships import router as sponsorships_router
 from src.api.subscriptions import router as subscriptions_router
 from src.api.surgeries import surgery_router
@@ -227,6 +228,7 @@ def create_app() -> FastAPI:
     application.include_router(vet_clinics_router)
     application.include_router(user_roles_router)
     application.include_router(pre_qualification_router)
+    application.include_router(smart_matching_router)
 
     return application
 
