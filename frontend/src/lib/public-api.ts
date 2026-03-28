@@ -101,6 +101,7 @@ import type {
   DonorCreateRequest,
   DonorResponse,
   FundCategory,
+  LeaderboardResponse,
   PaginatedAnimalListResponse,
   PreQualifyQuestionsResponse,
   PreQualifyRequest,
@@ -445,5 +446,25 @@ export async function getCastrationCampaignGallery(
   if (photoType) params.set("photo_type", photoType);
   return apiFetch<CastrationGalleryResponse>(
     `/public/castration-campaigns/${campaignId}/gallery?${params}`
+// --- Donor Leaderboard ---
+
+/**
+ * Fetch public donor leaderboard.
+ * GET /public/leaderboard/donors
+ */
+export async function getDonorLeaderboard(
+  currency = "EUR",
+  limit = 20,
+  offset = 0,
+  campaignId?: string
+): Promise<LeaderboardResponse> {
+  const params = new URLSearchParams({
+    currency,
+    limit: String(limit),
+    offset: String(offset),
+  });
+  if (campaignId) params.set("campaign_id", campaignId);
+  return apiFetch<LeaderboardResponse>(
+    `/public/leaderboard/donors?${params}`
   );
 }
