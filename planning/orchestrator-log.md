@@ -577,3 +577,12 @@
 - **Quality**: ruff clean | black clean | 37 unit tests passing | 9 integration tests added
 - **Changes**: Model extended (bio + languages_spoken), migration 072, new PUT /api/volunteers/profile + GET /api/volunteers/profile/options endpoints, /volunteer/profile frontend page
 - **Notes**: 31 pre-existing unit test failures in develop baseline — unchanged. S1 (RAP-640) already had skills/availability in model; S2 added bio, languages, approved-volunteer editing, and profile page.
+
+### [2026-03-28 15:30] Autonomous Worker Run — EPIC-36 S3 Complete
+- **Epic**: EPIC-36 — Volunteer Registration & Profiles
+- **Stories completed**: RAP-642
+- **PRs created**: #303 (feature/RAP-642-volunteer-onboarding-checklist)
+- **Duration**: ~20m
+- **Quality**: ruff clean | black clean | 45 unit tests passing | 11 integration tests added
+- **Changes**: New `volunteer_onboarding_items` table (ORM + migration 073), 3 new API endpoints (GET own checklist, POST initialize staff, PUT mark complete staff), ONBOARDING_ITEMS dict + MANDATORY_ITEM_KEYS frozenset
+- **Notes**: 30 pre-existing unit test failures in develop baseline (was 31 in S2 run — minor drift, no new failures). Initialize endpoint is idempotent. Branch based on develop (without S2/RAP-641 which is still pending merge as PR #302).
