@@ -1,7 +1,7 @@
 # Development Queue — Refugio Animal Paraguay
 
 **Last updated**: 2026-03-29
-**Active version**: V9 Sprint 6 COMPLETE + V10 Sprint 7 STARTED — EPIC-41–50 ALL DONE. EPIC-49 ALL DONE (RAP-240–244 all merged). EPIC-50 ALL DONE (RAP-245–249 all merged; RAP-245 PR #370, RAP-246 PR #371, RAP-249 PR #374 required rebase). V10 Sprint 7 EPIC-51 ALL DONE: RAP-250 PR #375, RAP-251 PR #376, RAP-252 PR #377, RAP-253 PR #378, RAP-254 PR #379 (all 2026-03-29).
+**Active version**: V9 Sprint 6 COMPLETE + V10 Sprint 7 IN PROGRESS — EPIC-41–50 ALL DONE. EPIC-49 ALL DONE (RAP-240–244 all merged). EPIC-50 ALL DONE (RAP-245–249 all merged; RAP-245 PR #370, RAP-246 PR #371, RAP-249 PR #374 required rebase). V10 Sprint 7 EPIC-51 PARTIAL: RAP-250 PR #375 DONE, RAP-251 PR #376 DONE, RAP-252 PR #377 DONE, RAP-253 PR #378 CONFLICTING (needs manual rebase — conflicts in operational_dashboard.py + operational_metrics_service.py), RAP-254 PR #379 CONFLICTING (needs manual rebase — conflicts in operational_dashboard.py).
 **Full roadmap**: [ROADMAP.md](ROADMAP.md) — 16 sprints, 68 epics, ~395 stories
 **Tech stack**: Python 3.12, FastAPI, SQLAlchemy 2.x, PostgreSQL 16, Next.js 14
 
