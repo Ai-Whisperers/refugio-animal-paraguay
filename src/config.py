@@ -202,7 +202,7 @@ class Settings(BaseSettings):
         description="Rate limit for general API endpoints (slowapi format).",
     )
 
-    # WhatsApp / Twilio
+    # WhatsApp / Twilio (legacy)
     whatsapp_enabled: bool = Field(
         default=False,
         description="Enable WhatsApp message delivery via Twilio. Disable in tests and local dev.",
@@ -220,6 +220,44 @@ class Settings(BaseSettings):
         description=(
             "Twilio WhatsApp sender number in E.164 format with 'whatsapp:' prefix. "
             "Use the Twilio sandbox number for development."
+        ),
+    )
+
+    # WhatsApp Business API — Meta Cloud (primary)
+    meta_whatsapp_enabled: bool = Field(
+        default=False,
+        description=(
+            "Enable WhatsApp message delivery via Meta Cloud API. "
+            "When True, meta_whatsapp_token and meta_whatsapp_phone_number_id are required."
+        ),
+    )
+    meta_whatsapp_token: str = Field(
+        default="",
+        description=(
+            "Meta Cloud API bearer token (System User token from Meta Business Manager). "
+            "Required when meta_whatsapp_enabled=True."
+        ),
+    )
+    meta_whatsapp_phone_number_id: str = Field(
+        default="",
+        description=(
+            "Meta WhatsApp Business phone number ID (from Meta Developer Console). "
+            "Required when meta_whatsapp_enabled=True."
+        ),
+    )
+    meta_whatsapp_api_version: str = Field(
+        default="v18.0",
+        description="Meta Graph API version used for WhatsApp Cloud API calls.",
+    )
+    meta_whatsapp_api_base_url: str = Field(
+        default="https://graph.facebook.com",
+        description="Meta Graph API base URL. Override for testing with a mock server.",
+    )
+    meta_whatsapp_verify_token: str = Field(
+        default="",
+        description=(
+            "Webhook verification token configured in Meta Developer Console. "
+            "Used to validate incoming webhook subscriptions."
         ),
     )
 
