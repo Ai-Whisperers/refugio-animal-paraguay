@@ -767,3 +767,11 @@
 - **Duration**: ~90m (including conflict resolution)
 - **Quality**: ruff clean, black clean, 27/27 unit tests passing
 - **Notes**: Test DB missing volunteer-related tables (volunteer_profiles, shifts, volunteer_hours_log) — pre-existing on develop. Integration tests structured correctly; will pass once migrations applied. PR #321 open for review.
+
+### [2026-03-29 03:10] Worker Run — EPIC-40 S2
+- **Epic**: EPIC-40 — Volunteer Recognition & Analytics
+- **Stories completed**: RAP-196 (volunteer leaderboard and recognition)
+- **PRs created**: #322
+- **Duration**: ~30m
+- **Quality**: ruff clean, black clean, 19/19 unit tests passing
+- **Notes**: Leaderboard uses `volunteer_profiles.total_hours_logged` (denormalized, already on develop) — avoids dependency on RAP-195 merging. Frontend page in Spanish with Trophy/Medal/Star rank badges, period filter, limit selector. Integration tests gracefully handle pre-existing test DB migration gap. PR #322 open for review.
