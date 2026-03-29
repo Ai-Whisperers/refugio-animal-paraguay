@@ -3,7 +3,7 @@ story: S4
 epic: EPIC-50
 ticket: RAP-248
 title: "Government reporting export formats"
-status: planned
+status: done
 points: 3
 priority: P2
 track: Backend

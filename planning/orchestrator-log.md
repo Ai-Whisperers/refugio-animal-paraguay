@@ -1151,3 +1151,16 @@ feature/RAP-216-newsletter-template-builder (PR #341, independent of stack)
 - **Deliverables**:
   - RAP-247: `paraguayan_retention_service.py` with 6 statutory retention constants + RETENTION_POLICY list + get_retention_status(); `GET /legal/record-retention-policy` (public); `GET /admin/data-retention/paraguayan-status` (admin-only); 44 unit tests + 13 integration tests
 - **Notes**: Public endpoint returns static RETENTION_POLICY (no DB). Admin status endpoint queries live Animal/AdoptionRequest/Donation counts. EPIC-50 S4–S5 still READY.
+
+---
+
+## Worker Run: 2026-03-29 — EPIC-50 S4 (RAP-248)
+
+- **Ticket**: RAP-248 Government reporting export formats
+- **Branch**: feature/RAP-248-government-reporting-export-formats
+- **PR**: #373 (open, targeting develop)
+- **Duration**: ~25m
+- **Quality**: ruff clean, black clean, 23 unit tests pass
+- **Deliverables**:
+  - RAP-248: `government_report_service.py` with AnnualCensusReport dataclass + generate_annual_census() + render_annual_census_csv(); `GET /admin/reports/government/annual-census` (JSON); `GET /admin/reports/government/annual-census/export` (CSV with UTF-8 BOM); 23 unit tests + 15 integration tests
+- **Notes**: year param bounded [2000, 2100], defaults to current year. CSV uses Spanish bilingual labels. EPIC-50 S5 (RAP-249) still READY.
