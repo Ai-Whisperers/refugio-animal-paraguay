@@ -3,7 +3,7 @@ story: S1
 epic: EPIC-48
 ticket: RAP-235
 title: "TOTP secret generation and verification"
-status: planned
+status: done
 points: 5
 priority: P0
 track: Backend
