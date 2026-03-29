@@ -1,23 +1,27 @@
 """Two-Factor Authentication router.
 
 Endpoints:
-  GET  /auth/2fa/status              — Return whether 2FA is enabled for the current user
-  POST /auth/2fa/setup               — Generate a new TOTP secret (does NOT activate 2FA yet)
-  POST /auth/2fa/verify              — Confirm the first TOTP code, activating 2FA
-  POST /auth/2fa/disable             — Deactivate 2FA (requires a live TOTP code)
-  POST /auth/2fa/backup-codes        — Generate a fresh batch of backup recovery codes
-  GET  /auth/2fa/backup-codes/count  — Return the number of unused backup codes remaining
+  GET    /auth/2fa/status                   — Return whether 2FA is enabled for the current user
+  POST   /auth/2fa/setup                    — Generate a new TOTP secret (does NOT activate 2FA yet)
+  POST   /auth/2fa/verify                   — Confirm the first TOTP code, activating 2FA
+  POST   /auth/2fa/disable                  — Deactivate 2FA (requires a live TOTP code)
+  POST   /auth/2fa/backup-codes             — Generate a fresh batch of backup recovery codes
+  GET    /auth/2fa/backup-codes/count       — Return the number of unused backup codes remaining
+  DELETE /auth/2fa/admin/users/{user_id}    — Admin: reset 2FA for a locked-out user
 """
 
 import logging
+from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.auth.dependencies import _get_current_user
+from src.auth.dependencies import _get_current_user, require_admin
+from src.db.models.totp_backup_code import TotpBackupCode
 from src.db.models.user import User
 from src.db.session import get_db
-from src.schemas.error import COMMON_RESPONSES
+from src.schemas.error import AUTHENTICATED_RESPONSES, COMMON_RESPONSES
 from src.schemas.two_factor import (
     BackupCodesCountResponse,
     BackupCodesResponse,
@@ -181,3 +185,54 @@ async def get_backup_codes_count(
     """Return the number of unused backup codes remaining for the authenticated user."""
     remaining = await count_remaining_backup_codes(db, current_user.id)
     return BackupCodesCountResponse(remaining=remaining)
+
+
+# ---------------------------------------------------------------------------
+# Admin recovery — reset 2FA for a locked-out user
+# ---------------------------------------------------------------------------
+
+_ADMIN_2FA_RESPONSES = {
+    **AUTHENTICATED_RESPONSES,
+    404: {"description": "User not found"},
+}
+
+
+@router.delete(
+    "/admin/users/{user_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    responses=_ADMIN_2FA_RESPONSES,
+)
+async def admin_reset_2fa(
+    user_id: UUID,
+    _admin: User = Depends(require_admin),
+    db: AsyncSession = Depends(get_db),
+) -> None:
+    """Disable 2FA and revoke all backup codes for the specified user.
+
+    Reserved for administrators to unblock staff members who have lost access
+    to both their authenticator device and their backup codes.  The user will
+    be able to re-enrol in 2FA after logging in again.
+    """
+    result = await db.execute(select(User).where(User.id == user_id))
+    target_user = result.scalar_one_or_none()
+
+    if target_user is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"User {user_id} not found.",
+        )
+
+    # Revoke all backup codes first
+    await db.execute(delete(TotpBackupCode).where(TotpBackupCode.user_id == user_id))
+
+    # Clear 2FA fields
+    target_user.totp_enabled = False
+    target_user.totp_secret = None
+
+    await db.flush()
+    await db.commit()
+
+    logger.info(
+        "Admin reset 2FA for user",
+        extra={"admin_id": str(_admin.id), "target_user_id": str(user_id)},
+    )
