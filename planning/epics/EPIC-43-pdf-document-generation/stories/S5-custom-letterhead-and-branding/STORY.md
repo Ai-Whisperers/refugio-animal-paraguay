@@ -3,7 +3,7 @@ story: S5
 epic: EPIC-43
 ticket: RAP-214
 title: "Custom letterhead and branding"
-status: planned
+status: done
 points: 3
 priority: P2
 track: Backend
