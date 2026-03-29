@@ -4,6 +4,9 @@ from __future__ import annotations
 
 from pydantic import BaseModel, ConfigDict, Field
 
+FREQUENCY_PATTERN = "^(immediate|daily_digest|weekly)$"
+CHANNEL_PATTERN = "^(in_app|email)$"
+
 
 class PreferenceItem(BaseModel):
     """Single notification preference entry."""
@@ -71,4 +74,36 @@ class UnsubscribeResult(BaseModel):
     preferences_updated: int = Field(
         ...,
         description="Number of email notification preferences set to disabled.",
+    )
+
+
+class FrequencyItem(BaseModel):
+    """Frequency setting for one channel."""
+
+    channel: str = Field(..., pattern=CHANNEL_PATTERN)
+    frequency: str = Field(..., pattern=FREQUENCY_PATTERN)
+
+
+class FrequencyResponse(BaseModel):
+    """Single channel frequency in API responses."""
+
+    channel: str
+    frequency: str
+
+    model_config = ConfigDict(from_attributes=True)
+
+
+class FrequencyListResponse(BaseModel):
+    """All channel frequency settings response."""
+
+    frequencies: list[FrequencyResponse]
+
+
+class FrequencyBulkUpdate(BaseModel):
+    """Request to update frequency settings for one or more channels."""
+
+    frequencies: list[FrequencyItem] = Field(
+        ...,
+        min_length=1,
+        max_length=10,
     )
