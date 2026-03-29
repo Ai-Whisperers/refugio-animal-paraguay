@@ -7,6 +7,7 @@ from .animal import Animal, AnimalGender, AnimalPhoto, AnimalSize, AnimalSpecies
 from .audit_log import AuditAction, AuditLog
 from .blog_post import BlogPost
 from .campaign import Campaign, CampaignDonation, CampaignStatus
+from .email_list import EmailList, EmailListMember, EmailListStatus, EmailListType, MemberStatus
 from .castration_drive import CastrationDrive
 from .castration_photo import CastrationPhoto
 from .community_need import CommunityNeed, NeedCategory, NeedStatus
@@ -86,6 +87,11 @@ __all__ = [
     "Campaign",
     "CampaignDonation",
     "CampaignStatus",
+    "EmailList",
+    "EmailListMember",
+    "EmailListStatus",
+    "EmailListType",
+    "MemberStatus",
     "CastrationDrive",
     "CastrationPhoto",
     "CommunityNeed",
