@@ -3,7 +3,7 @@ story: S5
 epic: EPIC-46
 ticket: RAP-229
 title: "Data retention policy automation"
-status: planned
+status: ready
 points: 3
 priority: P2
 track: Backend

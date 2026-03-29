@@ -2,7 +2,7 @@
 sprint: 6
 title: "GDPR, Security & Compliance"
 weeks: "Weeks 11-12"
-status: planned
+status: in_progress
 points: 87
 created: 2026-03-26T19:06:04
 ---
