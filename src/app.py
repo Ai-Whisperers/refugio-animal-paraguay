@@ -117,6 +117,7 @@ from src.api.notification_preferences import router as notification_preferences_
 from src.api.notifications import router as notifications_router
 from src.api.notifications_ws import router as notifications_ws_router
 from src.api.og_image import router as og_image_router
+from src.api.operational_dashboard import router as operational_dashboard_router
 from src.api.password_reset import router as password_reset_router
 from src.api.phone_verification import router as phone_verification_router
 from src.api.pipeline_tracking import router as pipeline_tracking_router
@@ -507,6 +508,7 @@ def create_app() -> FastAPI:
     application.include_router(request_matching_router)
     application.include_router(animal_intake_outcome_router)
     application.include_router(executive_kpi_dashboard_router)
+    application.include_router(operational_dashboard_router)
     application.include_router(community_needs_public_router)
     application.include_router(community_needs_rescuer_router)
     application.include_router(rescuer_directory_router)
