@@ -816,3 +816,26 @@
 - **Duration**: ~35m total
 - **Quality**: ruff/black clean, 36 new unit tests (12+11+13), all passing
 - **Notes**: S1+S2 (RAP-200, RAP-201) were already DONE. Donor model gained phone field (migration 082) for WhatsApp receipts. Two-way webhook uses HMAC-SHA256 signature verification + auto-ack template.
+
+---
+## [2026-03-29] Session: EPIC-42 continued
+
+**Worker**: Nyx (autonomous scheduled run, continued from previous session)
+**Branch strategy**: one branch per story
+
+### Completed this session
+
+| PR | Ticket | Story | Status |
+|----|--------|-------|--------|
+| #331 | RAP-206 | EPIC-42 S2: Notification Preferences Management UI | DONE |
+| #332 | RAP-207 | EPIC-42 S3: Channel routing based on preferences | DONE |
+
+### EPIC-42 Status
+- S1 (RAP-205): DONE (pre-existing, marked previous session)
+- S2 (RAP-206): DONE — PR #331 — Next.js preferences toggle matrix UI
+- S3 (RAP-207): DONE — PR #332 — Preference gating in in-app + email dispatchers
+- S4 (RAP-208): planned — Frequency controls (immediate/daily digest/weekly)
+- S5 (RAP-209): planned — Unsubscribe one-click for email
+
+### Next session starting point
+EPIC-42 S4 — RAP-208: Frequency controls (P2, Backend)
