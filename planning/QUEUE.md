@@ -1,7 +1,7 @@
 # Development Queue — Refugio Animal Paraguay
 
 **Last updated**: 2026-03-29
-**Active version**: V9 Sprint 6 IN PROGRESS — EPIC-41–48 ALL DONE. EPIC-49 PARTIAL (RAP-240 PR #365, RAP-241 PR #366, RAP-242 PR #367, RAP-244 PR #369 merged; RAP-243 PR #368 CONFLICTING on .github/workflows/security.yml). EPIC-50 pending.
+**Active version**: V9 Sprint 6 IN PROGRESS — EPIC-41–48 ALL DONE. EPIC-49 PARTIAL (RAP-240 PR #365, RAP-241 PR #366, RAP-242 PR #367, RAP-244 PR #369 merged; RAP-243 PR #368 CONFLICTING on .github/workflows/security.yml). EPIC-50 PARTIAL (RAP-245 PR #370 merged).
 **Full roadmap**: [ROADMAP.md](ROADMAP.md) — 16 sprints, 68 epics, ~395 stories
 **Tech stack**: Python 3.12, FastAPI, SQLAlchemy 2.x, PostgreSQL 16, Next.js 14
 
@@ -400,6 +400,16 @@ Week 3-4:
 | 3 | JWT key rotation with zero-downtime fallback | RAP-242 | 4 | DONE (PR #367) | Backend |
 | 4 | SQL injection and XSS audit script with CI integration | RAP-243 | 3 | CONFLICTING (PR #368 open) | Backend |
 | 5 | Security headers audit (HSTS, X-Frame-Options, etc.) | RAP-244 | 3 | DONE (PR #369) | Backend |
+
+### EPIC-50: Paraguayan Legal Compliance (17 pts)
+
+| # | Story | Ticket | Pts | Status | Track |
+|---|-------|--------|-----|--------|-------|
+| 1 | Animal registration number tracking (SENACSA) | RAP-245 | 3 | DONE (PR #370) | Backend |
+| 2 | Legal adoption contract template (Paraguay law) | RAP-246 | 5 | READY | Backend |
+| 3 | Required record retention implementation | RAP-247 | 3 | READY | Backend |
+| 4 | Government reporting export formats | RAP-248 | 3 | READY | Backend |
+| 5 | Multi-language legal documents | RAP-249 | 3 | READY | Backend |
 
 ---
 
