@@ -185,6 +185,7 @@ class TestProcessDeletionRequest:
     """Tests for process_deletion_request()."""
 
     @pytest.mark.asyncio
+    @patch("src.services.gdpr_third_party_deletion_service.process_third_party_deletion")
     @patch("src.services.gdpr_deletion_service.anonymize_adopter")
     @patch("src.services.gdpr_deletion_service.anonymize_donor")
     @patch("src.services.gdpr_deletion_service.delete_user_notifications")
@@ -197,6 +198,7 @@ class TestProcessDeletionRequest:
         mock_notifications: AsyncMock,
         mock_donor: AsyncMock,
         mock_adopter: AsyncMock,
+        mock_third_party: AsyncMock,
         mock_db: AsyncMock,
     ) -> None:
         """Process full deletion with user, donor, and adopter."""
@@ -209,6 +211,17 @@ class TestProcessDeletionRequest:
         mock_notifications.return_value = 5
         mock_donor.return_value = True
         mock_adopter.return_value = True
+        mock_third_party.return_value = {
+            "stripe_subscriptions_cancelled": 1,
+            "stripe_subscriptions_failed": 0,
+            "stripe_customer_deleted": True,
+            "email_lists_removed": 3,
+        }
+        # Make db.get return a mock donor so third-party cascade can read email/stripe_customer_id
+        mock_donor_obj = MagicMock()
+        mock_donor_obj.email = "donor@example.com"
+        mock_donor_obj.stripe_customer_id = "cus_test"
+        mock_db.get.return_value = mock_donor_obj
 
         result = await process_deletion_request(
             mock_db, user_id, donor_id=donor_id, adopter_id=adopter_id
@@ -220,6 +233,9 @@ class TestProcessDeletionRequest:
         assert result["notifications_deleted"] == 5
         assert result["donor_anonymized"] is True
         assert result["adopter_anonymized"] is True
+        assert result["stripe_subscriptions_cancelled"] == 1
+        assert result["stripe_customer_deleted"] is True
+        assert result["email_lists_removed"] == 3
 
     @pytest.mark.asyncio
     @patch("src.services.gdpr_deletion_service.delete_user_notifications")

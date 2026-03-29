@@ -22,3 +22,8 @@ class GDPRDeletionResponse(BaseModel):
     notifications_deleted: int
     donor_anonymized: bool
     adopter_anonymized: bool
+    # Third-party cascade results (Stripe, email lists)
+    stripe_subscriptions_cancelled: int
+    stripe_subscriptions_failed: int
+    stripe_customer_deleted: bool
+    email_lists_removed: int
