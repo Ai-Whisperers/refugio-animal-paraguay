@@ -3,7 +3,7 @@ story: S3
 epic: EPIC-53
 ticket: RAP-262
 title: "Return/surrender tracking and analysis"
-status: planned
+status: done
 points: 3
 priority: P1
 track: Backend

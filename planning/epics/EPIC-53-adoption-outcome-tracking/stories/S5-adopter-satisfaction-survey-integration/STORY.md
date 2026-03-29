@@ -3,7 +3,7 @@ story: S5
 epic: EPIC-53
 ticket: RAP-264
 title: "Adopter satisfaction survey integration"
-status: planned
+status: done
 points: 3
 priority: P2
 track: Fullstack

@@ -3,7 +3,7 @@ story: S2
 epic: EPIC-53
 ticket: RAP-261
 title: "Post-adoption follow-up schedule"
-status: planned
+status: done
 points: 3
 priority: P1
 track: Backend
