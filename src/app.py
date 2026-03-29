@@ -94,6 +94,7 @@ from src.api.feature_requests import router as feature_requests_router
 from src.api.financial_reporting import router as financial_reporting_router
 from src.api.financial_stats import router as financial_stats_router
 from src.api.follow_ups import router as follow_ups_router
+from src.api.return_tracking import router as return_tracking_router
 from src.api.followup_automation import admin_router as followup_auto_admin_router
 from src.api.followup_automation import public_router as followup_auto_public_router
 from src.api.foster import public_router as foster_public_router
@@ -398,6 +399,7 @@ def create_app() -> FastAPI:
     application.include_router(financial_reporting_router)
     application.include_router(financial_stats_router)
     application.include_router(follow_ups_router)
+    application.include_router(return_tracking_router)
     application.include_router(gdpr_router)
     application.include_router(impact_reports_router)
     application.include_router(sponsorships_router)
