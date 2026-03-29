@@ -1,8 +1,12 @@
 // Service Worker for Refugio Animal Paraguay PWA
-// Version: 1.0.0
+// Version: 2.0.0 — Added push notification support
 
 const CACHE_NAME = "refugio-animal-v1";
 const OFFLINE_URL = "/offline";
+
+// Default notification icon (relative to SW scope)
+const DEFAULT_ICON = "/images/icon-192.png";
+const DEFAULT_BADGE = "/images/badge-72.png";
 
 // Assets to precache on install
 const PRECACHE_ASSETS = [
@@ -71,4 +75,94 @@ self.addEventListener("fetch", (event) => {
         });
       })
   );
+});
+
+// Push: receive push messages from the server and show browser notifications
+self.addEventListener("push", (event) => {
+  // Parse push payload — fall back to sensible defaults if missing/malformed
+  let payload = {
+    title: "Refugio Animal Paraguay",
+    body: "Tienes una nueva notificacion.",
+    url: "/",
+    icon: DEFAULT_ICON,
+    badge: DEFAULT_BADGE,
+    tag: "refugio-notification",
+    data: {},
+  };
+
+  if (event.data) {
+    try {
+      const parsed = event.data.json();
+      payload = {
+        title: parsed.title || payload.title,
+        body: parsed.body || payload.body,
+        url: parsed.url || payload.url,
+        icon: parsed.icon || payload.icon,
+        badge: parsed.badge || payload.badge,
+        tag: parsed.tag || payload.tag,
+        data: parsed.data || {},
+      };
+    } catch {
+      // If JSON parse fails, try plain text as body
+      const text = event.data.text();
+      if (text) {
+        payload.body = text;
+      }
+    }
+  }
+
+  const notificationOptions = {
+    body: payload.body,
+    icon: payload.icon,
+    badge: payload.badge,
+    tag: payload.tag,
+    renotify: true,
+    data: {
+      url: payload.url,
+      ...payload.data,
+    },
+    actions: [
+      { action: "open", title: "Ver" },
+      { action: "dismiss", title: "Cerrar" },
+    ],
+  };
+
+  event.waitUntil(
+    self.registration.showNotification(payload.title, notificationOptions)
+  );
+});
+
+// NotificationClick: handle user interaction with the shown notification
+self.addEventListener("notificationclick", (event) => {
+  event.notification.close();
+
+  if (event.action === "dismiss") {
+    return;
+  }
+
+  // Determine target URL from notification data
+  const targetUrl = (event.notification.data && event.notification.data.url)
+    ? event.notification.data.url
+    : "/";
+
+  event.waitUntil(
+    clients.matchAll({ type: "window", includeUncontrolled: true }).then((windowClients) => {
+      // Focus an existing window on the target URL if one exists
+      for (const client of windowClients) {
+        if (client.url === targetUrl && "focus" in client) {
+          return client.focus();
+        }
+      }
+      // Otherwise open a new window
+      if (clients.openWindow) {
+        return clients.openWindow(targetUrl);
+      }
+    })
+  );
+});
+
+// NotificationClose: track dismissed notifications (optional analytics hook)
+self.addEventListener("notificationclose", (event) => {
+  // Payload data available for analytics if needed
+  const _data = event.notification.data;
 });
