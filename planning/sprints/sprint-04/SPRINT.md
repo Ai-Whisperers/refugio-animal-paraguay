@@ -2,7 +2,7 @@
 sprint: 4
 title: "Volunteer & Foster Programs"
 weeks: "Weeks 7-8"
-status: planned
+status: done
 points: 99
 created: 2026-03-26T19:06:04
 ---
@@ -19,11 +19,11 @@ Volunteer registration, shift scheduling, task assignment, foster care managemen
 Weeks 7-8 (2-week sprint)
 
 ## Epics
-- [ ] EPIC-36
-- [ ] EPIC-37
-- [ ] EPIC-38
-- [ ] EPIC-39
-- [ ] EPIC-40
+- [x] EPIC-36
+- [x] EPIC-37
+- [x] EPIC-38
+- [x] EPIC-39
+- [x] EPIC-40
 
 ## Total Points
 99 story points across 5 epics, 25 stories

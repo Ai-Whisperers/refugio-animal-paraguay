@@ -1,7 +1,7 @@
 # Development Queue — Refugio Animal Paraguay
 
 **Last updated**: 2026-03-29
-**Active version**: V8 EPIC-41 S1-S3 DONE, S5 DONE (PR #334 merged 2026-03-29), S4 BLOCKED (PR #329 conflict src/app.py). EPIC-42 S1-S3 DONE, S5 DONE (PR #334 merged), S4 BLOCKED (PR #333 conflict — story status corrected from done→blocked). V7 EPIC-40 S2 BLOCKED (PR #322 conflict: frontend/src/types/api.ts, src/app.py), S3 BLOCKED (PR #323 conflict: src/app.py), S4 BLOCKED (PR #333 conflict: src/api/notification_preferences.py, src/schemas/notification_preference.py)
+**Active version**: V8 Sprint 4 COMPLETE. Sprint 5 in progress — EPIC-41 ALL DONE, EPIC-42 ALL DONE (conflicts resolved + merged 2026-03-29: PR #329 RAP-203, PR #333 RAP-208, PR #322 RAP-196, PR #323 RAP-197). EPIC-43: S1-S2 DONE (PR #335, #336), S3-S5 READY. EPIC-44, EPIC-45: all planned.
 **Full roadmap**: [ROADMAP.md](ROADMAP.md) — 16 sprints, 68 epics, ~395 stories
 **Tech stack**: Python 3.12, FastAPI, SQLAlchemy 2.x, PostgreSQL 16, Next.js 14
 
@@ -591,8 +591,8 @@ Full details in [ROADMAP.md](ROADMAP.md). Each sprint has epic and story docs in
 | 1 | V4 | Staff Operations Launch (S1 done, S2+ pending) | 105 | EPIC 21-25 |
 | 2 | V5 | Veterinary & Medical Records | 105 | EPIC 26-30 |
 | 3 | V6 | EU Payment Integration | 112 | EPIC 31-35 |
-| 4 | V7 | Volunteer & Foster Programs | 99 | EPIC 36-40 | EPIC-36: S1 DONE (PR #301), S2 DONE (PR #302), S3 DONE (PR #303 — merged 2026-03-29), S4 DONE (PR #304), S5 DONE (PR #305). EPIC-37: S1 DONE (PR #306), S2 DONE (PR #307), S3 DONE (PR #308 — merged 2026-03-29), S4 DONE (PR #309), S5 DONE (PR #310). EPIC-38: S1 DONE (PR #311), S2 DONE (PR #312), S3 DONE (PR #313), S4 DONE (PR #314), S5 DONE (PR #315). EPIC-39: S1 DONE (PR #316), S2 DONE (PR #317), S3 DONE (PR #318), S4 DONE (PR #319 — merged 2026-03-29), S5 DONE (PR #320). EPIC-40: S1 DONE (PR #321 — merged 2026-03-29), S2 BLOCKED (PR #322 — merge conflict: frontend/src/types/api.ts, src/app.py need manual resolution), S3 BLOCKED (PR #323 — merge conflict: src/app.py needs manual resolution), S4 DONE (PR #324 — merged 2026-03-29), S5 DONE (PR #325 — merged 2026-03-29). |
-| 5 | V8 | Notifications & Communications | 102 | EPIC 41-45 | EPIC-41: S1 DONE (PR #326), S2 DONE (PR #327), S3 DONE (PR #328 — 2026-03-29), S4 BLOCKED (PR #329 — conflict src/app.py), S5 DONE (PR #330 — 2026-03-29). EPIC-42: S1 DONE (RAP-205), S2 DONE (PR #331), S3 DONE (PR #332), S4 BLOCKED (PR #333 — conflict: src/api/notification_preferences.py, src/schemas/notification_preference.py — story status corrected done→blocked), S5 DONE (PR #334 — merged 2026-03-29). EPIC-42 incomplete (S4 conflicting). EPIC-43: S1 DONE (PR #335 — 2026-03-29), S2 DONE (PR #336 — 2026-03-29), S3-S5 planned. |
+| 4 | V7 | Volunteer & Foster Programs | 99 | EPIC 36-40 | COMPLETE (2026-03-29). EPIC-36 through EPIC-40 all 5 stories each DONE. RAP-196 (S2) and RAP-197 (S3) conflicts resolved and merged via rebase. |
+| 5 | V8 | Notifications & Communications | 102 | EPIC 41-45 | In progress. EPIC-41 ALL DONE (RAP-200–204). EPIC-42 ALL DONE (RAP-205–209; RAP-203 and RAP-208 resolved via rebase 2026-03-29). EPIC-43 S1-S2 DONE (RAP-210, RAP-211), S3-S5 READY. EPIC-44, EPIC-45 all planned. |
 | 6 | V9 | GDPR, Security & Compliance | 87 | EPIC 46-50 |
 | 7 | V10 | Analytics & Reporting | 101 | EPIC 51-55 |
 | 8 | V11 | Public Experience & Content | 101 | EPIC 56-60 |
