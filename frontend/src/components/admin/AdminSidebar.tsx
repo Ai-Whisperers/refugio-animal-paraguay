@@ -124,6 +124,12 @@ const NAV_ITEMS: NavItem[] = [
     icon: FileText,
   },
   {
+    label: "Auditoria",
+    href: "/admin/audit-logs",
+    icon: Shield,
+    requiredRole: "admin",
+  },
+  {
     label: "Usuarios",
     href: "/admin/users",
     icon: Shield,
