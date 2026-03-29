@@ -2,7 +2,8 @@
 
 Generates structured impact data for a given date range, covering:
 animals served, adoptions by species, donations by currency, fund
-allocation breakdown, cost-per-adoption, and time-to-adoption metrics.
+allocation breakdown, cost-per-adoption, time-to-adoption metrics,
+volunteer hours contributed, and active foster placements.
 """
 
 from datetime import datetime
@@ -14,8 +15,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.db.models.adoption_request import AdoptionRequest, AdoptionRequestStatus
 from src.db.models.animal import Animal
 from src.db.models.donation import Donation, DonationStatus
+from src.db.models.foster_placement import FosterPlacement
 from src.db.models.fund_allocation import FundAllocation
 from src.db.models.in_kind_donation import InKindDonation
+from src.db.models.volunteer_hours import VolunteerHoursLog
 
 
 async def count_animals_served(
@@ -244,6 +247,89 @@ async def calculate_avg_time_to_adoption(
     return round(float(avg_days), 1) if avg_days is not None else None
 
 
+async def count_volunteer_hours(
+    db: AsyncSession,
+    start_date: datetime,
+    end_date: datetime,
+) -> dict:
+    """Count active volunteers and sum hours logged in the date range.
+
+    An "active volunteer" is any volunteer who logged at least one entry
+    in the period.  Returns unique_volunteers, total_hours, and
+    hours_by_category breakdown.
+    """
+    query = (
+        select(
+            VolunteerHoursLog.category,
+            func.count(VolunteerHoursLog.volunteer_id.distinct()).label("unique_volunteers"),
+            func.sum(VolunteerHoursLog.duration_hours).label("total_hours"),
+        )
+        .where(
+            VolunteerHoursLog.activity_date >= start_date.date(),
+            VolunteerHoursLog.activity_date <= end_date.date(),
+        )
+        .group_by(VolunteerHoursLog.category)
+    )
+
+    result = await db.execute(query)
+    rows = result.all()
+
+    by_category: dict[str, float] = {}
+
+    # Second pass to get global unique volunteer count
+    unique_query = select(
+        func.count(VolunteerHoursLog.volunteer_id.distinct()).label("unique_volunteers"),
+        func.sum(VolunteerHoursLog.duration_hours).label("total_hours"),
+    ).where(
+        VolunteerHoursLog.activity_date >= start_date.date(),
+        VolunteerHoursLog.activity_date <= end_date.date(),
+    )
+    unique_result = await db.execute(unique_query)
+    unique_row = unique_result.one()
+
+    for row in rows:
+        by_category[row.category] = float(row.total_hours or 0)
+
+    return {
+        "unique_volunteers": int(unique_row.unique_volunteers or 0),
+        "total_hours": round(float(unique_row.total_hours or 0), 1),
+        "by_category": by_category,
+    }
+
+
+async def count_active_foster_placements(
+    db: AsyncSession,
+    start_date: datetime,
+    end_date: datetime,
+) -> dict:
+    """Count foster placements active at any point in the date range.
+
+    A placement is counted if it started before end_date and either has
+    no ended_at (still active) or ended_at falls within the range.
+    Returns total placements and new placements started in the range.
+    """
+    # Total placements active during the period
+    active_query = select(func.count(FosterPlacement.id).label("count")).where(
+        FosterPlacement.started_at <= end_date,
+        (FosterPlacement.ended_at.is_(None)) | (FosterPlacement.ended_at >= start_date),
+    )
+    active_result = await db.execute(active_query)
+    active_count = int(active_result.scalar() or 0)
+
+    # New placements started within the range
+    new_query = select(func.count(FosterPlacement.id).label("count")).where(
+        FosterPlacement.started_at >= start_date,
+        FosterPlacement.started_at <= end_date,
+    )
+    new_result = await db.execute(new_query)
+    new_count = int(new_result.scalar() or 0)
+
+    return {
+        "active_during_period": active_count,
+        "new_placements": new_count,
+    }
+
+
 async def generate_impact_report(
     db: AsyncSession,
     start_date: datetime,
@@ -252,7 +338,9 @@ async def generate_impact_report(
 ) -> dict:
     """Generate a full impact report for the given date range.
 
-    Aggregates all metrics into a single structured response.
+    Aggregates all metrics into a single structured response, including:
+    animals served, adoptions, monetary and in-kind donations, fund
+    allocation, volunteer hours, foster placements, and performance KPIs.
     """
     animals = await count_animals_served(db, start_date, end_date)
     adoptions = await count_adoptions(db, start_date, end_date)
@@ -260,6 +348,8 @@ async def generate_impact_report(
     in_kind = await sum_in_kind_donations(db, start_date, end_date)
     fund_allocation = await get_fund_allocation_breakdown(db, start_date, end_date)
     avg_time = await calculate_avg_time_to_adoption(db, start_date, end_date)
+    volunteers = await count_volunteer_hours(db, start_date, end_date)
+    foster = await count_active_foster_placements(db, start_date, end_date)
 
     # Cost per adoption: total fund allocation / number of adoptions
     cost_per_adoption_cents = None
@@ -277,6 +367,8 @@ async def generate_impact_report(
         "donations": donations,
         "in_kind_donations": in_kind,
         "fund_allocation": fund_allocation,
+        "volunteers": volunteers,
+        "foster_placements": foster,
         "performance_metrics": {
             "avg_time_to_adoption_days": avg_time,
             "cost_per_adoption_cents": cost_per_adoption_cents,
