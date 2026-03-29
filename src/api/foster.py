@@ -50,6 +50,7 @@ from src.db.models.foster_profile import (
     FosterStatus,
     HomeType,
 )
+from src.db.models.foster_supply_request import FosterSupplyRequest
 from src.db.models.user import User
 from src.db.session import get_db
 from src.services.foster_check_in_service import (
@@ -66,6 +67,13 @@ from src.services.foster_placement_service import (
     MAX_LIMIT,
     find_animal_matches_for_foster,
     find_foster_matches_for_animal,
+)
+from src.services.foster_supply_service import (
+    create_supply_request,
+    fulfill_request,
+    list_all_requests,
+    list_requests_for_foster,
+    reject_request,
 )
 
 logger = logging.getLogger(__name__)
@@ -726,6 +734,247 @@ async def send_foster_check_in_reminder(
 
 
 # ---------------------------------------------------------------------------
+# Schemas — Supply requests (RAP-194)
+# ---------------------------------------------------------------------------
+
+
+class SupplyRequestCreateRequest(BaseModel):
+    """Foster family payload to submit a supply request."""
+
+    supply_type: str = Field(
+        ...,
+        description="Category of supply needed (food, medication, bedding, toys, transport, grooming, other)",
+    )
+    description: str = Field(
+        ...,
+        min_length=10,
+        max_length=1000,
+        description="What exactly is needed and why",
+    )
+    quantity: int | None = Field(
+        None,
+        ge=1,
+        le=999,
+        description="Quantity needed (optional)",
+    )
+    placement_id: UUID | None = Field(
+        None,
+        description="Placement this request is associated with (optional)",
+    )
+
+
+class SupplyRequestResponse(BaseModel):
+    """Supply request as returned by the API."""
+
+    id: UUID
+    foster_profile_id: UUID
+    placement_id: UUID | None
+    supply_type: str
+    description: str
+    quantity: int | None
+    status: str
+    resolved_at: datetime | None
+    resolved_by: UUID | None
+    staff_notes: str | None
+    created_at: datetime
+    updated_at: datetime
+
+
+class SupplyRequestListResponse(BaseModel):
+    """Paginated list of supply requests."""
+
+    items: list[SupplyRequestResponse]
+    total: int
+    page: int
+    page_size: int
+
+
+class SupplyRequestResolveRequest(BaseModel):
+    """Staff payload to fulfil or reject a supply request."""
+
+    notes: str | None = Field(
+        None,
+        max_length=500,
+        description="Optional staff notes recorded on the request",
+    )
+
+
+# ---------------------------------------------------------------------------
+# Endpoints — Supply requests: foster family (RAP-194)
+# ---------------------------------------------------------------------------
+
+
+@public_router.post(
+    "/api/foster/supply-requests",
+    response_model=SupplyRequestResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Submit a supply request",
+)
+async def submit_supply_request(
+    body: SupplyRequestCreateRequest,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> SupplyRequestResponse:
+    """Submit a supply request as the authenticated foster family.
+
+    The caller must have an approved FosterProfile.
+    Returns 422 if no approved profile exists for this user.
+    """
+    from sqlalchemy import select as sa_select
+
+    from src.db.models.foster_profile import FosterProfile, FosterStatus
+
+    profile_result = await db.execute(
+        sa_select(FosterProfile).where(
+            FosterProfile.user_id == current_user.id,
+            FosterProfile.status == FosterStatus.APPROVED,
+        )
+    )
+    profile = profile_result.scalar_one_or_none()
+    if profile is None:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="No approved foster profile found for this account",
+        )
+
+    req = await create_supply_request(
+        db,
+        foster_profile_id=profile.id,
+        supply_type=body.supply_type,
+        description=body.description,
+        quantity=body.quantity,
+        placement_id=body.placement_id,
+    )
+    return _to_supply_response(req)
+
+
+@public_router.get(
+    "/api/foster/supply-requests/me",
+    response_model=SupplyRequestListResponse,
+    summary="List own supply requests",
+)
+async def list_my_supply_requests(
+    page: int = Query(1, ge=1),
+    page_size: int = Query(DEFAULT_PAGE_SIZE, ge=1, le=MAX_PAGE_SIZE),
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> SupplyRequestListResponse:
+    """Return paginated supply requests submitted by the authenticated foster family."""
+    from sqlalchemy import select as sa_select
+
+    from src.db.models.foster_profile import FosterProfile
+
+    profile_result = await db.execute(
+        sa_select(FosterProfile).where(FosterProfile.user_id == current_user.id)
+    )
+    profile = profile_result.scalar_one_or_none()
+    if profile is None:
+        return SupplyRequestListResponse(items=[], total=0, page=page, page_size=page_size)
+
+    items, total = await list_requests_for_foster(db, profile.id, page=page, page_size=page_size)
+    return SupplyRequestListResponse(
+        items=[_to_supply_response(r) for r in items],
+        total=total,
+        page=page,
+        page_size=page_size,
+    )
+
+
+# ---------------------------------------------------------------------------
+# Endpoints — Supply requests: staff (RAP-194)
+# ---------------------------------------------------------------------------
+
+
+@staff_router.get(
+    "/api/staff/foster/supply-requests",
+    response_model=SupplyRequestListResponse,
+    summary="List all foster supply requests",
+)
+async def list_supply_requests(
+    supply_status: str | None = Query(None, alias="status", description="Filter by status"),
+    supply_type: str | None = Query(None, description="Filter by supply type"),
+    page: int = Query(1, ge=1),
+    page_size: int = Query(DEFAULT_PAGE_SIZE, ge=1, le=MAX_PAGE_SIZE),
+    db: AsyncSession = Depends(get_db),
+    _staff: object = Depends(require_staff),
+) -> SupplyRequestListResponse:
+    """Return paginated supply requests. Optionally filter by status and supply type. Staff only."""
+    items, total = await list_all_requests(
+        db,
+        status_filter=supply_status,
+        supply_type_filter=supply_type,
+        page=page,
+        page_size=page_size,
+    )
+    return SupplyRequestListResponse(
+        items=[_to_supply_response(r) for r in items],
+        total=total,
+        page=page,
+        page_size=page_size,
+    )
+
+
+@staff_router.put(
+    "/api/staff/foster/supply-requests/{request_id}/fulfill",
+    response_model=SupplyRequestResponse,
+    summary="Mark a supply request as fulfilled",
+)
+async def fulfill_supply_request(
+    request_id: UUID,
+    body: SupplyRequestResolveRequest | None = None,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_staff),
+) -> SupplyRequestResponse:
+    """Mark a supply request as fulfilled.
+
+    Returns 404 if not found.
+    Returns 422 if already fulfilled or rejected.
+    Staff only.
+    """
+    notes = body.notes if body else None
+    try:
+        req = await fulfill_request(db, request_id, resolved_by=current_user.id, staff_notes=notes)
+    except ValueError as exc:
+        error_msg = str(exc)
+        if "not found" in error_msg:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=error_msg) from exc
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=error_msg
+        ) from exc
+    return _to_supply_response(req)
+
+
+@staff_router.put(
+    "/api/staff/foster/supply-requests/{request_id}/reject",
+    response_model=SupplyRequestResponse,
+    summary="Reject a supply request",
+)
+async def reject_supply_request(
+    request_id: UUID,
+    body: SupplyRequestResolveRequest | None = None,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_staff),
+) -> SupplyRequestResponse:
+    """Reject a pending or approved supply request.
+
+    Returns 404 if not found.
+    Returns 422 if already fulfilled or rejected.
+    Staff only.
+    """
+    notes = body.notes if body else None
+    try:
+        req = await reject_request(db, request_id, resolved_by=current_user.id, staff_notes=notes)
+    except ValueError as exc:
+        error_msg = str(exc)
+        if "not found" in error_msg:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=error_msg) from exc
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=error_msg
+        ) from exc
+    return _to_supply_response(req)
+
+
+# ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
 
@@ -768,4 +1017,22 @@ def _to_response(profile: FosterProfile) -> FosterProfileResponse:
         reviewed_at=profile.reviewed_at,
         created_at=profile.created_at,
         updated_at=profile.updated_at,
+    )
+
+
+def _to_supply_response(req: FosterSupplyRequest) -> SupplyRequestResponse:
+    """Convert ORM FosterSupplyRequest to SupplyRequestResponse schema."""
+    return SupplyRequestResponse(
+        id=req.id,
+        foster_profile_id=req.foster_profile_id,
+        placement_id=req.placement_id,
+        supply_type=req.supply_type,
+        description=req.description,
+        quantity=req.quantity,
+        status=req.status,
+        resolved_at=req.resolved_at,
+        resolved_by=req.resolved_by,
+        staff_notes=req.staff_notes,
+        created_at=req.created_at,
+        updated_at=req.updated_at,
     )
