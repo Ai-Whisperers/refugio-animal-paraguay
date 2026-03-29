@@ -1138,3 +1138,16 @@ feature/RAP-216-newsletter-template-builder (PR #341, independent of stack)
 - **Deliverables**:
   - RAP-246: GET /legal/adoption-contract endpoint; bilingual ES/EN template; 10 clauses per Ley 4840/2013 + Ley 3140/2006; `?lang=es|en` query param; 16 new unit tests + 7 integration tests
 - **Notes**: Added to existing legal_documents.py router. No DB changes required. EPIC-50 S2 marked done; S3–S5 still READY.
+
+---
+
+## Worker Run: 2026-03-29 — EPIC-50 S3 (RAP-247)
+
+- **Ticket**: RAP-247 Required record retention implementation
+- **Branch**: feature/RAP-247-paraguayan-record-retention
+- **PR**: #372 (open, targeting develop)
+- **Duration**: ~1.5h
+- **Quality**: ruff clean, black clean, 44 unit tests pass
+- **Deliverables**:
+  - RAP-247: `paraguayan_retention_service.py` with 6 statutory retention constants + RETENTION_POLICY list + get_retention_status(); `GET /legal/record-retention-policy` (public); `GET /admin/data-retention/paraguayan-status` (admin-only); 44 unit tests + 13 integration tests
+- **Notes**: Public endpoint returns static RETENTION_POLICY (no DB). Admin status endpoint queries live Animal/AdoptionRequest/Donation counts. EPIC-50 S4–S5 still READY.

@@ -3,7 +3,7 @@ story: S3
 epic: EPIC-50
 ticket: RAP-247
 title: "Required record retention implementation"
-status: planned
+status: done
 points: 3
 priority: P1
 track: Backend
