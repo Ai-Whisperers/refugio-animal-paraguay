@@ -5,6 +5,20 @@
 ---
 
 ## 2026-03 (March)
+### [2026-03-29] Autonomous Worker Run — EPIC-49 Security Hardening (V9 Sprint 6)
+- **Epic**: EPIC-49 Security Hardening — ALL 5 STORIES COMPLETE
+- **Stories completed**:
+  - RAP-240 (S1, P1): Content Security Policy headers — `SecurityHeadersMiddleware`, env-aware CSP, HSTS in production, 28 tests. PR #365.
+  - RAP-241 (S2, P1): Automated dependency vulnerability scanning — `dependency-scan.yml`, weekly cron + GH Issue creation, `.pip-audit-ignore`, 18 tests. PR #366.
+  - RAP-242 (S3, P1): JWT key rotation — `secret_key_previous` fallback decode, admin status endpoint `GET /admin/security/jwt-rotation-status`, 18 tests. PR #367.
+  - RAP-243 (S4, P1): SQL injection and XSS audit — `scripts/security_audit.py` (7 patterns), wired into `security.yml`, false positive fixed in `castration_drive.py`, 34 tests. PR #368.
+  - RAP-244 (S5, P2): Security headers audit — `scripts/check_security_headers.py` (OWASP header validation CLI), CI import validation + live-server audit documented, 34 tests. PR #369.
+- **PRs created**: #365, #366, #367, #368, #369 (all targeting develop, awaiting review/merge)
+- **Tests added**: 132 new unit tests across the 5 stories
+- **Quality gates**: all stories — ruff clean, black clean, mypy clean, all tests passing
+- **QUEUE.md updates**: EPIC-49 stories marked done in STORY.md files on develop
+- **Next**: EPIC-50 (next in QUEUE.md) or V4+ roadmap stories
+
 ### [2026-03-29 13:43] Work Checker Run
 - **PRs merged**: 3 total — #362 (RAP-237 backup codes), #363 (RAP-238 2FA enforcement), #364 (RAP-239 2FA recovery flow)
 - **PRs rebased**: 0 — all were cleanly MERGEABLE
