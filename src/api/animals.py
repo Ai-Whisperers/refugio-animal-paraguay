@@ -1,7 +1,7 @@
 """Animals CRUD router.
 
 Endpoints:
-  GET    /animals                          — paginated list, filterable by species/status
+  GET    /animals                          — paginated list, filterable by species/status/senacsa_registered
   GET    /animals/{id}                     — single animal or 404
   POST   /animals                          — create, returns 201
   PATCH  /animals/{id}                     — partial update, returns 200 or 404
@@ -47,6 +47,10 @@ _MAX_LIMIT = 100
 async def list_animals(
     species: AnimalSpecies | None = Query(default=None),
     status: AnimalStatus | None = Query(default=None),
+    senacsa_registered: bool | None = Query(
+        default=None,
+        description="Filter by SENACSA registration status: true = has number, false = no number",
+    ),
     offset: int = Query(default=0, ge=0),
     limit: int = Query(default=_DEFAULT_LIMIT, ge=1, le=_MAX_LIMIT),
     db: AsyncSession = Depends(get_db),
@@ -56,6 +60,10 @@ async def list_animals(
         stmt = stmt.where(Animal.species == species.value)
     if status is not None:
         stmt = stmt.where(Animal.status == status.value)
+    if senacsa_registered is True:
+        stmt = stmt.where(Animal.senacsa_registration_number.isnot(None))
+    elif senacsa_registered is False:
+        stmt = stmt.where(Animal.senacsa_registration_number.is_(None))
     stmt = stmt.offset(offset).limit(limit).order_by(Animal.created_at.desc())
     result = await db.execute(stmt)
     return list(result.scalars().all())
@@ -88,6 +96,7 @@ async def create_animal(
         birth_date=payload.birth_date,
         description=payload.description,
         primary_photo_url=payload.primary_photo_url,
+        senacsa_registration_number=payload.senacsa_registration_number,
     )
     db.add(animal)
     await db.flush()

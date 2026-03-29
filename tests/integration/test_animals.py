@@ -196,3 +196,123 @@ async def test_delete_animal_then_get_returns_404(client: AsyncClient) -> None:
 async def test_delete_animal_unknown_id_returns_404(client: AsyncClient) -> None:
     response = await client.delete(f"/animals/{uuid4()}")
     assert response.status_code == 404
+
+
+# ---------------------------------------------------------------------------
+# SENACSA registration number — POST /animals
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+@pytest.mark.integration
+async def test_create_animal_with_senacsa_number(client: AsyncClient) -> None:
+    response = await client.post(
+        "/animals",
+        json={
+            "name": "Registrado",
+            "species": "dog",
+            "senacsa_registration_number": "SENACSA-2024-001234",
+        },
+    )
+    assert response.status_code == 201
+    body = response.json()
+    assert body["senacsa_registration_number"] == "SENACSA-2024-001234"
+
+
+@pytest.mark.asyncio
+@pytest.mark.integration
+async def test_create_animal_without_senacsa_number_defaults_to_null(
+    client: AsyncClient,
+) -> None:
+    response = await client.post("/animals", json={"name": "SinRegistro", "species": "cat"})
+    assert response.status_code == 201
+    assert response.json()["senacsa_registration_number"] is None
+
+
+# ---------------------------------------------------------------------------
+# SENACSA registration number — PATCH /animals/{id}
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+@pytest.mark.integration
+async def test_patch_animal_adds_senacsa_number(client: AsyncClient) -> None:
+    create = await client.post("/animals", json={"name": "SinNumero", "species": "dog"})
+    animal_id = create.json()["id"]
+
+    response = await client.patch(
+        f"/animals/{animal_id}",
+        json={"senacsa_registration_number": "SENACSA-2025-009999"},
+    )
+    assert response.status_code == 200
+    assert response.json()["senacsa_registration_number"] == "SENACSA-2025-009999"
+
+
+@pytest.mark.asyncio
+@pytest.mark.integration
+async def test_patch_animal_clears_senacsa_number(client: AsyncClient) -> None:
+    create = await client.post(
+        "/animals",
+        json={
+            "name": "ConNumero",
+            "species": "dog",
+            "senacsa_registration_number": "SENACSA-2024-001111",
+        },
+    )
+    animal_id = create.json()["id"]
+
+    response = await client.patch(
+        f"/animals/{animal_id}",
+        json={"senacsa_registration_number": None},
+    )
+    assert response.status_code == 200
+    assert response.json()["senacsa_registration_number"] is None
+
+
+# ---------------------------------------------------------------------------
+# SENACSA registration number — GET /animals?senacsa_registered=
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.asyncio
+@pytest.mark.integration
+async def test_filter_senacsa_registered_true_returns_only_registered(
+    client: AsyncClient,
+) -> None:
+    # Create one registered and one unregistered animal
+    await client.post(
+        "/animals",
+        json={"name": "Registrado2", "species": "dog", "senacsa_registration_number": "PY-001"},
+    )
+    await client.post("/animals", json={"name": "SinRegistro2", "species": "dog"})
+
+    response = await client.get("/animals?senacsa_registered=true&limit=100")
+    assert response.status_code == 200
+    body = response.json()
+    assert len(body) >= 1
+    assert all(a["senacsa_registration_number"] is not None for a in body)
+
+
+@pytest.mark.asyncio
+@pytest.mark.integration
+async def test_filter_senacsa_registered_false_returns_only_unregistered(
+    client: AsyncClient,
+) -> None:
+    await client.post("/animals", json={"name": "SinRegistro3", "species": "cat"})
+
+    response = await client.get("/animals?senacsa_registered=false&limit=100")
+    assert response.status_code == 200
+    body = response.json()
+    assert len(body) >= 1
+    assert all(a["senacsa_registration_number"] is None for a in body)
+
+
+@pytest.mark.asyncio
+@pytest.mark.integration
+async def test_filter_senacsa_registered_not_provided_returns_all(
+    client: AsyncClient,
+) -> None:
+    response = await client.get("/animals")
+    assert response.status_code == 200
+    # Should include both registered and unregistered animals — no assertion on field value
+    assert isinstance(response.json(), list)
