@@ -1,4 +1,4 @@
-"""Operational metrics service for shelter dashboard (RAP-250, RAP-252).
+"""Operational metrics service for shelter dashboard (RAP-250, RAP-252, RAP-253).
 
 Aggregates live data from the database to produce shelter operational KPIs:
 - Population breakdown by status
@@ -7,6 +7,7 @@ Aggregates live data from the database to produce shelter operational KPIs:
 - Species breakdown
 - Average length of stay for sheltered animals
 - Time-series trend data (daily / weekly / monthly)
+- Capacity alerts and threshold evaluation
 
 All queries are async and run against the live database.
 """
@@ -431,5 +432,169 @@ async def get_trend_data(
         interval=interval,
         lookback_days=days,
         data_points=data_points,
+        generated_at=datetime.now(UTC).isoformat(),
+    )
+
+
+# ---------------------------------------------------------------------------
+# Capacity alerts (RAP-253)
+# ---------------------------------------------------------------------------
+
+# Default alert threshold percentages.
+DEFAULT_WARNING_THRESHOLD_PCT = 70.0
+DEFAULT_CRITICAL_THRESHOLD_PCT = 85.0
+
+# Minimum and maximum allowed threshold values for validation.
+MIN_THRESHOLD_PCT = 1.0
+MAX_THRESHOLD_PCT = 100.0
+
+
+class CapacityAlertSeverity:
+    """Alert severity levels for capacity alerts."""
+
+    CRITICAL = "critical"
+    WARNING = "warning"
+    OK = "ok"
+
+
+class CapacityAlert:
+    """A single capacity alert."""
+
+    __slots__ = ("message", "occupancy_rate_pct", "recommended_action", "severity", "title")
+
+    def __init__(
+        self,
+        severity: str,
+        title: str,
+        message: str,
+        occupancy_rate_pct: float,
+        recommended_action: str,
+    ) -> None:
+        self.severity = severity
+        self.title = title
+        self.message = message
+        self.occupancy_rate_pct = occupancy_rate_pct
+        self.recommended_action = recommended_action
+
+
+class CapacityAlertsResult:
+    """Result of evaluating capacity alerts."""
+
+    __slots__ = (
+        "alerts",
+        "capacity",
+        "critical_threshold_pct",
+        "current_count",
+        "generated_at",
+        "occupancy_rate_pct",
+        "status",
+        "warning_threshold_pct",
+    )
+
+    def __init__(
+        self,
+        current_count: int,
+        capacity: int,
+        occupancy_rate_pct: float,
+        warning_threshold_pct: float,
+        critical_threshold_pct: float,
+        status: str,
+        alerts: list[CapacityAlert],
+        generated_at: str,
+    ) -> None:
+        self.current_count = current_count
+        self.capacity = capacity
+        self.occupancy_rate_pct = occupancy_rate_pct
+        self.warning_threshold_pct = warning_threshold_pct
+        self.critical_threshold_pct = critical_threshold_pct
+        self.status = status
+        self.alerts = alerts
+        self.generated_at = generated_at
+
+
+def _build_capacity_alerts(
+    occupancy: OccupancyMetrics,
+    warning_threshold_pct: float,
+    critical_threshold_pct: float,
+) -> list[CapacityAlert]:
+    """Evaluate occupancy metrics against thresholds and return alerts."""
+    rate = occupancy.occupancy_rate_pct
+    alerts: list[CapacityAlert] = []
+
+    if rate >= critical_threshold_pct:
+        alerts.append(
+            CapacityAlert(
+                severity=CapacityAlertSeverity.CRITICAL,
+                title="Capacidad critica",
+                message=(
+                    f"El refugio esta al {rate}% de capacidad "
+                    f"({occupancy.current_count}/{occupancy.capacity} animales). "
+                    "Se requiere accion inmediata."
+                ),
+                occupancy_rate_pct=rate,
+                recommended_action=(
+                    "Acelera el proceso de adopciones, coordina traslados a otros refugios, "
+                    "o incrementa la capacidad temporalmente con espacios de acogida."
+                ),
+            )
+        )
+    elif rate >= warning_threshold_pct:
+        alerts.append(
+            CapacityAlert(
+                severity=CapacityAlertSeverity.WARNING,
+                title="Capacidad elevada",
+                message=(
+                    f"El refugio esta al {rate}% de capacidad "
+                    f"({occupancy.current_count}/{occupancy.capacity} animales). "
+                    "Monitorea la situacion de cerca."
+                ),
+                occupancy_rate_pct=rate,
+                recommended_action=(
+                    "Prioriza animales disponibles para adopcion en redes sociales "
+                    "y revisa si hay candidatos para acogida temporal."
+                ),
+            )
+        )
+
+    return alerts
+
+
+async def get_capacity_alerts(
+    db: AsyncSession,
+    capacity: int = DEFAULT_SHELTER_CAPACITY,
+    warning_threshold_pct: float = DEFAULT_WARNING_THRESHOLD_PCT,
+    critical_threshold_pct: float = DEFAULT_CRITICAL_THRESHOLD_PCT,
+) -> CapacityAlertsResult:
+    """Evaluate current shelter occupancy against alert thresholds.
+
+    Args:
+        db: Async SQLAlchemy session.
+        capacity: Shelter maximum capacity.
+        warning_threshold_pct: Occupancy percentage that triggers a warning alert.
+        critical_threshold_pct: Occupancy percentage that triggers a critical alert.
+
+    Returns:
+        CapacityAlertsResult with list of active alerts and overall status.
+    """
+    population = await _get_population_breakdown(db)
+    occupancy = OccupancyMetrics(current_count=population.total, capacity=capacity)
+
+    alerts = _build_capacity_alerts(occupancy, warning_threshold_pct, critical_threshold_pct)
+
+    if any(a.severity == CapacityAlertSeverity.CRITICAL for a in alerts):
+        status = CapacityAlertSeverity.CRITICAL
+    elif any(a.severity == CapacityAlertSeverity.WARNING for a in alerts):
+        status = CapacityAlertSeverity.WARNING
+    else:
+        status = CapacityAlertSeverity.OK
+
+    return CapacityAlertsResult(
+        current_count=occupancy.current_count,
+        capacity=occupancy.capacity,
+        occupancy_rate_pct=occupancy.occupancy_rate_pct,
+        warning_threshold_pct=warning_threshold_pct,
+        critical_threshold_pct=critical_threshold_pct,
+        status=status,
+        alerts=alerts,
         generated_at=datetime.now(UTC).isoformat(),
     )
