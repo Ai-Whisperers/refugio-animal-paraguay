@@ -44,3 +44,22 @@ class TotpStatusResponse(BaseModel):
     """Response for GET /auth/2fa/status."""
 
     enabled: bool = Field(..., description="Whether 2FA is active for this user.")
+
+
+class BackupCodesResponse(BaseModel):
+    """Returned by POST /auth/2fa/backup-codes — one-time display of plain-text codes."""
+
+    codes: list[str] = Field(
+        ...,
+        description="Plain-text backup codes. Store these securely — they cannot be retrieved again.",
+    )
+
+
+class BackupCodesCountResponse(BaseModel):
+    """Returned by GET /auth/2fa/backup-codes/count — remaining unused backup codes."""
+
+    remaining: int = Field(
+        ...,
+        ge=0,
+        description="Number of unused backup codes remaining for this user.",
+    )
