@@ -1,7 +1,7 @@
 # Development Queue — Refugio Animal Paraguay
 
 **Last updated**: 2026-03-29
-**Active version**: V9 Sprint 6 WRAPPING UP + V10 Sprint 7 STARTED — EPIC-41–48 ALL DONE. EPIC-49 PARTIAL (RAP-240 PR #365, RAP-241 PR #366, RAP-242 PR #367, RAP-244 PR #369 merged; RAP-243 PR #368 REBASED & UNBLOCKED). EPIC-50 PARTIAL (RAP-247 PR #372 merged, RAP-248 PR #373 merged, RAP-249 PR #374 merged; RAP-245 PR #370 REBASED & UNBLOCKED, RAP-246 PR #371 REBASED & UNBLOCKED). V10 Sprint 7: RAP-250 PR #375 open.
+**Active version**: V9 Sprint 6 COMPLETE + V10 Sprint 7 STARTED — EPIC-41–50 ALL DONE. EPIC-49 ALL DONE (RAP-240–244 all merged). EPIC-50 ALL DONE (RAP-245–249 all merged; RAP-245 PR #370, RAP-246 PR #371, RAP-249 PR #374 required rebase). V10 Sprint 7: RAP-250 PR #375 DONE (merged 2026-03-29).
 **Full roadmap**: [ROADMAP.md](ROADMAP.md) — 16 sprints, 68 epics, ~395 stories
 **Tech stack**: Python 3.12, FastAPI, SQLAlchemy 2.x, PostgreSQL 16, Next.js 14
 
@@ -359,7 +359,7 @@ Week 3-4:
 
 ---
 
-## V9 Sprint 6 — GDPR, Security & Compliance (EPIC-46 + EPIC-47 + EPIC-48 + EPIC-49 partial complete)
+## V9 Sprint 6 — GDPR, Security & Compliance (EPIC-46 + EPIC-47 + EPIC-48 + EPIC-49 + EPIC-50 — ALL COMPLETE)
 
 ### EPIC-46: GDPR Right to Erasure (19 pts) — COMPLETE
 
@@ -398,18 +398,32 @@ Week 3-4:
 | 1 | Content Security Policy headers middleware | RAP-240 | 3 | DONE (PR #365) | Backend |
 | 2 | Automated weekly dependency vulnerability scanning | RAP-241 | 3 | DONE (PR #366) | DevOps |
 | 3 | JWT key rotation with zero-downtime fallback | RAP-242 | 4 | DONE (PR #367) | Backend |
-| 4 | SQL injection and XSS audit script with CI integration | RAP-243 | 3 | CONFLICTING (PR #368 open) | Backend |
+| 4 | SQL injection and XSS audit script with CI integration | RAP-243 | 3 | DONE (PR #368) | Backend |
 | 5 | Security headers audit (HSTS, X-Frame-Options, etc.) | RAP-244 | 3 | DONE (PR #369) | Backend |
 
 ### EPIC-50: Paraguayan Legal Compliance (17 pts)
 
 | # | Story | Ticket | Pts | Status | Track |
 |---|-------|--------|-----|--------|-------|
-| 1 | Animal registration number tracking (SENACSA) | RAP-245 | 3 | CONFLICTING (PR #370 open — conflict: src/api/legal_documents.py) | Backend |
-| 2 | Legal adoption contract template (Paraguay law) | RAP-246 | 5 | CONFLICTING (PR #371 open — conflict: src/api/legal_documents.py) | Backend |
+| 1 | Animal registration number tracking (SENACSA) | RAP-245 | 3 | DONE (PR #370) | Backend |
+| 2 | Legal adoption contract template (Paraguay law) | RAP-246 | 5 | DONE (PR #371) | Backend |
 | 3 | Required record retention implementation | RAP-247 | 3 | DONE (PR #372) | Backend |
 | 4 | Government reporting export formats | RAP-248 | 3 | DONE (PR #373) | Backend |
 | 5 | Multi-language legal documents | RAP-249 | 3 | DONE (PR #374) | Backend |
+
+---
+
+## V10 Sprint 7 — Analytics & Reporting (EPIC-51 partial)
+
+### EPIC-51: Operational Dashboard (21 pts) — IN PROGRESS
+
+| # | Story | Ticket | Pts | Status | Track |
+|---|-------|--------|-----|--------|-------|
+| 1 | Dashboard API with aggregated metrics | RAP-250 | 5 | DONE (PR #375) | Backend |
+| 2 | KPI cards — occupancy, intake, outcomes | RAP-251 | 5 | READY | Frontend |
+| 3 | Trend charts — daily/weekly/monthly | RAP-252 | 5 | READY | Frontend |
+| 4 | Capacity alerts and thresholds | RAP-253 | 3 | READY | Backend |
+| 5 | Exportable dashboard data | RAP-254 | 3 | READY | Backend |
 
 ---
 
@@ -647,7 +661,7 @@ Full details in [ROADMAP.md](ROADMAP.md). Each sprint has epic and story docs in
 | 3 | V6 | EU Payment Integration | 112 | EPIC 31-35 |
 | 4 | V7 | Volunteer & Foster Programs | 99 | EPIC 36-40 | COMPLETE (2026-03-29). EPIC-36 through EPIC-40 all 5 stories each DONE. RAP-196 (S2) and RAP-197 (S3) conflicts resolved and merged via rebase. |
 | 5 | V8 | Notifications & Communications | 102 | EPIC 41-45 | In progress. EPIC-41 ALL DONE (RAP-200–204). EPIC-42 ALL DONE (RAP-205–209). EPIC-43 ALL DONE (RAP-210–214; PR #335–339, 2026-03-29). EPIC-44 ALL DONE (RAP-215–219; PR #340–344, 2026-03-29). EPIC-45 ALL DONE (RAP-220–224; PR #345–349, 2026-03-29). EPIC-46 ALL DONE (RAP-225–229; PR #350–354, 2026-03-29). |
-| 6 | V9 | GDPR, Security & Compliance | 87 | EPIC 46-50 | In progress. EPIC-46 ALL DONE (RAP-225–229; PR #350–354). EPIC-47 ALL DONE (RAP-230–234; PR #355–359). EPIC-48 ALL DONE (RAP-235–239; PR #360–364). EPIC-49 PARTIAL (RAP-240/241/242/244 merged PR #365–367,369; RAP-243 PR #368 CONFLICTING). EPIC-50 pending. |
+| 6 | V9 | GDPR, Security & Compliance | 87 | EPIC 46-50 | COMPLETE (2026-03-29). EPIC-46 ALL DONE (RAP-225–229; PR #350–354). EPIC-47 ALL DONE (RAP-230–234; PR #355–359). EPIC-48 ALL DONE (RAP-235–239; PR #360–364). EPIC-49 ALL DONE (RAP-240–244; PR #365–369). EPIC-50 ALL DONE (RAP-245–249; PR #370–374; RAP-245/246/249 required rebase). |
 | 7 | V10 | Analytics & Reporting | 101 | EPIC 51-55 |
 | 8 | V11 | Public Experience & Content | 101 | EPIC 56-60 |
 | 9 | V12 | Infrastructure & DevOps | 104 | EPIC 61-65 |

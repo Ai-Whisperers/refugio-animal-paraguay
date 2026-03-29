@@ -3,7 +3,7 @@ story: S1
 epic: EPIC-50
 ticket: RAP-245
 title: "Animal registration number tracking (SENACSA)"
-status: in_progress
+status: done
 points: 3
 priority: P0
 track: Backend
