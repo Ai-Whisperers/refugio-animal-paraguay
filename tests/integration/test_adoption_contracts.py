@@ -126,3 +126,59 @@ class TestGenerateAdoptionContract:
         data = resp.json()
         assert data["contract_pdf_path"] is not None
         assert data["contract_generated_at"] is not None
+
+
+class TestDownloadAdoptionContract:
+    """Tests for GET /adoption-requests/{id}/contract/download."""
+
+    @pytest.mark.asyncio
+    @pytest.mark.integration
+    async def test_download_returns_pdf_bytes(self, client: AsyncClient) -> None:
+        request_id, _, _ = await _create_approved_request(client)
+
+        # Generate the contract first
+        resp = await client.post(f"/adoption-requests/{request_id}/contract")
+        assert resp.status_code == 201
+
+        # Download it
+        resp = await client.get(f"/adoption-requests/{request_id}/contract/download")
+        assert resp.status_code == 200
+        assert resp.headers["content-type"] == "application/pdf"
+        assert resp.content[:5] == b"%PDF-"
+
+    @pytest.mark.asyncio
+    @pytest.mark.integration
+    async def test_download_has_attachment_header(self, client: AsyncClient) -> None:
+        request_id, _, _ = await _create_approved_request(client)
+        await client.post(f"/adoption-requests/{request_id}/contract")
+
+        resp = await client.get(f"/adoption-requests/{request_id}/contract/download")
+        assert resp.status_code == 200
+        disposition = resp.headers.get("content-disposition", "")
+        assert "attachment" in disposition
+        assert ".pdf" in disposition
+
+    @pytest.mark.asyncio
+    @pytest.mark.integration
+    async def test_download_without_prior_generation_returns_404(self, client: AsyncClient) -> None:
+        request_id, _, _ = await _create_approved_request(client)
+        # Do NOT call POST /contract first
+        resp = await client.get(f"/adoption-requests/{request_id}/contract/download")
+        assert resp.status_code == 404
+
+    @pytest.mark.asyncio
+    @pytest.mark.integration
+    async def test_download_nonexistent_request_returns_404(self, client: AsyncClient) -> None:
+        fake_id = str(uuid4())
+        resp = await client.get(f"/adoption-requests/{fake_id}/contract/download")
+        assert resp.status_code == 404
+
+    @pytest.mark.asyncio
+    @pytest.mark.integration
+    async def test_download_pdf_has_content(self, client: AsyncClient) -> None:
+        request_id, _, _ = await _create_approved_request(client)
+        await client.post(f"/adoption-requests/{request_id}/contract")
+
+        resp = await client.get(f"/adoption-requests/{request_id}/contract/download")
+        assert resp.status_code == 200
+        assert len(resp.content) > 5000  # meaningful PDF size

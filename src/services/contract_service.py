@@ -87,6 +87,21 @@ class ContractPDFGenerator:
         )
         return output_path
 
+    def generate_bytes(self, data: ContractData) -> bytes:
+        """Generate a PDF contract and return its content as bytes.
+
+        Used for streaming HTTP responses without writing to disk.
+        """
+        pdf = self._build_pdf(data)
+        content = bytes(pdf.output())
+
+        logger.info(
+            "Contract PDF generated (bytes) for request_id=%s (%d bytes)",
+            data.request_id,
+            len(content),
+        )
+        return content
+
     def _build_pdf(self, data: ContractData) -> FPDF:
         """Build the PDF document in memory."""
         pdf = FPDF()
