@@ -1128,3 +1128,13 @@ feature/RAP-216-newsletter-template-builder (PR #341, independent of stack)
 - **Deliverables**:
   - RAP-245: Alembic migration 090 (`senacsa_registration_number` nullable String(100) + index); `Animal` model updated; `AnimalCreate`/`AnimalUpdate`/`AnimalResponse` schemas updated; GET `/animals` gains `senacsa_registered=true|false` filter; 8 new unit tests + 8 new integration tests
 - **Notes**: Pre-existing test failures in `test_volunteer_driver`, `test_media_upload_service`, `test_adoption_notifications`, `test_donation_dashboard` were present on develop before this run. EPIC-50 S1 marked done; S2–S5 marked READY.
+
+### [2026-03-29 01:00] Worker Run — EPIC-50 S2 Complete
+- **Epic**: EPIC-50 — Paraguayan Legal Compliance (V9 Sprint 6)
+- **Stories completed**: RAP-246 (S2 Legal adoption contract template — Paraguay law)
+- **PRs created**: #371 (RAP-246)
+- **Duration**: ~25m
+- **Quality**: ruff clean, black clean, 25 unit tests pass (test_legal_documents.py)
+- **Deliverables**:
+  - RAP-246: GET /legal/adoption-contract endpoint; bilingual ES/EN template; 10 clauses per Ley 4840/2013 + Ley 3140/2006; `?lang=es|en` query param; 16 new unit tests + 7 integration tests
+- **Notes**: Added to existing legal_documents.py router. No DB changes required. EPIC-50 S2 marked done; S3–S5 still READY.
