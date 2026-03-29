@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { Bell, BellOff, BellRing } from "lucide-react";
+import { subscribeToPush, unsubscribeFromPush } from "@/components/ServiceWorkerRegistration";
 
 /**
  * Push notification subscription manager.
@@ -9,6 +10,9 @@ import { Bell, BellOff, BellRing } from "lucide-react";
  * Handles browser push notification permission requests,
  * subscription management, and server registration.
  * Falls back gracefully when Push API is not supported.
+ *
+ * Delegates SW interaction to ServiceWorkerRegistration helpers
+ * to avoid duplicating the urlBase64ToUint8Array conversion.
  */
 
 type PermissionState = "default" | "granted" | "denied" | "unsupported";
@@ -22,35 +26,18 @@ const LABEL_SUBSCRIBING = "Activando...";
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
 const VAPID_PUBLIC_KEY = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY || "";
 
-/**
- * Convert a base64 URL-encoded string to a Uint8Array.
- * Required for applicationServerKey in PushManager.subscribe().
- */
-function urlBase64ToUint8Array(base64String: string): Uint8Array {
-  const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
-  const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
-  const rawData = window.atob(base64);
-  const outputArray = new Uint8Array(rawData.length);
-  for (let i = 0; i < rawData.length; i++) {
-    outputArray[i] = rawData.charCodeAt(i);
-  }
-  return outputArray;
-}
-
 export default function PushNotificationSubscription() {
   const [permission, setPermission] = useState<PermissionState>("default");
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    // Check Push API support
     if (typeof window === "undefined") return;
     if (!("serviceWorker" in navigator) || !("PushManager" in window)) {
       setPermission("unsupported");
       return;
     }
 
-    // Check current permission and subscription state
     setPermission(Notification.permission as PermissionState);
 
     navigator.serviceWorker.ready.then((registration) => {
@@ -63,28 +50,22 @@ export default function PushNotificationSubscription() {
   const subscribe = useCallback(async () => {
     if (!VAPID_PUBLIC_KEY) {
       if (process.env.NODE_ENV === "development") {
-        console.warn("[Push] VAPID_PUBLIC_KEY not configured");
+        console.warn("[Push] NEXT_PUBLIC_VAPID_PUBLIC_KEY not configured");
       }
       return;
     }
 
     setIsLoading(true);
     try {
-      const result = await Notification.requestPermission();
-      setPermission(result as PermissionState);
+      const permResult = await Notification.requestPermission();
+      setPermission(permResult as PermissionState);
 
-      if (result !== "granted") {
-        setIsLoading(false);
-        return;
-      }
+      if (permResult !== "granted") return;
 
-      const registration = await navigator.serviceWorker.ready;
-      const subscription = await registration.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY),
-      });
+      const subscription = await subscribeToPush(VAPID_PUBLIC_KEY);
+      if (!subscription) return;
 
-      // Send subscription to server
+      // Register subscription with backend
       await fetch(`${API_BASE}/api/push-subscriptions`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -108,16 +89,15 @@ export default function PushNotificationSubscription() {
       const subscription = await registration.pushManager.getSubscription();
 
       if (subscription) {
-        // Notify server before unsubscribing
+        // Deregister from backend before unsubscribing locally
         await fetch(`${API_BASE}/api/push-subscriptions`, {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ endpoint: subscription.endpoint }),
         });
-
-        await subscription.unsubscribe();
       }
 
+      await unsubscribeFromPush();
       setIsSubscribed(false);
     } catch (error) {
       if (process.env.NODE_ENV === "development") {
@@ -128,7 +108,6 @@ export default function PushNotificationSubscription() {
     }
   }, []);
 
-  // Don't render anything if push is not supported
   if (permission === "unsupported") return null;
 
   const Icon = permission === "denied" ? BellOff : isSubscribed ? BellRing : Bell;
