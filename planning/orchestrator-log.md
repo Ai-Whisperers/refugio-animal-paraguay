@@ -1070,3 +1070,14 @@ feature/RAP-216-newsletter-template-builder (PR #341, independent of stack)
   - RAP-238: Extended `POST /auth/token` with `totp_code` form field; 2FA enforcement block (TOTP first, backup code fallback); 7 integration tests
   - RAP-239: `DELETE /auth/2fa/admin/users/{user_id}` admin endpoint (disable 2FA + revoke backup codes for locked-out users); backup codes management section in security settings frontend page; 5 integration tests
 - **Notes**: Fixed audit_logs schema mismatches (ip_address TEXT, renamed created_at→timestamp). Custom error middleware wraps responses as {error_code, message} not FastAPI {detail} — tests use response.json()["message"]. EPIC-48 stories S1-S5 all marked done.
+
+### [2026-03-29 10:20] Worker Run — EPIC-48 PRs Completed
+- **Epic**: EPIC-48 — Two-Factor Authentication (V9 Sprint 6)
+- **Stories completed**: RAP-238 (S4 2FA enforcement), RAP-239 (S5 Recovery flow) — PRs were missing from previous run
+- **PRs created**: #363 (RAP-238 — 2FA enforcement at login), #364 (RAP-239 — recovery flow + admin reset)
+- **Duration**: ~20m (pickup run for missing PRs)
+- **Quality**: ruff + black clean on all new files; 28 unit + 7 integration tests for RAP-238/239; all passing
+- **Deliverables**:
+  - RAP-238: `src/api/auth.py` 2FA gate — HTTP 401 totp_required when second factor omitted; tries TOTP then backup code; 7 integration tests
+  - RAP-239: `src/api/two_factor.py` regenerate backup codes + admin reset endpoints; frontend security page updated; 5 integration tests (admin reset scenarios)
+- **Notes**: Branches were already committed from prior session (stacked: 239 → 238 → 237 → develop). Created missing PRs, wrote ticket docs (plan/context/progress/recap/timeline for RAP-238 and RAP-239), updated QUEUE.md on develop marking EPIC-48 ALL DONE.
