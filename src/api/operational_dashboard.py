@@ -1,14 +1,15 @@
-"""Operational dashboard API endpoint (RAP-250).
+"""Operational dashboard API endpoints (RAP-250, RAP-252).
 
 Provides live shelter metrics aggregated from the database. Intended for
 staff/admin use to monitor day-to-day shelter operations.
 
 Endpoints:
   GET /api/admin/operational-dashboard/metrics  — aggregated operational KPIs
+  GET /api/admin/operational-dashboard/trends   — time-series intake/outcome trends
 """
 
 import logging
-from typing import Annotated
+from typing import Annotated, Literal
 
 from fastapi import APIRouter, Depends, Query
 from pydantic import BaseModel
@@ -20,6 +21,7 @@ from src.db.session import get_db
 from src.services.operational_metrics_service import (
     DEFAULT_SHELTER_CAPACITY,
     get_operational_metrics,
+    get_trend_data,
 )
 
 logger = logging.getLogger(__name__)
@@ -153,4 +155,77 @@ async def get_metrics(
             other=metrics.species.other,
         ),
         avg_los_days=metrics.avg_los_days,
+    )
+
+
+# ---------------------------------------------------------------------------
+# Trends endpoint (RAP-252)
+# ---------------------------------------------------------------------------
+
+# Query parameter bounds for lookback window.
+MAX_TREND_LOOKBACK_DAYS = 730
+
+
+class TrendDataPointSchema(BaseModel):
+    period_label: str
+    intake_count: int
+    outcome_count: int
+
+
+class TrendsResponse(BaseModel):
+    interval: str
+    lookback_days: int
+    generated_at: str
+    data_points: list[TrendDataPointSchema]
+
+
+@router.get(
+    "/trends",
+    response_model=TrendsResponse,
+    summary="Time-series intake/outcome trend data",
+)
+async def get_trends(
+    interval: Annotated[
+        Literal["daily", "weekly", "monthly"],
+        Query(description="Grouping interval: daily, weekly, or monthly (default: monthly)"),
+    ] = "monthly",
+    lookback_days: Annotated[
+        int,
+        Query(
+            ge=1,
+            le=MAX_TREND_LOOKBACK_DAYS,
+            description=(
+                "Days of history to include. Defaults: daily=30, weekly=90, monthly=365."
+            ),
+        ),
+    ] = 0,
+    _current_user: User = Depends(require_staff),
+    db: AsyncSession = Depends(get_db),
+) -> TrendsResponse:
+    """Return time-series intake and outcome trend data grouped by interval.
+
+    Each data point represents one period (day/week/month) with:
+    - **period_label**: Human-readable label (e.g. "29/03", "Sem 13", "Mar 2026")
+    - **intake_count**: Animals that entered the shelter in this period
+    - **outcome_count**: Animals that were adopted in this period (proxy metric)
+
+    Defaults (when lookback_days=0): daily=30d, weekly=90d, monthly=365d.
+
+    Auth: requires staff or admin role.
+    """
+    resolved_lookback = lookback_days if lookback_days > 0 else None
+    trend = await get_trend_data(db, interval=interval, lookback_days=resolved_lookback)
+
+    return TrendsResponse(
+        interval=trend.interval,
+        lookback_days=trend.lookback_days,
+        generated_at=trend.generated_at,
+        data_points=[
+            TrendDataPointSchema(
+                period_label=dp.period_label,
+                intake_count=dp.intake_count,
+                outcome_count=dp.outcome_count,
+            )
+            for dp in trend.data_points
+        ],
     )

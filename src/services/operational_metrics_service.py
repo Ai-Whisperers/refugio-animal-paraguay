@@ -1,4 +1,4 @@
-"""Operational metrics service for shelter dashboard (RAP-250).
+"""Operational metrics service for shelter dashboard (RAP-250, RAP-252).
 
 Aggregates live data from the database to produce shelter operational KPIs:
 - Population breakdown by status
@@ -6,6 +6,7 @@ Aggregates live data from the database to produce shelter operational KPIs:
 - Intake and outcome counts for a configurable period
 - Species breakdown
 - Average length of stay for sheltered animals
+- Time-series trend data (daily / weekly / monthly)
 
 All queries are async and run against the live database.
 """
@@ -14,8 +15,9 @@ from __future__ import annotations
 
 import logging
 from datetime import UTC, datetime, timedelta
+from typing import Literal
 
-from sqlalchemy import case, cast, func, select
+from sqlalchemy import case, cast, func, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.types import Integer
 
@@ -299,4 +301,135 @@ async def get_operational_metrics(
         period=period,
         species=species,
         avg_los_days=avg_los,
+    )
+
+
+# ---------------------------------------------------------------------------
+# Trend data (RAP-252)
+# ---------------------------------------------------------------------------
+
+# Valid grouping intervals for trend queries.
+TrendInterval = Literal["daily", "weekly", "monthly"]
+
+# Maximum number of data points per interval to avoid overwhelming the caller.
+MAX_TREND_POINTS = 90
+
+
+class TrendDataPoint:
+    """A single time-series data point for the trend chart."""
+
+    __slots__ = ("intake_count", "outcome_count", "period_label")
+
+    def __init__(self, period_label: str, intake_count: int, outcome_count: int) -> None:
+        self.period_label = period_label
+        self.intake_count = intake_count
+        self.outcome_count = outcome_count
+
+
+class TrendData:
+    """Time-series trend data for the operational dashboard."""
+
+    __slots__ = ("data_points", "generated_at", "interval", "lookback_days")
+
+    def __init__(
+        self,
+        interval: str,
+        lookback_days: int,
+        data_points: list[TrendDataPoint],
+        generated_at: str,
+    ) -> None:
+        self.interval = interval
+        self.lookback_days = lookback_days
+        self.data_points = data_points
+        self.generated_at = generated_at
+
+
+# Mapping from interval name to PostgreSQL date_trunc value and lookback window.
+_INTERVAL_CONFIG: dict[str, dict[str, object]] = {
+    "daily": {"trunc": "day", "default_days": 30},
+    "weekly": {"trunc": "week", "default_days": 90},
+    "monthly": {"trunc": "month", "default_days": 365},
+}
+
+# Format strings for display labels per interval.
+_LABEL_FORMAT: dict[str, str] = {
+    "daily": "%d/%m",
+    "weekly": "Sem %W",
+    "monthly": "%b %Y",
+}
+
+
+async def get_trend_data(
+    db: AsyncSession,
+    interval: TrendInterval = "monthly",
+    lookback_days: int | None = None,
+) -> TrendData:
+    """Compute intake/outcome time-series data grouped by the given interval.
+
+    Uses created_at as the intake proxy and approximates outcomes via adopted
+    animals created within the window (consistent with get_operational_metrics).
+
+    Args:
+        db: Async SQLAlchemy session.
+        interval: Grouping interval — "daily", "weekly", or "monthly".
+        lookback_days: Days of history to include. Defaults per interval:
+            daily=30, weekly=90, monthly=365.
+
+    Returns:
+        TrendData with a list of TrendDataPoint sorted ascending by date.
+    """
+    config = _INTERVAL_CONFIG[interval]
+    trunc_value: str = str(config["trunc"])
+    days: int = lookback_days if lookback_days is not None else int(str(config["default_days"]))
+    since = datetime.now(UTC) - timedelta(days=days)
+
+    # Build grouped intake counts.
+    intake_stmt = (
+        select(
+            func.date_trunc(trunc_value, Animal.created_at).label("period"),
+            func.count(Animal.id).label("intake_count"),
+        )
+        .where(Animal.created_at >= since)
+        .group_by(text("period"))
+        .order_by(text("period"))
+    )
+
+    # Build grouped outcome counts (adopted animals as proxy).
+    outcome_stmt = (
+        select(
+            func.date_trunc(trunc_value, Animal.created_at).label("period"),
+            func.count(Animal.id).label("outcome_count"),
+        )
+        .where(
+            Animal.status == AnimalStatus.ADOPTED,
+            Animal.created_at >= since,
+        )
+        .group_by(text("period"))
+        .order_by(text("period"))
+    )
+
+    intake_result = await db.execute(intake_stmt)
+    outcome_result = await db.execute(outcome_stmt)
+
+    intake_rows = {row.period: row.intake_count for row in intake_result}
+    outcome_rows = {row.period: row.outcome_count for row in outcome_result}
+
+    # Merge the two sets of periods into unified data points.
+    all_periods = sorted(set(intake_rows.keys()) | set(outcome_rows.keys()))
+
+    label_fmt = _LABEL_FORMAT[interval]
+    data_points = [
+        TrendDataPoint(
+            period_label=period.strftime(label_fmt) if hasattr(period, "strftime") else str(period),
+            intake_count=intake_rows.get(period, 0),
+            outcome_count=outcome_rows.get(period, 0),
+        )
+        for period in all_periods[-MAX_TREND_POINTS:]
+    ]
+
+    return TrendData(
+        interval=interval,
+        lookback_days=days,
+        data_points=data_points,
+        generated_at=datetime.now(UTC).isoformat(),
     )
