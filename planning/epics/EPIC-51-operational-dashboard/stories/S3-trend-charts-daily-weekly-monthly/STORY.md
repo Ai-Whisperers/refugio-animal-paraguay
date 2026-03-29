@@ -3,7 +3,7 @@ story: S3
 epic: EPIC-51
 ticket: RAP-252
 title: "Trend charts (daily/weekly/monthly)"
-status: planned
+status: done
 points: 5
 priority: P1
 track: Frontend

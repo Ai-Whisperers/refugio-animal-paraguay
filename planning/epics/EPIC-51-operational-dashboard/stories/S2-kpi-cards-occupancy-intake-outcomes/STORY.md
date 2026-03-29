@@ -3,7 +3,7 @@ story: S2
 epic: EPIC-51
 ticket: RAP-251
 title: "KPI cards (occupancy, intake, outcomes)"
-status: planned
+status: done
 points: 5
 priority: P0
 track: Frontend

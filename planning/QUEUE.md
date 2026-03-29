@@ -1,7 +1,7 @@
 # Development Queue — Refugio Animal Paraguay
 
 **Last updated**: 2026-03-29
-**Active version**: V9 Sprint 6 COMPLETE + V10 Sprint 7 STARTED — EPIC-41–50 ALL DONE. EPIC-49 ALL DONE (RAP-240–244 all merged). EPIC-50 ALL DONE (RAP-245–249 all merged; RAP-245 PR #370, RAP-246 PR #371, RAP-249 PR #374 required rebase). V10 Sprint 7: RAP-250 PR #375 DONE (merged 2026-03-29).
+**Active version**: V9 Sprint 6 COMPLETE + V10 Sprint 7 STARTED — EPIC-41–50 ALL DONE. EPIC-49 ALL DONE (RAP-240–244 all merged). EPIC-50 ALL DONE (RAP-245–249 all merged; RAP-245 PR #370, RAP-246 PR #371, RAP-249 PR #374 required rebase). V10 Sprint 7 EPIC-51 ALL DONE: RAP-250 PR #375, RAP-251 PR #376, RAP-252 PR #377, RAP-253 PR #378, RAP-254 PR #379 (all 2026-03-29).
 **Full roadmap**: [ROADMAP.md](ROADMAP.md) — 16 sprints, 68 epics, ~395 stories
 **Tech stack**: Python 3.12, FastAPI, SQLAlchemy 2.x, PostgreSQL 16, Next.js 14
 
@@ -423,7 +423,7 @@ Week 3-4:
 | 2 | KPI cards — occupancy, intake, outcomes | RAP-251 | 5 | DONE (PR #376) | Frontend |
 | 3 | Trend charts — daily/weekly/monthly | RAP-252 | 5 | DONE (PR #377) | Frontend |
 | 4 | Capacity alerts and thresholds | RAP-253 | 3 | DONE (PR #378) | Backend |
-| 5 | Exportable dashboard data | RAP-254 | 3 | READY | Backend |
+| 5 | Exportable dashboard data | RAP-254 | 3 | DONE (PR #379) | Backend |
 
 ---
 

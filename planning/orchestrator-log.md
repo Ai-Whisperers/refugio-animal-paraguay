@@ -5,6 +5,20 @@
 ---
 
 ## 2026-03 (March)
+### [2026-03-29] Autonomous Worker Run — EPIC-51 Operational Dashboard (V10 Sprint 7)
+- **Epic**: EPIC-51 Operational Dashboard — ALL 5 STORIES COMPLETE (RAP-250 was pre-existing, RAP-251–254 implemented this run)
+- **Stories completed this run**:
+  - RAP-251 (S2, Frontend): KPI cards — occupancy rate with colour alerts, intake/outcome counts, population breakdown bars, species distribution, avg LOS, capacity banners. Next.js page at `/admin/operational-dashboard`. 23 Vitest tests. PR #376.
+  - RAP-252 (S3, Frontend+Backend): Trend charts — `get_trend_data()` with `date_trunc` grouping (daily/weekly/monthly), recharts `AreaChart` page with interval toggle, summary stat cards, empty/error states. 19 Vitest + 19 pytest tests. PR #377.
+  - RAP-253 (S4, Backend): Capacity alerts — `get_capacity_alerts()`, `CapacityAlertSeverity`, configurable warning/critical thresholds. `GET /alerts` endpoint. 28 pytest tests. PR #378.
+  - RAP-254 (S5, Backend): CSV export — `GET /export/metrics` (full snapshot, 19-field single-row CSV) and `GET /export/population` (7-row breakdown). `StreamingResponse` + `Content-Disposition`. 14 pytest tests. PR #379.
+- **PRs created**: #376, #377, #378, #379 (all targeting develop, awaiting review/merge)
+- **Tests added**: ~84 new tests across the 4 stories (23 Vitest + 19 Vitest + 19 pytest + 28 pytest + 14 pytest — some overlap with service tests)
+- **Key fixes**: Vitest `vi.hoisted()` for mock hoisting; recharts `ResizeObserver` polyfill in jsdom; `dependency_overrides` (not `patch`) to bypass FastAPI `Depends`-captured auth; `pytest_asyncio.fixture` for async generator fixtures
+- **Quality gates**: all stories — ruff clean, all tests passing
+- **QUEUE.md updates**: RAP-254 → DONE (PR #379), header updated to EPIC-51 ALL DONE, S2–S5 STORY.md files → status: done
+- **Next**: Next epic from QUEUE.md (RAP-255+)
+
 ### [2026-03-29] Autonomous Worker Run — EPIC-49 Security Hardening (V9 Sprint 6)
 - **Epic**: EPIC-49 Security Hardening — ALL 5 STORIES COMPLETE
 - **Stories completed**:
