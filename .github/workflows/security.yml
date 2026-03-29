@@ -39,6 +39,12 @@ jobs:
         if: always()
         run: bandit -r src/ -ll --format json --output bandit-report.json || true
 
+      - name: SQL injection and XSS audit
+        # Custom script scans for f-string interpolation in text(), %-formatted SQL,
+        # concatenation in execute(), and XSS sinks (HTMLResponse, Markup) in src/.
+        # Use  # audit-ignore  on a line to suppress a confirmed false positive.
+        run: python3 scripts/security_audit.py --src src
+
       # pip-audit dependency scanning has been moved to dependency-scan.yml (RAP-241),
       # which runs on PR/push AND on a weekly schedule with automatic GitHub Issue creation.
       # This step is retained as a lightweight summary reference only.
