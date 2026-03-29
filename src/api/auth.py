@@ -1,15 +1,21 @@
 """Auth router: login, user creation (admin only), current user.
 
 Endpoints:
-  POST /auth/token   — email + password → JWT access token
+  POST /auth/token   — email + password (+ optional TOTP) → JWT access token
   POST /auth/users   — admin only: create staff/admin user
   GET  /auth/me      — current authenticated user info
+
+2FA enforcement:
+  When a user has totp_enabled=True, the login endpoint requires a valid
+  TOTP code or a valid backup code via the optional ``totp_code`` form field.
+  If omitted for a 2FA-enabled account, HTTP 401 is returned with
+  detail "totp_required" so the client can prompt for the second factor.
 """
 
 import logging
 from datetime import UTC, datetime, timedelta
 
-from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi import APIRouter, Depends, Form, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -42,10 +48,19 @@ router = APIRouter(prefix="/auth", tags=["auth"], responses=COMMON_RESPONSES)
 async def login(
     request: Request,
     form: OAuth2PasswordRequestForm = Depends(),
+    totp_code: str | None = Form(
+        default=None, description="TOTP or backup code (required when 2FA is enabled)"
+    ),
     db: AsyncSession = Depends(get_db),
     settings: Settings = Depends(get_settings),
 ) -> TokenResponse:
-    """Authenticate with email + password and return a JWT access token."""
+    """Authenticate with email + password and return a JWT access token.
+
+    When 2FA is enabled for the account, an additional ``totp_code`` form field
+    must be supplied. This can be either a live TOTP code (6 digits) or one of
+    the user's backup codes (8 characters). If ``totp_code`` is omitted and 2FA
+    is enabled, HTTP 401 is returned with detail ``"totp_required"``.
+    """
     result = await db.execute(select(User).where(User.email == form.username))
     user = result.scalar_one_or_none()
 
@@ -100,6 +115,29 @@ async def login(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Email not verified. Check your inbox for the verification link.",
         )
+
+    # --- 2FA enforcement ---
+    if user.totp_enabled:
+        if not totp_code:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="totp_required",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        # Try TOTP code first, then fall back to backup code
+        from src.services.totp_service import verify_totp
+
+        if user.totp_secret and verify_totp(user.totp_secret, totp_code):
+            pass  # TOTP valid
+        else:
+            from src.services.backup_code_service import use_backup_code
+
+            if not await use_backup_code(db, user.id, totp_code):
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Invalid two-factor authentication code.",
+                    headers={"WWW-Authenticate": "Bearer"},
+                )
 
     # Successful login — reset any failed-attempt counter
     await reset_failed_attempts(db, user)
