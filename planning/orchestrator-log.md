@@ -1184,3 +1184,19 @@ feature/RAP-216-newsletter-template-builder (PR #341, independent of stack)
 - **Open PRs**: 3 remaining — PR #368 CONFLICTING, PR #370 CONFLICTING, PR #371 CONFLICTING
 - **Queue**: Fixed QUEUE.md — RAP-245/246 incorrectly marked DONE; corrected to CONFLICTING; STORY.md statuses for EPIC-50 S1/S2 reset to in_progress
 - **Actions taken**: Stale lock removed (PID 3312829). RAP-247 + RAP-248 merged, remote branches deleted. 3 rebases aborted (conflicts). QUEUE.md corrected. Branch hygiene clean.
+
+---
+
+## Worker Run: 2026-03-29 — EPIC-50 S5 (RAP-249)
+
+- **Ticket**: RAP-249 Multi-language legal documents
+- **Branch**: feature/RAP-249-multi-language-legal-documents
+- **PR**: #374 (open, targeting develop)
+- **Duration**: ~2h (split across two sessions due to context exhaustion)
+- **Quality**: ruff clean, black clean, 42 unit tests pass
+- **Deliverables**:
+  - RAP-249: `multilingual_legal_service.py` with SUPPORTED_LANGUAGES (frozenset), DEFAULT_LANGUAGE="es", normalise_language(), MULTILINGUAL_DOCUMENTS, DPA_SECTIONS_ES (9 Spanish DPA sections), RETENTION_POLICY_SUMMARY_ES, RETENTION_POLICY_DOCUMENT_TITLE_ES
+  - Updated `legal_documents.py`: _DPA_SECTIONS_EN (9 English DPA sections), _DPA_BY_LANG dispatch dict, GET /legal/dpa upgraded with ?lang param, GET /legal/record-retention-policy upgraded with ?lang param, new GET /legal/supported-languages endpoint
+  - 42 unit tests (service constants, normalise_language, endpoint layer via TestClient)
+  - 16 integration tests (bilingual smoke tests via AsyncClient, all 3 endpoints)
+- **Notes**: Unsupported ?lang= codes fall back silently to "es". SUPPORTED_LANGUAGES is frozenset for O(1) lookup and immutability. English DPA sections kept in legal_documents.py (not in service) to keep translation service focused on constants only. EPIC-50 now fully delivered (S3–S5 all DONE; S1/S2 CONFLICTING — blocked on PRs #370/#371).
