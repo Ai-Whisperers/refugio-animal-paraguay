@@ -46,3 +46,29 @@ class PreferenceBulkUpdate(BaseModel):
         min_length=1,
         max_length=50,
     )
+
+
+class UnsubscribeLinkResponse(BaseModel):
+    """Response containing a signed one-click unsubscribe URL."""
+
+    unsubscribe_url: str = Field(
+        ...,
+        description="Signed URL to disable all email notifications. Valid for 30 days.",
+    )
+    expires_in_days: int = Field(
+        default=30,
+        description="Number of days until the unsubscribe link expires.",
+    )
+
+
+class UnsubscribeResult(BaseModel):
+    """Response after successfully processing an unsubscribe request."""
+
+    message: str = Field(
+        default="Successfully unsubscribed from all email notifications.",
+        description="Human-readable confirmation message.",
+    )
+    preferences_updated: int = Field(
+        ...,
+        description="Number of email notification preferences set to disabled.",
+    )
