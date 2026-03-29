@@ -8,9 +8,11 @@ from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.audit.service import record_audit
 from src.auth.utils import hash_password, verify_password
 from src.db.models.adopter import Adopter
 from src.db.models.adoption_request import AdoptionRequest
+from src.db.models.audit_log import AuditAction
 from src.db.models.donation import Donation, Donor
 from src.db.models.notification_preference import NotificationPreference
 from src.db.models.sponsorship import Sponsorship
@@ -199,6 +201,17 @@ async def request_account_deletion(db: AsyncSession, user: User, password: str) 
     db.add(verification_token)
     await db.flush()
     logger.info("Account deletion requested for user %s", str(user.id)[:8] + "...")
+
+    # Audit: record the initiation of the self-service deletion request.
+    await record_audit(
+        db,
+        user_id=user.id,
+        action=AuditAction.GDPR_ERASURE,
+        resource_type="user",
+        resource_id=str(user.id),
+        new_values={"stage": "deletion_requested"},
+    )
+
     return token_value
 
 
@@ -229,4 +242,16 @@ async def confirm_account_deletion(db: AsyncSession, token: str) -> bool:
     verification_token.used_at = datetime.now(UTC)
     await db.flush()
     logger.info("Account deletion confirmed for user %s", str(verification_token.user_id)[:8] + "...")
+
+    # Audit: record the confirmed self-service deletion.
+    # Must use verification_token.user_id — user object is now anonymized.
+    await record_audit(
+        db,
+        user_id=verification_token.user_id,
+        action=AuditAction.GDPR_ERASURE,
+        resource_type="user",
+        resource_id=str(verification_token.user_id),
+        new_values={"stage": "deletion_confirmed", "user_deactivated": True},
+    )
+
     return True

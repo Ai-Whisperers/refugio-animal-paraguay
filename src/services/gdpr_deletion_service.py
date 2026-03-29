@@ -25,7 +25,9 @@ from uuid import UUID, uuid4
 from sqlalchemy import delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.audit.service import record_audit
 from src.db.models.adopter import Adopter
+from src.db.models.audit_log import AuditAction
 from src.db.models.donation import Donor
 from src.db.models.foster_profile import FosterProfile
 from src.db.models.notification import Notification
@@ -282,4 +284,16 @@ async def process_deletion_request(
         summary["foster_anonymized"] = await anonymize_foster(db, foster_id)
 
     logger.info("GDPR deletion request processed for user %s: %s", user_id, summary)
+
+    # GDPR Article 5(2) accountability: record the erasure event in the audit trail.
+    # The user record still exists (anonymized), so the FK remains valid.
+    await record_audit(
+        db,
+        user_id=user_id,
+        action=AuditAction.GDPR_ERASURE,
+        resource_type="user",
+        resource_id=str(user_id),
+        new_values=summary,
+    )
+
     return summary
