@@ -8,6 +8,7 @@ Endpoints:
   DELETE /email-campaigns/{id}         — cancel a campaign
   POST   /email-campaigns/{id}/schedule — schedule a draft campaign
   POST   /email-campaigns/{id}/send    — trigger immediate send
+  POST   /email-campaigns/{id}/send/ab  — trigger A/B test send
 """
 
 from uuid import UUID
@@ -27,6 +28,10 @@ from src.schemas.email_campaign import (
     EmailCampaignUpdate,
 )
 from src.schemas.error import RESOURCE_RESPONSES
+from src.services.email_ab_test_service import (
+    initiate_send_ab,
+    is_ab_test_active,
+)
 from src.services.email_campaign_service import (
     cancel_campaign as cancel_campaign_service,
 )
@@ -192,6 +197,41 @@ async def send_campaign_now(
         )
     try:
         await initiate_send(db, campaign)
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=str(exc),
+        ) from exc
+    await db.refresh(campaign)
+    return campaign
+
+
+@router.post("/{campaign_id}/send/ab", response_model=EmailCampaignResponse)
+async def send_campaign_ab(
+    campaign_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    _current_user: User = Depends(require_staff),
+) -> EmailCampaign:
+    """Trigger A/B subject line test send for a draft or scheduled campaign.
+
+    Requires subject_a and subject_b to be set on the campaign.
+    Recipients are split by ab_ratio (default 50/50). Variant attribution
+    is tracked on engagement events for stats comparison.
+    """
+    campaign = await db.get(EmailCampaign, campaign_id)
+    if campaign is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Email campaign not found",
+        )
+    if not is_ab_test_active(campaign):
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Campaign does not have an A/B subject line configured. "
+            "Set subject_b on the campaign before triggering an A/B send.",
+        )
+    try:
+        await initiate_send_ab(db, campaign)
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,

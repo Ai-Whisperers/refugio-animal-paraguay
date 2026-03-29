@@ -65,6 +65,25 @@ class EmailCampaign(Base):
         index=True,
     )
 
+    # A/B testing — subject line variants
+    subject_a: Mapped[str | None] = mapped_column(
+        sa.String(255),
+        nullable=True,
+        comment="Subject line for variant A (or the only subject when not A/B testing)",
+    )
+    subject_b: Mapped[str | None] = mapped_column(
+        sa.String(255),
+        nullable=True,
+        comment="Subject line for variant B. When set, A/B test is active.",
+    )
+    ab_ratio: Mapped[float] = mapped_column(
+        sa.Numeric(4, 3),
+        nullable=False,
+        default=0.5,
+        server_default="0.500",
+        comment="Fraction of recipients assigned to variant A (0.0-1.0).",
+    )
+
     # Scheduling
     scheduled_at: Mapped[datetime | None] = mapped_column(
         sa.DateTime(timezone=True),

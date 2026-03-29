@@ -19,6 +19,23 @@ class EmailCampaignCreate(BaseModel):
         default=None,
         description="When to send the campaign. If null, campaign must be triggered manually.",
     )
+    # A/B testing — both subject lines must be provided together
+    subject_a: str | None = Field(
+        default=None,
+        max_length=255,
+        description="Subject line for variant A. Required when subject_b is set.",
+    )
+    subject_b: str | None = Field(
+        default=None,
+        max_length=255,
+        description="Subject line for variant B. When set, A/B test mode is active.",
+    )
+    ab_ratio: float = Field(
+        default=0.5,
+        ge=0.0,
+        le=1.0,
+        description="Fraction of recipients assigned to variant A (0.0-1.0).",
+    )
 
 
 class EmailCampaignUpdate(BaseModel):
@@ -30,6 +47,9 @@ class EmailCampaignUpdate(BaseModel):
     email_template_id: UUID | None = None
     scheduled_at: datetime | None = None
     status: EmailCampaignStatus | None = None
+    subject_a: str | None = Field(default=None, max_length=255)
+    subject_b: str | None = Field(default=None, max_length=255)
+    ab_ratio: float | None = Field(default=None, ge=0.0, le=1.0)
 
 
 class EmailCampaignResponse(BaseModel):
@@ -52,6 +72,9 @@ class EmailCampaignResponse(BaseModel):
     created_at: datetime
     updated_at: datetime
     error_message: str | None
+    subject_a: str | None
+    subject_b: str | None
+    ab_ratio: float | None
 
 
 class EmailCampaignSummary(BaseModel):
@@ -68,3 +91,4 @@ class EmailCampaignSummary(BaseModel):
     sent_count: int
     total_recipients: int
     created_at: datetime
+    subject_b: str | None
