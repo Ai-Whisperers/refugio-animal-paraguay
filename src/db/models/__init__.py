@@ -62,6 +62,7 @@ from .user_consent import ConsentMethod, ConsentStatus, ConsentType, UserConsent
 from .vaccination import Vaccination, VaccinationSchedule, VaccinationStatus, VaccineType
 from .verification_token import TokenType, VerificationToken
 from .vet_referral import ReferralStatus, ReferralUrgency, VetReferral
+from .whatsapp_template import WhatsAppTemplate, WhatsAppTemplateCategory, WhatsAppTemplateStatus
 
 __all__ = [
     "BRONZE_AMOUNT_CENTS",
@@ -161,4 +162,7 @@ __all__ = [
     "VetVisit",
     "VisitStatus",
     "VisitType",
+    "WhatsAppTemplate",
+    "WhatsAppTemplateCategory",
+    "WhatsAppTemplateStatus",
 ]
