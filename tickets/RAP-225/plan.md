@@ -1,39 +1,36 @@
 # RAP-225 Plan
 
 ## Objective
-Extend the GDPR data deletion service to anonymize volunteer, rescuer, and foster profiles, ensuring EPIC-46 S1 covers all personally-linked entities.
+Extend the GDPR data deletion API to cover all PII-bearing entities (volunteers, rescuers, foster profiles, users with phone/full_name) and add deletion request tracking.
 
 ## Description
-The existing deletion service handled donors, adopters, and user accounts. This ticket extends it to also anonymize VolunteerProfile, RescuerProfile, and FosterProfile personal data — completing the Article 17 coverage for all entities that carry PII.
+The existing deletion service only anonymizes donors and adopters. GDPR Article 17 requires all personal data to be erased across all systems. This story extends the anonymization to cover volunteer profiles, rescuer profiles, foster profiles, and adds a `DeletionRequest` model for audit/tracking purposes. A new endpoint to list pending requests supports the admin review workflow.
 
 ## Acceptance Criteria
-- [x] `anonymize_volunteer()` clears emergency contact name/phone, bio; sets motivation to "[DELETED]", status to "inactive"
-- [x] `anonymize_rescuer()` clears display_name, sets unique anonymized slug, clears bio/location/social_links/phone_whatsapp
-- [x] `anonymize_foster()` clears motivation/experience_description/other_pets_description; sets status to "inactive"
-- [x] `deactivate_user_account()` also clears full_name and phone
-- [x] `process_deletion_request()` accepts volunteer_id, rescuer_id, foster_id optional params
-- [x] GDPRDeletionRequest and GDPRDeletionResponse schemas updated with new fields
-- [x] Unit tests cover all new anonymization functions
-- [x] Integration test verifies response includes new boolean fields
-- [x] All quality gates pass (ruff, mypy, black, pytest)
+- [ ] All PII-bearing entities are anonymized: donor, adopter, volunteer, rescuer, foster, user (full_name, phone)
+- [ ] A `DeletionRequest` model records each request with requestor, target user, status, and timestamp
+- [ ] POST /gdpr/deletion-request creates a DeletionRequest record before executing
+- [ ] GET /gdpr/deletion-requests returns paginated list of deletion requests (admin only)
+- [ ] API endpoints documented in OpenAPI schema
+- [ ] Unit and integration tests passing (80%+ coverage)
 
 ## Complexity Assessment
 **Track**: Complex Implementation
 
-**Assessment result**: Complex — touches 5+ files, adds 3 new service functions, extends schema and API layer.
+### Assessment result: Complex — affects 5+ models, requires DB migration, new endpoints, extended service logic
 
 ## Approach
-1. Extend gdpr_deletion_service.py with three new anonymize_* functions
-2. Update deactivate_user_account() to also clear full_name and phone
-3. Extend process_deletion_request() signature and summary dict
-4. Update schemas (GDPRDeletionRequest, GDPRDeletionResponse)
-5. Update API router docstring
-6. Add unit tests (TestAnonymizeVolunteer, TestAnonymizeRescuer, TestAnonymizeFoster, TestDeactivateUserAccountExtended)
-7. Update integration test
+1. Add `DeletionRequest` DB model + Alembic migration
+2. Extend `gdpr_deletion_service.py` to anonymize volunteer, rescuer, and foster profiles
+3. Update `GDPRDeletionRequest` schema to accept `volunteer_id`, `rescuer_id`, `foster_id`
+4. Update `GDPRDeletionResponse` schema with new fields
+5. Add `GET /gdpr/deletion-requests` endpoint
+6. Write unit tests for new service functions
+7. Write integration tests for new endpoint
 
 ## Dependencies
-- Depends on: RAP-224 (existing deletion service baseline)
-- Blocks: RAP-226 (third-party cascade builds on this)
+- Depends on: existing GDPR deletion service (RAP-007 era)
+- Depends on: VolunteerProfile, RescuerProfile, FosterProfile models (already exist)
 
 ## Risks
-- UNIQUE constraint on rescuer slug → Mitigation: _anonymized_slug() with uuid4 suffix
+- Risk: migration ordering conflicts → Mitigation: use next available migration number

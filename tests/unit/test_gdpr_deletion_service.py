@@ -8,8 +8,12 @@ from src.services.gdpr_deletion_service import (
     ANONYMIZED_ADDRESS,
     ANONYMIZED_NAME,
     ANONYMIZED_PHONE,
+    ANONYMIZED_TEXT,
     anonymize_adopter,
     anonymize_donor,
+    anonymize_foster,
+    anonymize_rescuer,
+    anonymize_volunteer,
     deactivate_user_account,
     delete_user_consents,
     delete_user_notifications,
@@ -283,3 +287,195 @@ class TestProcessDeletionRequest:
         assert result["user_deactivated"] is False
         mock_consents.assert_awaited_once()
         mock_notifications.assert_awaited_once()
+
+
+class TestAnonymizeVolunteer:
+    """Tests for anonymize_volunteer()."""
+
+    @pytest.mark.asyncio
+    async def test_anonymize_volunteer_found(self, mock_db: AsyncMock) -> None:
+        """Anonymize a volunteer profile's personal data when found."""
+        volunteer_id = uuid4()
+        volunteer = MagicMock()
+        mock_db.get.return_value = volunteer
+
+        result = await anonymize_volunteer(mock_db, volunteer_id)
+
+        assert result is True
+        assert volunteer.emergency_contact_name is None
+        assert volunteer.emergency_contact_phone is None
+        assert volunteer.bio is None
+        assert volunteer.motivation == ANONYMIZED_TEXT
+        assert volunteer.status == "inactive"
+        mock_db.flush.assert_awaited_once()
+
+    @pytest.mark.asyncio
+    async def test_anonymize_volunteer_not_found(self, mock_db: AsyncMock) -> None:
+        """Return False when volunteer profile does not exist."""
+        mock_db.get.return_value = None
+
+        result = await anonymize_volunteer(mock_db, uuid4())
+
+        assert result is False
+        mock_db.flush.assert_not_awaited()
+
+
+class TestAnonymizeRescuer:
+    """Tests for anonymize_rescuer()."""
+
+    @pytest.mark.asyncio
+    async def test_anonymize_rescuer_found(self, mock_db: AsyncMock) -> None:
+        """Anonymize a rescuer profile's personal data when found."""
+        rescuer_id = uuid4()
+        rescuer = MagicMock()
+        mock_db.get.return_value = rescuer
+
+        result = await anonymize_rescuer(mock_db, rescuer_id)
+
+        assert result is True
+        assert rescuer.display_name == ANONYMIZED_NAME
+        assert rescuer.slug.startswith("deleted-")
+        assert rescuer.bio is None
+        assert rescuer.location_city is None
+        assert rescuer.location_coords is None
+        assert rescuer.social_links is None
+        assert rescuer.phone_whatsapp is None
+        mock_db.flush.assert_awaited_once()
+
+    @pytest.mark.asyncio
+    async def test_anonymize_rescuer_not_found(self, mock_db: AsyncMock) -> None:
+        """Return False when rescuer profile does not exist."""
+        mock_db.get.return_value = None
+
+        result = await anonymize_rescuer(mock_db, uuid4())
+
+        assert result is False
+        mock_db.flush.assert_not_awaited()
+
+    @pytest.mark.asyncio
+    async def test_anonymize_rescuer_generates_unique_slugs(self, mock_db: AsyncMock) -> None:
+        """Each anonymization produces a unique slug to avoid UNIQUE constraint violations."""
+        rescuer1 = MagicMock()
+        rescuer2 = MagicMock()
+        mock_db.get.side_effect = [rescuer1, rescuer2]
+
+        await anonymize_rescuer(mock_db, uuid4())
+        await anonymize_rescuer(mock_db, uuid4())
+
+        assert rescuer1.slug != rescuer2.slug
+
+
+class TestAnonymizeFoster:
+    """Tests for anonymize_foster()."""
+
+    @pytest.mark.asyncio
+    async def test_anonymize_foster_found(self, mock_db: AsyncMock) -> None:
+        """Anonymize a foster profile's personal data when found."""
+        foster_id = uuid4()
+        foster = MagicMock()
+        mock_db.get.return_value = foster
+
+        result = await anonymize_foster(mock_db, foster_id)
+
+        assert result is True
+        assert foster.motivation == ANONYMIZED_TEXT
+        assert foster.experience_description is None
+        assert foster.other_pets_description is None
+        assert foster.status == "inactive"
+        mock_db.flush.assert_awaited_once()
+
+    @pytest.mark.asyncio
+    async def test_anonymize_foster_not_found(self, mock_db: AsyncMock) -> None:
+        """Return False when foster profile does not exist."""
+        mock_db.get.return_value = None
+
+        result = await anonymize_foster(mock_db, uuid4())
+
+        assert result is False
+        mock_db.flush.assert_not_awaited()
+
+
+class TestDeactivateUserAccountExtended:
+    """Extended tests for deactivate_user_account() — new full_name/phone clearing."""
+
+    @pytest.mark.asyncio
+    async def test_deactivate_clears_full_name_and_phone(self, mock_db: AsyncMock) -> None:
+        """User account deactivation also clears full_name and phone (new PII fields)."""
+        user = MagicMock()
+        mock_db.get.return_value = user
+
+        await deactivate_user_account(mock_db, uuid4())
+
+        assert user.full_name is None
+        assert user.phone is None
+
+
+class TestProcessDeletionRequestExtended:
+    """Extended tests for process_deletion_request() — new entity types."""
+
+    @pytest.mark.asyncio
+    @patch("src.services.gdpr_deletion_service.anonymize_foster")
+    @patch("src.services.gdpr_deletion_service.anonymize_rescuer")
+    @patch("src.services.gdpr_deletion_service.anonymize_volunteer")
+    @patch("src.services.gdpr_deletion_service.delete_user_notifications")
+    @patch("src.services.gdpr_deletion_service.delete_user_consents")
+    @patch("src.services.gdpr_deletion_service.deactivate_user_account")
+    async def test_full_deletion_all_entity_types(
+        self,
+        mock_deactivate: AsyncMock,
+        mock_consents: AsyncMock,
+        mock_notifications: AsyncMock,
+        mock_volunteer: AsyncMock,
+        mock_rescuer: AsyncMock,
+        mock_foster: AsyncMock,
+        mock_db: AsyncMock,
+    ) -> None:
+        """Full deletion request covers volunteer, rescuer, and foster profiles."""
+        user_id = uuid4()
+        volunteer_id = uuid4()
+        rescuer_id = uuid4()
+        foster_id = uuid4()
+
+        mock_deactivate.return_value = True
+        mock_consents.return_value = 0
+        mock_notifications.return_value = 0
+        mock_volunteer.return_value = True
+        mock_rescuer.return_value = True
+        mock_foster.return_value = True
+
+        result = await process_deletion_request(
+            mock_db,
+            user_id,
+            volunteer_id=volunteer_id,
+            rescuer_id=rescuer_id,
+            foster_id=foster_id,
+        )
+
+        assert result["volunteer_anonymized"] is True
+        assert result["rescuer_anonymized"] is True
+        assert result["foster_anonymized"] is True
+        mock_volunteer.assert_awaited_once_with(mock_db, volunteer_id)
+        mock_rescuer.assert_awaited_once_with(mock_db, rescuer_id)
+        mock_foster.assert_awaited_once_with(mock_db, foster_id)
+
+    @pytest.mark.asyncio
+    @patch("src.services.gdpr_deletion_service.delete_user_notifications")
+    @patch("src.services.gdpr_deletion_service.delete_user_consents")
+    @patch("src.services.gdpr_deletion_service.deactivate_user_account")
+    async def test_deletion_skips_profiles_when_ids_not_provided(
+        self,
+        mock_deactivate: AsyncMock,
+        mock_consents: AsyncMock,
+        mock_notifications: AsyncMock,
+        mock_db: AsyncMock,
+    ) -> None:
+        """Profile anonymization is skipped when IDs are not provided."""
+        mock_deactivate.return_value = True
+        mock_consents.return_value = 0
+        mock_notifications.return_value = 0
+
+        result = await process_deletion_request(mock_db, uuid4())
+
+        assert result["volunteer_anonymized"] is False
+        assert result["rescuer_anonymized"] is False
+        assert result["foster_anonymized"] is False
