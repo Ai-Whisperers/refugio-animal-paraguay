@@ -1,7 +1,7 @@
 # Development Queue — Refugio Animal Paraguay
 
 **Last updated**: 2026-03-29
-**Active version**: V10 Sprint 7 IN PROGRESS — EPIC-51 ALL DONE, EPIC-52 ALL DONE (conflicts resolved 2026-03-29; PRs #378/#380/#382 rebased), EPIC-53 ALL DONE (RAP-260 PR #385, RAP-261 PR #386, RAP-262 PR #387, RAP-263 PR #388, RAP-264 PR #389). Next: EPIC-54 and EPIC-55.
+**Active version**: V10 Sprint 7 IN PROGRESS — EPIC-51 ALL DONE, EPIC-52 ALL DONE (conflicts resolved 2026-03-29; PRs #378/#380/#382 rebased), EPIC-53 ALL DONE (RAP-260 PR #385, RAP-261 PR #386, RAP-262 PR #387, RAP-263 PR #388, RAP-264 PR #389). EPIC-54 IN PROGRESS: RAP-265 PR #390 (open), RAP-266 PR #391 (open). Next: EPIC-54 S3-S5, then EPIC-55.
 **Full roadmap**: [ROADMAP.md](ROADMAP.md) — 16 sprints, 68 epics, ~395 stories
 **Tech stack**: Python 3.12, FastAPI, SQLAlchemy 2.x, PostgreSQL 16, Next.js 14
 
@@ -444,6 +444,16 @@ Week 3-4:
 | 3 | Return and surrender tracking analytics | RAP-262 | 3 | DONE (PR #387) | Backend |
 | 4 | Adoption success rate dashboard | RAP-263 | 5 | DONE (PR #388) | Frontend |
 | 5 | Adopter satisfaction survey integration | RAP-264 | 3 | DONE (PR #389) | Fullstack |
+
+### EPIC-54: Impact Report Generator (21 pts) — IN PROGRESS
+
+| # | Story | Ticket | Pts | Status | Track |
+|---|-------|--------|-----|--------|-------|
+| 1 | Impact report data aggregation service | RAP-265 | 5 | DONE (PR #390) | Backend |
+| 2 | Impact report PDF template | RAP-266 | 5 | DONE (PR #391) | Backend |
+| 3 | Donor-specific impact summaries | RAP-267 | 3 | READY | Backend |
+| 4 | Annual impact report with visualizations | RAP-268 | 5 | READY | Fullstack |
+| 5 | Scheduled report generation and distribution | RAP-269 | 3 | READY | Backend |
 
 ---
 

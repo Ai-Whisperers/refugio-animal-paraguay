@@ -3,7 +3,7 @@ story: S2
 epic: EPIC-54
 ticket: RAP-266
 title: "Impact report PDF template"
-status: planned
+status: done
 points: 5
 priority: P0
 track: Backend
