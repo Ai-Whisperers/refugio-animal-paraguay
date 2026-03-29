@@ -135,6 +135,7 @@ from src.api.public_sponsorships import router as public_sponsorships_router
 from src.api.public_statistics import router as public_statistics_router
 from src.api.public_survey import router as public_survey_router
 from src.api.public_voucher_stats import router as public_voucher_stats_router
+from src.api.notifications_ws import router as notifications_ws_router
 from src.api.push_subscriptions import router as push_subscriptions_router
 from src.api.queued_donations import router as queued_donations_router
 from src.api.referral_tracking import admin_router as referral_tracking_admin_router
@@ -364,6 +365,7 @@ def create_app() -> FastAPI:
     application.include_router(tigo_money_router)
     application.include_router(webhooks_router)
     application.include_router(push_subscriptions_router)
+    application.include_router(notifications_ws_router)
     application.include_router(admin_campaigns_router)
     application.include_router(admin_fund_dashboard_router)
     application.include_router(admin_castration_campaigns_router)
