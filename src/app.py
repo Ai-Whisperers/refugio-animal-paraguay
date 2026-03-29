@@ -78,6 +78,7 @@ from src.api.driver_reimbursement import router as driver_reimbursement_router
 from src.api.educational_article import admin_router as article_admin_router
 from src.api.educational_article import public_router as article_public_router
 from src.api.email_campaigns import router as email_campaigns_router
+from src.api.email_tracking import router as email_tracking_router
 from src.api.email_lists import router as email_lists_router
 from src.api.email_verification import router as email_verification_router
 from src.api.emergencies import router as emergencies_router
@@ -516,6 +517,7 @@ def create_app() -> FastAPI:
     application.include_router(whatsapp_webhook_router)  # RAP-204: two-way WhatsApp
     application.include_router(email_lists_router)  # RAP-215: email list management
     application.include_router(email_campaigns_router)  # RAP-217: campaign scheduling
+    application.include_router(email_tracking_router)  # RAP-218: open/click tracking
     return application
 
 

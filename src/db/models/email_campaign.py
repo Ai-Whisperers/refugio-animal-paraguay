@@ -10,7 +10,7 @@ from datetime import datetime
 from uuid import UUID
 
 import sqlalchemy as sa
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from ..base import Base
 
@@ -119,4 +119,12 @@ class EmailCampaign(Base):
         sa.Text,
         nullable=True,
         comment="Last error message if campaign sending failed",
+    )
+
+    # Events (opens/clicks) recorded via tracking endpoints
+    events: Mapped[list["EmailCampaignEvent"]] = relationship(  # noqa: F821
+        "EmailCampaignEvent",
+        back_populates="campaign",
+        lazy="select",
+        cascade="all, delete-orphan",
     )
