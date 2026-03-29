@@ -861,6 +861,14 @@ EPIC-42 S4 — RAP-208: Frequency controls (P2, Backend)
 - **Quality**: ruff clean, black clean, 12 unit tests (RAP-208) + 18 unit tests (RAP-209) all passing
 - **Notes**: EPIC-42 fully complete (all 5 stories done). RAP-208 adds per-channel frequency settings (immediate/daily_digest/weekly) via new notification_channel_frequency table + migration 082 + GET/PUT /notification-preferences/frequency endpoints. RAP-209 adds one-click email unsubscribe via signed JWT — GET /notification-preferences/unsubscribe-link (authenticated, returns 30-day token URL) + GET /notification-preferences/unsubscribe?token=<jwt> (public). EPIC-43 (PDF Document Generation) is next.
 
+### [2026-03-29 05:19] Worker Run — EPIC-43 S1+S2 Complete
+- **Epic**: EPIC-43 — PDF Document Generation
+- **Stories completed**: RAP-210 (S1 Base PDF Service), RAP-211 (S2 Adoption Contract PDF Download)
+- **PRs created**: #335 (RAP-210), #336 (RAP-211)
+- **Duration**: ~45m total
+- **Quality**: ruff clean, black clean, 33 unit tests (RAP-210) + 17 unit tests + 5 integration tests (RAP-211) all passing
+- **Notes**: RAP-210 adds `src/services/pdf_service.py` — centralized base with `ShelterPDF(FPDF)` (branded header/footer, helper methods), `BasePDFGenerator` abstract class (generate_bytes/generate_file), `PDFGenerationError`, and `SHELTER_INFO` constants as single source of truth. RAP-211 adds `ContractPDFGenerator.generate_bytes()` and `GET /adoption-requests/{id}/contract/download` streaming endpoint. EPIC-43 S3-S5 (vaccination certificate, donation receipt EU, letterhead) remain planned.
+
 ### [2026-03-29 04:42] Work Checker Run
 - **PRs merged**: 1 — PR #334 (RAP-209 email-unsubscribe, was already merged by prior worker run)
 - **PRs rebased**: 0 successful, 4 failed — PR #333 (src/api/notification_preferences.py, src/schemas/notification_preference.py), PR #329 (src/app.py), PR #323 (src/app.py), PR #322 (frontend/src/types/api.ts, src/app.py)
