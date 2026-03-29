@@ -3,7 +3,7 @@ story: S3
 epic: EPIC-45
 ticket: RAP-222
 title: "In-app notification center redesign"
-status: planned
+status: ready
 points: 5
 priority: P1
 track: Frontend

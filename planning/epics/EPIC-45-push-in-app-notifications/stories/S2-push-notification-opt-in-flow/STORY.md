@@ -3,7 +3,7 @@ story: S2
 epic: EPIC-45
 ticket: RAP-221
 title: "Push notification opt-in flow"
-status: planned
+status: ready
 points: 3
 priority: P1
 track: Frontend

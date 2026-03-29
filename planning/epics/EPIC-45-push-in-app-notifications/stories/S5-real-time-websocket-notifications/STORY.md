@@ -3,7 +3,7 @@ story: S5
 epic: EPIC-45
 ticket: RAP-224
 title: "Real-time WebSocket notifications"
-status: planned
+status: ready
 points: 5
 priority: P2
 track: Fullstack

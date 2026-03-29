@@ -3,7 +3,7 @@ story: S1
 epic: EPIC-45
 ticket: RAP-220
 title: "Service Worker for browser push"
-status: planned
+status: ready
 points: 5
 priority: P1
 track: Frontend
