@@ -19,10 +19,11 @@ from slowapi.errors import RateLimitExceeded
 from src.api.admin import router as admin_router
 from src.api.admin_campaigns import router as admin_campaigns_router
 from src.api.admin_castration_campaigns import router as admin_castration_campaigns_router
-from src.api.admin_security import router as admin_security_router
 from src.api.admin_data_retention import router as admin_data_retention_router
 from src.api.admin_fund_dashboard import router as admin_fund_dashboard_router
+from src.api.admin_government_reports import router as admin_government_reports_router
 from src.api.admin_moderation import router as admin_moderation_router
+from src.api.admin_security import router as admin_security_router
 from src.api.admin_sse import router as admin_sse_router
 from src.api.admin_voucher_finance import router as admin_voucher_finance_router
 from src.api.adopters import router as adopters_router
@@ -35,7 +36,6 @@ from src.api.adoption_requirements import (
 )
 from src.api.adoption_success import router as adoption_success_router
 from src.api.anbi_compliance import router as anbi_compliance_router
-from src.api.sub_processor_registry import router as sub_processor_registry_router
 from src.api.animal_intake_outcome import router as animal_intake_outcome_router
 from src.api.animal_updates import router as animal_updates_router
 from src.api.animals import router as animals_router
@@ -171,6 +171,7 @@ from src.api.shifts import public_router as shifts_public_router
 from src.api.shifts import staff_router as shifts_staff_router
 from src.api.smart_matching import router as smart_matching_router
 from src.api.sponsorships import router as sponsorships_router
+from src.api.sub_processor_registry import router as sub_processor_registry_router
 from src.api.subscriptions import router as subscriptions_router
 from src.api.success_stories import admin_router as stories_admin_router
 from src.api.success_stories import public_router as stories_public_router
@@ -380,6 +381,7 @@ def create_app() -> FastAPI:
     application.include_router(notifications_ws_router)
     application.include_router(admin_campaigns_router)
     application.include_router(admin_data_retention_router)
+    application.include_router(admin_government_reports_router)
     application.include_router(admin_fund_dashboard_router)
     application.include_router(admin_castration_campaigns_router)
     application.include_router(admin_voucher_finance_router)
