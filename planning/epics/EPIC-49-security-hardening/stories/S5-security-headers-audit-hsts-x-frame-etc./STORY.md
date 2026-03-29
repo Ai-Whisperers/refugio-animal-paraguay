@@ -3,7 +3,7 @@ story: S5
 epic: EPIC-49
 ticket: RAP-244
 title: "Security headers audit (HSTS, X-Frame, etc.)"
-status: planned
+status: done
 points: 2
 priority: P2
 track: Backend
