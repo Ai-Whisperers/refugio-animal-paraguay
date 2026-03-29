@@ -3,7 +3,7 @@ story: S1
 epic: EPIC-42
 ticket: RAP-205
 title: "Notification preference model and API"
-status: planned
+status: done
 points: 5
 priority: P0
 track: Backend
