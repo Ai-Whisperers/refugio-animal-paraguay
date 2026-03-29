@@ -1004,3 +1004,15 @@ feature/RAP-216-newsletter-template-builder (PR #341, independent of stack)
 - **Open PRs**: 0 remaining
 - **Queue**: EPIC-41–45 ALL DONE. EPIC-46 S1+S2 DONE (RAP-225/226). EPIC-46 S3–S5 (RAP-227–229) marked READY.
 - **Actions taken**: Rebased + merged 3 PRs; EPIC-46 S3–S5 promoted from planned→ready; sprint-06 set to in_progress; 4 orphaned ACTIVE tickets (RAP-216/217/225/226) marked COMPLETED; 3 stale local branches deleted; remote branches deleted post-merge
+
+---
+### [2026-03-29] Autonomous Worker Run — EPIC-46 S3+S4+S5 (RAP-227/228/229)
+- **Stories implemented**: 3 — RAP-227 (EPIC-46 S3, P1), RAP-228 (EPIC-46 S4, P1), RAP-229 (EPIC-46 S5, P2)
+- **PRs created**: #352 (RAP-227), #353 (RAP-228), #354 (RAP-229)
+- **Quality**: ruff clean on all new/modified files; all new tests pass; no regressions beyond pre-existing failures
+- **Notes**:
+  - RAP-227: Frontend GDPR deletion flow — replaced window.confirm() placeholder in portal profile page with full AccountDeletionModal (password input, idle/confirming/submitting/sent/error states, Escape key handler); added confirm-deletion page handling ?token= param, calls POST /portal/gdpr/delete/confirm, clears access token, 5s countdown to /login. Fixed: clearAccessToken (not removeAccessToken).
+  - RAP-228: GDPR audit trail — added GDPR_ERASURE to AuditAction enum (→12 values); integrated record_audit() into request_account_deletion(), confirm_account_deletion(), process_deletion_request(); used verification_token.user_id in confirm path to avoid reading mutated anonymized user. 10 new unit tests.
+  - RAP-229: Data retention policy — DataRetentionService with purge_expired_unused_tokens (30d) + purge_used_tokens (90d) + run_data_retention orchestrator + count_retention_candidates dry-run; admin endpoints GET /admin/data-retention/preview and POST /admin/data-retention/run; 19 unit tests all pass.
+  - Pre-existing: 68 TypeScript errors (all in src/app/page.tsx + public-api.ts, unrelated), 29 pre-existing unit test failures (test_survey_analytics, test_event_types), black would reformat 43 files — none introduced by this run.
+- **Queue**: EPIC-46 ALL DONE (RAP-225–229; PR #350–354). Sprint 6 EPIC-46 complete.
