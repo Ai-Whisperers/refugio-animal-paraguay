@@ -1,13 +1,16 @@
-"""Legal document endpoints (RAP-233, RAP-234).
+"""Legal document endpoints (RAP-233, RAP-234, RAP-247).
 
 Provides public access to legal document templates:
-  GET /legal/dpa              — Data Processing Agreement template
-  GET /legal/sub-processors   — Sub-processor registry
+  GET /legal/dpa                      — Data Processing Agreement template
+  GET /legal/sub-processors           — Sub-processor registry
+  GET /legal/record-retention-policy  — Paraguayan record retention policy
 """
 
 from datetime import date
 
 from fastapi import APIRouter
+
+from src.services.paraguayan_retention_service import RETENTION_POLICY
 
 router = APIRouter(prefix="/legal", tags=["legal"])
 
@@ -146,4 +149,38 @@ async def get_dpa_template() -> dict:
             },
         ],
         "contact_for_execution": "privacidad@refugioanimal.com.py",
+    }
+
+
+# ---------------------------------------------------------------------------
+# Paraguayan record retention policy (RAP-247)
+# ---------------------------------------------------------------------------
+
+RETENTION_POLICY_LAST_UPDATED = date(2026, 3, 29).isoformat()
+
+
+@router.get("/record-retention-policy", summary="Paraguayan record retention policy")
+async def get_record_retention_policy() -> dict:
+    """Return the mandatory record retention periods per Paraguayan law.
+
+    Covers:
+    - Adoption contracts (Codigo Civil Art. 633): 10 years
+    - Animal health records (Ley 4840/2013): 5 years
+    - Vaccination records (Ley 3140/2006): 5 years
+    - Donation/financial records (Ley 125/91): 5 years
+    - Adopter personal data: 5 years
+    - General correspondence: 2 years
+
+    These are minimum retention periods. The shelter may retain records longer.
+    """
+    return {
+        "document": "Paraguayan Record Retention Policy",
+        "version": "1.0",
+        "last_updated": RETENTION_POLICY_LAST_UPDATED,
+        "jurisdiction": "Republic of Paraguay",
+        "note": (
+            "These are minimum mandatory retention periods under Paraguayan law. "
+            "The shelter may retain records for longer periods at its discretion."
+        ),
+        "policies": RETENTION_POLICY,
     }
