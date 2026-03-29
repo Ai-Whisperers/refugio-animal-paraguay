@@ -1,15 +1,16 @@
 """Notification preferences router.
 
 Endpoints for viewing and updating notification delivery preferences.
-Users control which notification types they receive through each channel.
-One-click email unsubscribe is available without authentication via
-a signed JWT token.
+Users control which notification types they receive through each channel,
+at what delivery frequency, and can unsubscribe from email without login.
 
 Endpoints:
     GET  /notification-preferences                   -- list all preferences (with defaults)
     PUT  /notification-preferences                   -- bulk update preferences
     GET  /notification-preferences/unsubscribe-link  -- generate signed unsubscribe URL
     GET  /notification-preferences/unsubscribe       -- process unsubscribe (public, token-based)
+    GET  /notification-preferences/frequency         -- get per-channel frequency settings
+    PUT  /notification-preferences/frequency         -- update per-channel frequency settings
 """
 
 import logging
@@ -23,6 +24,9 @@ from src.db.models.user import User
 from src.db.session import get_db
 from src.schemas.error import AUTHENTICATED_RESPONSES
 from src.schemas.notification_preference import (
+    FrequencyBulkUpdate,
+    FrequencyListResponse,
+    FrequencyResponse,
     PreferenceBulkUpdate,
     PreferenceListResponse,
     PreferenceResponse,
@@ -34,6 +38,10 @@ from src.services.email_unsubscribe_service import (
     generate_unsubscribe_token,
     unsubscribe_all_email,
     validate_unsubscribe_token,
+)
+from src.services.notification_frequency_service import (
+    get_channel_frequencies,
+    set_channel_frequency,
 )
 from src.services.notification_preference_service import (
     get_preferences_with_defaults,
@@ -147,4 +155,50 @@ async def process_unsubscribe(
     return UnsubscribeResult(
         message="Successfully unsubscribed from all email notifications.",
         preferences_updated=count,
+    )
+
+
+@router.get("/frequency", response_model=FrequencyListResponse)
+async def list_frequency_settings(
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_staff),
+) -> FrequencyListResponse:
+    """Get notification delivery frequency settings for the current user.
+
+    Returns frequency for each supported channel (in_app, email).
+    Missing settings default to 'immediate'. Email supports batching
+    via 'daily_digest' or 'weekly'; in_app is always immediate.
+    """
+    freqs = await get_channel_frequencies(db, current_user.id)
+    return FrequencyListResponse(
+        frequencies=[FrequencyResponse(**f) for f in freqs],
+    )
+
+
+@router.put("/frequency", response_model=FrequencyListResponse)
+async def update_frequency_settings(
+    payload: FrequencyBulkUpdate,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_staff),
+) -> FrequencyListResponse:
+    """Update notification delivery frequency for one or more channels.
+
+    Accepts a list of (channel, frequency) pairs. Valid frequencies are:
+    - immediate: notifications sent as they occur (default)
+    - daily_digest: all notifications batched and sent once per day
+    - weekly: all notifications batched and sent once per week
+
+    Returns all channel frequency settings after the update.
+    """
+    for item in payload.frequencies:
+        await set_channel_frequency(
+            db,
+            current_user.id,
+            item.channel,
+            item.frequency,
+        )
+
+    freqs = await get_channel_frequencies(db, current_user.id)
+    return FrequencyListResponse(
+        frequencies=[FrequencyResponse(**f) for f in freqs],
     )
