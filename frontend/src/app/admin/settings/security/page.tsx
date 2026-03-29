@@ -19,6 +19,14 @@ interface SetupResponse {
   secret: string;
 }
 
+interface BackupCodesResponse {
+  codes: string[];
+}
+
+interface BackupCodesCountResponse {
+  remaining: number;
+}
+
 // ---------------------------------------------------------------------------
 // Helper: masked secret display
 // ---------------------------------------------------------------------------
@@ -43,13 +51,27 @@ export default function TwoFactorSettingsPage() {
   const [loading, setLoading] = useState(false);
   const [showSecret, setShowSecret] = useState(false);
 
-  // Load current 2FA status on mount
+  // Backup codes state
+  const [backupCodes, setBackupCodes] = useState<string[] | null>(null);
+  const [backupCodesRemaining, setBackupCodesRemaining] = useState<number | null>(null);
+  const [backupCodesLoading, setBackupCodesLoading] = useState(false);
+  const [backupCodesError, setBackupCodesError] = useState("");
+
+  // Load current 2FA status and backup code count on mount
   useEffect(() => {
     async function loadStatus() {
       try {
         const data = await api.get<StatusResponse>("/auth/2fa/status");
         setIsEnabled(data.enabled);
         setStep("status");
+        if (data.enabled) {
+          try {
+            const countData = await api.get<BackupCodesCountResponse>("/auth/2fa/backup-codes/count");
+            setBackupCodesRemaining(countData.remaining);
+          } catch {
+            // non-critical — silently ignore
+          }
+        }
       } catch {
         setError("Could not load 2FA status. Please refresh.");
       }
@@ -105,11 +127,27 @@ export default function TwoFactorSettingsPage() {
       await api.post("/auth/2fa/disable", { code: disableCode });
       setIsEnabled(false);
       setDisableCode("");
+      setBackupCodes(null);
+      setBackupCodesRemaining(null);
       setStep("status");
     } catch {
       setError("Invalid code. Enter the current code from your authenticator app.");
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function handleGenerateBackupCodes() {
+    setBackupCodesError("");
+    setBackupCodesLoading(true);
+    try {
+      const data = await api.post<BackupCodesResponse>("/auth/2fa/backup-codes", {});
+      setBackupCodes(data.codes);
+      setBackupCodesRemaining(data.codes.length);
+    } catch {
+      setBackupCodesError("Failed to generate backup codes. Please try again.");
+    } finally {
+      setBackupCodesLoading(false);
     }
   }
 
@@ -341,15 +379,95 @@ export default function TwoFactorSettingsPage() {
           </h2>
           <p className="mt-2 text-sm text-green-700">
             Your account is protected. You will be asked for a code at each
-            login.
+            login. Generate backup codes below in case you lose access to your
+            authenticator device.
           </p>
           <button
             type="button"
-            onClick={() => setStep("status")}
+            onClick={() => {
+              setStep("status");
+              api
+                .get<BackupCodesCountResponse>("/auth/2fa/backup-codes/count")
+                .then((d) => setBackupCodesRemaining(d.remaining))
+                .catch(() => null);
+            }}
             className="mt-4 rounded-md bg-green-700 px-5 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-800 focus:outline-none"
           >
             Done
           </button>
+        </div>
+      )}
+
+      {/* --- Backup codes section (shown when 2FA is enabled) --- */}
+      {isEnabled && step === "status" && (
+        <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+          <div className="flex items-start justify-between">
+            <div>
+              <h2 className="text-base font-semibold text-gray-900">
+                Backup Recovery Codes
+              </h2>
+              <p className="mt-1 text-sm text-gray-600">
+                Single-use codes you can use to sign in if you lose access to
+                your authenticator app. Store them somewhere safe — they are
+                shown only once.
+              </p>
+              {backupCodesRemaining !== null && (
+                <p className="mt-2 text-sm">
+                  <span
+                    className={
+                      backupCodesRemaining === 0
+                        ? "font-medium text-red-600"
+                        : backupCodesRemaining <= 3
+                          ? "font-medium text-amber-600"
+                          : "text-gray-500"
+                    }
+                  >
+                    {backupCodesRemaining} unused code
+                    {backupCodesRemaining !== 1 ? "s" : ""} remaining
+                  </span>
+                </p>
+              )}
+            </div>
+            <button
+              type="button"
+              onClick={handleGenerateBackupCodes}
+              disabled={backupCodesLoading}
+              className="ml-4 shrink-0 rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50"
+            >
+              {backupCodesLoading
+                ? "Generating…"
+                : backupCodes
+                  ? "Regenerate codes"
+                  : "Generate codes"}
+            </button>
+          </div>
+
+          {backupCodesError && (
+            <p className="mt-3 text-sm text-red-600">{backupCodesError}</p>
+          )}
+
+          {/* Display freshly generated codes — shown exactly once */}
+          {backupCodes && (
+            <div className="mt-4">
+              <p className="mb-2 text-xs font-medium uppercase tracking-wide text-gray-500">
+                Save these codes now — they will not be shown again
+              </p>
+              <div className="grid grid-cols-2 gap-2 rounded-md bg-gray-50 p-4 sm:grid-cols-5">
+                {backupCodes.map((code) => (
+                  <span
+                    key={code}
+                    className="rounded border border-gray-200 bg-white px-2 py-1 text-center font-mono text-sm text-gray-900 shadow-sm"
+                  >
+                    {code}
+                  </span>
+                ))}
+              </div>
+              <p className="mt-2 text-xs text-gray-500">
+                Each code can only be used once. Generating new codes invalidates
+                all previous ones.
+              </p>
+            </div>
+          )}
         </div>
       )}
     </div>
