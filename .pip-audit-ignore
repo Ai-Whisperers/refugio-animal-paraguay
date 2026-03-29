@@ -1,0 +1,10 @@
+# pip-audit ignore list — Refugio Animal Paraguay
+#
+# Format: one OSV/GHSA/CVE ID per line.
+# Always include a comment explaining WHY the vulnerability is suppressed:
+#   - Is it a transitive dep with no fix available?
+#   - Is it unexploitable in our deployment context?
+#   - Is there a mitigating control already in place?
+#
+# Example (DO NOT uncomment unless the vulnerability is real):
+# GHSA-xxxx-xxxx-xxxx  # transitive via package-x, no fix available as of 2026-03-29
