@@ -15,7 +15,7 @@ version: V10
 **Target users**: Shelter staff, administrators, donors, adopters, veterinarians, volunteers
 
 ## Stories
-- [ ] [S1] Audit log viewer with filters (5 pts, P0, Frontend)
+- [x] [S1] Audit log viewer with filters (5 pts, P0, Frontend) — DONE (PR #394)
 - [ ] [S2] User activity timeline (3 pts, P1, Frontend)
 - [ ] [S3] Export audit logs (CSV, JSON) (3 pts, P1, Frontend)
 - [ ] [S4] Alert on suspicious activity (3 pts, P2, Backend)

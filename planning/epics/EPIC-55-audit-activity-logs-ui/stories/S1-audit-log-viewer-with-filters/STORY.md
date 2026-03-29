@@ -3,7 +3,7 @@ story: S1
 epic: EPIC-55
 ticket: RAP-270
 title: "Audit log viewer with filters"
-status: planned
+status: done
 points: 5
 priority: P0
 track: Frontend
