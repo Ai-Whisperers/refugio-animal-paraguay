@@ -3,7 +3,7 @@ story: S2
 epic: EPIC-46
 ticket: RAP-226
 title: "Third-party deletion cascade (Stripe, email)"
-status: planned
+status: done
 points: 5
 priority: P0
 track: Backend

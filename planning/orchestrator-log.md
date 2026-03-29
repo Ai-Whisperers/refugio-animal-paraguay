@@ -983,3 +983,16 @@ feature/RAP-216-newsletter-template-builder (PR #341, independent of stack)
 - **Queue**: V8 Sprint 5: EPIC-41–45 ALL DONE. V9 Sprint 6: EPIC-46 (GDPR Right to Erasure) — next.
 - **Flags**: RAP-216 STORY.md marked "done" but PR #341 still open+conflicting. RAP-217 PR #342 closed without merge — story left ACTIVE.
 - **Actions taken**: 6 orphaned tickets marked COMPLETED (RAP-215, RAP-220–224). Remote branches pruned. Local merged branches cleaned.
+
+---
+### [2026-03-29] Autonomous Worker Run — EPIC-46 S1+S2
+- **Stories implemented**: 2 — RAP-225 (EPIC-46 S1, P0), RAP-226 (EPIC-46 S2, P0)
+- **PRs created**: #350 (RAP-225), #351 (RAP-226)
+- **Duration**: ~70m total
+- **Quality**: ruff clean, mypy clean, black clean, all new tests pass
+- **Notes**:
+  - RAP-225: Extended gdpr_deletion_service.py to anonymize VolunteerProfile, RescuerProfile, FosterProfile; extended deactivate_user_account() to also clear full_name/phone; extended process_deletion_request() signature; updated schemas and API router; added unit + integration tests
+  - RAP-226: Created gdpr_third_party_deletion_service.py with Stripe subscription cancellation, Stripe customer deletion, EmailListMember hard-deletion; integrated cascade into process_deletion_request() with pre-fetch order (email/stripe_id before anonymization); 17 unit tests; log-don't-raise isolation pattern
+  - Local import in process_deletion_request() → patch path is source module, not caller
+  - Pre-existing test failure: test_volunteer_driver.py 31 tests (shared mutable state, pre-existing on develop)
+- **Queue**: EPIC-46 S1+S2 DONE. EPIC-46 S3–S5 (P1/P2) next.
