@@ -64,6 +64,21 @@ class PerformanceMetrics(BaseModel):
     cost_per_adoption_cents: int | None = None
 
 
+class VolunteerSummary(BaseModel):
+    """Volunteer contribution metrics for the report period."""
+
+    unique_volunteers: int
+    total_hours: float
+    by_category: dict[str, float]
+
+
+class FosterPlacementSummary(BaseModel):
+    """Foster placement metrics for the report period."""
+
+    active_during_period: int
+    new_placements: int
+
+
 class ReportMetadata(BaseModel):
     """Metadata about the generated report."""
 
@@ -81,4 +96,6 @@ class ImpactReportResponse(BaseModel):
     donations: DonationSummary
     in_kind_donations: InKindSummary
     fund_allocation: FundAllocationSummary
+    volunteers: VolunteerSummary
+    foster_placements: FosterPlacementSummary
     performance_metrics: PerformanceMetrics

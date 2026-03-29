@@ -239,6 +239,26 @@ class TestGenerateImpactReport:
         avg_time_result = MagicMock()
         avg_time_result.scalar.return_value = 12.5
 
+        # count_volunteer_hours: 2 queries (category breakdown + unique totals)
+        vol_cat_result = MagicMock()
+        vol_cat_row = MagicMock()
+        vol_cat_row.category = "animal_care"
+        vol_cat_row.total_hours = 60.0
+        vol_cat_result.all.return_value = [vol_cat_row]
+
+        vol_unique_row = MagicMock()
+        vol_unique_row.unique_volunteers = 5
+        vol_unique_row.total_hours = 60.0
+        vol_unique_result = MagicMock()
+        vol_unique_result.one.return_value = vol_unique_row
+
+        # count_active_foster_placements: 2 queries (active + new)
+        foster_active_result = MagicMock()
+        foster_active_result.scalar.return_value = 7
+
+        foster_new_result = MagicMock()
+        foster_new_result.scalar.return_value = 3
+
         db.execute.side_effect = [
             animals_result,  # count_animals_served
             adoptions_result,  # count_adoptions
@@ -247,6 +267,10 @@ class TestGenerateImpactReport:
             inkind_result,  # sum_in_kind_donations
             fund_result,  # get_fund_allocation_breakdown
             avg_time_result,  # calculate_avg_time_to_adoption
+            vol_cat_result,  # count_volunteer_hours (categories)
+            vol_unique_result,  # count_volunteer_hours (totals)
+            foster_active_result,  # count_active_foster_placements (active)
+            foster_new_result,  # count_active_foster_placements (new)
         ]
 
         result = await impact_report_service.generate_impact_report(
@@ -262,3 +286,104 @@ class TestGenerateImpactReport:
         # cost_per_adoption = 500000 / 10 = 50000
         assert result["performance_metrics"]["cost_per_adoption_cents"] == 50000
         assert result["report_metadata"]["generated_by_user_id"] == str(user_id)
+        assert result["volunteers"]["unique_volunteers"] == 5
+        assert result["volunteers"]["total_hours"] == 60.0
+        assert result["foster_placements"]["active_during_period"] == 7
+        assert result["foster_placements"]["new_placements"] == 3
+
+
+class TestCountVolunteerHours:
+    """Tests for count_volunteer_hours."""
+
+    @pytest.mark.asyncio
+    async def test_returns_totals_and_by_category(self) -> None:
+        db = AsyncMock()
+
+        # Category breakdown query result
+        cat_row1 = MagicMock()
+        cat_row1.category = "animal_care"
+        cat_row1.total_hours = 40.0
+
+        cat_row2 = MagicMock()
+        cat_row2.category = "transport"
+        cat_row2.total_hours = 10.5
+
+        cat_result = MagicMock()
+        cat_result.all.return_value = [cat_row1, cat_row2]
+
+        # Global unique + total query result
+        unique_row = MagicMock()
+        unique_row.unique_volunteers = 8
+        unique_row.total_hours = 50.5
+
+        unique_result = MagicMock()
+        unique_result.one.return_value = unique_row
+
+        db.execute.side_effect = [cat_result, unique_result]
+
+        result = await impact_report_service.count_volunteer_hours(db, START, END)
+
+        assert result["unique_volunteers"] == 8
+        assert result["total_hours"] == 50.5
+        assert result["by_category"]["animal_care"] == 40.0
+        assert result["by_category"]["transport"] == 10.5
+
+    @pytest.mark.asyncio
+    async def test_returns_zeros_when_no_activity(self) -> None:
+        db = AsyncMock()
+
+        cat_result = MagicMock()
+        cat_result.all.return_value = []
+
+        unique_row = MagicMock()
+        unique_row.unique_volunteers = None
+        unique_row.total_hours = None
+
+        unique_result = MagicMock()
+        unique_result.one.return_value = unique_row
+
+        db.execute.side_effect = [cat_result, unique_result]
+
+        result = await impact_report_service.count_volunteer_hours(db, START, END)
+
+        assert result["unique_volunteers"] == 0
+        assert result["total_hours"] == 0.0
+        assert result["by_category"] == {}
+
+
+class TestCountActiveFosterPlacements:
+    """Tests for count_active_foster_placements."""
+
+    @pytest.mark.asyncio
+    async def test_returns_active_and_new_counts(self) -> None:
+        db = AsyncMock()
+
+        active_result = MagicMock()
+        active_result.scalar.return_value = 12
+
+        new_result = MagicMock()
+        new_result.scalar.return_value = 4
+
+        db.execute.side_effect = [active_result, new_result]
+
+        result = await impact_report_service.count_active_foster_placements(db, START, END)
+
+        assert result["active_during_period"] == 12
+        assert result["new_placements"] == 4
+
+    @pytest.mark.asyncio
+    async def test_returns_zeros_when_no_placements(self) -> None:
+        db = AsyncMock()
+
+        active_result = MagicMock()
+        active_result.scalar.return_value = None
+
+        new_result = MagicMock()
+        new_result.scalar.return_value = None
+
+        db.execute.side_effect = [active_result, new_result]
+
+        result = await impact_report_service.count_active_foster_placements(db, START, END)
+
+        assert result["active_during_period"] == 0
+        assert result["new_placements"] == 0
