@@ -1,8 +1,9 @@
 """Admin API endpoints for data retention policy management.
 
 Endpoints:
-  GET  /admin/data-retention/preview  — count records eligible for deletion (dry run)
-  POST /admin/data-retention/run      — run the data retention cleanup
+  GET  /admin/data-retention/preview              — count records eligible for deletion (dry run)
+  POST /admin/data-retention/run                  — run the data retention cleanup
+  GET  /admin/data-retention/paraguayan-status    — live record counts for Paraguayan retention obligations
 """
 
 from fastapi import APIRouter, Depends
@@ -20,6 +21,10 @@ from src.services.data_retention_service import (
     count_retention_candidates,
     run_data_retention,
 )
+from src.services.paraguayan_retention_service import (
+    RetentionStatusResult,
+    get_retention_status,
+)
 
 router = APIRouter(
     prefix="/admin/data-retention",
@@ -34,10 +39,14 @@ router = APIRouter(
 class DataRetentionPreviewResponse(BaseModel):
     """Summary of records eligible for deletion without actually deleting them."""
 
-    expired_tokens: int = Field(description="Expired unused verification tokens eligible for deletion")
+    expired_tokens: int = Field(
+        description="Expired unused verification tokens eligible for deletion"
+    )
     used_tokens: int = Field(description="Used verification tokens eligible for deletion")
     total: int = Field(description="Total records eligible for deletion")
-    expired_token_retention_days: int = Field(description="Retention period for expired tokens (days)")
+    expired_token_retention_days: int = Field(
+        description="Retention period for expired tokens (days)"
+    )
     used_token_retention_days: int = Field(description="Retention period for used tokens (days)")
 
 
@@ -95,3 +104,33 @@ async def run_data_retention_endpoint(
         total_deleted=result.total_deleted,
         ran_at=result.ran_at.isoformat(),
     )
+
+
+@router.get("/paraguayan-status", response_model=None)
+async def get_paraguayan_retention_status(
+    db: AsyncSession = Depends(get_db),
+    _: User = Depends(require_admin),
+) -> dict:
+    """Return live record counts relevant to Paraguayan legal retention obligations.
+
+    Reports current active animals, pending adoptions, and recent donations against
+    the mandatory retention periods defined in Paraguayan law (Ley 4840/2013,
+    Ley 3140/2006, Codigo Civil Art. 633, Ley 125/91).
+
+    This is informational only — it does not delete or modify any records.
+    Admin-only.
+    """
+    status: RetentionStatusResult = await get_retention_status(db)
+    return {
+        "check_date": status.check_date.isoformat(),
+        "active_animal_count": status.active_animal_count,
+        "pending_adoption_count": status.pending_adoption_count,
+        "recent_donation_count": status.recent_donation_count,
+        "oldest_adoption_date": (
+            status.oldest_adoption_date.isoformat() if status.oldest_adoption_date else None
+        ),
+        "oldest_donation_date": (
+            status.oldest_donation_date.isoformat() if status.oldest_donation_date else None
+        ),
+        "policy": status.policy,
+    }
