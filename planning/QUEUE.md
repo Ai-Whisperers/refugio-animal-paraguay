@@ -1,7 +1,7 @@
 # Development Queue — Refugio Animal Paraguay
 
 **Last updated**: 2026-03-29
-**Active version**: V9 Sprint 6 COMPLETE + V10 Sprint 7 COMPLETE — EPIC-41–52 ALL DONE. Sprint 7 final: EPIC-51 all 5 merged (RAP-250–254). EPIC-52 all 5 implemented: RAP-255 PR #380, RAP-256 PR #381, RAP-257 PR #382, RAP-258 PR #383, RAP-259 PR #384 (all open, some need rebase on maintainer merge — financial_reporting.py add/add conflict chain, RAP-253 PR #378 operational_dashboard.py conflict). Next: V11 Sprint 8.
+**Active version**: V9 Sprint 6 COMPLETE + V10 Sprint 7 IN PROGRESS — EPIC-41–51 ALL DONE. Sprint 7 EPIC-52 PARTIAL: RAP-256 PR #381 DONE, RAP-258 PR #383 DONE, RAP-259 PR #384 DONE. RAP-255 PR #380 CONFLICTING (financial_reporting.py), RAP-257 PR #382 CONFLICTING (financial_reporting.py). RAP-253 PR #378 CONFLICTING (operational_dashboard.py — requires manual rebase). Next: resolve 3 conflicting PRs then V11 Sprint 8.
 **Full roadmap**: [ROADMAP.md](ROADMAP.md) — 16 sprints, 68 epics, ~395 stories
 **Tech stack**: Python 3.12, FastAPI, SQLAlchemy 2.x, PostgreSQL 16, Next.js 14
 
@@ -433,7 +433,7 @@ Week 3-4:
 | 2 | Fund allocation vs budget report | RAP-256 | 5 | DONE (PR #381) | Frontend |
 | 3 | EU tax compliance export (annual) | RAP-257 | 5 | CONFLICTING (PR #382 — manual rebase needed, conflicts in financial_reporting.py) | Backend |
 | 4 | Donor retention and churn analysis | RAP-258 | 3 | DONE (PR #383) | Backend |
-| 5 | Financial dashboard with charts | RAP-259 | 5 | READY | Frontend |
+| 5 | Financial dashboard with charts | RAP-259 | 5 | DONE (PR #384) | Frontend |
 
 ---
 

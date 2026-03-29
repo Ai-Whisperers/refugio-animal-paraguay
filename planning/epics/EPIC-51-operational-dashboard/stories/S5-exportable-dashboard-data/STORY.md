@@ -3,7 +3,7 @@ story: S5
 epic: EPIC-51
 ticket: RAP-254
 title: "Exportable dashboard data"
-status: in_progress
+status: done
 points: 3
 priority: P2
 track: Backend
