@@ -888,3 +888,15 @@ EPIC-42 S4 — RAP-208: Frequency controls (P2, Backend)
 - **Queue**: V7 Sprint 4 (EPIC-36 through EPIC-40) COMPLETE. V8 Sprint 5 in progress: EPIC-41 DONE, EPIC-42 DONE, EPIC-43 S1-S2 done (S3-S5 READY), EPIC-44/45 planned.
 - **Actions taken**: 4 story statuses updated to done (RAP-196/197/203/208), Sprint 4 marked done, Sprint 5 marked in_progress, 5 ACTIVE tickets marked COMPLETED, 6 local+remote branches cleaned.
 - **Blocking issue**: GitHub Actions billing failure still preventing CI pipeline. Requires Ivan to check billing settings.
+
+### [2026-03-29 07:10] Worker Run — EPIC-43 PDF Document Generation (S3-S5)
+- **Stories implemented**: 3 — RAP-212 (S3), RAP-213 (S4), RAP-214 (S5)
+- **PRs created**: PR #337 (RAP-212), PR #338 (RAP-213), PR #339 (RAP-214)
+- **Epic complete**: EPIC-43 ALL DONE — all 5 stories (S1-S5, RAP-210–214)
+- **Work summary**:
+  - RAP-212: Refactored `vaccination_certificate_service.py` — `VaccinationCertificateGenerator(BasePDFGenerator)`, 18 unit tests pass
+  - RAP-213: Refactored `donation_receipt_service.py` and `tax_receipt_eu_service.py` — both extend `BasePDFGenerator`, 39 unit tests pass (22 receipt + 17 EU)
+  - RAP-214: Refactored `contract_service.py`, `anbi_compliance_service.py`, `annual_donation_summary_service.py` — all extend `BasePDFGenerator`; ANBI service split into `ANBIDonorLetterGenerator` + `ANBIDeclarationGenerator` with `ANBIComplianceService` as facade; 56 unit tests pass
+- **Quality gates**: ruff clean, black clean, 5259/5290 unit tests pass (31 pre-existing failures unrelated to PDF services)
+- **Queue updated**: EPIC-43 marked ALL DONE in QUEUE.md header and sprint table
+- **Next**: EPIC-44 (Email Campaign System) or EPIC-45 (Push/In-App Notifications) — check QUEUE.md for READY status
