@@ -1138,6 +1138,27 @@ export interface MySignupsResponse {
   total: number;
 }
 
+// --- Volunteer Leaderboard (RAP-196) ---
+
+export type LeaderboardPeriod = "all" | "month" | "quarter" | "year";
+
+export interface LeaderboardEntry {
+  rank: number;
+  volunteer_id: string;
+  user_id: string;
+  full_name: string | null;
+  email: string;
+  total_hours_logged: number;
+  skills: string[];
+}
+
+export interface LeaderboardResponse {
+  period: LeaderboardPeriod;
+  period_start: string | null;
+  entries: LeaderboardEntry[];
+  total_approved_volunteers: number;
+}
+
 // --- API Error ---
 
 export interface ApiError {
