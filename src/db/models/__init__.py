@@ -2,6 +2,7 @@
 
 from .active_session import ActiveSession
 from .adopter import Adopter
+from .adoption_outcome import AdoptionOutcome, AdoptionOutcomeType
 from .adoption_request import AdoptionRequest, AdoptionRequestStatus
 from .animal import Animal, AnimalGender, AnimalPhoto, AnimalSize, AnimalSpecies, AnimalStatus
 from .audit_log import AuditAction, AuditLog
