@@ -1200,3 +1200,22 @@ feature/RAP-216-newsletter-template-builder (PR #341, independent of stack)
   - 42 unit tests (service constants, normalise_language, endpoint layer via TestClient)
   - 16 integration tests (bilingual smoke tests via AsyncClient, all 3 endpoints)
 - **Notes**: Unsupported ?lang= codes fall back silently to "es". SUPPORTED_LANGUAGES is frozenset for O(1) lookup and immutability. English DPA sections kept in legal_documents.py (not in service) to keep translation service focused on constants only. EPIC-50 now fully delivered (S3–S5 all DONE; S1/S2 CONFLICTING — blocked on PRs #370/#371).
+
+---
+
+## Worker Run: 2026-03-29 — V9 Sprint 6 Conflict Resolution + EPIC-51 S1 (RAP-250)
+
+- **Tickets resolved**: RAP-243 (security pipeline), RAP-245 (cookie consent), RAP-246 (adoption contract legal doc)
+- **EPIC-51 S1 ticket**: RAP-250 Operational dashboard API
+- **Branch**: feature/RAP-250-operational-dashboard-api
+- **PR**: #375 (merged to develop)
+- **Duration**: ~3h (context exhaustion mid-run; continued in new session)
+- **Quality**: ruff clean, mypy clean, black clean, 37 new tests pass
+- **Deliverables**:
+  - Conflict resolution: rebased RAP-243, RAP-245, RAP-246 onto develop (force-pushed); merged content conflicts manually (security.yml SQL injection step + pip-audit comment preserved; legal_documents.py merged adoption-contract + record-retention-policy endpoints from two branches)
+  - RAP-250: `src/schemas/operational_metrics.py` (PopulationBreakdown, OccupancyMetrics, PeriodCounts, SpeciesBreakdown, OperationalMetrics, OperationalMetricsResponse)
+  - RAP-250: `src/services/operational_metrics_service.py` (5 async helpers + get_operational_metrics; SQLAlchemy 2.x case/cast aggregate counts; epoch-based LOS calculation)
+  - RAP-250: `src/api/operational_dashboard.py` (GET /api/admin/operational-dashboard/metrics, staff auth, period_days/capacity query params)
+  - `src/app.py`: router registered (alphabetically after og_image)
+  - 22 unit tests (AsyncMock DB), 15 integration tests (AsyncClient)
+- **Notes**: 3 CONFLICTING PRs from V9 Sprint 6 now unblocked (rebased). 31 pre-existing test failures in volunteer_driver/adoption_notifications/donation_dashboard modules confirmed not caused by RAP-250. LOS excludes FOSTER status (animals not physically sheltered). EPIC-51 S1 DONE; S2 (RAP-251, KPI frontend) is next.
