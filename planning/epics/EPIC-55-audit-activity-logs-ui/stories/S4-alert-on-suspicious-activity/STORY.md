@@ -3,7 +3,7 @@ story: S4
 epic: EPIC-55
 ticket: RAP-273
 title: "Alert on suspicious activity"
-status: planned
+status: done
 points: 3
 priority: P2
 track: Backend
