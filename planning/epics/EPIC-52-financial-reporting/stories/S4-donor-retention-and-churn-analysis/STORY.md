@@ -3,7 +3,7 @@ story: S4
 epic: EPIC-52
 ticket: RAP-258
 title: "Donor retention and churn analysis"
-status: planned
+status: done
 points: 3
 priority: P1
 track: Backend
