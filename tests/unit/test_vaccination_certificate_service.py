@@ -4,9 +4,10 @@ from datetime import date
 from uuid import uuid4
 
 import pytest
+from src.services.pdf_service import PDFGenerationError
 from src.services.vaccination_certificate_service import (
     CertificateData,
-    VaccinationCertificatePDF,
+    VaccinationCertificateGenerator,
     VaccinationRecord,
     generate_vaccination_certificate,
 )
@@ -119,30 +120,55 @@ class TestCertificateData:
             sample_certificate_data.animal_name = "Modified"  # type: ignore[misc]
 
 
-class TestVaccinationCertificatePDF:
-    """Tests for VaccinationCertificatePDF class."""
+class TestVaccinationCertificateGenerator:
+    """Tests for VaccinationCertificateGenerator using BasePDFGenerator interface."""
 
-    def test_creates_pdf_instance(self) -> None:
-        pdf = VaccinationCertificatePDF()
-        assert pdf is not None
+    def test_generate_bytes_returns_pdf(self, sample_certificate_data) -> None:
+        generator = VaccinationCertificateGenerator()
+        pdf_bytes = generator.generate_bytes(sample_certificate_data)
+        assert isinstance(pdf_bytes, bytes)
+        assert pdf_bytes[:4] == b"%PDF"
 
-    def test_header_renders_without_error(self) -> None:
-        pdf = VaccinationCertificatePDF()
-        pdf.add_page()
-        # header() is called automatically by add_page()
-        assert pdf.page_no() == 1
+    def test_generate_bytes_empty_vaccinations(self) -> None:
+        generator = VaccinationCertificateGenerator()
+        data = CertificateData(
+            animal_id=uuid4(),
+            animal_name="Orphan",
+            animal_species="cat",
+            animal_breed=None,
+            animal_birth_date=None,
+            vaccinations=[],
+        )
+        pdf_bytes = generator.generate_bytes(data)
+        assert pdf_bytes[:4] == b"%PDF"
+        assert len(pdf_bytes) > 1000
 
-    def test_footer_renders_without_error(self, tmp_path) -> None:
-        pdf = VaccinationCertificatePDF()
-        pdf.alias_nb_pages()
-        pdf.add_page()
-        pdf.set_font("Helvetica", "", 10)
-        pdf.cell(0, 10, "Test content")
-        # footer() is called during output
-        output_path = tmp_path / "test.pdf"
-        pdf.output(str(output_path))
-        assert output_path.exists()
-        assert output_path.stat().st_size > 0
+    def test_generate_bytes_multiple_vaccinations(self, sample_certificate_data) -> None:
+        generator = VaccinationCertificateGenerator()
+        pdf_bytes = generator.generate_bytes(sample_certificate_data)
+        # Multi-vaccination certificate should be larger than empty one
+        empty_data = CertificateData(
+            animal_id=uuid4(),
+            animal_name="Empty",
+            animal_species="dog",
+            animal_breed=None,
+            animal_birth_date=None,
+        )
+        empty_bytes = generator.generate_bytes(empty_data)
+        assert len(pdf_bytes) > len(empty_bytes)
+
+    def test_generate_file_writes_pdf(self, sample_certificate_data, tmp_path) -> None:
+        generator = VaccinationCertificateGenerator()
+        out_path = tmp_path / "cert.pdf"
+        result = generator.generate_file(sample_certificate_data, out_path)
+        assert result == out_path.resolve()
+        assert out_path.exists()
+        assert out_path.read_bytes()[:4] == b"%PDF"
+
+    def test_invalid_data_raises_error(self) -> None:
+        generator = VaccinationCertificateGenerator()
+        with pytest.raises(PDFGenerationError):
+            generator.generate_bytes("not a CertificateData")  # type: ignore[arg-type]
 
 
 class TestGenerateVaccinationCertificate:
