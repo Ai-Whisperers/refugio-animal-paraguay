@@ -21,7 +21,7 @@ Weeks 9-10 (2-week sprint)
 ## Epics
 - [x] EPIC-41
 - [x] EPIC-42
-- [ ] EPIC-43
+- [x] EPIC-43
 - [ ] EPIC-44
 - [ ] EPIC-45
 
