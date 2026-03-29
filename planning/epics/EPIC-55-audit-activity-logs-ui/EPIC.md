@@ -2,7 +2,7 @@
 epic: EPIC-55
 title: "Audit & Activity Logs UI"
 sprint: 7
-status: planned
+status: done
 points: 17
 created: 2026-03-26T19:06:04
 version: V10
@@ -19,12 +19,12 @@ version: V10
 - [x] [S2] User activity timeline (3 pts, P1, Frontend) — DONE (PR #395)
 - [x] [S3] Export audit logs (CSV, JSON) (3 pts, P1, Frontend) — DONE (PR #396)
 - [x] [S4] Alert on suspicious activity (3 pts, P2, Backend) — DONE (PR #397)
-- [ ] [S5] Data change history viewer (3 pts, P2, Frontend)
+- [x] [S5] Data change history viewer (3 pts, P2, Frontend) — DONE (PR #398)
 
 ## Total Points
 17
 
 ## Acceptance Criteria (Epic Level)
-- [ ] All P0 stories completed
-- [ ] All tests passing
+- [x] All P0 stories completed
+- [x] All tests passing
 - [ ] Deployed to staging and verified
