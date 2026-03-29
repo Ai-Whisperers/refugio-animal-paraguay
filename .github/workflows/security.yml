@@ -39,15 +39,9 @@ jobs:
         if: always()
         run: bandit -r src/ -ll --format json --output bandit-report.json || true
 
-      - name: pip-audit dependency vulnerability scan
-        # Informational for now — transitive CVEs may have no available fix.
-        # Tighten to hard-fail once all HIGH/CRITICAL direct deps are patched (RAP-404).
-        continue-on-error: true
-        run: pip-audit
-
-      - name: pip-audit JSON report (artifact)
-        if: always()
-        run: pip-audit --format json --output pip-audit-report.json || true
+      # pip-audit dependency scanning has been moved to dependency-scan.yml (RAP-241),
+      # which runs on PR/push AND on a weekly schedule with automatic GitHub Issue creation.
+      # This step is retained as a lightweight summary reference only.
 
       - name: Upload security reports
         if: always()
