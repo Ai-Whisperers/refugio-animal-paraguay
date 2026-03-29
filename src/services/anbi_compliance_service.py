@@ -5,8 +5,11 @@ the shelter's Dutch donors. ANBI is the Dutch tax authority designation for
 public benefit organizations, enabling donors to deduct gifts.
 
 This service produces:
-1. Annual ANBI declaration summary (for shelther internal compliance)
+1. Annual ANBI declaration summary (for shelter internal compliance)
 2. Donor-facing ANBI information letter
+
+Uses the centralized :class:`~src.services.pdf_service.BasePDFGenerator` and
+:class:`~src.services.pdf_service.ShelterPDF` for consistent shelter branding.
 """
 
 import logging
@@ -14,19 +17,17 @@ from dataclasses import dataclass
 from datetime import datetime
 from uuid import UUID
 
-from fpdf import FPDF
+from src.services.pdf_service import BasePDFGenerator, ShelterPDF
 
 logger = logging.getLogger(__name__)
-
-SHELTER_NAME = "Refugio Animal Paraguay"
-SHELTER_ADDRESS = "Asuncion, Paraguay"
-SHELTER_EMAIL = "info@refugioanimalparaguay.org"
-SHELTER_WEBSITE = "https://refugioanimalparaguay.org"
 
 # Placeholder values - to be updated when ANBI registration is obtained
 SHELTER_ANBI_RSIN = "RSIN: PENDING"
 SHELTER_BANK_IBAN = "IBAN: NL00 XXXX 0000 0000 00"
 CURRENT_TAX_YEAR = datetime.now().year
+
+DONOR_LETTER_TITLE = "ANBI GIFT CONFIRMATION / ANBI GIFTENBEVESTIGING"
+DECLARATION_TITLE = "ANBI ANNUAL COMPLIANCE DECLARATION"
 
 
 @dataclass(frozen=True)
@@ -63,121 +64,49 @@ def _format_eur(amount_cents: int) -> str:
     return f"EUR {amount_cents / 100:,.2f}"
 
 
-class ANBIComplianceService:
-    """Generates ANBI compliance documents for Dutch regulatory purposes."""
+class ANBIDonorLetterGenerator(BasePDFGenerator):
+    """Generates ANBI donor information letters using ShelterPDF branding.
 
-    def generate_donor_letter_bytes(self, data: ANBILetterData) -> bytes:
-        """Generate an ANBI information letter for a specific donor.
+    Example::
 
-        This letter confirms the shelter's charitable status and informs
-        the donor about the conditions for Dutch tax deductibility.
-        """
-        pdf = self._build_donor_letter(data)
-        content = bytes(pdf.output())
-        logger.info(
-            "ANBI donor letter generated for donor_id=%s year=%d (%d bytes)",
-            data.donor_id,
-            data.year,
-            len(content),
-        )
-        return content
+        generator = ANBIDonorLetterGenerator()
+        pdf_bytes = generator.generate_bytes(letter_data)
+    """
 
-    def generate_declaration_bytes(self, data: ANBIDeclarationData) -> bytes:
-        """Generate the annual ANBI compliance declaration (internal document)."""
-        pdf = self._build_declaration(data)
-        content = bytes(pdf.output())
-        logger.info(
-            "ANBI declaration generated for year=%d (%d bytes)",
-            data.year,
-            len(content),
-        )
-        return content
-
-    def _build_donor_letter(self, data: ANBILetterData) -> FPDF:
+    def _build_pdf(self, data: ANBILetterData) -> ShelterPDF:  # type: ignore[override]
         """Build the ANBI donor information letter PDF."""
-        pdf = FPDF()
-        pdf.set_auto_page_break(auto=True, margin=25)
+        pdf = ShelterPDF(title=DONOR_LETTER_TITLE)
         pdf.add_page()
 
-        # Header
-        pdf.set_font("Helvetica", "B", 14)
-        pdf.cell(
-            0,
-            10,
-            "ANBI Gift Confirmation / ANBI Giftenbevestiging",
-            align="C",
-            new_x="LMARGIN",
-            new_y="NEXT",
-        )
-        pdf.set_font("Helvetica", "", 9)
-        pdf.set_text_color(100, 100, 100)
-        pdf.cell(0, 5, SHELTER_NAME, align="C", new_x="LMARGIN", new_y="NEXT")
-        pdf.cell(
-            0, 5, f"{SHELTER_EMAIL} | {SHELTER_WEBSITE}", align="C", new_x="LMARGIN", new_y="NEXT"
-        )
-        pdf.set_text_color(0, 0, 0)
-        pdf.ln(6)
-
-        pdf.set_draw_color(60, 120, 180)
-        pdf.set_line_width(0.4)
-        pdf.line(pdf.l_margin, pdf.get_y(), pdf.w - pdf.r_margin, pdf.get_y())
-        pdf.set_line_width(0.2)
-        pdf.ln(6)
-
-        # Addressee
-        pdf.set_font("Helvetica", "B", 10)
-        pdf.cell(0, 7, "Addressed to / Gericht aan", new_x="LMARGIN", new_y="NEXT")
-        pdf.set_draw_color(180, 180, 180)
-        pdf.line(pdf.l_margin, pdf.get_y(), pdf.w - pdf.r_margin, pdf.get_y())
-        pdf.ln(3)
-
-        pdf.set_font("Helvetica", "B", 9)
-        pdf.cell(55, 5, "Name / Naam:")
-        pdf.set_font("Helvetica", "", 9)
-        pdf.cell(0, 5, data.donor_name, new_x="LMARGIN", new_y="NEXT")
-
-        pdf.set_font("Helvetica", "B", 9)
-        pdf.cell(55, 5, "Email:")
-        pdf.set_font("Helvetica", "", 9)
-        pdf.cell(0, 5, data.donor_email, new_x="LMARGIN", new_y="NEXT")
-
+        # Addressee section
+        pdf.section_title("Addressed to / Gericht aan")
+        pdf.info_row("Name / Naam:", data.donor_name)
+        pdf.info_row("Email:", data.donor_email)
         if data.donor_country:
-            pdf.set_font("Helvetica", "B", 9)
-            pdf.cell(55, 5, "Country / Land:")
-            pdf.set_font("Helvetica", "", 9)
-            pdf.cell(0, 5, data.donor_country, new_x="LMARGIN", new_y="NEXT")
-
-        pdf.set_font("Helvetica", "B", 9)
-        pdf.cell(55, 5, "Tax Year / Belastingjaar:")
-        pdf.set_font("Helvetica", "", 9)
-        pdf.cell(0, 5, str(data.year), new_x="LMARGIN", new_y="NEXT")
-        pdf.ln(6)
+            pdf.info_row("Country / Land:", data.donor_country)
+        pdf.info_row("Tax Year / Belastingjaar:", str(data.year))
+        pdf.ln(4)
 
         # Donation confirmation
-        pdf.set_font("Helvetica", "B", 10)
-        pdf.cell(0, 7, "Donation Confirmation / Donatiebewijs", new_x="LMARGIN", new_y="NEXT")
-        pdf.set_draw_color(180, 180, 180)
-        pdf.line(pdf.l_margin, pdf.get_y(), pdf.w - pdf.r_margin, pdf.get_y())
-        pdf.ln(3)
-
-        pdf.set_font("Helvetica", "", 9)
+        pdf.section_title("Donation Confirmation / Donatiebewijs")
         amount_str = (
             _format_eur(data.total_donated_cents)
             if data.primary_currency == "EUR"
             else f"{data.total_donated_cents} {data.primary_currency}"
         )
+        pdf.set_font("Helvetica", "", 9)
         pdf.multi_cell(
             0,
             5,
             f"This letter confirms that {data.donor_name} made charitable donations totalling "
-            f"{amount_str} to {SHELTER_NAME} during the tax year {data.year}.",
+            f"{amount_str} to Refugio Animal Paraguay during the tax year {data.year}.",
         )
         pdf.ln(3)
         pdf.multi_cell(
             0,
             5,
             f"Dit schrijven bevestigt dat {data.donor_name} gedurende het belastingjaar {data.year} "
-            f"giften heeft gedaan aan {SHELTER_NAME} voor een totaalbedrag van {amount_str}.",
+            f"giften heeft gedaan aan Refugio Animal Paraguay voor een totaalbedrag van {amount_str}.",
         )
         pdf.ln(6)
 
@@ -215,68 +144,46 @@ class ANBIComplianceService:
         pdf.set_text_color(0, 0, 0)
         pdf.ln(6)
 
-        # Footer
-        pdf.set_draw_color(200, 200, 200)
-        pdf.line(pdf.l_margin, pdf.get_y(), pdf.w - pdf.r_margin, pdf.get_y())
-        pdf.ln(4)
-        pdf.set_font("Helvetica", "", 7)
+        # Donor ID line above auto footer
+        pdf.set_y(-30)
+        pdf.set_font("Helvetica", "I", 7)
         pdf.set_text_color(150, 150, 150)
         pdf.cell(
             0,
             4,
-            f"Generated by {SHELTER_NAME} on {data.generated_at.strftime('%d/%m/%Y')} | {SHELTER_ANBI_RSIN}",
+            f"Donor ID: {data.donor_id} | {SHELTER_ANBI_RSIN}",
             align="C",
             new_x="LMARGIN",
             new_y="NEXT",
         )
-        pdf.cell(
-            0,
-            4,
-            f"Donor ID: {data.donor_id}",
-            align="C",
-            new_x="LMARGIN",
-            new_y="NEXT",
-        )
+        pdf.set_text_color(0, 0, 0)
 
         return pdf
 
-    def _build_declaration(self, data: ANBIDeclarationData) -> FPDF:
+
+class ANBIDeclarationGenerator(BasePDFGenerator):
+    """Generates annual ANBI compliance declarations using ShelterPDF branding.
+
+    Example::
+
+        generator = ANBIDeclarationGenerator()
+        pdf_bytes = generator.generate_bytes(declaration_data)
+    """
+
+    def _build_pdf(self, data: ANBIDeclarationData) -> ShelterPDF:  # type: ignore[override]
         """Build the annual ANBI compliance declaration PDF (internal)."""
-        pdf = FPDF()
-        pdf.set_auto_page_break(auto=True, margin=25)
+        pdf = ShelterPDF(title=f"{DECLARATION_TITLE} {data.year}")
         pdf.add_page()
 
-        # Header
-        pdf.set_font("Helvetica", "B", 14)
-        pdf.cell(
-            0,
-            10,
-            f"ANBI Annual Compliance Declaration {data.year}",
-            align="C",
-            new_x="LMARGIN",
-            new_y="NEXT",
-        )
-        pdf.set_font("Helvetica", "", 9)
+        # Internal document label
+        pdf.set_font("Helvetica", "I", 9)
         pdf.set_text_color(100, 100, 100)
-        pdf.cell(
-            0, 5, f"{SHELTER_NAME} - INTERNAL DOCUMENT", align="C", new_x="LMARGIN", new_y="NEXT"
-        )
+        pdf.cell(0, 5, "INTERNAL DOCUMENT", align="C", new_x="LMARGIN", new_y="NEXT")
         pdf.set_text_color(0, 0, 0)
-        pdf.ln(6)
+        pdf.ln(4)
 
-        pdf.set_draw_color(60, 120, 180)
-        pdf.set_line_width(0.4)
-        pdf.line(pdf.l_margin, pdf.get_y(), pdf.w - pdf.r_margin, pdf.get_y())
-        pdf.set_line_width(0.2)
-        pdf.ln(6)
-
-        # Stats
-        pdf.set_font("Helvetica", "B", 10)
-        pdf.cell(0, 7, f"Donation Statistics {data.year}", new_x="LMARGIN", new_y="NEXT")
-        pdf.set_draw_color(180, 180, 180)
-        pdf.line(pdf.l_margin, pdf.get_y(), pdf.w - pdf.r_margin, pdf.get_y())
-        pdf.ln(3)
-
+        # Donation statistics
+        pdf.section_title(f"Donation Statistics {data.year}")
         rows = [
             ("Total donors:", str(data.total_donors)),
             ("EU donors:", str(data.total_eu_donors)),
@@ -285,28 +192,16 @@ class ANBIComplianceService:
             ("PYG donations:", f"{data.total_pyg_cents:,} PYG"),
         ]
         for label, value in rows:
-            pdf.set_font("Helvetica", "B", 9)
-            pdf.cell(65, 5, label)
-            pdf.set_font("Helvetica", "", 9)
-            pdf.cell(0, 5, value, new_x="LMARGIN", new_y="NEXT")
-
-        pdf.ln(6)
+            pdf.info_row(label, value, label_width=65)
+        pdf.ln(4)
 
         if data.top_fund_categories:
-            pdf.set_font("Helvetica", "B", 10)
-            pdf.cell(0, 7, "Fund Allocation", new_x="LMARGIN", new_y="NEXT")
-            pdf.set_draw_color(180, 180, 180)
-            pdf.line(pdf.l_margin, pdf.get_y(), pdf.w - pdf.r_margin, pdf.get_y())
-            pdf.ln(3)
-
+            pdf.section_title("Fund Allocation")
             for category, total_cents in data.top_fund_categories:
-                pdf.set_font("Helvetica", "B", 9)
-                pdf.cell(65, 5, f"{category}:")
-                pdf.set_font("Helvetica", "", 9)
-                pdf.cell(0, 5, _format_eur(total_cents), new_x="LMARGIN", new_y="NEXT")
-            pdf.ln(6)
+                pdf.info_row(f"{category}:", _format_eur(total_cents), label_width=65)
+            pdf.ln(4)
 
-        # Generated by
+        # Generated-by attribution
         pdf.set_font("Helvetica", "", 8)
         pdf.set_text_color(100, 100, 100)
         pdf.cell(
@@ -319,3 +214,40 @@ class ANBIComplianceService:
         pdf.set_text_color(0, 0, 0)
 
         return pdf
+
+
+class ANBIComplianceService:
+    """Facade for generating ANBI compliance documents for Dutch regulatory purposes.
+
+    Delegates to :class:`ANBIDonorLetterGenerator` and
+    :class:`ANBIDeclarationGenerator` for consistent shelter branding.
+    """
+
+    def __init__(self) -> None:
+        self._letter_generator = ANBIDonorLetterGenerator()
+        self._declaration_generator = ANBIDeclarationGenerator()
+
+    def generate_donor_letter_bytes(self, data: ANBILetterData) -> bytes:
+        """Generate an ANBI information letter for a specific donor.
+
+        This letter confirms the shelter's charitable status and informs
+        the donor about the conditions for Dutch tax deductibility.
+        """
+        content = self._letter_generator.generate_bytes(data)
+        logger.info(
+            "ANBI donor letter generated for donor_id=%s year=%d (%d bytes)",
+            data.donor_id,
+            data.year,
+            len(content),
+        )
+        return content
+
+    def generate_declaration_bytes(self, data: ANBIDeclarationData) -> bytes:
+        """Generate the annual ANBI compliance declaration (internal document)."""
+        content = self._declaration_generator.generate_bytes(data)
+        logger.info(
+            "ANBI declaration generated for year=%d (%d bytes)",
+            data.year,
+            len(content),
+        )
+        return content
