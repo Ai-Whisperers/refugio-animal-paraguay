@@ -3,7 +3,7 @@ story: S2
 epic: EPIC-50
 ticket: RAP-246
 title: "Legal adoption contract template (Paraguay law)"
-status: done
+status: in_progress
 points: 5
 priority: P1
 track: Backend

@@ -1164,3 +1164,23 @@ feature/RAP-216-newsletter-template-builder (PR #341, independent of stack)
 - **Deliverables**:
   - RAP-248: `government_report_service.py` with AnnualCensusReport dataclass + generate_annual_census() + render_annual_census_csv(); `GET /admin/reports/government/annual-census` (JSON); `GET /admin/reports/government/annual-census/export` (CSV with UTF-8 BOM); 23 unit tests + 15 integration tests
 - **Notes**: year param bounded [2000, 2100], defaults to current year. CSV uses Spanish bilingual labels. EPIC-50 S5 (RAP-249) still READY.
+
+---
+
+### [2026-03-29 15:42] Work Checker Run
+- **PRs merged**: 1 — RAP-247 Add Paraguayan record retention policy endpoints (PR #372)
+- **PRs rebased**: 0 successful, 3 failed — RAP-246 (src/api/legal_documents.py), RAP-245 (src/api/legal_documents.py), RAP-243 (.github/workflows/security.yml)
+- **Deploy**: Staging unhealthy/skipped (GitHub Actions billing failure — account payments issue) | Production healthy (previous build serving, no new deploy)
+- **Open PRs**: 4 remaining — PR #368 CONFLICTING, PR #370 CONFLICTING, PR #371 CONFLICTING, PR #373 MERGEABLE
+- **Queue**: Fixed QUEUE.md — RAP-245 and RAP-246 were incorrectly marked DONE; corrected to CONFLICTING; STORY.md statuses reset to in_progress
+- **Actions taken**: Stale lock removed (PID 3312829). RAP-247 merged + remote branch deleted. 3 rebases attempted, all aborted due to conflicts. QUEUE.md header + table corrected. EPIC-50 S1/S2 STORY.md status fixed. Local merged branch cleaned up.
+
+---
+
+### [2026-03-29 15:42] Work Checker Run
+- **PRs merged**: 2 — RAP-247 (PR #372), RAP-248 (PR #373 — found open/MERGEABLE during run)
+- **PRs rebased**: 0 successful, 3 failed — RAP-246 conflict in src/api/legal_documents.py, RAP-245 conflict in src/api/legal_documents.py, RAP-243 conflict in .github/workflows/security.yml
+- **Deploy**: Staging unhealthy/skipped (GitHub Actions billing failure — account payments issue) | Production healthy (no new deploy, previous build active)
+- **Open PRs**: 3 remaining — PR #368 CONFLICTING, PR #370 CONFLICTING, PR #371 CONFLICTING
+- **Queue**: Fixed QUEUE.md — RAP-245/246 incorrectly marked DONE; corrected to CONFLICTING; STORY.md statuses for EPIC-50 S1/S2 reset to in_progress
+- **Actions taken**: Stale lock removed (PID 3312829). RAP-247 + RAP-248 merged, remote branches deleted. 3 rebases aborted (conflicts). QUEUE.md corrected. Branch hygiene clean.
