@@ -3,7 +3,7 @@ story: S3
 epic: EPIC-42
 ticket: RAP-207
 title: "Channel routing based on preferences"
-status: planned
+status: done
 points: 5
 priority: P1
 track: Backend
