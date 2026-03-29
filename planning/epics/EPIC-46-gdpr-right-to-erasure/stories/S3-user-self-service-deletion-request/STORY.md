@@ -3,7 +3,7 @@ story: S3
 epic: EPIC-46
 ticket: RAP-227
 title: "User self-service deletion request"
-status: ready
+status: done
 points: 3
 priority: P1
 track: Frontend

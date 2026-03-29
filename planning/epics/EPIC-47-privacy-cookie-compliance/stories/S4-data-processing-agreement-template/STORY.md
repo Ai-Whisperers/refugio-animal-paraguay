@@ -3,7 +3,7 @@ story: S4
 epic: EPIC-47
 ticket: RAP-233
 title: "Data processing agreement template"
-status: planned
+status: ready
 points: 3
 priority: P1
 track: Backend

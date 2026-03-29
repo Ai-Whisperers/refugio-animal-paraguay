@@ -3,7 +3,7 @@ story: S1
 epic: EPIC-47
 ticket: RAP-230
 title: "Privacy policy page (Spanish + English)"
-status: planned
+status: ready
 points: 3
 priority: P0
 track: Frontend

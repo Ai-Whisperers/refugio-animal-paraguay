@@ -3,7 +3,7 @@ story: S4
 epic: EPIC-46
 ticket: RAP-228
 title: "Deletion audit trail and confirmation"
-status: ready
+status: done
 points: 3
 priority: P1
 track: Backend

@@ -3,7 +3,7 @@ story: S2
 epic: EPIC-47
 ticket: RAP-231
 title: "Cookie consent banner with preferences"
-status: planned
+status: ready
 points: 5
 priority: P0
 track: Frontend
