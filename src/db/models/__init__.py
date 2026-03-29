@@ -16,6 +16,7 @@ from .foster_check_in import CheckInStatus, CheckInType, FosterCheckIn
 from .foster_placement import FosterPlacement
 from .foster_profile import AnimalTypePreference, FosterProfile, FosterStatus, HomeType
 from .fund_allocation import FundAllocation, FundCategory
+from .volunteer_hours import HoursCategory, VolunteerHoursLog
 from .home_visit import HomeVisit, HomeVisitStatus
 from .in_kind_donation import InKindDonation, ItemType
 from .medical import (
@@ -108,6 +109,8 @@ __all__ = [
     "FundAllocation",
     "FundCategory",
     "HomeType",
+    "HoursCategory",
+    "VolunteerHoursLog",
     "HomeVisit",
     "HomeVisitStatus",
     "InKindDonation",

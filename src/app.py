@@ -88,6 +88,8 @@ from src.api.financial_stats import router as financial_stats_router
 from src.api.follow_ups import router as follow_ups_router
 from src.api.followup_automation import admin_router as followup_auto_admin_router
 from src.api.followup_automation import public_router as followup_auto_public_router
+from src.api.foster import public_router as foster_public_router
+from src.api.foster import staff_router as foster_staff_router
 from src.api.fund_allocations import router as fund_allocations_router
 from src.api.gdpr import router as gdpr_router
 from src.api.gdpr_export import router as gdpr_export_router
@@ -155,6 +157,9 @@ from src.api.sepa import router as sepa_router
 from src.api.sessions import router as sessions_router
 from src.api.share_tracking import admin_router as share_admin_router
 from src.api.share_tracking import public_router as share_public_router
+from src.api.shift_reminders import router as shift_reminders_router
+from src.api.shifts import public_router as shifts_public_router
+from src.api.shifts import staff_router as shifts_staff_router
 from src.api.smart_matching import router as smart_matching_router
 from src.api.sponsorships import router as sponsorships_router
 from src.api.subscriptions import router as subscriptions_router
@@ -164,6 +169,8 @@ from src.api.surgeries import surgery_router
 from src.api.survey_admin import router as survey_admin_router
 from src.api.survey_analytics import router as survey_analytics_router
 from src.api.survey_distribution import router as survey_distribution_router
+from src.api.tasks import public_router as tasks_public_router
+from src.api.tasks import staff_router as tasks_staff_router
 from src.api.tigo_money import router as tigo_money_router
 from src.api.transport import router as transport_router
 from src.api.transport_request import router as transport_request_router
@@ -179,16 +186,11 @@ from src.api.vet_referrals import referral_router
 from src.api.vet_transport import router as vet_transport_router
 from src.api.vet_visits import router as vet_visits_router
 from src.api.vet_vouchers import router as vet_vouchers_router
-from src.api.shift_reminders import router as shift_reminders_router
-from src.api.shifts import public_router as shifts_public_router
-from src.api.shifts import staff_router as shifts_staff_router
-from src.api.foster import public_router as foster_public_router
-from src.api.foster import staff_router as foster_staff_router
-from src.api.tasks import public_router as tasks_public_router
-from src.api.tasks import staff_router as tasks_staff_router
 from src.api.volunteer import public_router as volunteer_public_router
 from src.api.volunteer import staff_router as volunteer_staff_router
 from src.api.volunteer_driver import router as volunteer_driver_router
+from src.api.volunteer_hours import public_router as volunteer_hours_public_router
+from src.api.volunteer_hours import staff_router as volunteer_hours_staff_router
 from src.api.voucher_expiry import router as voucher_expiry_router
 from src.api.voucher_notifications import router as voucher_notifications_router
 from src.api.voucher_purchase import router as voucher_purchase_router
@@ -486,6 +488,8 @@ def create_app() -> FastAPI:
     application.include_router(volunteer_public_router)
     application.include_router(volunteer_staff_router)
     application.include_router(volunteer_driver_router)
+    application.include_router(volunteer_hours_public_router)
+    application.include_router(volunteer_hours_staff_router)
     return application
 
 
