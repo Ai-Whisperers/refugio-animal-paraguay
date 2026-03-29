@@ -205,9 +205,7 @@ async def get_trends(
         Query(
             ge=1,
             le=MAX_TREND_LOOKBACK_DAYS,
-            description=(
-                "Days of history to include. Defaults: daily=30, weekly=90, monthly=365."
-            ),
+            description=("Days of history to include. Defaults: daily=30, weekly=90, monthly=365."),
         ),
     ] = 0,
     _current_user: User = Depends(require_staff),
