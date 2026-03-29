@@ -43,6 +43,12 @@ jobs:
       # which runs on PR/push AND on a weekly schedule with automatic GitHub Issue creation.
       # This step is retained as a lightweight summary reference only.
 
+      - name: Security headers audit script validation
+        # Full live-server audit (run manually or post-deploy):
+        #   python3 scripts/check_security_headers.py --url https://sunstein.cloud/petShelter/
+        # CI validates the script is syntactically correct and importable.
+        run: python3 -c "import sys; sys.path.insert(0, 'scripts'); import check_security_headers; print('check_security_headers script OK')"
+
       - name: Upload security reports
         if: always()
         uses: actions/upload-artifact@v4
