@@ -23,13 +23,17 @@ _TEST_STAFF_ID = "00000000-0000-0000-0000-000000000001"
 
 @pytest_asyncio.fixture(autouse=True)
 async def _reset_2fa_state() -> None:
-    """Reset the test user's 2FA state before each test to ensure isolation."""
+    """Reset the test user's 2FA state and backup codes before each test to ensure isolation."""
     settings = Settings()
     engine = init_engine(settings)
     session_factory = async_sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
     async with session_factory() as session:
         await session.execute(
             text("UPDATE users SET totp_secret = NULL, totp_enabled = FALSE WHERE id = :id"),
+            {"id": _TEST_STAFF_ID},
+        )
+        await session.execute(
+            text("DELETE FROM totp_backup_codes WHERE user_id = :id"),
             {"id": _TEST_STAFF_ID},
         )
         await session.commit()
@@ -243,7 +247,6 @@ async def test_backup_codes_count_decreases_after_use(client: AsyncClient) -> No
 
     # Consume one code via the DB service directly
     from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
-
     from src.config import Settings
     from src.db.session import init_engine
     from src.services.backup_code_service import use_backup_code
