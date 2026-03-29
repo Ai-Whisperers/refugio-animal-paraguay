@@ -3,7 +3,7 @@ story: S4
 epic: EPIC-40
 ticket: RAP-198
 title: "Volunteer certificates and thank-you automation"
-status: planned
+status: done
 points: 3
 priority: P2
 track: Fullstack
