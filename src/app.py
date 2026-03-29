@@ -34,7 +34,6 @@ from src.api.adoption_requirements import (
 )
 from src.api.adoption_success import router as adoption_success_router
 from src.api.anbi_compliance import router as anbi_compliance_router
-from src.api.legal_documents import router as legal_documents_router
 from src.api.animal_intake_outcome import router as animal_intake_outcome_router
 from src.api.animal_updates import router as animal_updates_router
 from src.api.animals import router as animals_router
@@ -80,9 +79,9 @@ from src.api.driver_reimbursement import router as driver_reimbursement_router
 from src.api.educational_article import admin_router as article_admin_router
 from src.api.educational_article import public_router as article_public_router
 from src.api.email_campaigns import router as email_campaigns_router
-from src.api.email_tracking import router as email_tracking_router
 from src.api.email_lists import router as email_lists_router
 from src.api.email_templates import router as email_templates_router
+from src.api.email_tracking import router as email_tracking_router
 from src.api.email_verification import router as email_verification_router
 from src.api.emergencies import router as emergencies_router
 from src.api.emergency_donations import router as emergency_donations_router
@@ -107,12 +106,14 @@ from src.api.homepage_content import router as homepage_content_router
 from src.api.impact_emails import router as impact_emails_router
 from src.api.impact_reports import router as impact_reports_router
 from src.api.in_kind_donations import router as in_kind_donations_router
+from src.api.legal_documents import router as legal_documents_router
 from src.api.media_serve import router as media_serve_router
 from src.api.media_upload import router as media_upload_router
 from src.api.medical_documents import router as medical_documents_router
 from src.api.medications import router as medications_router
 from src.api.notification_preferences import router as notification_preferences_router
 from src.api.notifications import router as notifications_router
+from src.api.notifications_ws import router as notifications_ws_router
 from src.api.og_image import router as og_image_router
 from src.api.password_reset import router as password_reset_router
 from src.api.phone_verification import router as phone_verification_router
@@ -138,7 +139,6 @@ from src.api.public_sponsorships import router as public_sponsorships_router
 from src.api.public_statistics import router as public_statistics_router
 from src.api.public_survey import router as public_survey_router
 from src.api.public_voucher_stats import router as public_voucher_stats_router
-from src.api.notifications_ws import router as notifications_ws_router
 from src.api.push_subscriptions import router as push_subscriptions_router
 from src.api.queued_donations import router as queued_donations_router
 from src.api.referral_tracking import admin_router as referral_tracking_admin_router
@@ -184,6 +184,7 @@ from src.api.transport_request import router as transport_request_router
 from src.api.trial_periods import admin_router as trial_admin_router
 from src.api.trial_periods import public_router as trial_public_router
 from src.api.trip_tracking import router as trip_tracking_router
+from src.api.two_factor import router as two_factor_router
 from src.api.user_roles import router as user_roles_router
 from src.api.vaccinations import vaccination_router, vaccine_type_router
 from src.api.vet_analytics import router as vet_analytics_router
@@ -221,11 +222,11 @@ from src.notifications.activity_sse_handlers import ActivitySSEHandlers
 from src.notifications.donation_sse_handlers import DonationSSEHandlers
 from src.notifications.handlers import NotificationHandlers
 from src.notifications.in_app_handlers import InAppNotificationHandlers
-from src.notifications.service import EmailService
-from src.notifications.templates import TemplateRenderer
 from src.notifications.meta_whatsapp_adoption_handler import MetaWhatsAppAdoptionHandler
 from src.notifications.meta_whatsapp_donation_handler import MetaWhatsAppDonationHandler
 from src.notifications.meta_whatsapp_service import MetaWhatsAppService
+from src.notifications.service import EmailService
+from src.notifications.templates import TemplateRenderer
 from src.notifications.whatsapp_handlers import WhatsAppHandlers
 from src.notifications.whatsapp_service import WhatsAppService
 from src.sentry_config import configure_sentry
@@ -340,6 +341,7 @@ def create_app() -> FastAPI:
     application.include_router(blog_admin_router)
     application.include_router(blog_public_router)
     application.include_router(auth_router)
+    application.include_router(two_factor_router)
     application.include_router(google_oauth_router)
     application.include_router(password_reset_router)
     application.include_router(email_verification_router)
