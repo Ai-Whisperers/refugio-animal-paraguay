@@ -196,6 +196,7 @@ from src.api.voucher_expiry import router as voucher_expiry_router
 from src.api.voucher_notifications import router as voucher_notifications_router
 from src.api.voucher_purchase import router as voucher_purchase_router
 from src.api.webhooks import router as webhooks_router
+from src.api.whatsapp_templates import router as whatsapp_templates_router
 from src.audit.middleware import AuditMiddleware
 from src.config import Settings, get_settings
 from src.db.session import dispose_engine, init_engine
@@ -492,6 +493,7 @@ def create_app() -> FastAPI:
     application.include_router(volunteer_driver_router)
     application.include_router(volunteer_hours_public_router)
     application.include_router(volunteer_hours_staff_router)
+    application.include_router(whatsapp_templates_router)
     return application
 
 
