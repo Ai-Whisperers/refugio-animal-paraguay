@@ -1249,3 +1249,19 @@ feature/RAP-216-newsletter-template-builder (PR #341, independent of stack)
 - **Open PRs**: 0 remaining
 - **Queue**: V9 EPIC-46–50 ALL DONE. V10 Sprint 7: EPIC-51 S1 (RAP-250) DONE; S2–S5 (RAP-251–254) READY.
 - **Actions taken**: Ticket statuses ACTIVE→COMPLETED for RAP-245/246/250; EPIC-50 S1/S2 STORY.md status→done; QUEUE.md updated; V10 Sprint 7 section added; 3 local branches deleted
+
+---
+
+## Worker Run: 2026-03-29 — EPIC-52 (Financial Reporting) COMPLETE
+
+- **Tickets**: RAP-257 (EU tax export), RAP-258 (donor retention/churn), RAP-259 (financial dashboard charts)
+- **Branches**: feature/RAP-257-eu-tax-compliance-export, feature/RAP-258-donor-retention-churn-analysis, feature/RAP-259-financial-dashboard-charts
+- **PRs**: #382 (RAP-257), #383 (RAP-258), #384 (RAP-259) — all open, require maintainer merge
+- **Duration**: ~2h (context continuation from previous session)
+- **Quality**: ruff clean, black clean, all new tests pass (19 + 14 = 33 new unit tests)
+- **Deliverables**:
+  - RAP-257: `src/services/eu_tax_export_service.py` — EU_MEMBER_STATES (27 countries), EUDonorTaxRow/EUTaxExportResult dataclasses, get_eu_tax_export() async DB query, render_eu_tax_csv() CSV serialiser; `GET /api/admin/financial-reporting/eu-tax-export/{year}` StreamingResponse CSV; 19 unit tests
+  - RAP-258: `src/services/donor_retention_service.py` — DonorSegmentCounts, RetentionMetrics, CohortRetentionRow/Result, get_donor_segments(), get_retention_metrics(), get_cohort_retention(); `GET /api/admin/financial-reporting/donor-retention` and `GET /api/admin/financial-reporting/donor-cohorts`; 14 unit tests
+  - RAP-259: `frontend/src/app/admin/financial-dashboard/page.tsx` — 693-line chart dashboard: KPI cards, donation trend bar chart, currency breakdown bars, donor segment bars, retention vs churn panel, cohort retention heat-map table; connects to RAP-255/258 APIs
+  - All branches carry forward RAP-255 (donation_summary_service, financial_reporting router base) since PRs #380/#381 not yet merged
+- **Notes**: PRs #380 (RAP-255), #381 (RAP-256) were merged into develop before this session. PRs #382/#383/#384 have add/add conflicts on financial_reporting.py — maintainer should merge in order: #382 first, then rebase #383 and #384. RAP-253 PR #378 still has operational_dashboard.py conflict. EPIC-52 ALL 5 STORIES DONE. Sprint 7 COMPLETE.

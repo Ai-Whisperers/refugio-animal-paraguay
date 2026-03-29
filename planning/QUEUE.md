@@ -1,7 +1,7 @@
 # Development Queue — Refugio Animal Paraguay
 
 **Last updated**: 2026-03-29
-**Active version**: V9 Sprint 6 COMPLETE + V10 Sprint 7 IN PROGRESS — EPIC-41–50 ALL DONE. EPIC-49 ALL DONE (RAP-240–244 all merged). EPIC-50 ALL DONE (RAP-245–249 all merged; RAP-245 PR #370, RAP-246 PR #371, RAP-249 PR #374 required rebase). V10 Sprint 7 EPIC-51 PARTIAL: RAP-250 PR #375 DONE, RAP-251 PR #376 DONE, RAP-252 PR #377 DONE, RAP-253 PR #378 CONFLICTING (needs manual rebase — conflicts in operational_dashboard.py + operational_metrics_service.py), RAP-254 PR #379 CONFLICTING (needs manual rebase — conflicts in operational_dashboard.py).
+**Active version**: V9 Sprint 6 COMPLETE + V10 Sprint 7 COMPLETE — EPIC-41–52 ALL DONE. Sprint 7 final: EPIC-51 all 5 merged (RAP-250–254). EPIC-52 all 5 implemented: RAP-255 PR #380, RAP-256 PR #381, RAP-257 PR #382, RAP-258 PR #383, RAP-259 PR #384 (all open, some need rebase on maintainer merge — financial_reporting.py add/add conflict chain, RAP-253 PR #378 operational_dashboard.py conflict). Next: V11 Sprint 8.
 **Full roadmap**: [ROADMAP.md](ROADMAP.md) — 16 sprints, 68 epics, ~395 stories
 **Tech stack**: Python 3.12, FastAPI, SQLAlchemy 2.x, PostgreSQL 16, Next.js 14
 
@@ -413,17 +413,27 @@ Week 3-4:
 
 ---
 
-## V10 Sprint 7 — Analytics & Reporting (EPIC-51 partial)
+## V10 Sprint 7 — Analytics & Reporting (EPIC-51 COMPLETE + EPIC-52 partial)
 
-### EPIC-51: Operational Dashboard (21 pts) — IN PROGRESS
+### EPIC-51: Operational Dashboard (21 pts) — COMPLETE
 
 | # | Story | Ticket | Pts | Status | Track |
 |---|-------|--------|-----|--------|-------|
 | 1 | Dashboard API with aggregated metrics | RAP-250 | 5 | DONE (PR #375) | Backend |
 | 2 | KPI cards — occupancy, intake, outcomes | RAP-251 | 5 | DONE (PR #376) | Frontend |
 | 3 | Trend charts — daily/weekly/monthly | RAP-252 | 5 | DONE (PR #377) | Frontend |
-| 4 | Capacity alerts and thresholds | RAP-253 | 3 | DONE (PR #378) | Backend |
+| 4 | Capacity alerts and thresholds | RAP-253 | 3 | CONFLICTING (PR #378 — manual rebase needed, conflicts in operational_dashboard.py) | Backend |
 | 5 | Exportable dashboard data | RAP-254 | 3 | DONE (PR #379) | Backend |
+
+### EPIC-52: Financial Reporting (23 pts) — IN PROGRESS
+
+| # | Story | Ticket | Pts | Status | Track |
+|---|-------|--------|-----|--------|-------|
+| 1 | Donation summary by period/currency/type | RAP-255 | 5 | CONFLICTING (PR #380 — manual rebase needed, conflicts in financial_reporting.py) | Backend |
+| 2 | Fund allocation vs budget report | RAP-256 | 5 | DONE (PR #381) | Frontend |
+| 3 | EU tax compliance export (annual) | RAP-257 | 5 | CONFLICTING (PR #382 — manual rebase needed, conflicts in financial_reporting.py) | Backend |
+| 4 | Donor retention and churn analysis | RAP-258 | 3 | DONE (PR #383) | Backend |
+| 5 | Financial dashboard with charts | RAP-259 | 5 | READY | Frontend |
 
 ---
 
