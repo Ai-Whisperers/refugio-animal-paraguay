@@ -1,7 +1,7 @@
 # RAP-223 Context
 
-## STATUS: ACTIVE
-**Last updated**: 2026-03-29 00:20
+## STATUS: COMPLETED
+**Last updated**: 2026-03-29 05:42
 
 ## Technical State
 - useGroupedNotifications.ts: pure hook, groups by type, sorts by latest
