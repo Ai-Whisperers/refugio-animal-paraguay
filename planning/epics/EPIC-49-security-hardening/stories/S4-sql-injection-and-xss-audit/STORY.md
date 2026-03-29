@@ -3,7 +3,7 @@ story: S4
 epic: EPIC-49
 ticket: RAP-243
 title: "SQL injection and XSS audit"
-status: planned
+status: done
 points: 5
 priority: P1
 track: Backend
