@@ -3,7 +3,7 @@ story: S2
 epic: EPIC-42
 ticket: RAP-206
 title: "Preference management UI for users"
-status: planned
+status: done
 points: 5
 priority: P0
 track: Frontend
