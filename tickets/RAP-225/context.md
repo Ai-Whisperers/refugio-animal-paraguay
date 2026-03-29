@@ -1,24 +1,26 @@
 # RAP-225 Context
 
-## STATUS: COMPLETED
-**Last updated**: 2026-03-29
+## STATUS: ACTIVE
+**Last updated**: 2026-03-29 06:08
 
 ## Current Focus
-COMPLETED — PR #350 created and pushed.
+Implementing extended GDPR anonymization: volunteer, rescuer, foster profiles + DeletionRequest model.
 
 ## Technical State
-- Branch: feature/RAP-225-gdpr-extended-entity-anonymization
-- PR: #350
-- Files modified: src/services/gdpr_deletion_service.py, src/schemas/gdpr_deletion.py, src/api/gdpr.py
-- Files added: tests/unit (extended), tests/integration (extended)
-- All quality gates passed (ruff, mypy, black, pytest)
-- Pre-existing test failures in test_volunteer_driver.py confirmed unrelated (same count on develop)
+- Existing: gdpr_deletion_service.py covers donor + adopter + user account
+- New: DeletionRequest model, migration, extended service, new schemas, new endpoint
+
+## Next Steps
+1. Create DeletionRequest model
+2. Create Alembic migration
+3. Extend service
+4. Update schemas
+5. Add GET endpoint
+6. Write tests
+
+## Blockers
+None
 
 ## Key Decisions Made
-- Used ANONYMIZED_TEXT = "[DELETED]" constant for text fields (motivation, bio, etc.)
-- Used _anonymized_slug() with uuid4().hex[:16] to avoid UNIQUE constraint on rescuer slug
-- Cleared emergency contact fields to None rather than "[DELETED]" (phone numbers have no unique constraint)
-- Set volunteer and foster status to "inactive" on anonymization (not deleted)
-
-## RESUME POINT
-N/A — ticket complete.
+- Using anonymize-not-delete strategy (preserves referential integrity)
+- DeletionRequest model uses append-only audit approach

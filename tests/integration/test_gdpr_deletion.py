@@ -236,6 +236,28 @@ async def test_deletion_request_full(admin_client: AsyncClient) -> None:
     assert isinstance(body["notifications_deleted"], int)
     assert isinstance(body["donor_anonymized"], bool)
     assert isinstance(body["adopter_anonymized"], bool)
+    # New fields from extended anonymization scope
+    assert isinstance(body["volunteer_anonymized"], bool)
+    assert isinstance(body["rescuer_anonymized"], bool)
+    assert isinstance(body["foster_anonymized"], bool)
+
+
+@pytest.mark.asyncio
+@pytest.mark.integration
+async def test_deletion_request_response_includes_extended_fields(
+    admin_client: AsyncClient,
+) -> None:
+    """Response schema includes all new anonymization fields."""
+    resp = await admin_client.post(
+        "/gdpr/deletion-request",
+        json={"user_id": str(_TARGET_USER_ID)},
+    )
+    assert resp.status_code == 200
+    body = resp.json()
+    # All new entity types default to False when IDs not provided
+    assert body["volunteer_anonymized"] is False
+    assert body["rescuer_anonymized"] is False
+    assert body["foster_anonymized"] is False
 
 
 @pytest.mark.asyncio
