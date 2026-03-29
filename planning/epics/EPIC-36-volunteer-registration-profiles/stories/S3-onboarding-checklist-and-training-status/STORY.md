@@ -3,7 +3,7 @@ story: S3
 epic: EPIC-36
 ticket: RAP-642
 title: "Onboarding checklist and training status"
-status: in_progress
+status: done
 points: 3
 priority: P1
 track: Fullstack

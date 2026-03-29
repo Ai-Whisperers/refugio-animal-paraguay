@@ -3,7 +3,7 @@ story: S3
 epic: EPIC-37
 ticket: RAP-182
 title: "Volunteer self-signup for open shifts"
-status: in_progress
+status: done
 points: 5
 priority: P1
 track: Frontend

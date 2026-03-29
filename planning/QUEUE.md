@@ -1,7 +1,7 @@
 # Development Queue — Refugio Animal Paraguay
 
 **Last updated**: 2026-03-29
-**Active version**: V6 Sprint 3 EPIC-33 COMPLETE | New epics EPIC-76 to EPIC-93 queued
+**Active version**: V7 EPIC-36 through EPIC-39 COMPLETE, EPIC-40 S1 DONE | EPIC-40 S2 BLOCKED (PR #322 conflict)
 **Full roadmap**: [ROADMAP.md](ROADMAP.md) — 16 sprints, 68 epics, ~395 stories
 **Tech stack**: Python 3.12, FastAPI, SQLAlchemy 2.x, PostgreSQL 16, Next.js 14
 
@@ -591,7 +591,7 @@ Full details in [ROADMAP.md](ROADMAP.md). Each sprint has epic and story docs in
 | 1 | V4 | Staff Operations Launch (S1 done, S2+ pending) | 105 | EPIC 21-25 |
 | 2 | V5 | Veterinary & Medical Records | 105 | EPIC 26-30 |
 | 3 | V6 | EU Payment Integration | 112 | EPIC 31-35 |
-| 4 | V7 | Volunteer & Foster Programs | 99 | EPIC 36-40 | EPIC-36: S1 DONE (PR #301), S2 DONE (PR #302), S3 BLOCKED (PR #303 conflict — rebased 2026-03-29), S4 DONE (PR #304), S5 DONE (PR #305). EPIC-37: S1 DONE (PR #306), S2 DONE (PR #307), S3 BLOCKED (PR #308 conflict — rebased 2026-03-29), S4 DONE (PR #309), S5 DONE (PR #310). EPIC-38: S1 DONE (PR #311), S2 DONE (PR #312), S3 DONE (PR #313), S4 DONE (PR #314), S5 DONE (PR #315). EPIC-39: S1 DONE (PR #316), S2 DONE (PR #317), S3 DONE (PR #318), S4 BLOCKED (PR #319 conflict — rebased 2026-03-29), S5 DONE (PR #320). EPIC-40: S1 IN REVIEW (PR #321), S2 IN REVIEW (PR #322). |
+| 4 | V7 | Volunteer & Foster Programs | 99 | EPIC 36-40 | EPIC-36: S1 DONE (PR #301), S2 DONE (PR #302), S3 DONE (PR #303 — merged 2026-03-29), S4 DONE (PR #304), S5 DONE (PR #305). EPIC-37: S1 DONE (PR #306), S2 DONE (PR #307), S3 DONE (PR #308 — merged 2026-03-29), S4 DONE (PR #309), S5 DONE (PR #310). EPIC-38: S1 DONE (PR #311), S2 DONE (PR #312), S3 DONE (PR #313), S4 DONE (PR #314), S5 DONE (PR #315). EPIC-39: S1 DONE (PR #316), S2 DONE (PR #317), S3 DONE (PR #318), S4 DONE (PR #319 — merged 2026-03-29), S5 DONE (PR #320). EPIC-40: S1 DONE (PR #321 — merged 2026-03-29), S2 BLOCKED (PR #322 — merge conflict: frontend/src/types/api.ts, src/app.py need manual resolution). |
 | 5 | V8 | Notifications & Communications | 102 | EPIC 41-45 |
 | 6 | V9 | GDPR, Security & Compliance | 87 | EPIC 46-50 |
 | 7 | V10 | Analytics & Reporting | 101 | EPIC 51-55 |
