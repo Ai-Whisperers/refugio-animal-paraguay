@@ -3,7 +3,7 @@ story: S3
 epic: EPIC-52
 ticket: RAP-257
 title: "EU tax compliance export (annual)"
-status: in_progress
+status: done
 points: 5
 priority: P1
 track: Backend

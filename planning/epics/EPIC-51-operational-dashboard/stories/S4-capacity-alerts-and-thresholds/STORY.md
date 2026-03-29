@@ -3,7 +3,7 @@ story: S4
 epic: EPIC-51
 ticket: RAP-253
 title: "Capacity alerts and thresholds"
-status: in_progress
+status: done
 points: 3
 priority: P1
 track: Backend

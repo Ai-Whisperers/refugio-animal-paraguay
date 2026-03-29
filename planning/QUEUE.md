@@ -422,16 +422,16 @@ Week 3-4:
 | 1 | Dashboard API with aggregated metrics | RAP-250 | 5 | DONE (PR #375) | Backend |
 | 2 | KPI cards — occupancy, intake, outcomes | RAP-251 | 5 | DONE (PR #376) | Frontend |
 | 3 | Trend charts — daily/weekly/monthly | RAP-252 | 5 | DONE (PR #377) | Frontend |
-| 4 | Capacity alerts and thresholds | RAP-253 | 3 | CONFLICTING (PR #378 — manual rebase needed, conflicts in operational_dashboard.py) | Backend |
+| 4 | Capacity alerts and thresholds | RAP-253 | 3 | DONE (PR #378) | Backend |
 | 5 | Exportable dashboard data | RAP-254 | 3 | DONE (PR #379) | Backend |
 
-### EPIC-52: Financial Reporting (23 pts) — IN PROGRESS
+### EPIC-52: Financial Reporting (23 pts) — COMPLETE
 
 | # | Story | Ticket | Pts | Status | Track |
 |---|-------|--------|-----|--------|-------|
-| 1 | Donation summary by period/currency/type | RAP-255 | 5 | CONFLICTING (PR #380 — manual rebase needed, conflicts in financial_reporting.py) | Backend |
+| 1 | Donation summary by period/currency/type | RAP-255 | 5 | DONE (PR #380) | Backend |
 | 2 | Fund allocation vs budget report | RAP-256 | 5 | DONE (PR #381) | Frontend |
-| 3 | EU tax compliance export (annual) | RAP-257 | 5 | CONFLICTING (PR #382 — manual rebase needed, conflicts in financial_reporting.py) | Backend |
+| 3 | EU tax compliance export (annual) | RAP-257 | 5 | DONE (PR #382) | Backend |
 | 4 | Donor retention and churn analysis | RAP-258 | 3 | DONE (PR #383) | Backend |
 | 5 | Financial dashboard with charts | RAP-259 | 5 | DONE (PR #384) | Frontend |
 
