@@ -860,3 +860,14 @@ EPIC-42 S4 — RAP-208: Frequency controls (P2, Backend)
 - **Duration**: ~45m total
 - **Quality**: ruff clean, black clean, 12 unit tests (RAP-208) + 18 unit tests (RAP-209) all passing
 - **Notes**: EPIC-42 fully complete (all 5 stories done). RAP-208 adds per-channel frequency settings (immediate/daily_digest/weekly) via new notification_channel_frequency table + migration 082 + GET/PUT /notification-preferences/frequency endpoints. RAP-209 adds one-click email unsubscribe via signed JWT — GET /notification-preferences/unsubscribe-link (authenticated, returns 30-day token URL) + GET /notification-preferences/unsubscribe?token=<jwt> (public). EPIC-43 (PDF Document Generation) is next.
+
+### [2026-03-29 04:42] Work Checker Run
+- **PRs merged**: 1 — PR #334 (RAP-209 email-unsubscribe, was already merged by prior worker run)
+- **PRs rebased**: 0 successful, 4 failed — PR #333 (src/api/notification_preferences.py, src/schemas/notification_preference.py), PR #329 (src/app.py), PR #323 (src/app.py), PR #322 (frontend/src/types/api.ts, src/app.py)
+- **Deploy**: Staging unhealthy (GH Actions billing failure) | Production skipped (staging unhealthy) | Production health: OK (migration 023)
+- **Open PRs**: 4 remaining — #322, #323, #329, #333 (all CONFLICTING, rebase failed)
+- **Queue**: V8 EPIC-42 S5 DONE. EPIC-42 S4 status corrected done→blocked (PR #333 not merged). EPIC-41 S4 remains blocked (PR #329 conflict). V7 EPIC-40 S2/S3 still blocked.
+- **Tickets**: RAP-209 context.md updated ACTIVE→COMPLETED. current.md empty. No orphaned ACTIVE tickets.
+- **Branches**: Deleted local feature/RAP-209-email-unsubscribe-one-click. Remote RAP-209 branch deleted. 4 remote branches remain (open conflicting PRs).
+- **Actions taken**: EPIC-42 S4 STORY.md status corrected, QUEUE.md header updated, orchestrator-log appended.
+- **Blocking issue**: GH Actions billing failure prevents staging/prod CI pipeline from running. Needs manual resolution.

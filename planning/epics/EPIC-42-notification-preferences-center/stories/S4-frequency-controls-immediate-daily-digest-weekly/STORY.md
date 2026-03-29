@@ -3,7 +3,7 @@ story: S4
 epic: EPIC-42
 ticket: RAP-208
 title: "Frequency controls (immediate, daily digest, weekly)"
-status: done
+status: blocked
 points: 3
 priority: P1
 track: Backend

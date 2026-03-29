@@ -1,7 +1,7 @@
 # RAP-209 Context
 
-## STATUS: ACTIVE
-**Last updated**: 2026-03-29 00:30
+## STATUS: COMPLETED
+**Last updated**: 2026-03-29 04:39
 
 ## Current Focus
 Implementing one-click email unsubscribe — signed JWT token flow + endpoint to disable all email preferences.
