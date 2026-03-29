@@ -17,7 +17,7 @@ version: V10
 ## Stories
 - [x] [S1] Audit log viewer with filters (5 pts, P0, Frontend) — DONE (PR #394)
 - [x] [S2] User activity timeline (3 pts, P1, Frontend) — DONE (PR #395)
-- [ ] [S3] Export audit logs (CSV, JSON) (3 pts, P1, Frontend)
+- [x] [S3] Export audit logs (CSV, JSON) (3 pts, P1, Frontend) — DONE (PR #396)
 - [ ] [S4] Alert on suspicious activity (3 pts, P2, Backend)
 - [ ] [S5] Data change history viewer (3 pts, P2, Frontend)
 

@@ -3,7 +3,7 @@ story: S3
 epic: EPIC-55
 ticket: RAP-272
 title: "Export audit logs (CSV, JSON)"
-status: planned
+status: done
 points: 3
 priority: P1
 track: Frontend
