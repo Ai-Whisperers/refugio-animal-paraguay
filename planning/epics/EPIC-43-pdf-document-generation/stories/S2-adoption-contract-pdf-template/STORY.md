@@ -3,7 +3,7 @@ story: S2
 epic: EPIC-43
 ticket: RAP-211
 title: "Adoption contract PDF template"
-status: planned
+status: done
 points: 5
 priority: P0
 track: Backend

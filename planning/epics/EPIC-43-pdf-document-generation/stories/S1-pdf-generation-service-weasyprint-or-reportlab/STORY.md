@@ -3,7 +3,7 @@ story: S1
 epic: EPIC-43
 ticket: RAP-210
 title: "PDF generation service (WeasyPrint or ReportLab)"
-status: planned
+status: done
 points: 5
 priority: P0
 track: Backend
