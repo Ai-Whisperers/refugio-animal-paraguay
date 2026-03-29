@@ -850,3 +850,13 @@ EPIC-42 S4 — RAP-208: Frequency controls (P2, Backend)
 - **Queue**: V8 (Sprint 5) EPIC-41: 4/5 done, S4 BLOCKED. EPIC-42: 3/5 done, S4/S5 planned. V7 EPIC-40 S2/S3 still BLOCKED (src/app.py conflict needs manual resolution)
 - **Tickets**: Closed 4 stale ACTIVE tickets (RAP-202, 204, 206, 207). RAP-203 story status corrected from done → blocked (PR not merged)
 - **Actions taken**: Deleted 4 merged local branches + 4 remote branches. GitHub Actions billing issue blocking staging deploy — requires account attention.
+
+---
+
+### [2026-03-29 00:45] Worker Run — EPIC-42 Complete (S4 + S5)
+- **Epic**: EPIC-42 — Notification Preferences Center
+- **Stories completed**: RAP-208 (S4 Frequency Controls), RAP-209 (S5 Email Unsubscribe)
+- **PRs created**: #333 (RAP-208), #334 (RAP-209)
+- **Duration**: ~45m total
+- **Quality**: ruff clean, black clean, 12 unit tests (RAP-208) + 18 unit tests (RAP-209) all passing
+- **Notes**: EPIC-42 fully complete (all 5 stories done). RAP-208 adds per-channel frequency settings (immediate/daily_digest/weekly) via new notification_channel_frequency table + migration 082 + GET/PUT /notification-preferences/frequency endpoints. RAP-209 adds one-click email unsubscribe via signed JWT — GET /notification-preferences/unsubscribe-link (authenticated, returns 30-day token URL) + GET /notification-preferences/unsubscribe?token=<jwt> (public). EPIC-43 (PDF Document Generation) is next.
