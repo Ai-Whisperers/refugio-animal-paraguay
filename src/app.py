@@ -24,6 +24,7 @@ from src.api.admin_fund_dashboard import router as admin_fund_dashboard_router
 from src.api.admin_government_reports import router as admin_government_reports_router
 from src.api.admin_moderation import router as admin_moderation_router
 from src.api.admin_security import router as admin_security_router
+from src.api.admin_suspicious_activity import router as admin_suspicious_activity_router
 from src.api.admin_sse import router as admin_sse_router
 from src.api.admin_voucher_finance import router as admin_voucher_finance_router
 from src.api.adopters import router as adopters_router
@@ -370,6 +371,7 @@ def create_app() -> FastAPI:
     application.include_router(fund_allocations_router)
     application.include_router(admin_router)
     application.include_router(admin_security_router)
+    application.include_router(admin_suspicious_activity_router)
     application.include_router(admin_sse_router)
     application.include_router(adoption_req_admin_router)
     application.include_router(adoption_req_public_router)
