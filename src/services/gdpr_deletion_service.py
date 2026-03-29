@@ -115,9 +115,15 @@ async def process_deletion_request(
 ) -> dict:
     """Process a full GDPR deletion request for a user.
 
+    Performs third-party deletion cascade (Stripe, email lists) BEFORE anonymizing
+    the donor record, so that the original email/stripe_customer_id are still
+    available to identify the records to delete externally.
+
     Anonymizes personal data across all relevant tables.
     Returns a summary of actions taken.
     """
+    from src.services.gdpr_third_party_deletion_service import process_third_party_deletion
+
     summary: dict = {
         "user_id": str(user_id),
         "user_deactivated": False,
@@ -125,7 +131,28 @@ async def process_deletion_request(
         "notifications_deleted": 0,
         "donor_anonymized": False,
         "adopter_anonymized": False,
+        "stripe_subscriptions_cancelled": 0,
+        "stripe_subscriptions_failed": 0,
+        "stripe_customer_deleted": False,
+        "email_lists_removed": 0,
     }
+
+    # Third-party deletion cascade happens FIRST — before we anonymize the donor email
+    if donor_id is not None:
+        donor = await db.get(Donor, donor_id)
+        donor_email = donor.email if donor is not None else None
+        stripe_customer_id = donor.stripe_customer_id if donor is not None else None
+
+        third_party = await process_third_party_deletion(
+            db,
+            donor_id=donor_id,
+            donor_email=donor_email,
+            stripe_customer_id=stripe_customer_id,
+        )
+        summary["stripe_subscriptions_cancelled"] = third_party["stripe_subscriptions_cancelled"]
+        summary["stripe_subscriptions_failed"] = third_party["stripe_subscriptions_failed"]
+        summary["stripe_customer_deleted"] = third_party["stripe_customer_deleted"]
+        summary["email_lists_removed"] = third_party["email_lists_removed"]
 
     # Deactivate and anonymize the user account
     summary["user_deactivated"] = await deactivate_user_account(db, user_id)
@@ -136,7 +163,7 @@ async def process_deletion_request(
     # Delete notifications
     summary["notifications_deleted"] = await delete_user_notifications(db, user_id)
 
-    # Anonymize donor profile if linked
+    # Anonymize donor profile if linked (after third-party cascade)
     if donor_id is not None:
         summary["donor_anonymized"] = await anonymize_donor(db, donor_id)
 

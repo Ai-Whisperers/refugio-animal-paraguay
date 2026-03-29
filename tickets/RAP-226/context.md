@@ -1,23 +1,19 @@
 # RAP-226 Context
 
-## STATUS: COMPLETED
-**Last updated**: 2026-03-29
+## STATUS: ACTIVE
+**Last updated**: 2026-03-29 06:24
 
 ## Current Focus
-COMPLETED — PR #351 created and pushed.
+Implementation complete. Third-party deletion cascade (Stripe + email) implemented and tested.
 
 ## Technical State
-- Branch: feature/RAP-226-gdpr-third-party-deletion-cascade
-- PR: #351
-- Files added: src/services/gdpr_third_party_deletion_service.py, tests/unit/test_gdpr_third_party_deletion_service.py
-- Files modified: src/services/gdpr_deletion_service.py, src/schemas/gdpr_deletion.py
-- All quality gates passed
+- Created: src/services/gdpr_third_party_deletion_service.py
+- Updated: src/services/gdpr_deletion_service.py (calls third-party cascade before anonymizing donor)
+- Updated: src/schemas/gdpr_deletion.py (extended response with third-party fields)
+- Tests: 17 new unit tests all passing
 
-## Key Decisions Made
-- Local import pattern inside process_deletion_request() to avoid circular imports
-- Patch target for tests: src.services.gdpr_third_party_deletion_service.process_third_party_deletion (not the deletion_service module path)
-- Pre-fetch donor.email and donor.stripe_customer_id BEFORE anonymization — otherwise email becomes anonymized before cascade runs
-- SubscriptionStatus.CANCELED (single L) — matched actual enum value in model
+## Next Steps
+Commit and create PR.
 
-## RESUME POINT
-N/A — ticket complete.
+## Blockers
+None
