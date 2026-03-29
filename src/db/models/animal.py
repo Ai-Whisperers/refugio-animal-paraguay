@@ -106,6 +106,12 @@ class Animal(Base):
     birth_date: Mapped[date | None] = mapped_column(sa.Date, nullable=True)
     description: Mapped[str | None] = mapped_column(sa.Text, nullable=True)
     primary_photo_url: Mapped[str | None] = mapped_column(sa.Text, nullable=True)
+    senacsa_registration_number: Mapped[str | None] = mapped_column(
+        sa.String(100),
+        nullable=True,
+        index=True,
+        comment="SENACSA (Servicio Nacional de Calidad y Salud Animal) registration number",
+    )
     is_featured: Mapped[bool] = mapped_column(
         sa.Boolean,
         nullable=False,

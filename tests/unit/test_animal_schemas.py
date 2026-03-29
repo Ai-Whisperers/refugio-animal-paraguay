@@ -17,6 +17,7 @@ class TestAnimalCreate:
         assert a.status == AnimalStatus.INTAKE
         assert a.birth_date is None
         assert a.description is None
+        assert a.senacsa_registration_number is None
 
     def test_all_fields(self) -> None:
         a = AnimalCreate(
@@ -46,6 +47,18 @@ class TestAnimalCreate:
         with pytest.raises(ValidationError):
             AnimalCreate(name="Rex", status="missing")  # type: ignore[arg-type]
 
+    def test_senacsa_registration_number_accepted(self) -> None:
+        a = AnimalCreate(name="Rex", senacsa_registration_number="SENACSA-2024-001234")
+        assert a.senacsa_registration_number == "SENACSA-2024-001234"
+
+    def test_senacsa_registration_number_max_length(self) -> None:
+        with pytest.raises(ValidationError, match="string_too_long"):
+            AnimalCreate(name="Rex", senacsa_registration_number="x" * 101)
+
+    def test_senacsa_registration_number_exactly_100_chars_is_valid(self) -> None:
+        a = AnimalCreate(name="Rex", senacsa_registration_number="x" * 100)
+        assert len(a.senacsa_registration_number) == 100  # type: ignore[arg-type]
+
 
 class TestAnimalUpdate:
     def test_empty_payload_is_valid(self) -> None:
@@ -69,6 +82,21 @@ class TestAnimalUpdate:
         with pytest.raises(ValidationError, match="string_too_short"):
             AnimalUpdate(name="")
 
+    def test_senacsa_registration_number_can_be_updated(self) -> None:
+        u = AnimalUpdate(senacsa_registration_number="PY-2025-999")
+        data = u.model_dump(exclude_unset=True)
+        assert data == {"senacsa_registration_number": "PY-2025-999"}
+
+    def test_senacsa_registration_number_can_be_cleared(self) -> None:
+        # Passing None explicitly removes the registration number
+        u = AnimalUpdate(senacsa_registration_number=None)
+        data = u.model_dump(exclude_unset=True)
+        assert data == {"senacsa_registration_number": None}
+
+    def test_senacsa_registration_number_max_length_on_update(self) -> None:
+        with pytest.raises(ValidationError, match="string_too_long"):
+            AnimalUpdate(senacsa_registration_number="x" * 101)
+
 
 class TestAnimalResponse:
     def test_from_orm_attributes(self) -> None:
@@ -86,6 +114,7 @@ class TestAnimalResponse:
             birth_date = None
             description = None
             primary_photo_url = None
+            senacsa_registration_number = None
             photos: list = []  # noqa: RUF012
             created_at = now
             updated_at = now
@@ -95,3 +124,27 @@ class TestAnimalResponse:
         assert resp.name == "Bolt"
         assert resp.species == AnimalSpecies.DOG
         assert resp.status == AnimalStatus.AVAILABLE
+        assert resp.senacsa_registration_number is None
+
+    def test_senacsa_number_included_in_response(self) -> None:
+        now = datetime.now(UTC)
+        uid = uuid4()
+
+        class _FakeAnimalWithSenacsa:
+            id = uid
+            name = "Firulais"
+            species = "dog"
+            status = "available"
+            breed = None
+            size = None
+            gender = None
+            birth_date = None
+            description = None
+            primary_photo_url = None
+            senacsa_registration_number = "SENACSA-2024-005678"
+            photos: list = []  # noqa: RUF012
+            created_at = now
+            updated_at = now
+
+        resp = AnimalResponse.model_validate(_FakeAnimalWithSenacsa())
+        assert resp.senacsa_registration_number == "SENACSA-2024-005678"
