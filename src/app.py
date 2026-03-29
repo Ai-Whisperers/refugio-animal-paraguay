@@ -91,6 +91,7 @@ from src.api.executive_kpi_dashboard import router as executive_kpi_dashboard_ro
 from src.api.expense_approval import router as expense_approval_router
 from src.api.expense_crud import router as expense_crud_router
 from src.api.feature_requests import router as feature_requests_router
+from src.api.financial_reporting import router as financial_reporting_router
 from src.api.financial_stats import router as financial_stats_router
 from src.api.follow_ups import router as follow_ups_router
 from src.api.followup_automation import admin_router as followup_auto_admin_router
@@ -394,6 +395,7 @@ def create_app() -> FastAPI:
     application.include_router(notifications_router)
     application.include_router(gdpr_export_router)
     application.include_router(notification_preferences_router)
+    application.include_router(financial_reporting_router)
     application.include_router(financial_stats_router)
     application.include_router(follow_ups_router)
     application.include_router(gdpr_router)
