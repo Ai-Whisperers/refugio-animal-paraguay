@@ -3,7 +3,7 @@ story: S3
 epic: EPIC-41
 ticket: RAP-202
 title: "Adoption status notifications via WhatsApp"
-status: planned
+status: done
 points: 5
 priority: P1
 track: Backend
