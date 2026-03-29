@@ -1,7 +1,7 @@
 # Development Queue — Refugio Animal Paraguay
 
 **Last updated**: 2026-03-29
-**Active version**: V8 Sprint 5 in progress — EPIC-41 ALL DONE, EPIC-42 ALL DONE, EPIC-43 ALL DONE (S1-S5: PR #335 RAP-210, PR #336 RAP-211, PR #337 RAP-212, PR #338 RAP-213, PR #339 RAP-214). EPIC-44, EPIC-45: all planned.
+**Active version**: V8 Sprint 5 in progress — EPIC-41 ALL DONE, EPIC-42 ALL DONE, EPIC-43 ALL DONE (S1-S5: PR #335 RAP-210, PR #336 RAP-211, PR #337 RAP-212, PR #338 RAP-213, PR #339 RAP-214). EPIC-44 ALL DONE (RAP-215–219; PR #340–344, 2026-03-29). EPIC-45: planned.
 **Full roadmap**: [ROADMAP.md](ROADMAP.md) — 16 sprints, 68 epics, ~395 stories
 **Tech stack**: Python 3.12, FastAPI, SQLAlchemy 2.x, PostgreSQL 16, Next.js 14
 
@@ -592,7 +592,7 @@ Full details in [ROADMAP.md](ROADMAP.md). Each sprint has epic and story docs in
 | 2 | V5 | Veterinary & Medical Records | 105 | EPIC 26-30 |
 | 3 | V6 | EU Payment Integration | 112 | EPIC 31-35 |
 | 4 | V7 | Volunteer & Foster Programs | 99 | EPIC 36-40 | COMPLETE (2026-03-29). EPIC-36 through EPIC-40 all 5 stories each DONE. RAP-196 (S2) and RAP-197 (S3) conflicts resolved and merged via rebase. |
-| 5 | V8 | Notifications & Communications | 102 | EPIC 41-45 | In progress. EPIC-41 ALL DONE (RAP-200–204). EPIC-42 ALL DONE (RAP-205–209). EPIC-43 ALL DONE (RAP-210–214; PR #335–339, 2026-03-29). EPIC-44, EPIC-45 all planned. |
+| 5 | V8 | Notifications & Communications | 102 | EPIC 41-45 | In progress. EPIC-41 ALL DONE (RAP-200–204). EPIC-42 ALL DONE (RAP-205–209). EPIC-43 ALL DONE (RAP-210–214; PR #335–339, 2026-03-29). EPIC-44 ALL DONE (RAP-215–219; PR #340–344, 2026-03-29). EPIC-45: planned. |
 | 6 | V9 | GDPR, Security & Compliance | 87 | EPIC 46-50 |
 | 7 | V10 | Analytics & Reporting | 101 | EPIC 51-55 |
 | 8 | V11 | Public Experience & Content | 101 | EPIC 56-60 |

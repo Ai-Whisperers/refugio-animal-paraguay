@@ -911,3 +911,40 @@ EPIC-42 S4 — RAP-208: Frequency controls (P2, Backend)
 - **Branches**: Deleted 3 local + 3 remote feature branches (RAP-212/213/214). Only develop + main remain.
 - **Actions taken**: EPIC-43 S5 STORY.md status corrected (planned→done), Sprint 5 SPRINT.md EPIC-43 marked [x].
 - **Blocking issue**: GitHub Actions billing failure still preventing CI pipeline. Requires Ivan to check billing settings.
+
+### [2026-03-29 (session resumed)] EPIC-44 Sprint 5 — Autonomous Worker Session (S3–S5)
+
+**Session**: Context-resumed automated worker session. EPIC-44 S1 (RAP-215) and S2 (RAP-216) were already completed in the prior session; PRs #340 and #341 open. This session completed S3–S5.
+
+**Stories completed this session**:
+| Story | Ticket | PR | Description |
+|-------|--------|-----|-------------|
+| S3 | RAP-217 | #342 | Campaign scheduling and sending service |
+| S4 | RAP-218 | #343 | Open/click tracking (pixel + redirect + stats) |
+| S5 | RAP-219 | #344 | A/B subject line testing |
+
+**Branch topology** (stacked PRs, merged after review):
+```
+develop
+  └── feature/RAP-215-email-list-management (PR #340)
+       └── feature/RAP-217-campaign-scheduling-sending (PR #342, stacked on RAP-215)
+            └── feature/RAP-218-open-click-tracking (PR #343, stacked on RAP-217)
+                 └── feature/RAP-219-ab-testing-subject-lines (PR #344, stacked on RAP-218)
+feature/RAP-216-newsletter-template-builder (PR #341, independent of stack)
+```
+
+**Test counts** (unit tests, all passing):
+- RAP-217: 11 unit + 15 integration
+- RAP-218: 11 unit + 10 integration
+- RAP-219: 14 unit + 8 integration
+
+**Quality gates**: ruff clean, black clean on all new files
+
+**Work summary**:
+- RAP-217: `EmailCampaign` model (6-state lifecycle), migration 085, service (`schedule_campaign`, `cancel_campaign`, `initiate_send`, `get_pending_scheduled_campaigns`), 7 REST endpoints
+- RAP-218: `EmailCampaignEvent` model (open/click events with variant/ip/ua), migration 086, tracking pixel endpoint (1x1 GIF, errors swallowed), click redirect endpoint, staff stats endpoint with open/click rates and variant breakdown
+- RAP-219: `subject_a`, `subject_b`, `ab_ratio` columns (migration 087), `split_recipients_by_variant` (deterministic ceil split), `initiate_send_ab` service, `/send/ab` endpoint
+
+**EPIC-44 status**: ALL 5 stories done (S1–S5 PRs #340–#344 open, awaiting merge)
+
+**Queue**: EPIC-44 complete. Check QUEUE.md for next epic (EPIC-45: Push/In-App Notifications or V4+ stories)
