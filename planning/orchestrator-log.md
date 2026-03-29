@@ -792,3 +792,11 @@
 - **Duration**: ~75m total
 - **Quality**: ruff clean, black clean: 20 unit tests RAP-197, 21 unit tests RAP-198, 19 unit tests RAP-199 (all pass)
 - **Notes**: EPIC-40 fully complete — all 5 stories done and in review. RAP-198 code accidentally committed directly to develop (eb7365b) in addition to PR #324 feature branch. PR #322 (RAP-196) has a merge conflict on frontend/src/types/api.ts and src/app.py — needs manual resolution before merge.
+
+### [2026-03-28 08:00] Worker Run — EPIC-41 S1, S2 (V8 Sprint Start)
+- **Epic**: EPIC-41 — WhatsApp Business Integration
+- **Stories completed**: RAP-200 (Meta Cloud WhatsApp API setup), RAP-201 (Message template registry)
+- **PRs created**: #326 (RAP-200), #327 (RAP-201)
+- **Duration**: ~90m total
+- **Quality**: ruff clean, black clean: 23 unit tests RAP-200, 14 unit tests RAP-201 (all pass)
+- **Notes**: V8 sprint begins. New `MetaWhatsAppService` added alongside existing Twilio integration (no breaking changes). Template registry uses soft-delete (is_active=False). Key bug fix during dev: patching ORM class with MagicMock breaks SQLAlchemy select() — use refresh side_effect instead. Ruff B904 required `raise ... from exc` in API exception handlers.
