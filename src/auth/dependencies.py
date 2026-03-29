@@ -31,7 +31,10 @@ async def _get_current_user(
     )
     try:
         payload = decode_access_token(
-            credentials.credentials, settings.secret_key, settings.algorithm
+            credentials.credentials,
+            settings.secret_key,
+            settings.algorithm,
+            secret_key_previous=settings.secret_key_previous,
         )
         user_id: str | None = payload.get("sub")  # type: ignore[assignment]
         if user_id is None:

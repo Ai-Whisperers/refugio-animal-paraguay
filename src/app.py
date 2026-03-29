@@ -19,6 +19,7 @@ from slowapi.errors import RateLimitExceeded
 from src.api.admin import router as admin_router
 from src.api.admin_campaigns import router as admin_campaigns_router
 from src.api.admin_castration_campaigns import router as admin_castration_campaigns_router
+from src.api.admin_security import router as admin_security_router
 from src.api.admin_data_retention import router as admin_data_retention_router
 from src.api.admin_fund_dashboard import router as admin_fund_dashboard_router
 from src.api.admin_moderation import router as admin_moderation_router
@@ -356,6 +357,7 @@ def create_app() -> FastAPI:
     application.include_router(in_kind_donations_router)
     application.include_router(fund_allocations_router)
     application.include_router(admin_router)
+    application.include_router(admin_security_router)
     application.include_router(admin_sse_router)
     application.include_router(adoption_req_admin_router)
     application.include_router(adoption_req_public_router)
