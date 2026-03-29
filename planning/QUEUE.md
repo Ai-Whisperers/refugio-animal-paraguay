@@ -1,7 +1,7 @@
 # Development Queue — Refugio Animal Paraguay
 
 **Last updated**: 2026-03-29
-**Active version**: V9 Sprint 6 in progress — EPIC-41 ALL DONE, EPIC-42 ALL DONE, EPIC-43 ALL DONE (S1-S5: PR #335 RAP-210, PR #336 RAP-211, PR #337 RAP-212, PR #338 RAP-213, PR #339 RAP-214). EPIC-44 ALL DONE (RAP-215–219; PR #340–344, 2026-03-29). EPIC-45 ALL DONE (RAP-220–224; PR #345–349, 2026-03-29). EPIC-46 ALL DONE (RAP-225–229; PR #350–354, 2026-03-29). EPIC-47 ALL DONE (RAP-230–234; PR #355–359, 2026-03-29).
+**Active version**: V9 Sprint 6 in progress — EPIC-41 ALL DONE, EPIC-42 ALL DONE, EPIC-43 ALL DONE (S1-S5: PR #335 RAP-210, PR #336 RAP-211, PR #337 RAP-212, PR #338 RAP-213, PR #339 RAP-214). EPIC-44 ALL DONE (RAP-215–219; PR #340–344, 2026-03-29). EPIC-45 ALL DONE (RAP-220–224; PR #345–349, 2026-03-29). EPIC-46 ALL DONE (RAP-225–229; PR #350–354, 2026-03-29). EPIC-47 ALL DONE (RAP-230–234; PR #355–359, 2026-03-29). EPIC-48 S1+S2 DONE (RAP-235 PR #360, RAP-236 PR #361, 2026-03-29); S3–S5 in progress.
 **Full roadmap**: [ROADMAP.md](ROADMAP.md) — 16 sprints, 68 epics, ~395 stories
 **Tech stack**: Python 3.12, FastAPI, SQLAlchemy 2.x, PostgreSQL 16, Next.js 14
 
@@ -359,7 +359,17 @@ Week 3-4:
 
 ---
 
-## V9 Sprint 6 — GDPR, Security & Compliance (EPIC-47 complete)
+## V9 Sprint 6 — GDPR, Security & Compliance (EPIC-46 + EPIC-47 complete, EPIC-48 in progress)
+
+### EPIC-46: GDPR Right to Erasure (19 pts) — COMPLETE
+
+| # | Story | Ticket | Pts | Status | Track |
+|---|-------|--------|-----|--------|-------|
+| 1 | GDPR anonymization for all PII entities | RAP-225 | 4 | DONE (PR #350) | Backend |
+| 2 | GDPR third-party deletion cascade | RAP-226 | 4 | DONE (PR #351) | Backend |
+| 3 | User self-service deletion request (frontend) | RAP-227 | 4 | DONE (PR #352) | Frontend |
+| 4 | GDPR erasure audit trail | RAP-228 | 4 | DONE (PR #353) | Backend |
+| 5 | Data retention policy automation | RAP-229 | 3 | DONE (PR #354) | Backend |
 
 ### EPIC-47: Privacy & Cookie Compliance (16 pts) — COMPLETE
 
@@ -370,6 +380,16 @@ Week 3-4:
 | 3 | Terms of service page | RAP-232 | 3 | DONE (PR #357) | Frontend |
 | 4 | Data processing agreement template | RAP-233 | 3 | DONE (PR #358) | Backend |
 | 5 | Sub-processor registry (Stripe, SMTP, etc.) | RAP-234 | 2 | DONE (PR #359) | Backend |
+
+### EPIC-48: Two-Factor Authentication (19 pts) — IN PROGRESS
+
+| # | Story | Ticket | Pts | Status | Track |
+|---|-------|--------|-----|--------|-------|
+| 1 | TOTP secret generation and verification | RAP-235 | 5 | DONE (PR #360) | Backend |
+| 2 | 2FA setup flow with QR code | RAP-236 | 5 | DONE (PR #361) | Frontend |
+| 3 | Backup codes generation and usage | RAP-237 | 3 | IN PROGRESS | Backend |
+| 4 | 2FA enforcement for admin role | RAP-238 | 3 | READY | Backend |
+| 5 | 2FA recovery flow | RAP-239 | 3 | READY | Fullstack |
 
 ---
 
@@ -607,7 +627,7 @@ Full details in [ROADMAP.md](ROADMAP.md). Each sprint has epic and story docs in
 | 3 | V6 | EU Payment Integration | 112 | EPIC 31-35 |
 | 4 | V7 | Volunteer & Foster Programs | 99 | EPIC 36-40 | COMPLETE (2026-03-29). EPIC-36 through EPIC-40 all 5 stories each DONE. RAP-196 (S2) and RAP-197 (S3) conflicts resolved and merged via rebase. |
 | 5 | V8 | Notifications & Communications | 102 | EPIC 41-45 | In progress. EPIC-41 ALL DONE (RAP-200–204). EPIC-42 ALL DONE (RAP-205–209). EPIC-43 ALL DONE (RAP-210–214; PR #335–339, 2026-03-29). EPIC-44 ALL DONE (RAP-215–219; PR #340–344, 2026-03-29). EPIC-45 ALL DONE (RAP-220–224; PR #345–349, 2026-03-29). EPIC-46 ALL DONE (RAP-225–229; PR #350–354, 2026-03-29). |
-| 6 | V9 | GDPR, Security & Compliance | 87 | EPIC 46-50 | In progress. EPIC-46 ALL DONE (RAP-225–229; PR #350–354, 2026-03-29). EPIC-47 ALL DONE (RAP-230–234; PR #355–359, 2026-03-29). |
+| 6 | V9 | GDPR, Security & Compliance | 87 | EPIC 46-50 | In progress. EPIC-46 ALL DONE (RAP-225–229; PR #350–354, 2026-03-29). EPIC-47 ALL DONE (RAP-230–234; PR #355–359, 2026-03-29). EPIC-48 S1+S2 DONE (PR #360–361, 2026-03-29); S3–S5 in progress. |
 | 7 | V10 | Analytics & Reporting | 101 | EPIC 51-55 |
 | 8 | V11 | Public Experience & Content | 101 | EPIC 56-60 |
 | 9 | V12 | Infrastructure & DevOps | 104 | EPIC 61-65 |

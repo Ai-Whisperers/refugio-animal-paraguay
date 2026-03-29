@@ -2,7 +2,7 @@
 epic: EPIC-47
 title: "Privacy & Cookie Compliance"
 sprint: 6
-status: planned
+status: done
 points: 16
 created: 2026-03-26T19:06:04
 version: V9
