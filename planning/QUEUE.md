@@ -1,7 +1,7 @@
 # Development Queue — Refugio Animal Paraguay
 
 **Last updated**: 2026-03-29
-**Active version**: V10 Sprint 7 IN PROGRESS — EPIC-51–54 ALL DONE. EPIC-55 (Audit & Activity Logs UI) READY. RAP-269 status anomaly: story marked done but no merged PR found (flagged 2026-03-29).
+**Active version**: V10 Sprint 7 COMPLETE — EPIC-51–55 ALL DONE (25/25 stories). Sprint 8 (Public Experience) is next. RAP-269 status anomaly: story marked done but no merged PR found (flagged 2026-03-29).
 **Full roadmap**: [ROADMAP.md](ROADMAP.md) — 16 sprints, 68 epics, ~395 stories
 **Tech stack**: Python 3.12, FastAPI, SQLAlchemy 2.x, PostgreSQL 16, Next.js 14
 
@@ -454,6 +454,16 @@ Week 3-4:
 | 3 | Donor-specific impact summaries | RAP-267 | 3 | DONE (PR #392) | Backend |
 | 4 | Annual impact report with visualizations | RAP-268 | 5 | DONE (PR #393) | Fullstack |
 | 5 | Scheduled report generation and distribution | RAP-269 | 3 | DONE (story file done; no merged PR found — anomaly flagged) | Backend |
+
+### EPIC-55: Audit & Activity Logs UI (17 pts) — COMPLETE
+
+| # | Story | Ticket | Pts | Status | Track |
+|---|-------|--------|-----|--------|-------|
+| 1 | Audit log viewer with filters | RAP-270 | 5 | DONE (PR #394) | Frontend |
+| 2 | User activity timeline | RAP-271 | 3 | DONE (PR #395) | Frontend |
+| 3 | Export audit logs (CSV, JSON) | RAP-272 | 3 | DONE (PR #396) | Frontend |
+| 4 | Alert on suspicious activity | RAP-273 | 3 | DONE (PR #397) | Backend |
+| 5 | Data change history viewer | RAP-274 | 3 | DONE (PR #398) | Frontend |
 
 ---
 
