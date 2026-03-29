@@ -872,3 +872,34 @@ export const TERMS = {
   section8BodyEn:
     "For inquiries about these terms: info@refugioanimal.com.py | Refugio Animal Paraguay, Asuncion, Paraguay.",
 } as const;
+
+// --- Cookie Consent Banner ---
+export const COOKIE_CONSENT = {
+  // Banner
+  bannerTitle: "Usamos cookies",
+  bannerText:
+    "Usamos cookies esenciales para el funcionamiento del sitio y cookies opcionales de analisis para mejorar la experiencia. Podes aceptar todas, rechazar las opcionales, o personalizar tu eleccion.",
+  acceptAll: "Aceptar todo",
+  rejectOptional: "Solo esenciales",
+  customize: "Personalizar",
+  // Preferences modal
+  preferencesTitle: "Preferencias de cookies",
+  preferencesSubtitle: "Elige que tipos de cookies aceptas.",
+  essentialTitle: "Esenciales",
+  essentialDesc:
+    "Necesarias para el funcionamiento del sitio (autenticacion, seguridad, formularios). No se pueden desactivar.",
+  analyticsTitle: "Analisis",
+  analyticsDesc:
+    "Nos ayudan a entender como se usa el sitio para mejorarlo. No rastrean informacion personal.",
+  marketingTitle: "Marketing",
+  marketingDesc:
+    "Se usan para mostrar contenido relevante. Actualmente no utilizamos cookies de marketing.",
+  savePreferences: "Guardar preferencias",
+  cancel: "Cancelar",
+  // Footer link
+  cookieSettings: "Configuracion de cookies",
+  // Accessibility
+  closeModal: "Cerrar",
+  alwaysActive: "Siempre activo",
+  privacyLink: "Ver politica de privacidad",
+} as const;

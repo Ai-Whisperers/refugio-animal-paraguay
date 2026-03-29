@@ -158,3 +158,104 @@ async def test_2fa_endpoints_require_auth() -> None:
     ) as unauthenticated:
         response = await unauthenticated.get("/auth/2fa/status")
         assert response.status_code in (401, 403)
+
+
+# ---------------------------------------------------------------------------
+# Backup codes endpoints
+# ---------------------------------------------------------------------------
+
+
+async def _enable_2fa(client: AsyncClient) -> str:
+    """Helper: enable 2FA for the test user; return the TOTP secret."""
+    setup_response = await client.post("/auth/2fa/setup")
+    secret = setup_response.json()["secret"]
+    totp = pyotp.TOTP(secret)
+    await client.post("/auth/2fa/verify", json={"code": totp.now()})
+    return secret
+
+
+async def test_generate_backup_codes_requires_2fa_enabled(client: AsyncClient) -> None:
+    """POST /auth/2fa/backup-codes should return 400 if 2FA is not yet enabled."""
+    response = await client.post("/auth/2fa/backup-codes")
+    assert response.status_code == 400
+
+
+async def test_generate_backup_codes_returns_codes_list(client: AsyncClient) -> None:
+    """When 2FA is enabled, POST /auth/2fa/backup-codes returns a list of codes."""
+    from src.db.models.totp_backup_code import BACKUP_CODE_COUNT
+
+    await _enable_2fa(client)
+    response = await client.post("/auth/2fa/backup-codes")
+    assert response.status_code == 200
+    data = response.json()
+    assert "codes" in data
+    assert isinstance(data["codes"], list)
+    assert len(data["codes"]) == BACKUP_CODE_COUNT
+
+
+async def test_generated_codes_have_correct_format(client: AsyncClient) -> None:
+    """Each backup code should be 8 uppercase alphanumeric characters."""
+    from src.services.backup_code_service import BACKUP_CODE_LENGTH
+
+    await _enable_2fa(client)
+    response = await client.post("/auth/2fa/backup-codes")
+    codes = response.json()["codes"]
+    for code in codes:
+        assert len(code) == BACKUP_CODE_LENGTH
+        assert code == code.upper()
+
+
+async def test_generate_backup_codes_replaces_previous_batch(client: AsyncClient) -> None:
+    """Calling generate twice should produce a completely different set of codes."""
+    await _enable_2fa(client)
+    first = set((await client.post("/auth/2fa/backup-codes")).json()["codes"])
+    second = set((await client.post("/auth/2fa/backup-codes")).json()["codes"])
+    # All previous codes should be invalidated; in practice codes differ
+    # (36^8 space — probability of identical batch is negligible)
+    assert first != second
+
+
+async def test_backup_codes_count_zero_before_generation(client: AsyncClient) -> None:
+    """Before generating backup codes the count should be 0."""
+    await _enable_2fa(client)
+    response = await client.get("/auth/2fa/backup-codes/count")
+    assert response.status_code == 200
+    assert response.json()["remaining"] == 0
+
+
+async def test_backup_codes_count_matches_generated_count(client: AsyncClient) -> None:
+    """After generating backup codes the count should equal BACKUP_CODE_COUNT."""
+    from src.db.models.totp_backup_code import BACKUP_CODE_COUNT
+
+    await _enable_2fa(client)
+    await client.post("/auth/2fa/backup-codes")
+    response = await client.get("/auth/2fa/backup-codes/count")
+    assert response.json()["remaining"] == BACKUP_CODE_COUNT
+
+
+async def test_backup_codes_count_decreases_after_use(client: AsyncClient) -> None:
+    """Using a backup code should decrement the remaining count by one."""
+    from src.db.models.totp_backup_code import BACKUP_CODE_COUNT
+
+    await _enable_2fa(client)
+    codes_response = await client.post("/auth/2fa/backup-codes")
+    codes = codes_response.json()["codes"]
+
+    # Consume one code via the DB service directly
+    from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
+
+    from src.config import Settings
+    from src.db.session import init_engine
+    from src.services.backup_code_service import use_backup_code
+
+    settings = Settings()
+    engine = init_engine(settings)
+    session_factory = async_sessionmaker(bind=engine, class_=AsyncSession, expire_on_commit=False)
+    async with session_factory() as session:
+        used = await use_backup_code(session, _TEST_STAFF_ID, codes[0])
+        await session.commit()
+    await engine.dispose()
+    assert used is True
+
+    count_response = await client.get("/auth/2fa/backup-codes/count")
+    assert count_response.json()["remaining"] == BACKUP_CODE_COUNT - 1

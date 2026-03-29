@@ -7,6 +7,7 @@ import WhatsAppFab from "@/components/WhatsAppFab";
 import WebVitals from "@/components/WebVitals";
 import ServiceWorkerRegistration from "@/components/ServiceWorkerRegistration";
 import BottomNav from "@/components/BottomNav";
+import CookieConsentBanner from "@/components/CookieConsentBanner";
 import { SITE_TITLE, SITE_DESCRIPTION, SKIP_LINK } from "@/lib/strings";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -67,6 +68,7 @@ export default function RootLayout({
         <WebVitals />
         <ServiceWorkerRegistration />
         <BottomNav />
+        <CookieConsentBanner />
       </body>
     </html>
   );

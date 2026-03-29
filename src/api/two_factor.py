@@ -1,10 +1,12 @@
 """Two-Factor Authentication router.
 
 Endpoints:
-  GET  /auth/2fa/status   — Return whether 2FA is enabled for the current user
-  POST /auth/2fa/setup    — Generate a new TOTP secret (does NOT activate 2FA yet)
-  POST /auth/2fa/verify   — Confirm the first TOTP code, activating 2FA
-  POST /auth/2fa/disable  — Deactivate 2FA (requires a live TOTP code)
+  GET  /auth/2fa/status              — Return whether 2FA is enabled for the current user
+  POST /auth/2fa/setup               — Generate a new TOTP secret (does NOT activate 2FA yet)
+  POST /auth/2fa/verify              — Confirm the first TOTP code, activating 2FA
+  POST /auth/2fa/disable             — Deactivate 2FA (requires a live TOTP code)
+  POST /auth/2fa/backup-codes        — Generate a fresh batch of backup recovery codes
+  GET  /auth/2fa/backup-codes/count  — Return the number of unused backup codes remaining
 """
 
 import logging
@@ -17,10 +19,16 @@ from src.db.models.user import User
 from src.db.session import get_db
 from src.schemas.error import COMMON_RESPONSES
 from src.schemas.two_factor import (
+    BackupCodesCountResponse,
+    BackupCodesResponse,
     TotpDisableRequest,
     TotpSetupResponse,
     TotpStatusResponse,
     TotpVerifyRequest,
+)
+from src.services.backup_code_service import (
+    count_remaining_backup_codes,
+    generate_backup_codes,
 )
 from src.services.totp_service import generate_secret, get_provisioning_uri, verify_totp
 
@@ -127,3 +135,49 @@ async def disable_2fa(
 
     logger.info("2FA disabled", extra={"user_id": str(current_user.id)})
     return {"message": "Two-factor authentication has been disabled."}
+
+
+@router.post(
+    "/backup-codes",
+    response_model=BackupCodesResponse,
+    status_code=status.HTTP_200_OK,
+)
+async def generate_new_backup_codes(
+    current_user: User = Depends(_get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> BackupCodesResponse:
+    """Generate a fresh batch of backup recovery codes.
+
+    Requires 2FA to be enabled. Calling this endpoint invalidates all
+    previously issued codes (used or not) and returns a new set of plain-text
+    codes. Present these to the user exactly once — they are stored hashed and
+    cannot be retrieved again.
+    """
+    if not current_user.totp_enabled:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="2FA must be enabled before generating backup codes.",
+        )
+
+    plain_codes = await generate_backup_codes(db, current_user.id)
+    await db.commit()
+
+    logger.info(
+        "Backup codes regenerated",
+        extra={"user_id": str(current_user.id), "count": len(plain_codes)},
+    )
+    return BackupCodesResponse(codes=plain_codes)
+
+
+@router.get(
+    "/backup-codes/count",
+    response_model=BackupCodesCountResponse,
+    status_code=status.HTTP_200_OK,
+)
+async def get_backup_codes_count(
+    current_user: User = Depends(_get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> BackupCodesCountResponse:
+    """Return the number of unused backup codes remaining for the authenticated user."""
+    remaining = await count_remaining_backup_codes(db, current_user.id)
+    return BackupCodesCountResponse(remaining=remaining)
