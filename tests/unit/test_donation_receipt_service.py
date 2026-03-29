@@ -250,3 +250,24 @@ class TestDonationReceiptGenerator:
         )
         result = generator.generate_bytes(data)
         assert result[:5] == b"%PDF-"
+
+
+class TestDonationReceiptGeneratorBaseInterface:
+    """Tests for DonationReceiptGenerator via BasePDFGenerator interface."""
+
+    def test_generate_bytes_returns_valid_pdf(self, generator, sample_receipt_data) -> None:
+        pdf_bytes = generator.generate_bytes(sample_receipt_data)
+        assert isinstance(pdf_bytes, bytes)
+        assert pdf_bytes[:4] == b"%PDF"
+
+    def test_generate_file_writes_pdf(self, generator, sample_receipt_data, tmp_path) -> None:
+        out_path = tmp_path / "receipt.pdf"
+        result = generator.generate_file(sample_receipt_data, out_path)
+        assert result == out_path.resolve()
+        assert out_path.exists()
+        assert out_path.read_bytes()[:4] == b"%PDF"
+
+    def test_generate_bytes_anonymous_donation(self, generator, anonymous_receipt_data) -> None:
+        pdf_bytes = generator.generate_bytes(anonymous_receipt_data)
+        assert pdf_bytes[:4] == b"%PDF"
+        assert len(pdf_bytes) > 1000
