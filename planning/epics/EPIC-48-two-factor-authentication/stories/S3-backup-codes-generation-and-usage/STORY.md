@@ -3,7 +3,7 @@ story: S3
 epic: EPIC-48
 ticket: RAP-237
 title: "Backup codes generation and usage"
-status: planned
+status: done
 points: 3
 priority: P1
 track: Backend
