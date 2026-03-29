@@ -2,7 +2,7 @@
 epic: EPIC-45
 title: "Push & In-App Notifications"
 sprint: 5
-status: planned
+status: done
 points: 21
 created: 2026-03-26T19:06:04
 version: V8
