@@ -422,7 +422,7 @@ Week 3-4:
 | 1 | Dashboard API with aggregated metrics | RAP-250 | 5 | DONE (PR #375) | Backend |
 | 2 | KPI cards — occupancy, intake, outcomes | RAP-251 | 5 | DONE (PR #376) | Frontend |
 | 3 | Trend charts — daily/weekly/monthly | RAP-252 | 5 | DONE (PR #377) | Frontend |
-| 4 | Capacity alerts and thresholds | RAP-253 | 3 | READY | Backend |
+| 4 | Capacity alerts and thresholds | RAP-253 | 3 | DONE (PR #378) | Backend |
 | 5 | Exportable dashboard data | RAP-254 | 3 | READY | Backend |
 
 ---
