@@ -7,7 +7,7 @@ Tests cover:
   - Donation received handler
   - _lookup_adoption_context DB helper
   - _lookup_donation_context DB helper
-  - _get_staff_emails DB helper
+  - _get_staff_email_recipients DB helper
   - Error handling (missing aggregate_id, DB lookup failures)
 """
 
@@ -294,7 +294,7 @@ class TestAdoptionRequestCreatedHandler:
 
         with patch.object(
             NotificationHandlers,
-            "_get_staff_emails",
+            "_get_staff_email_recipients",
             new_callable=AsyncMock,
             return_value=[],
         ):
@@ -313,7 +313,7 @@ class TestAdoptionRequestCreatedHandler:
 
         with patch.object(
             NotificationHandlers,
-            "_get_staff_emails",
+            "_get_staff_email_recipients",
             new_callable=AsyncMock,
             return_value=staff_emails,
         ):
@@ -332,7 +332,7 @@ class TestAdoptionRequestCreatedHandler:
 
         with patch.object(
             NotificationHandlers,
-            "_get_staff_emails",
+            "_get_staff_email_recipients",
             new_callable=AsyncMock,
             return_value=[],
         ):
@@ -347,7 +347,7 @@ class TestAdoptionRequestCreatedHandler:
 
         with patch.object(
             NotificationHandlers,
-            "_get_staff_emails",
+            "_get_staff_email_recipients",
             new_callable=AsyncMock,
             side_effect=RuntimeError("DB exploded"),
         ):
@@ -498,41 +498,65 @@ class TestLookupDonationContext:
 
 
 # ---------------------------------------------------------------------------
-# _get_staff_emails
+# _get_staff_email_recipients
 # ---------------------------------------------------------------------------
 
 
 class TestGetStaffEmails:
-    """Test NotificationHandlers._get_staff_emails static method."""
+    """Test NotificationHandlers._get_staff_email_recipients static method.
+
+    The method now accepts a notification_type argument and checks each
+    user's email preference via is_notification_enabled before including
+    them. The DB query returns (user_id, email) rows via result.all().
+    """
 
     @pytest.mark.asyncio
     async def test_returns_staff_email_list(self) -> None:
+        uid1, uid2 = uuid4(), uuid4()
         session = _make_fake_session()
-        scalars_mock = MagicMock()
-        scalars_mock.all.return_value = ["staff@shelter.org", "admin@shelter.org"]
         result_mock = MagicMock()
-        result_mock.scalars.return_value = scalars_mock
+        result_mock.all.return_value = [(uid1, "staff@shelter.org"), (uid2, "admin@shelter.org")]
         session.execute.return_value = result_mock
 
-        with _patch_handlers_session(session):
-            emails = await NotificationHandlers._get_staff_emails()
+        # Both users have email enabled
+        with (
+            _patch_handlers_session(session),
+            patch(
+                "src.notifications.handlers.is_notification_enabled",
+                new=AsyncMock(return_value=True),
+            ),
+        ):
+            emails = await NotificationHandlers._get_staff_email_recipients(
+                "adoption_request_created"
+            )
 
         assert emails == ["staff@shelter.org", "admin@shelter.org"]
 
     @pytest.mark.asyncio
-    async def test_filters_out_none_emails(self) -> None:
+    async def test_filters_out_opted_out_users(self) -> None:
+        uid1, uid2 = uuid4(), uuid4()
         session = _make_fake_session()
-        scalars_mock = MagicMock()
-        scalars_mock.all.return_value = ["staff@shelter.org", None, "admin@shelter.org"]
         result_mock = MagicMock()
-        result_mock.scalars.return_value = scalars_mock
+        result_mock.all.return_value = [(uid1, "staff@shelter.org"), (uid2, "admin@shelter.org")]
         session.execute.return_value = result_mock
 
-        with _patch_handlers_session(session):
-            emails = await NotificationHandlers._get_staff_emails()
+        # uid2 (admin) has email disabled for this type
+        async def fake_enabled(db, *, user_id, notification_type, channel):
+            return user_id == uid1
 
-        assert None not in emails
-        assert len(emails) == 2
+        with (
+            _patch_handlers_session(session),
+            patch(
+                "src.notifications.handlers.is_notification_enabled",
+                side_effect=fake_enabled,
+            ),
+        ):
+            emails = await NotificationHandlers._get_staff_email_recipients(
+                "adoption_request_created"
+            )
+
+        assert emails == ["staff@shelter.org"]
+        assert "admin@shelter.org" not in emails
 
     @pytest.mark.asyncio
     async def test_returns_empty_list_on_db_exception(self) -> None:
@@ -540,6 +564,8 @@ class TestGetStaffEmails:
         session.execute = AsyncMock(side_effect=RuntimeError("DB error"))
 
         with _patch_handlers_session(session):
-            emails = await NotificationHandlers._get_staff_emails()
+            emails = await NotificationHandlers._get_staff_email_recipients(
+                "adoption_request_created"
+            )
 
         assert emails == []

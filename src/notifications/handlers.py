@@ -3,6 +3,11 @@
 Each handler subscribes to a specific domain event type and sends
 the appropriate email using the EmailService + TemplateRenderer.
 
+Staff alert emails are gated by each recipient's email preference for
+the relevant notification type (opt-out model — missing rows default to
+enabled). Adopter/donor transactional emails (to non-User recipients) are
+always sent, as they have no User preference record.
+
 Registration:
     Called from app lifespan via register_notification_handlers().
 """
@@ -16,12 +21,14 @@ from src.db.models.adopter import Adopter
 from src.db.models.adoption_request import AdoptionRequest
 from src.db.models.animal import Animal
 from src.db.models.donation import Donation, Donor
+from src.db.models.notification_preference import NotificationChannel
 from src.db.models.user import User, UserRole
 from src.db.session import get_async_session
 from src.events.bus import EventBus
 from src.events.types import DomainEvent, EventType
 from src.notifications.service import EmailMessage, EmailService
 from src.notifications.templates import TemplateRenderer
+from src.services.notification_preference_service import is_notification_enabled
 
 logger = logging.getLogger(__name__)
 
@@ -33,6 +40,9 @@ class NotificationHandlers:
     render a template, and send via EmailService. Each handler is designed
     to fail gracefully: errors are logged but never re-raised, so they
     don't disrupt the event bus.
+
+    Staff alert emails respect each recipient's email preference for the
+    relevant notification type before dispatching.
     """
 
     def __init__(self, email_service: EmailService, renderer: TemplateRenderer) -> None:
@@ -47,14 +57,14 @@ class NotificationHandlers:
         logger.info("Notification handlers registered on event bus")
 
     async def on_adoption_request_created(self, event: DomainEvent) -> None:
-        """Send confirmation to adopter and alert to staff on new application."""
+        """Send confirmation to adopter and alert to opted-in staff on new application."""
         try:
             payload = event.payload
             adopter_email = payload.get("adopter_email")
             adopter_name = payload.get("adopter_name", "Valued Adopter")
             animal_name = payload.get("animal_name", "an animal")
 
-            # Send confirmation to adopter
+            # Send confirmation to adopter (non-User recipient — no preference gate)
             if adopter_email:
                 html = self._renderer.render(
                     "adoption_request_received",
@@ -71,9 +81,11 @@ class NotificationHandlers:
                     )
                 )
 
-            # Send staff alert
-            staff_emails = await self._get_staff_emails()
-            if staff_emails:
+            # Send staff alert — gated by each user's email preference
+            staff_recipients = await self._get_staff_email_recipients(
+                "adoption_request_created"
+            )
+            if staff_recipients:
                 staff_html = self._renderer.render(
                     "adoption_request_staff_alert",
                     {
@@ -81,7 +93,7 @@ class NotificationHandlers:
                         "animal_name": animal_name,
                     },
                 )
-                for email in staff_emails:
+                for email in staff_recipients:
                     await self._email.send_email(
                         EmailMessage(
                             to=email,
@@ -129,6 +141,7 @@ class NotificationHandlers:
             new_status = payload.get("new_status", "updated")
             subject = f"Adoption Request Update: {new_status.replace('_', ' ').title()}"
 
+            # Adopter is a non-User recipient — no preference gate
             await self._email.send_email(
                 EmailMessage(to=adopter_email, subject=subject, html_body=html)
             )
@@ -172,6 +185,7 @@ class NotificationHandlers:
                 },
             )
 
+            # Donor is a non-User recipient — no preference gate
             await self._email.send_email(
                 EmailMessage(
                     to=donor_email,
@@ -267,17 +281,50 @@ class NotificationHandlers:
             return None, None, None, None, None
 
     @staticmethod
-    async def _get_staff_emails() -> list[str]:
-        """Get email addresses of all active staff and admin users."""
+    async def _get_staff_email_recipients(notification_type: str) -> list[str]:
+        """Get email addresses of active staff/admin users who have email enabled.
+
+        Checks each user's email preference for the given notification_type.
+        Missing preference rows are treated as enabled (opt-out model).
+
+        Args:
+            notification_type: The notification category to check preferences for.
+
+        Returns:
+            List of email addresses for opted-in staff users.
+        """
         try:
             async with get_async_session() as session:
                 result = await session.execute(
-                    select(User.email).where(
+                    select(User.id, User.email).where(
                         User.is_active == True,  # noqa: E712
                         User.role.in_([UserRole.STAFF.value, UserRole.ADMIN.value]),
+                        User.email.isnot(None),
                     )
                 )
-                return [email for email in result.scalars().all() if email]
+                rows = result.all()
+
+                recipients: list[str] = []
+                for user_id, email in rows:
+                    enabled = await is_notification_enabled(
+                        session,
+                        user_id=user_id,
+                        notification_type=notification_type,
+                        channel=NotificationChannel.EMAIL,
+                    )
+                    if enabled:
+                        recipients.append(email)
+                    else:
+                        logger.debug(
+                            "Skipping email notification type=%s for user_id=%s (opted out)",
+                            notification_type,
+                            user_id,
+                        )
+                return recipients
         except Exception as exc:
-            logger.exception("Failed to look up staff emails: %s", exc)
+            logger.exception(
+                "Failed to look up staff email recipients for type=%s: %s",
+                notification_type,
+                exc,
+            )
             return []
