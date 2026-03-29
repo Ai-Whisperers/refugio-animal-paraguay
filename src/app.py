@@ -219,6 +219,7 @@ from src.middleware.error_handler import register_exception_handlers
 from src.middleware.logging_middleware import RequestLoggingMiddleware
 from src.middleware.rate_limiter import configure_limiter, limiter
 from src.middleware.request_id import RequestIDMiddleware
+from src.middleware.security_headers import SecurityHeadersMiddleware
 from src.notifications.activity_sse_handlers import ActivitySSEHandlers
 from src.notifications.donation_sse_handlers import DonationSSEHandlers
 from src.notifications.handlers import NotificationHandlers
@@ -310,6 +311,9 @@ def create_app() -> FastAPI:
         debug=settings.debug,
         lifespan=lifespan,
     )
+
+    # --- Security headers (outermost — applies to every response) ---
+    application.add_middleware(SecurityHeadersMiddleware, environment=settings.app_env)
 
     # --- Request ID middleware (must be outermost to cover all responses) ---
     application.add_middleware(RequestIDMiddleware)
