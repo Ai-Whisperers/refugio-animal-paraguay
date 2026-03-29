@@ -3,7 +3,7 @@ story: S5
 epic: EPIC-47
 ticket: RAP-234
 title: "Sub-processor registry (Stripe, SMTP, etc.)"
-status: ready
+status: done
 points: 2
 priority: P2
 track: Backend

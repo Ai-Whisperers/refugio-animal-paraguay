@@ -3,7 +3,7 @@ story: S3
 epic: EPIC-47
 ticket: RAP-232
 title: "Terms of service page"
-status: ready
+status: done
 points: 3
 priority: P1
 track: Frontend

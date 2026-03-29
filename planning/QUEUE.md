@@ -1,7 +1,7 @@
 # Development Queue — Refugio Animal Paraguay
 
 **Last updated**: 2026-03-29
-**Active version**: V9 Sprint 6 in progress — EPIC-41 ALL DONE, EPIC-42 ALL DONE, EPIC-43 ALL DONE (S1-S5: PR #335 RAP-210, PR #336 RAP-211, PR #337 RAP-212, PR #338 RAP-213, PR #339 RAP-214). EPIC-44 ALL DONE (RAP-215–219; PR #340–344, 2026-03-29). EPIC-45 ALL DONE (RAP-220–224; PR #345–349, 2026-03-29). EPIC-46 S1 DONE (RAP-225; PR #350, 2026-03-29). EPIC-46 S2 DONE (RAP-226; PR #351, 2026-03-29). EPIC-46 S3 DONE (RAP-227; PR #352, 2026-03-29). EPIC-46 S4 DONE (RAP-228; PR #353, 2026-03-29). EPIC-46 S5 DONE (RAP-229; PR #354, 2026-03-29). EPIC-46 ALL DONE.
+**Active version**: V9 Sprint 6 in progress — EPIC-41 ALL DONE, EPIC-42 ALL DONE, EPIC-43 ALL DONE (S1-S5: PR #335 RAP-210, PR #336 RAP-211, PR #337 RAP-212, PR #338 RAP-213, PR #339 RAP-214). EPIC-44 ALL DONE (RAP-215–219; PR #340–344, 2026-03-29). EPIC-45 ALL DONE (RAP-220–224; PR #345–349, 2026-03-29). EPIC-46 ALL DONE (RAP-225–229; PR #350–354, 2026-03-29). EPIC-47 ALL DONE (RAP-230–234; PR #355–359, 2026-03-29).
 **Full roadmap**: [ROADMAP.md](ROADMAP.md) — 16 sprints, 68 epics, ~395 stories
 **Tech stack**: Python 3.12, FastAPI, SQLAlchemy 2.x, PostgreSQL 16, Next.js 14
 
@@ -359,6 +359,20 @@ Week 3-4:
 
 ---
 
+## V9 Sprint 6 — GDPR, Security & Compliance (EPIC-47 complete)
+
+### EPIC-47: Privacy & Cookie Compliance (16 pts) — COMPLETE
+
+| # | Story | Ticket | Pts | Status | Track |
+|---|-------|--------|-----|--------|-------|
+| 1 | Privacy policy page (Spanish + English) | RAP-230 | 3 | DONE (PR #355) | Frontend |
+| 2 | Cookie consent banner with preferences | RAP-231 | 5 | DONE (PR #356) | Frontend |
+| 3 | Terms of service page | RAP-232 | 3 | DONE (PR #357) | Frontend |
+| 4 | Data processing agreement template | RAP-233 | 3 | DONE (PR #358) | Backend |
+| 5 | Sub-processor registry (Stripe, SMTP, etc.) | RAP-234 | 2 | DONE (PR #359) | Backend |
+
+---
+
 ## Sprint 12 — Campaigns & Donations (143 pts, 4 epics)
 
 **Goal**: Castration campaigns, flexible donations, photo management, real-time dashboards.
@@ -593,7 +607,7 @@ Full details in [ROADMAP.md](ROADMAP.md). Each sprint has epic and story docs in
 | 3 | V6 | EU Payment Integration | 112 | EPIC 31-35 |
 | 4 | V7 | Volunteer & Foster Programs | 99 | EPIC 36-40 | COMPLETE (2026-03-29). EPIC-36 through EPIC-40 all 5 stories each DONE. RAP-196 (S2) and RAP-197 (S3) conflicts resolved and merged via rebase. |
 | 5 | V8 | Notifications & Communications | 102 | EPIC 41-45 | In progress. EPIC-41 ALL DONE (RAP-200–204). EPIC-42 ALL DONE (RAP-205–209). EPIC-43 ALL DONE (RAP-210–214; PR #335–339, 2026-03-29). EPIC-44 ALL DONE (RAP-215–219; PR #340–344, 2026-03-29). EPIC-45 ALL DONE (RAP-220–224; PR #345–349, 2026-03-29). EPIC-46 ALL DONE (RAP-225–229; PR #350–354, 2026-03-29). |
-| 6 | V9 | GDPR, Security & Compliance | 87 | EPIC 46-50 |
+| 6 | V9 | GDPR, Security & Compliance | 87 | EPIC 46-50 | In progress. EPIC-46 ALL DONE (RAP-225–229; PR #350–354, 2026-03-29). EPIC-47 ALL DONE (RAP-230–234; PR #355–359, 2026-03-29). |
 | 7 | V10 | Analytics & Reporting | 101 | EPIC 51-55 |
 | 8 | V11 | Public Experience & Content | 101 | EPIC 56-60 |
 | 9 | V12 | Infrastructure & DevOps | 104 | EPIC 61-65 |
