@@ -10,6 +10,7 @@ from .campaign import Campaign, CampaignDonation, CampaignStatus
 from .email_campaign import EmailCampaign, EmailCampaignStatus
 from .email_campaign_event import CampaignVariant, EmailCampaignEvent, EventType
 from .email_list import EmailList, EmailListMember, EmailListStatus, EmailListType, MemberStatus
+from .email_template import EmailTemplate, TemplateStatus
 from .castration_drive import CastrationDrive
 from .castration_photo import CastrationPhoto
 from .community_need import CommunityNeed, NeedCategory, NeedStatus
@@ -96,6 +97,8 @@ __all__ = [
     "EmailListStatus",
     "EmailListType",
     "MemberStatus",
+    "EmailTemplate",
+    "TemplateStatus",
     "CastrationDrive",
     "CastrationPhoto",
     "CommunityNeed",
