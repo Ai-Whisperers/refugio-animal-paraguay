@@ -3,7 +3,7 @@ story: S5
 epic: EPIC-41
 ticket: RAP-204
 title: "Two-way WhatsApp conversation handling"
-status: planned
+status: done
 points: 5
 priority: P2
 track: Backend
