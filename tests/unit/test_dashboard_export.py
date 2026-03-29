@@ -82,9 +82,7 @@ async def client(app: FastAPI) -> AsyncGenerator[AsyncClient, None]:
     app.dependency_overrides[require_staff] = lambda: mock_user
     app.dependency_overrides[get_db] = lambda: AsyncMock()
 
-    async with AsyncClient(
-        transport=ASGITransport(app=app), base_url="http://test"
-    ) as ac:
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as ac:
         yield ac
 
     app.dependency_overrides.clear()
@@ -226,7 +224,15 @@ class TestExportPopulationCsv:
             new=AsyncMock(return_value=_make_metrics()),
         ):
             response = await client.get("/api/admin/operational-dashboard/export/population")
-        for status in ("intake", "quarantine", "available", "foster", "under_treatment", "adopted", "deceased"):
+        for status in (
+            "intake",
+            "quarantine",
+            "available",
+            "foster",
+            "under_treatment",
+            "adopted",
+            "deceased",
+        ):
             assert status in response.text
 
     @pytest.mark.asyncio
