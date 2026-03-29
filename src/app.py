@@ -94,6 +94,8 @@ from src.api.expense_crud import router as expense_crud_router
 from src.api.feature_requests import router as feature_requests_router
 from src.api.financial_reporting import router as financial_reporting_router
 from src.api.financial_stats import router as financial_stats_router
+from src.api.follow_up_schedule import adoption_schedule_router as follow_up_adoption_schedule_router
+from src.api.follow_up_schedule import router as follow_up_schedule_router
 from src.api.follow_ups import router as follow_ups_router
 from src.api.followup_automation import admin_router as followup_auto_admin_router
 from src.api.followup_automation import public_router as followup_auto_public_router
@@ -466,6 +468,8 @@ def create_app() -> FastAPI:
     application.include_router(transport_router)
     application.include_router(followup_auto_admin_router)
     application.include_router(followup_auto_public_router)
+    application.include_router(follow_up_schedule_router)
+    application.include_router(follow_up_adoption_schedule_router)
     application.include_router(adoption_success_router)
     application.include_router(adoption_outcomes_router)
     application.include_router(transport_router)
