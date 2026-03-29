@@ -3,7 +3,7 @@ story: S4
 epic: EPIC-41
 ticket: RAP-203
 title: "Donation receipt via WhatsApp"
-status: planned
+status: done
 points: 3
 priority: P1
 track: Backend
