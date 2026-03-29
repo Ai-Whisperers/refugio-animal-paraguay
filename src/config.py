@@ -59,7 +59,21 @@ class Settings(BaseSettings):
     # Auth
     secret_key: str = Field(
         default="dev-secret-key-change-in-production-must-be-32-chars-min",
-        description="JWT signing secret. Must be ≥32 chars in production.",
+        description=(
+            "JWT signing secret (active key). Must be ≥32 chars in production. "
+            "To rotate: set SECRET_KEY_PREVIOUS to the old value, then update SECRET_KEY "
+            "to the new value. Tokens signed with the previous key remain valid until "
+            "SECRET_KEY_PREVIOUS is cleared (typically after access_token_expire_minutes)."
+        ),
+    )
+    secret_key_previous: str = Field(
+        default="",
+        description=(
+            "Previous JWT signing secret retained during key rotation. "
+            "Tokens signed with this key are still accepted during the transition window. "
+            "Clear this value after all in-flight tokens have expired. "
+            "Must be ≥32 chars if set."
+        ),
     )
     algorithm: str = Field(
         default="HS256",
@@ -75,6 +89,14 @@ class Settings(BaseSettings):
     def validate_secret_key(cls, value: str) -> str:
         if len(value) < 32:
             raise ValueError("secret_key must be at least 32 characters")
+        return value
+
+    @field_validator("secret_key_previous")
+    @classmethod
+    def validate_secret_key_previous(cls, value: str) -> str:
+        # Only validate length when a previous key is actually configured.
+        if value and len(value) < 32:
+            raise ValueError("secret_key_previous must be at least 32 characters when set")
         return value
 
     # CORS
