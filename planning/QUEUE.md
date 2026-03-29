@@ -451,7 +451,7 @@ Week 3-4:
 |---|-------|--------|-----|--------|-------|
 | 1 | Impact report data aggregation service | RAP-265 | 5 | DONE (PR #390) | Backend |
 | 2 | Impact report PDF template | RAP-266 | 5 | DONE (PR #391) | Backend |
-| 3 | Donor-specific impact summaries | RAP-267 | 3 | READY | Backend |
+| 3 | Donor-specific impact summaries | RAP-267 | 3 | DONE (PR #392) | Backend |
 | 4 | Annual impact report with visualizations | RAP-268 | 5 | READY | Fullstack |
 | 5 | Scheduled report generation and distribution | RAP-269 | 3 | READY | Backend |
 
