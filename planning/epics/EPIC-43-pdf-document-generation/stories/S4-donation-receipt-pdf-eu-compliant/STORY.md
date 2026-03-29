@@ -3,7 +3,7 @@ story: S4
 epic: EPIC-43
 ticket: RAP-213
 title: "Donation receipt PDF (EU compliant)"
-status: planned
+status: done
 points: 3
 priority: P1
 track: Backend
