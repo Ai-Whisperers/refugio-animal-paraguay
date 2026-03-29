@@ -1,9 +1,9 @@
-"""Foster family registration, approval, placement matching, and check-in API (RAP-190, RAP-191, RAP-192).
+"""Foster family registration, approval, placement matching, check-in, and adoption conversion API (RAP-190, RAP-191, RAP-192, RAP-193).
 
 Any authenticated user can apply to become a foster family.
 Staff can list applications, approve/reject them, use the placement matching
 endpoints to find the best foster family for a given animal (or vice-versa),
-and manage periodic welfare check-ins.
+manage periodic welfare check-ins, and convert active placements to adoptions.
 
 Endpoints:
     POST /api/foster/apply                                    -- submit foster application (authenticated)
@@ -19,6 +19,7 @@ Endpoints:
     PUT  /api/staff/foster/check-ins/{check_in_id}/cancel                -- cancel a check-in (staff only)
     POST /api/staff/foster/check-ins/{check_in_id}/remind                -- log reminder dispatch (staff only)
     GET  /api/staff/foster/check-ins/upcoming                            -- upcoming/overdue check-ins (staff only)
+    POST /api/staff/foster/placements/{placement_id}/convert-to-adoption -- convert placement to adoption (staff only, RAP-193)
 """
 
 import logging
@@ -61,6 +62,10 @@ from src.services.foster_check_in_service import (
     list_check_ins_for_placement,
     list_upcoming_check_ins,
     record_reminder_sent,
+)
+from src.services.foster_conversion_service import (
+    FosterConversionResult,
+    convert_foster_to_adoption,
 )
 from src.services.foster_placement_service import (
     DEFAULT_LIMIT,
@@ -540,6 +545,33 @@ class CancelCheckInRequest(BaseModel):
 
 
 # ---------------------------------------------------------------------------
+# Schema — Foster-to-adopt conversion (RAP-193)
+# ---------------------------------------------------------------------------
+
+
+class ConvertToAdoptionRequest(BaseModel):
+    """Optional staff payload for a foster-to-adopt conversion."""
+
+    notes: str | None = Field(
+        None,
+        max_length=1000,
+        description="Optional staff notes recorded on both the placement and the adoption request",
+    )
+
+
+class ConvertToAdoptionResponse(BaseModel):
+    """Result returned after a successful foster-to-adopt conversion."""
+
+    placement_id: UUID
+    adoption_request_id: UUID
+    adopter_id: UUID
+    animal_id: UUID
+    foster_profile_id: UUID
+    adopter_created: bool
+    converted_at: datetime
+
+
+# ---------------------------------------------------------------------------
 # Endpoints — Check-in schedule (staff only, RAP-192)
 # ---------------------------------------------------------------------------
 
@@ -731,6 +763,62 @@ async def send_foster_check_in_reminder(
     except ValueError as exc:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(exc)) from exc
     return _to_check_in_response(check_in)
+
+
+# ---------------------------------------------------------------------------
+# Endpoint — Foster-to-adopt conversion (staff only, RAP-193)
+# ---------------------------------------------------------------------------
+
+
+@staff_router.post(
+    "/api/staff/foster/placements/{placement_id}/convert-to-adoption",
+    response_model=ConvertToAdoptionResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Convert an active foster placement into an approved adoption request",
+)
+async def convert_foster_placement_to_adoption(
+    placement_id: UUID,
+    body: ConvertToAdoptionRequest | None = None,
+    db: AsyncSession = Depends(get_db),
+    _staff: object = Depends(require_staff),
+) -> ConvertToAdoptionResponse:
+    """Convert an active foster placement into a pre-approved adoption request.
+
+    This fast-track workflow is for cases where the foster family has decided to
+    permanently adopt the animal.  The endpoint:
+
+    - Closes the foster placement (sets ended_at to now).
+    - Resolves or auto-creates an Adopter record for the foster family's user.
+    - Creates an AdoptionRequest with status APPROVED.
+    - Updates the animal's status to ADOPTED.
+
+    All changes are applied atomically.  Staff only.
+
+    Returns 404 if the placement does not exist.
+    Returns 422 if the placement is already closed.
+    """
+    notes = body.notes if body else None
+    try:
+        result: FosterConversionResult = await convert_foster_to_adoption(
+            db, placement_id, staff_notes=notes
+        )
+    except ValueError as exc:
+        error_msg = str(exc)
+        if "not found" in error_msg:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=error_msg) from exc
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=error_msg
+        ) from exc
+
+    return ConvertToAdoptionResponse(
+        placement_id=result.placement_id,
+        adoption_request_id=result.adoption_request_id,
+        adopter_id=result.adopter_id,
+        animal_id=result.animal_id,
+        foster_profile_id=result.foster_profile_id,
+        adopter_created=result.adopter_created,
+        converted_at=result.converted_at,
+    )
 
 
 # ---------------------------------------------------------------------------
