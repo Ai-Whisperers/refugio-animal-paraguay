@@ -215,6 +215,7 @@ from src.notifications.in_app_handlers import InAppNotificationHandlers
 from src.notifications.service import EmailService
 from src.notifications.templates import TemplateRenderer
 from src.notifications.meta_whatsapp_adoption_handler import MetaWhatsAppAdoptionHandler
+from src.notifications.meta_whatsapp_donation_handler import MetaWhatsAppDonationHandler
 from src.notifications.meta_whatsapp_service import MetaWhatsAppService
 from src.notifications.whatsapp_handlers import WhatsAppHandlers
 from src.notifications.whatsapp_service import WhatsAppService
@@ -250,10 +251,12 @@ async def lifespan(application: FastAPI) -> AsyncGenerator[None, None]:
     whatsapp_handlers = WhatsAppHandlers(whatsapp_service)
     whatsapp_handlers.register(event_bus)
 
-    # Register Meta Cloud WhatsApp adoption notification handler (RAP-202)
+    # Register Meta Cloud WhatsApp handlers (RAP-202 adoption, RAP-203 donation receipts)
     meta_whatsapp_service = MetaWhatsAppService(settings)
     meta_whatsapp_adoption_handler = MetaWhatsAppAdoptionHandler(meta_whatsapp_service)
     meta_whatsapp_adoption_handler.register(event_bus)
+    meta_whatsapp_donation_handler = MetaWhatsAppDonationHandler(meta_whatsapp_service)
+    meta_whatsapp_donation_handler.register(event_bus)
 
     # Register SSE handlers for real-time admin dashboard notifications
     donation_sse_handlers = DonationSSEHandlers(sse_manager)

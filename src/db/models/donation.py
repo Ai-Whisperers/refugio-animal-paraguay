@@ -74,6 +74,13 @@ class Donor(Base):
         index=True,
     )
     country: Mapped[str | None] = mapped_column(sa.String(2), nullable=True)
+    # E.164 phone number for WhatsApp receipt delivery (RAP-203)
+    phone: Mapped[str | None] = mapped_column(
+        sa.String(50),
+        nullable=True,
+        index=True,
+        comment="E.164 phone number for WhatsApp receipt delivery (e.g. +595981234567)",
+    )
     # Preferred currency for display and default donation creation
     currency_preference: Mapped[str] = mapped_column(
         sa.String(3),
