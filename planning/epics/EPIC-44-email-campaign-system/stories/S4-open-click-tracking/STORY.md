@@ -3,7 +3,7 @@ story: S4
 epic: EPIC-44
 ticket: RAP-218
 title: "Open/click tracking"
-status: planned
+status: done
 points: 3
 priority: P2
 track: Backend
