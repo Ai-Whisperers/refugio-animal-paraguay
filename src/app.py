@@ -188,6 +188,7 @@ from src.api.vet_visits import router as vet_visits_router
 from src.api.vet_vouchers import router as vet_vouchers_router
 from src.api.volunteer import public_router as volunteer_public_router
 from src.api.volunteer import staff_router as volunteer_staff_router
+from src.api.volunteer_certificates import router as volunteer_certificates_router
 from src.api.volunteer_driver import router as volunteer_driver_router
 from src.api.volunteer_hours import public_router as volunteer_hours_public_router
 from src.api.volunteer_hours import staff_router as volunteer_hours_staff_router
@@ -487,6 +488,7 @@ def create_app() -> FastAPI:
     application.include_router(tasks_staff_router)
     application.include_router(volunteer_public_router)
     application.include_router(volunteer_staff_router)
+    application.include_router(volunteer_certificates_router)
     application.include_router(volunteer_driver_router)
     application.include_router(volunteer_hours_public_router)
     application.include_router(volunteer_hours_staff_router)
