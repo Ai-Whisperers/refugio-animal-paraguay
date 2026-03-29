@@ -1,7 +1,7 @@
 # Development Queue — Refugio Animal Paraguay
 
 **Last updated**: 2026-03-29
-**Active version**: V10 Sprint 7 IN PROGRESS — EPIC-51 ALL DONE, EPIC-52 ALL DONE, EPIC-53 ALL DONE. EPIC-54 ALL DONE: RAP-265 PR #390, RAP-266 PR #391, RAP-267 PR #392, RAP-268 PR #393, RAP-269 PR pending merge (2026-03-29). Next: EPIC-55.
+**Active version**: V10 Sprint 7 IN PROGRESS — EPIC-51–54 ALL DONE. EPIC-55 (Audit & Activity Logs UI) READY. RAP-269 status anomaly: story marked done but no merged PR found (flagged 2026-03-29).
 **Full roadmap**: [ROADMAP.md](ROADMAP.md) — 16 sprints, 68 epics, ~395 stories
 **Tech stack**: Python 3.12, FastAPI, SQLAlchemy 2.x, PostgreSQL 16, Next.js 14
 
@@ -453,7 +453,7 @@ Week 3-4:
 | 2 | Impact report PDF template | RAP-266 | 5 | DONE (PR #391) | Backend |
 | 3 | Donor-specific impact summaries | RAP-267 | 3 | DONE (PR #392) | Backend |
 | 4 | Annual impact report with visualizations | RAP-268 | 5 | DONE (PR #393) | Fullstack |
-| 5 | Scheduled report generation and distribution | RAP-269 | 3 | DONE (PR pending) | Backend |
+| 5 | Scheduled report generation and distribution | RAP-269 | 3 | DONE (story file done; no merged PR found — anomaly flagged) | Backend |
 
 ---
 

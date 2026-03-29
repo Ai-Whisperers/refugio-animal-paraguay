@@ -3,7 +3,7 @@ story: S4
 epic: EPIC-54
 ticket: RAP-268
 title: "Annual impact report with visualizations"
-status: planned
+status: done
 points: 5
 priority: P1
 track: Fullstack

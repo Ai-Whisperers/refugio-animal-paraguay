@@ -22,7 +22,7 @@ Weeks 13-14 (2-week sprint)
 - [x] EPIC-51 — ALL DONE (5/5 stories merged 2026-03-29)
 - [x] EPIC-52 — ALL DONE (5/5 stories merged 2026-03-29)
 - [x] EPIC-53 — ALL DONE (5/5 stories merged 2026-03-29)
-- [ ] EPIC-54 — IN PROGRESS (2/5 stories done: S1 PR #390, S2 PR #391)
+- [x] EPIC-54 — ALL DONE (S1 PR #390, S2 PR #391, S3 PR #392, S4 PR #393; S5/RAP-269 story marked done — no PR found, flagged)
 - [ ] EPIC-55 — planned
 
 ## Total Points
