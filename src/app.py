@@ -27,6 +27,7 @@ from src.api.admin_security import router as admin_security_router
 from src.api.admin_suspicious_activity import router as admin_suspicious_activity_router
 from src.api.admin_sse import router as admin_sse_router
 from src.api.admin_voucher_finance import router as admin_voucher_finance_router
+from src.api.adopter_documents import router as adopter_documents_router
 from src.api.adopters import router as adopters_router
 from src.api.adoption_requests import router as adoption_requests_router
 from src.api.adoption_requirements import (
@@ -364,6 +365,7 @@ def create_app() -> FastAPI:
     application.include_router(sessions_router)
     application.include_router(animals_router)
     application.include_router(adopters_router)
+    application.include_router(adopter_documents_router)
     application.include_router(adoption_requests_router)
     application.include_router(donors_router)
     application.include_router(donations_router)
