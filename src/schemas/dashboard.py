@@ -49,3 +49,23 @@ class DashboardResponse(BaseModel):
     # Convenience counts for quick-access cards
     total_applications: int = Field(ge=0)
     total_sponsored_animals: int = Field(ge=0)
+
+
+class AdopterApplicationDetail(BaseModel):
+    """Detailed adoption application for the adopter-focused status page."""
+
+    id: UUID
+    animal_id: UUID
+    animal_name: str
+    animal_species: str
+    submitted_at: datetime
+    decided_at: datetime | None = None
+    status: str = Field(description="pending | approved | rejected | cancelled")
+    notes: str | None = Field(default=None, description="Staff decision notes, visible to adopter")
+
+
+class AdopterApplicationsResponse(BaseModel):
+    """Response for GET /api/portal/adoptions — all applications for the authenticated adopter."""
+
+    applications: list[AdopterApplicationDetail] = Field(default_factory=list)
+    total: int = Field(ge=0, description="Total number of applications")

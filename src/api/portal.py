@@ -1,7 +1,8 @@
 """Portal API endpoints for authenticated public users.
 
 Endpoints:
-  GET /api/portal/dashboard  - Unified personal dashboard data
+  GET /api/portal/dashboard   - Unified personal dashboard data
+  GET /api/portal/adoptions   - Full adoption application history for the authenticated user
 """
 
 import logging
@@ -13,13 +14,15 @@ from src.auth.dependencies import _get_current_user
 from src.db.models.user import User
 from src.db.session import get_db
 from src.schemas.dashboard import (
+    AdopterApplicationDetail,
+    AdopterApplicationsResponse,
     ApplicationItem,
     DashboardResponse,
     DonationStats,
     SponsoredAnimalItem,
 )
 from src.schemas.error import COMMON_RESPONSES
-from src.services.dashboard_service import get_dashboard_data
+from src.services.dashboard_service import get_adopter_applications, get_dashboard_data
 
 logger = logging.getLogger(__name__)
 
@@ -72,4 +75,34 @@ async def portal_dashboard(
         ],
         total_applications=len(data.applications),
         total_sponsored_animals=len(data.sponsored_animals),
+    )
+
+
+@router.get("/adoptions", response_model=AdopterApplicationsResponse)
+async def portal_adoptions(
+    user: User = Depends(_get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> AdopterApplicationsResponse:
+    """Return all adoption applications for the authenticated user.
+
+    Matched by email to the Adopter profile. Returns detailed status including
+    decision notes and decided_at timestamp for adopter self-service tracking.
+    """
+    applications = await get_adopter_applications(db, user)
+
+    return AdopterApplicationsResponse(
+        applications=[
+            AdopterApplicationDetail(
+                id=app.id,
+                animal_id=app.animal_id,
+                animal_name=app.animal_name,
+                animal_species=app.animal_species,
+                submitted_at=app.submitted_at,
+                decided_at=app.decided_at,
+                status=app.status,
+                notes=app.notes,
+            )
+            for app in applications
+        ],
+        total=len(applications),
     )
