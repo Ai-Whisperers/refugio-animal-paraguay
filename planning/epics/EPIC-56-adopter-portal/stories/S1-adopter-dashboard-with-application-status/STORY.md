@@ -3,7 +3,7 @@ story: S1
 epic: EPIC-56
 ticket: RAP-275
 title: "Adopter dashboard with application status"
-status: planned
+status: done
 points: 5
 priority: P0
 track: Frontend
