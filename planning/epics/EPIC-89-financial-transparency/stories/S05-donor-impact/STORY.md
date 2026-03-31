@@ -3,7 +3,7 @@ story: S5
 epic: EPIC-89
 ticket: RAP-608
 title: "Donor impact summaries"
-status: ready
+status: done
 points: 6
 priority: P0
 track: Fullstack

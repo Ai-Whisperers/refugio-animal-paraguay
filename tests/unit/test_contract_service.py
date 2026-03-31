@@ -121,6 +121,53 @@ class TestContractPDFGenerator:
         assert header == b"%PDF-"
 
 
+class TestContractPDFGeneratorBytes:
+    """Tests for the generate_bytes() method."""
+
+    def test_generate_bytes_returns_bytes(self, sample_contract_data: ContractData) -> None:
+        generator = ContractPDFGenerator()
+        result = generator.generate_bytes(sample_contract_data)
+        assert isinstance(result, bytes)
+
+    def test_generate_bytes_is_valid_pdf(self, sample_contract_data: ContractData) -> None:
+        generator = ContractPDFGenerator()
+        result = generator.generate_bytes(sample_contract_data)
+        assert result[:5] == b"%PDF-"
+
+    def test_generate_bytes_has_content(self, sample_contract_data: ContractData) -> None:
+        generator = ContractPDFGenerator()
+        result = generator.generate_bytes(sample_contract_data)
+        assert len(result) > 1000
+
+    def test_generate_bytes_minimal_data(self, minimal_contract_data: ContractData) -> None:
+        generator = ContractPDFGenerator()
+        result = generator.generate_bytes(minimal_contract_data)
+        assert result[:5] == b"%PDF-"
+
+    def test_generate_bytes_does_not_write_to_disk(
+        self, tmp_path: Path, sample_contract_data: ContractData
+    ) -> None:
+        generator = ContractPDFGenerator(storage_dir=tmp_path)
+        generator.generate_bytes(sample_contract_data)
+        # No files should be created in the storage dir
+        assert not any(tmp_path.iterdir())
+
+    def test_generate_bytes_consistent_with_generate_file(
+        self, tmp_path: Path, sample_contract_data: ContractData
+    ) -> None:
+        generator = ContractPDFGenerator(storage_dir=tmp_path)
+        pdf_bytes = generator.generate_bytes(sample_contract_data)
+        pdf_path = generator.generate(sample_contract_data)
+
+        with open(pdf_path, "rb") as f:
+            file_bytes = f.read()
+
+        # Both should be valid PDFs of similar size (minor timestamp diff allowed)
+        assert pdf_bytes[:5] == b"%PDF-"
+        assert file_bytes[:5] == b"%PDF-"
+        assert abs(len(pdf_bytes) - len(file_bytes)) < 200
+
+
 class TestCommitmentClauses:
     """Tests for the commitment clauses constant."""
 

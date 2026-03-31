@@ -965,6 +965,200 @@ export interface ClinicFundResponse {
   message: string;
 }
 
+// --- Volunteer Applications (Staff) ---
+
+export type VolunteerStatus = "pending" | "approved" | "rejected" | "inactive";
+
+export interface VolunteerListItem {
+  id: string;
+  user_id: string;
+  full_name: string | null;
+  email: string;
+  status: VolunteerStatus;
+  skills: string[];
+  hours_per_week: number | null;
+  created_at: string;
+}
+
+export interface PaginatedVolunteerList {
+  items: VolunteerListItem[];
+  total: number;
+  page: number;
+  page_size: number;
+}
+
+export interface VolunteerProfileResponse {
+  id: string;
+  user_id: string;
+  full_name: string | null;
+  email: string;
+  motivation: string;
+  bio: string | null;
+  skills: string[];
+  availability: string[];
+  hours_per_week: number | null;
+  languages_spoken: string[];
+  emergency_contact_name: string | null;
+  emergency_contact_phone: string | null;
+  status: VolunteerStatus;
+  rejection_reason: string | null;
+  total_hours_logged: number;
+  created_at: string;
+}
+
+export interface VolunteerReviewRequest {
+  decision: VolunteerStatus;
+  rejection_reason?: string | null;
+}
+
+// --- Shift Scheduling (RAP-180, RAP-181) ---
+
+export type ShiftStatus = "open" | "full" | "cancelled" | "completed";
+export type ShiftRole =
+  | "animal_care"
+  | "veterinary_assistance"
+  | "cleaning"
+  | "transport_driving"
+  | "admin_office"
+  | "education_outreach"
+  | "event_coordination"
+  | "general";
+
+export interface Shift {
+  id: string;
+  created_by: string;
+  shift_date: string; // ISO date: YYYY-MM-DD
+  start_time: string; // HH:MM:SS
+  end_time: string; // HH:MM:SS
+  role: ShiftRole;
+  capacity: number;
+  slots_filled: number;
+  status: ShiftStatus;
+  title: string | null;
+  notes: string | null;
+  location: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface PaginatedShiftList {
+  items: Shift[];
+  total: number;
+  page: number;
+  page_size: number;
+}
+
+export interface ShiftCreateRequest {
+  shift_date: string;
+  start_time: string;
+  end_time: string;
+  role?: ShiftRole;
+  capacity?: number;
+  title?: string | null;
+  notes?: string | null;
+  location?: string | null;
+}
+
+// --- Tasks ---
+
+export type TaskStatus = "pending" | "in_progress" | "completed" | "cancelled";
+
+export type TaskCategory =
+  | "feeding"
+  | "cleaning"
+  | "walking"
+  | "socialization"
+  | "veterinary_assistance"
+  | "transport"
+  | "admin"
+  | "other";
+
+export type TaskPriority = "low" | "medium" | "high" | "urgent";
+
+export interface Task {
+  id: string;
+  created_by: string;
+  assigned_to: string | null;
+  title: string;
+  description: string | null;
+  category: TaskCategory;
+  priority: TaskPriority;
+  status: TaskStatus;
+  due_date: string | null; // ISO datetime
+  completed_at: string | null; // ISO datetime
+  completion_notes: string | null;
+  animal_id: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TaskListResponse {
+  items: Task[];
+  total: number;
+  page: number;
+  page_size: number;
+}
+
+export interface TaskCreateRequest {
+  title: string;
+  description?: string | null;
+  category?: TaskCategory;
+  priority?: TaskPriority;
+  assigned_to?: string | null;
+  due_date?: string | null;
+  animal_id?: string | null;
+}
+
+export interface TaskUpdateRequest {
+  title?: string | null;
+  description?: string | null;
+  category?: TaskCategory | null;
+  priority?: TaskPriority | null;
+  status?: TaskStatus | null;
+  assigned_to?: string | null;
+  due_date?: string | null;
+  animal_id?: string | null;
+  completion_notes?: string | null;
+}
+
+// --- Shift Signup (RAP-182) ---
+
+export interface ShiftSignup {
+  id: string;
+  shift_id: string;
+  volunteer_id: string;
+  confirmed: boolean;
+  attended: boolean | null;
+  signed_up_at: string;
+  notes: string | null;
+}
+
+export interface MySignupsResponse {
+  items: ShiftSignup[];
+  total: number;
+}
+
+// --- Volunteer Leaderboard (RAP-196) ---
+
+export type LeaderboardPeriod = "all" | "month" | "quarter" | "year";
+
+export interface LeaderboardEntry {
+  rank: number;
+  volunteer_id: string;
+  user_id: string;
+  full_name: string | null;
+  email: string;
+  total_hours_logged: number;
+  skills: string[];
+}
+
+export interface LeaderboardResponse {
+  period: LeaderboardPeriod;
+  period_start: string | null;
+  entries: LeaderboardEntry[];
+  total_approved_volunteers: number;
+}
+
 // --- API Error ---
 
 export interface ApiError {

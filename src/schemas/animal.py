@@ -41,6 +41,11 @@ class AnimalCreate(BaseModel):
     birth_date: date | None = None
     description: str | None = None
     primary_photo_url: str | None = None
+    senacsa_registration_number: str | None = Field(
+        default=None,
+        max_length=100,
+        description="SENACSA (Servicio Nacional de Calidad y Salud Animal) registration number",
+    )
 
 
 class AnimalUpdate(BaseModel):
@@ -55,6 +60,11 @@ class AnimalUpdate(BaseModel):
     birth_date: date | None = None
     description: str | None = None
     primary_photo_url: str | None = None
+    senacsa_registration_number: str | None = Field(
+        default=None,
+        max_length=100,
+        description="SENACSA (Servicio Nacional de Calidad y Salud Animal) registration number",
+    )
 
 
 class AnimalResponse(BaseModel):
@@ -72,6 +82,7 @@ class AnimalResponse(BaseModel):
     birth_date: date | None
     description: str | None
     primary_photo_url: str | None
+    senacsa_registration_number: str | None
     photos: list[PhotoResponse]
     created_at: datetime
     updated_at: datetime

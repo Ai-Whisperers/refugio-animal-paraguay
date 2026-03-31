@@ -3,7 +3,7 @@ story: S2
 epic: EPIC-39
 ticket: RAP-191
 title: "Foster placement matching algorithm"
-status: planned
+status: done
 points: 5
 priority: P1
 track: Backend

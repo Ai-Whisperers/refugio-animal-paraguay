@@ -3,7 +3,7 @@ story: S3
 epic: EPIC-91
 ticket: RAP-620
 title: "Volunteer driver registration"
-status: ready
+status: done
 points: 5
 priority: P0
 track: Fullstack

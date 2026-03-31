@@ -21,6 +21,7 @@ class TestAuditAction:
             "generate_report",
             "login",
             "logout",
+            "gdpr_erasure",
         }
         actual = {a.value for a in AuditAction}
         assert actual == expected
@@ -30,7 +31,10 @@ class TestAuditAction:
         assert AuditAction.CREATE == "create"
 
     def test_action_count(self) -> None:
-        assert len(AuditAction) == 11
+        assert len(AuditAction) == 12
+
+    def test_gdpr_erasure_action_exists(self) -> None:
+        assert AuditAction.GDPR_ERASURE == "gdpr_erasure"
 
 
 class TestAuditLogModel:

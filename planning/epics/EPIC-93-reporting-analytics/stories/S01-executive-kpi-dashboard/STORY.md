@@ -3,7 +3,7 @@ story: S1
 epic: EPIC-93
 ticket: RAP-632
 title: "Executive KPI dashboard"
-status: ready
+status: done
 points: 7
 priority: P0
 track: Fullstack

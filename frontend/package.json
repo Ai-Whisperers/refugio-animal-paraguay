@@ -17,11 +17,13 @@
     "@stripe/stripe-js": "^4.0.0",
     "lucide-react": "^1.7.0",
     "next": "14.2.35",
+    "qrcode.react": "^4.2.0",
     "react": "^18",
     "react-dom": "^18",
     "react-hook-form": "^7.72.0",
     "recharts": "^3.8.1",
     "swr": "^2.4.1",
+    "web-vitals": "^5.2.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {

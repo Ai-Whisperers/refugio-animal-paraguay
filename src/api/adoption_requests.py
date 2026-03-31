@@ -6,13 +6,15 @@ Endpoints:
   GET    /adoption-requests/analytics    — time-to-decision, approval rate, weekly volume
   POST   /adoption-requests              — create, returns 201
   PATCH  /adoption-requests/{id}/status  — transition status; approved sets animal → adopted
-  POST   /adoption-requests/{id}/contract — generate adoption contract PDF
+  POST   /adoption-requests/{id}/contract          — generate adoption contract PDF
+  GET    /adoption-requests/{id}/contract/download — stream adoption contract PDF bytes
 """
 
 from datetime import UTC, datetime, timedelta
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi.responses import StreamingResponse
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -352,3 +354,71 @@ async def generate_adoption_contract(
         "contract_pdf_path": req.contract_pdf_path,
         "contract_generated_at": req.contract_generated_at,
     }
+
+
+@router.get(
+    "/{request_id}/contract/download",
+    responses={
+        200: {"content": {"application/pdf": {}}, "description": "Adoption contract PDF"},
+        404: {"description": "Request not found or contract not yet generated"},
+    },
+)
+async def download_adoption_contract(
+    request_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    _: User = Depends(require_staff),
+) -> StreamingResponse:
+    """Stream the adoption contract PDF for a given request.
+
+    The contract must already have been generated via the POST endpoint.
+    Returns the PDF as an attachment with a descriptive filename.
+    """
+    req = await db.get(AdoptionRequest, request_id)
+    if req is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Adoption request not found",
+        )
+
+    if not req.contract_pdf_path:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Contract has not been generated yet. Use POST /{id}/contract first.",
+        )
+
+    # Load related data to regenerate in-memory (avoids serving stale files)
+    adopter = await db.get(Adopter, req.adopter_id)
+    if adopter is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Adopter not found for this request",
+        )
+
+    animal = await db.get(Animal, req.animal_id)
+    if animal is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Animal not found for this request",
+        )
+
+    contract_data = ContractData(
+        request_id=req.id,
+        adopter_name=adopter.full_name,
+        adopter_email=adopter.email,
+        adopter_phone=adopter.phone,
+        adopter_address=adopter.address,
+        animal_name=animal.name,
+        animal_species=animal.species,
+        animal_breed=animal.breed,
+        approved_at=req.decided_at,
+    )
+
+    generator = ContractPDFGenerator()
+    pdf_bytes = generator.generate_bytes(contract_data)
+
+    filename = f"contrato-adopcion-{str(request_id)[:8]}.pdf"
+    return StreamingResponse(
+        iter([pdf_bytes]),
+        media_type="application/pdf",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )

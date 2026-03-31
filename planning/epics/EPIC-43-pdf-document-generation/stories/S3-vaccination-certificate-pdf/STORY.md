@@ -3,7 +3,7 @@ story: S3
 epic: EPIC-43
 ticket: RAP-212
 title: "Vaccination certificate PDF"
-status: planned
+status: done
 points: 3
 priority: P1
 track: Backend

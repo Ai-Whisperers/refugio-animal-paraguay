@@ -3,7 +3,7 @@ story: S3
 epic: EPIC-49
 ticket: RAP-242
 title: "Secret rotation mechanism for JWT keys"
-status: planned
+status: done
 points: 3
 priority: P1
 track: Backend

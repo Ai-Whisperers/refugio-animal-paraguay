@@ -262,4 +262,5 @@ class TestConstants:
         assert DonationTargetType.CLINIC == "clinic"
         assert DonationTargetType.CAMPAIGN == "campaign"
         assert DonationTargetType.NEED == "need"
-        assert len(DonationTargetType) == 6
+        assert DonationTargetType.EMERGENCY == "emergency"
+        assert len(DonationTargetType) == 7

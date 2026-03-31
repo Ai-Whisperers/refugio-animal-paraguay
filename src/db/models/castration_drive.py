@@ -75,7 +75,7 @@ class CastrationDrive(Base):
     status: Mapped[str] = mapped_column(
         sa.String(20),
         nullable=False,
-        server_default=sa.text(f"'{DRIVE_STATUS_SCHEDULED}'"),
+        server_default=sa.text("'scheduled'"),
     )
     notes: Mapped[str | None] = mapped_column(sa.Text, nullable=True)
     contact_phone: Mapped[str | None] = mapped_column(sa.String(30), nullable=True)

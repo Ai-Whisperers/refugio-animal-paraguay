@@ -3,7 +3,7 @@ story: S3
 epic: EPIC-40
 ticket: RAP-197
 title: "Volunteer program analytics dashboard"
-status: planned
+status: done
 points: 5
 priority: P1
 track: Frontend

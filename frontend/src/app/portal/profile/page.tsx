@@ -12,6 +12,8 @@ import {
   EyeOff,
   Download,
   Trash2,
+  X,
+  TriangleAlert,
 } from "lucide-react";
 import { api } from "@/lib/api";
 import { isAuthenticated } from "@/lib/auth";
@@ -72,6 +74,215 @@ function FeedbackBanner({
         <AlertCircle className="h-4 w-4 flex-shrink-0" />
       )}
       {message}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Account Deletion Modal
+// ---------------------------------------------------------------------------
+
+type DeletionModalState = "idle" | "confirming" | "submitting" | "sent" | "error";
+
+interface AccountDeletionModalProps {
+  onClose: () => void;
+}
+
+function AccountDeletionModal({ onClose }: AccountDeletionModalProps) {
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [state, setState] = useState<DeletionModalState>("confirming");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setPasswordError("");
+    setErrorMessage("");
+
+    if (!password) {
+      setPasswordError("Ingresa tu contrasena para confirmar.");
+      return;
+    }
+
+    setState("submitting");
+    try {
+      await api.post("/portal/gdpr/delete", { password });
+      setState("sent");
+    } catch (err: unknown) {
+      if (
+        err &&
+        typeof err === "object" &&
+        "statusCode" in err &&
+        (err as { statusCode: number }).statusCode === 400
+      ) {
+        setPasswordError("Contrasena incorrecta. Intenta nuevamente.");
+        setState("confirming");
+      } else {
+        setErrorMessage(
+          "No se pudo enviar la solicitud. Intenta mas tarde."
+        );
+        setState("error");
+      }
+    }
+  }
+
+  // Trap focus: close on Escape
+  useEffect(() => {
+    function handleKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") onClose();
+    }
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="deletion-modal-title"
+    >
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6 relative">
+        <button
+          type="button"
+          onClick={onClose}
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+          aria-label="Cerrar"
+        >
+          <X className="h-5 w-5" />
+        </button>
+
+        {state === "sent" ? (
+          /* Success state */
+          <div className="text-center py-4">
+            <CheckCircle className="mx-auto h-12 w-12 text-green-500 mb-4" />
+            <h2
+              id="deletion-modal-title"
+              className="text-lg font-semibold text-gray-900 mb-2"
+            >
+              Solicitud enviada
+            </h2>
+            <p className="text-sm text-gray-600 mb-6">
+              Hemos recibido tu solicitud de eliminacion de cuenta. Revisa tu email para confirmar la accion. El enlace expira en 24 horas.
+            </p>
+            <button
+              type="button"
+              onClick={onClose}
+              className="bg-amber-500 text-white px-6 py-2 rounded-lg font-medium hover:bg-amber-600 transition-colors"
+            >
+              Entendido
+            </button>
+          </div>
+        ) : state === "error" ? (
+          /* Error state */
+          <div className="text-center py-4">
+            <AlertCircle className="mx-auto h-12 w-12 text-red-500 mb-4" />
+            <h2
+              id="deletion-modal-title"
+              className="text-lg font-semibold text-gray-900 mb-2"
+            >
+              Error al enviar solicitud
+            </h2>
+            <p className="text-sm text-gray-600 mb-6">{errorMessage}</p>
+            <div className="flex gap-3 justify-center">
+              <button
+                type="button"
+                onClick={() => setState("confirming")}
+                className="border border-gray-300 text-gray-700 px-5 py-2 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Reintentar
+              </button>
+              <button
+                type="button"
+                onClick={onClose}
+                className="border border-gray-300 text-gray-700 px-5 py-2 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        ) : (
+          /* Confirmation form */
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="flex items-start gap-3">
+              <TriangleAlert className="h-6 w-6 text-red-500 flex-shrink-0 mt-0.5" />
+              <div>
+                <h2
+                  id="deletion-modal-title"
+                  className="text-lg font-semibold text-red-700"
+                >
+                  Eliminar cuenta
+                </h2>
+                <p className="text-sm text-gray-600 mt-1">
+                  Esta accion es{" "}
+                  <span className="font-semibold">irreversible</span>. Todos tus datos personales seran anonimizados de acuerdo con el GDPR Art. 17. Tus registros de adopcion y donaciones se conservan de forma anonima para la integridad operativa del refugio.
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700">
+              Para confirmar, ingresa tu contrasena actual:
+            </div>
+
+            <div>
+              <label
+                htmlFor="deletion-password"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Contrasena
+              </label>
+              <div className="relative">
+                <input
+                  id="deletion-password"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  autoFocus
+                  className={`w-full px-3 py-2 pr-10 border rounded-lg focus:ring-2 focus:ring-red-500 focus:outline-none ${
+                    passwordError ? "border-red-500" : "border-gray-300"
+                  }`}
+                  placeholder="Tu contrasena actual"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  aria-label={showPassword ? "Ocultar" : "Mostrar"}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </button>
+              </div>
+              {passwordError && (
+                <p className="text-xs text-red-600 mt-1">{passwordError}</p>
+              )}
+            </div>
+
+            <div className="flex gap-3 pt-2">
+              <button
+                type="submit"
+                disabled={state === "submitting"}
+                className="flex items-center gap-2 bg-red-600 text-white px-5 py-2 rounded-lg font-medium hover:bg-red-700 transition-colors disabled:opacity-50"
+              >
+                <Trash2 className="h-4 w-4" />
+                {state === "submitting" ? "Enviando..." : "Eliminar mi cuenta"}
+              </button>
+              <button
+                type="button"
+                onClick={onClose}
+                disabled={state === "submitting"}
+                className="border border-gray-300 text-gray-700 px-5 py-2 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+              >
+                Cancelar
+              </button>
+            </div>
+          </form>
+        )}
+      </div>
     </div>
   );
 }
@@ -237,6 +448,7 @@ function SecurityTab() {
     message: string;
   } | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [showDeletionModal, setShowDeletionModal] = useState(false);
 
   function validate(): boolean {
     const newErrors: Record<string, string> = {};
@@ -287,6 +499,10 @@ function SecurityTab() {
 
   return (
     <div className="space-y-6">
+      {showDeletionModal && (
+        <AccountDeletionModal onClose={() => setShowDeletionModal(false)} />
+      )}
+
       <form onSubmit={handleChangePassword} className="space-y-4">
         <h3 className="text-lg font-semibold text-gray-900">
           Cambiar contrasena
@@ -423,15 +639,11 @@ function SecurityTab() {
           Eliminar mi cuenta
         </h3>
         <p className="text-sm text-gray-600 mb-3">
-          Esta accion es irreversible. Todos tus datos seran anonimizados de acuerdo con la normativa GDPR.
+          Esta accion es irreversible. Todos tus datos personales seran anonimizados de acuerdo con la normativa GDPR Art. 17. Recibiras un email de confirmacion antes de que se ejecute la accion.
         </p>
         <button
           type="button"
-          onClick={() =>
-            window.confirm(
-              "Esta seguro/a que desea eliminar su cuenta? Esta accion no se puede deshacer."
-            )
-          }
+          onClick={() => setShowDeletionModal(true)}
           className="inline-flex items-center gap-2 border border-red-300 text-red-700 px-4 py-2 rounded-lg hover:bg-red-50 transition-colors text-sm"
         >
           <Trash2 className="h-4 w-4" />

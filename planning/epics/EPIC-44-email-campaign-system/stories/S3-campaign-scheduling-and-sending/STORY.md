@@ -3,7 +3,7 @@ story: S3
 epic: EPIC-44
 ticket: RAP-217
 title: "Campaign scheduling and sending"
-status: planned
+status: done
 points: 5
 priority: P1
 track: Backend

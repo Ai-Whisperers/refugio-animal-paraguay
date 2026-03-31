@@ -4,6 +4,10 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import WhatsAppFab from "@/components/WhatsAppFab";
+import WebVitals from "@/components/WebVitals";
+import ServiceWorkerRegistration from "@/components/ServiceWorkerRegistration";
+import BottomNav from "@/components/BottomNav";
+import CookieConsentBanner from "@/components/CookieConsentBanner";
 import { SITE_TITLE, SITE_DESCRIPTION, SKIP_LINK } from "@/lib/strings";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
@@ -27,6 +31,12 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: SITE_TITLE,
     description: SITE_DESCRIPTION,
+  },
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: SITE_TITLE,
   },
 };
 
@@ -55,6 +65,10 @@ export default function RootLayout({
         </main>
         <Footer />
         <WhatsAppFab />
+        <WebVitals />
+        <ServiceWorkerRegistration />
+        <BottomNav />
+        <CookieConsentBanner />
       </body>
     </html>
   );

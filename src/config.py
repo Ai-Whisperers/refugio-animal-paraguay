@@ -59,7 +59,21 @@ class Settings(BaseSettings):
     # Auth
     secret_key: str = Field(
         default="dev-secret-key-change-in-production-must-be-32-chars-min",
-        description="JWT signing secret. Must be ≥32 chars in production.",
+        description=(
+            "JWT signing secret (active key). Must be ≥32 chars in production. "
+            "To rotate: set SECRET_KEY_PREVIOUS to the old value, then update SECRET_KEY "
+            "to the new value. Tokens signed with the previous key remain valid until "
+            "SECRET_KEY_PREVIOUS is cleared (typically after access_token_expire_minutes)."
+        ),
+    )
+    secret_key_previous: str = Field(
+        default="",
+        description=(
+            "Previous JWT signing secret retained during key rotation. "
+            "Tokens signed with this key are still accepted during the transition window. "
+            "Clear this value after all in-flight tokens have expired. "
+            "Must be ≥32 chars if set."
+        ),
     )
     algorithm: str = Field(
         default="HS256",
@@ -75,6 +89,14 @@ class Settings(BaseSettings):
     def validate_secret_key(cls, value: str) -> str:
         if len(value) < 32:
             raise ValueError("secret_key must be at least 32 characters")
+        return value
+
+    @field_validator("secret_key_previous")
+    @classmethod
+    def validate_secret_key_previous(cls, value: str) -> str:
+        # Only validate length when a previous key is actually configured.
+        if value and len(value) < 32:
+            raise ValueError("secret_key_previous must be at least 32 characters when set")
         return value
 
     # CORS
@@ -202,7 +224,7 @@ class Settings(BaseSettings):
         description="Rate limit for general API endpoints (slowapi format).",
     )
 
-    # WhatsApp / Twilio
+    # WhatsApp / Twilio (legacy)
     whatsapp_enabled: bool = Field(
         default=False,
         description="Enable WhatsApp message delivery via Twilio. Disable in tests and local dev.",
@@ -220,6 +242,54 @@ class Settings(BaseSettings):
         description=(
             "Twilio WhatsApp sender number in E.164 format with 'whatsapp:' prefix. "
             "Use the Twilio sandbox number for development."
+        ),
+    )
+
+    # WhatsApp Business API — Meta Cloud (primary)
+    meta_whatsapp_enabled: bool = Field(
+        default=False,
+        description=(
+            "Enable WhatsApp message delivery via Meta Cloud API. "
+            "When True, meta_whatsapp_token and meta_whatsapp_phone_number_id are required."
+        ),
+    )
+    meta_whatsapp_token: str = Field(
+        default="",
+        description=(
+            "Meta Cloud API bearer token (System User token from Meta Business Manager). "
+            "Required when meta_whatsapp_enabled=True."
+        ),
+    )
+    meta_whatsapp_phone_number_id: str = Field(
+        default="",
+        description=(
+            "Meta WhatsApp Business phone number ID (from Meta Developer Console). "
+            "Required when meta_whatsapp_enabled=True."
+        ),
+    )
+    meta_whatsapp_api_version: str = Field(
+        default="v18.0",
+        description="Meta Graph API version used for WhatsApp Cloud API calls.",
+    )
+    meta_whatsapp_api_base_url: str = Field(
+        default="https://graph.facebook.com",
+        description="Meta Graph API base URL. Override for testing with a mock server.",
+    )
+    meta_whatsapp_verify_token: str = Field(
+        default="",
+        description=(
+            "Webhook verification token configured in Meta Developer Console. "
+            "Used to validate incoming webhook subscriptions."
+        ),
+    )
+
+    # Donor tax ID encryption
+    donor_tax_id_encryption_key: str = Field(
+        default="",
+        description=(
+            "Fernet encryption key for donor BSN/TIN storage. "
+            "Generate with: python3 -c 'from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())'. "
+            "Required in production when storing donor tax IDs."
         ),
     )
 

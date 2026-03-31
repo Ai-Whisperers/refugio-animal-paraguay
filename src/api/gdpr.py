@@ -1,7 +1,7 @@
-"""GDPR data deletion endpoint.
+"""GDPR data deletion endpoints.
 
 Endpoints:
-  POST /gdpr/deletion-request — process GDPR right to erasure request
+  POST /gdpr/deletion-request — process GDPR right to erasure request (Article 17)
 """
 
 from fastapi import APIRouter, Depends
@@ -28,6 +28,16 @@ async def request_data_deletion(
     Admin-only endpoint. Anonymizes personal data across all relevant tables
     while preserving non-personal records for operational integrity.
 
+    Covered entities:
+    - User account (email, full_name, phone)
+    - Donor profile (full_name, email, country)
+    - Adopter profile (full_name, email, phone, address)
+    - Volunteer profile (emergency contact, bio, motivation)
+    - Rescuer profile (display_name, slug, bio, location, social links, WhatsApp)
+    - Foster profile (motivation, experience description)
+    - Consent records (hard deleted)
+    - Notification records (hard deleted)
+
     This action is irreversible.
     """
     return await process_deletion_request(
@@ -35,4 +45,7 @@ async def request_data_deletion(
         user_id=payload.user_id,
         donor_id=payload.donor_id,
         adopter_id=payload.adopter_id,
+        volunteer_id=payload.volunteer_id,
+        rescuer_id=payload.rescuer_id,
+        foster_id=payload.foster_id,
     )

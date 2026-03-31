@@ -1,0 +1,5 @@
+# RAP-230 Timeline
+
+| Timestamp | Event | Duration |
+|-----------|-------|---------|
+| 2026-03-29 08:08 | Session start | — |

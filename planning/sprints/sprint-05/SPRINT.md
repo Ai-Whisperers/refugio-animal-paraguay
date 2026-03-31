@@ -2,7 +2,7 @@
 sprint: 5
 title: "Notifications & Communications"
 weeks: "Weeks 9-10"
-status: planned
+status: in_progress
 points: 102
 created: 2026-03-26T19:06:04
 ---
@@ -19,9 +19,9 @@ WhatsApp integration, notification preferences, PDF generation, email campaigns,
 Weeks 9-10 (2-week sprint)
 
 ## Epics
-- [ ] EPIC-41
-- [ ] EPIC-42
-- [ ] EPIC-43
+- [x] EPIC-41
+- [x] EPIC-42
+- [x] EPIC-43
 - [ ] EPIC-44
 - [ ] EPIC-45
 

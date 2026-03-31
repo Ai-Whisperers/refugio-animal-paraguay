@@ -3,7 +3,7 @@ story: S2
 epic: EPIC-80
 ticket: RAP-534
 title: "Rescuer profile page"
-status: ready
+status: done
 points: 8
 priority: P0
 track: Fullstack

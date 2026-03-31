@@ -3,7 +3,7 @@ story: S2
 epic: EPIC-48
 ticket: RAP-236
 title: "2FA setup flow with QR code"
-status: planned
+status: done
 points: 5
 priority: P0
 track: Frontend

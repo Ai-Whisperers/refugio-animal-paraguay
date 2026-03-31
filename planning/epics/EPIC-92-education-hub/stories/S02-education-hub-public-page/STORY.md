@@ -3,7 +3,7 @@ story: S2
 epic: EPIC-92
 ticket: RAP-626
 title: "Education hub public page"
-status: ready
+status: done
 points: 5
 priority: P0
 track: Frontend

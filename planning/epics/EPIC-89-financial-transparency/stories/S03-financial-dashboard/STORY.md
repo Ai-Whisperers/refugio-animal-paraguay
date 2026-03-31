@@ -3,7 +3,7 @@ story: S3
 epic: EPIC-89
 ticket: RAP-606
 title: "Financial transparency dashboard"
-status: ready
+status: done
 points: 7
 priority: P0
 track: Fullstack

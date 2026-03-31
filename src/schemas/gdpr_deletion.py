@@ -11,6 +11,9 @@ class GDPRDeletionRequest(BaseModel):
     user_id: UUID
     donor_id: UUID | None = None
     adopter_id: UUID | None = None
+    volunteer_id: UUID | None = None
+    rescuer_id: UUID | None = None
+    foster_id: UUID | None = None
 
 
 class GDPRDeletionResponse(BaseModel):
@@ -22,3 +25,11 @@ class GDPRDeletionResponse(BaseModel):
     notifications_deleted: int
     donor_anonymized: bool
     adopter_anonymized: bool
+    volunteer_anonymized: bool
+    rescuer_anonymized: bool
+    foster_anonymized: bool
+    # Third-party cascade results (Stripe, email lists)
+    stripe_subscriptions_cancelled: int
+    stripe_subscriptions_failed: int
+    stripe_customer_deleted: bool
+    email_lists_removed: int

@@ -3,7 +3,7 @@ story: S5
 epic: EPIC-42
 ticket: RAP-209
 title: "Unsubscribe one-click for email"
-status: planned
+status: done
 points: 2
 priority: P1
 track: Backend

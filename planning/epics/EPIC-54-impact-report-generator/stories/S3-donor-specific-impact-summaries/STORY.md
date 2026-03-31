@@ -3,7 +3,7 @@ story: S3
 epic: EPIC-54
 ticket: RAP-267
 title: "Donor-specific impact summaries"
-status: planned
+status: done
 points: 3
 priority: P1
 track: Backend

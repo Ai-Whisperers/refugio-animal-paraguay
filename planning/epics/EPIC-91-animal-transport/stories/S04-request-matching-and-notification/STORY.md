@@ -3,7 +3,7 @@ story: S4
 epic: EPIC-91
 ticket: RAP-621
 title: "Intelligent request matching and notification"
-status: ready
+status: done
 points: 6
 priority: P0
 track: Fullstack

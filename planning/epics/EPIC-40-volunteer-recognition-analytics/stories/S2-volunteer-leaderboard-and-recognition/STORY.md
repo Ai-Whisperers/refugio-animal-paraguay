@@ -3,7 +3,7 @@ story: S2
 epic: EPIC-40
 ticket: RAP-196
 title: "Volunteer leaderboard and recognition"
-status: planned
+status: done
 points: 3
 priority: P1
 track: Frontend

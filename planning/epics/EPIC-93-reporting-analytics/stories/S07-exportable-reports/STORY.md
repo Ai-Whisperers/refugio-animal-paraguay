@@ -3,7 +3,7 @@ story: S7
 epic: EPIC-93
 ticket: RAP-638
 title: "Exportable reports (PDF/CSV)"
-status: ready
+status: done
 points: 4
 priority: P0
 track: Fullstack

@@ -3,7 +3,7 @@ story: S2
 epic: EPIC-38
 ticket: RAP-186
 title: "Task board view (Kanban-style)"
-status: planned
+status: done
 points: 5
 priority: P0
 track: Frontend

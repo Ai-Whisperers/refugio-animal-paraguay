@@ -3,7 +3,7 @@ story: S5
 epic: EPIC-38
 ticket: RAP-189
 title: "Daily task summary reports"
-status: planned
+status: done
 points: 3
 priority: P2
 track: Backend

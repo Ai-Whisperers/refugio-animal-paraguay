@@ -3,7 +3,7 @@ story: S1
 epic: EPIC-46
 ticket: RAP-225
 title: "Data deletion API with anonymization"
-status: planned
+status: done
 points: 5
 priority: P0
 track: Backend

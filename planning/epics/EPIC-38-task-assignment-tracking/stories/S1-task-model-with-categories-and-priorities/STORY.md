@@ -3,7 +3,7 @@ story: S1
 epic: EPIC-38
 ticket: RAP-185
 title: "Task model with categories and priorities"
-status: planned
+status: done
 points: 5
 priority: P0
 track: Backend

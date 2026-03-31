@@ -29,6 +29,7 @@ class AuditAction(enum.StrEnum):
     GENERATE_REPORT = "generate_report"
     LOGIN = "login"
     LOGOUT = "logout"
+    GDPR_ERASURE = "gdpr_erasure"
 
 
 class AuditLog(Base):

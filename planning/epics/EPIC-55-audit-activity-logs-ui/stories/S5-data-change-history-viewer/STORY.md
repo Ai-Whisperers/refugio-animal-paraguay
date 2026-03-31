@@ -3,7 +3,7 @@ story: S5
 epic: EPIC-55
 ticket: RAP-274
 title: "Data change history viewer"
-status: planned
+status: done
 points: 3
 priority: P2
 track: Frontend
@@ -21,16 +21,16 @@ As a **staff member**, I want **data change history viewer** so that **the shelt
 Data change history viewer — part of EPIC-55: Audit & Activity Logs UI.
 
 ## Acceptance Criteria
-- [ ] Feature implemented according to specification
-- [ ] All edge cases handled (empty state, errors, permissions)
-- [ ] API endpoints documented in OpenAPI schema
-- [ ] Unit and integration tests passing
+- [x] Feature implemented according to specification
+- [x] All edge cases handled (empty state, errors, permissions)
+- [x] API endpoints documented in OpenAPI schema
+- [x] Unit and integration tests passing
 
 ## Definition of Done
-- [ ] Code complete, peer reviewed
-- [ ] Unit tests written and passing (80%+ coverage)
-- [ ] Integration test for happy path
-- [ ] Edge cases handled (empty state, errors)
+- [x] Code complete, peer reviewed
+- [x] Unit tests written and passing (80%+ coverage)
+- [x] Integration test for happy path
+- [x] Edge cases handled (empty state, errors)
 - [ ] Deployed to staging and verified
 
 ## Technical Notes

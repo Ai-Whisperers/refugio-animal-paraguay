@@ -3,7 +3,7 @@ story: S2
 epic: EPIC-52
 ticket: RAP-256
 title: "Fund allocation vs budget report"
-status: planned
+status: done
 points: 5
 priority: P0
 track: Frontend

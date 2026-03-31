@@ -3,7 +3,7 @@ story: S5
 epic: EPIC-50
 ticket: RAP-249
 title: "Multi-language legal documents"
-status: planned
+status: done
 points: 3
 priority: P2
 track: Backend

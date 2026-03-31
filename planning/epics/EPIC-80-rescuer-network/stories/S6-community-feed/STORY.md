@@ -3,7 +3,7 @@ story: S6
 epic: EPIC-80
 ticket: RAP-538
 title: "Community feed"
-status: ready
+status: done
 points: 5
 priority: P1
 track: Fullstack

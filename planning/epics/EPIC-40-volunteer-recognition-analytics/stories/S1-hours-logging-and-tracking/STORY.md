@@ -3,7 +3,7 @@ story: S1
 epic: EPIC-40
 ticket: RAP-195
 title: "Hours logging and tracking"
-status: planned
+status: done
 points: 3
 priority: P0
 track: Fullstack

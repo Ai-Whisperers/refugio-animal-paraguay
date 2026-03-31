@@ -3,7 +3,7 @@ story: S2
 epic: EPIC-44
 ticket: RAP-216
 title: "Newsletter template builder"
-status: planned
+status: done
 points: 5
 priority: P1
 track: Frontend

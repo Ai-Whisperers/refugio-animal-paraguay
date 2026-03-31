@@ -3,7 +3,7 @@ story: S5
 epic: EPIC-44
 ticket: RAP-219
 title: "A/B testing for subject lines"
-status: planned
+status: done
 points: 3
 priority: P2
 track: Backend

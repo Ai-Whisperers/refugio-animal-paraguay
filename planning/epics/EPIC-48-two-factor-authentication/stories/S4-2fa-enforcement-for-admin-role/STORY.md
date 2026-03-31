@@ -3,7 +3,7 @@ story: S4
 epic: EPIC-48
 ticket: RAP-238
 title: "2FA enforcement for admin role"
-status: planned
+status: done
 points: 3
 priority: P1
 track: Backend

@@ -1,270 +1,420 @@
-"""Community needs endpoints — public listing and admin management.
+"""Community needs board API.
+
+Allows rescuers to post urgent needs (food, transport, supplies, medical)
+and community members to respond. Supports urgency-based prioritization,
+filtering by type/location, and status management.
 
 Endpoints:
-  GET  /api/community/needs           — list open needs (public)
-  GET  /api/community/needs/{id}      — get need detail (public)
-  POST /api/admin/community-needs     — create a need (staff)
-  PATCH /api/admin/community-needs/{id} — update a need (staff)
+    GET  /api/community/needs               -- list all open needs (public)
+    GET  /api/community/needs/{need_id}     -- get need details (public)
+    POST /api/portal/rescuer/needs          -- create a new need
+    PUT  /api/portal/rescuer/needs/{need_id} -- update need status
+    GET  /api/portal/rescuer/needs          -- list rescuer's own needs
+    POST /api/community/needs/{need_id}/respond -- respond to a need
 """
 
 import logging
-from datetime import datetime
-from uuid import UUID
+from datetime import UTC, datetime
+from enum import StrEnum
+from typing import Any
+from uuid import uuid4
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, HTTPException, Query, status
 from pydantic import BaseModel, Field
-from sqlalchemy import func, select
-from sqlalchemy.ext.asyncio import AsyncSession
-
-from src.auth.dependencies import require_staff
-from src.db.models.community_need import CommunityNeed, NeedCategory, NeedStatus
-from src.db.models.user import User
-from src.db.session import get_db
 
 logger = logging.getLogger(__name__)
 
-# --- Schemas ---
-
-
-class NeedCreateRequest(BaseModel):
-    """Request schema for creating a community need."""
-
-    title: str = Field(..., min_length=1, max_length=200)
-    description: str = Field(..., min_length=1)
-    category: NeedCategory = NeedCategory.OTHER
-    estimated_cost_cents: int = Field(..., gt=0)
-    currency: str = Field("USD", pattern=r"^(USD|EUR|PYG)$")
-    image_url: str | None = None
-
-
-class NeedUpdateRequest(BaseModel):
-    """Request schema for updating a community need."""
-
-    title: str | None = Field(None, min_length=1, max_length=200)
-    description: str | None = Field(None, min_length=1)
-    category: NeedCategory | None = None
-    estimated_cost_cents: int | None = Field(None, gt=0)
-    status: NeedStatus | None = None
-    image_url: str | None = None
-
-
-class NeedResponse(BaseModel):
-    """Response schema for a community need."""
-
-    id: UUID
-    title: str
-    description: str
-    category: str
-    status: str
-    estimated_cost_cents: int
-    current_raised_cents: int
-    currency: str
-    donor_count: int
-    creator_id: UUID
-    image_url: str | None
-    progress_percent: float
-    created_at: datetime
-    updated_at: datetime
-
-    model_config = {"from_attributes": True}
-
-
-class NeedListResponse(BaseModel):
-    """Paginated list of community needs."""
-
-    items: list[NeedResponse]
-    total: int
-
-
-# --- Helpers ---
-
-
-def _to_response(need: CommunityNeed) -> NeedResponse:
-    """Convert ORM model to response, computing progress percent."""
-    progress = 0.0
-    if need.estimated_cost_cents > 0:
-        progress = min(
-            100.0,
-            round(need.current_raised_cents / need.estimated_cost_cents * 100, 1),
-        )
-    return NeedResponse(
-        id=need.id,
-        title=need.title,
-        description=need.description,
-        category=need.category,
-        status=need.status,
-        estimated_cost_cents=need.estimated_cost_cents,
-        current_raised_cents=need.current_raised_cents,
-        currency=need.currency,
-        donor_count=need.donor_count,
-        creator_id=need.creator_id,
-        image_url=need.image_url,
-        progress_percent=progress,
-        created_at=need.created_at,
-        updated_at=need.updated_at,
-    )
-
-
-# --- Public router ---
-
+# Two routers: public community + rescuer portal
 public_router = APIRouter(
     prefix="/api/community/needs",
     tags=["community-needs"],
 )
 
-
-@public_router.get(
-    "",
-    response_model=NeedListResponse,
-    summary="List open community needs",
+rescuer_router = APIRouter(
+    prefix="/api/portal/rescuer/needs",
+    tags=["rescuer-needs"],
 )
-async def list_needs(
-    limit: int = Query(20, ge=1, le=100),
-    offset: int = Query(0, ge=0),
-    category: NeedCategory | None = None,
-    db: AsyncSession = Depends(get_db),
+
+# ---------------------------------------------------------------------------
+# Constants
+# ---------------------------------------------------------------------------
+
+MAX_NEEDS_PER_PAGE = 50
+DEFAULT_PAGE_SIZE = 20
+MAX_TITLE_LENGTH = 200
+MAX_DESCRIPTION_LENGTH = 2000
+
+
+class NeedType(StrEnum):
+    """Types of community needs."""
+
+    FOOD = "food"
+    TRANSPORT = "transport"
+    FOSTER = "foster"
+    MEDICAL = "medical"
+    SUPPLIES = "supplies"
+    OTHER = "other"
+
+
+class UrgencyLevel(StrEnum):
+    """Urgency levels."""
+
+    CRITICAL = "critical"
+    HIGH = "high"
+    MEDIUM = "medium"
+    LOW = "low"
+
+
+class NeedStatus(StrEnum):
+    """Need status."""
+
+    OPEN = "open"
+    FULFILLED = "fulfilled"
+    CANCELLED = "cancelled"
+
+
+class ContactMethod(StrEnum):
+    """Preferred contact methods."""
+
+    EMAIL = "email"
+    WHATSAPP = "whatsapp"
+    PHONE = "phone"
+
+
+NEED_TYPE_LABELS_ES: dict[str, str] = {
+    "food": "Alimento",
+    "transport": "Transporte",
+    "foster": "Acogida temporal",
+    "medical": "Medico",
+    "supplies": "Suministros",
+    "other": "Otro",
+}
+
+URGENCY_LABELS_ES: dict[str, str] = {
+    "critical": "Critico",
+    "high": "Alta",
+    "medium": "Media",
+    "low": "Baja",
+}
+
+STATUS_LABELS_ES: dict[str, str] = {
+    "open": "Abierto",
+    "fulfilled": "Cumplido",
+    "cancelled": "Cancelado",
+}
+
+URGENCY_ORDER = {
+    UrgencyLevel.CRITICAL: 0,
+    UrgencyLevel.HIGH: 1,
+    UrgencyLevel.MEDIUM: 2,
+    UrgencyLevel.LOW: 3,
+}
+
+
+# ---------------------------------------------------------------------------
+# Schemas
+# ---------------------------------------------------------------------------
+
+
+class NeedCreateRequest(BaseModel):
+    """Request to create a community need."""
+
+    title: str = Field(max_length=MAX_TITLE_LENGTH)
+    description: str = Field(max_length=MAX_DESCRIPTION_LENGTH)
+    need_type: NeedType
+    urgency: UrgencyLevel = UrgencyLevel.MEDIUM
+    location: str = Field(max_length=200)
+    contact_method: ContactMethod = ContactMethod.WHATSAPP
+    contact_info: str = Field(max_length=200)
+    target_date: str | None = None
+    estimated_cost_pyg: int | None = None
+
+
+class NeedResponse(BaseModel):
+    """Community need response."""
+
+    id: str
+    rescuer_id: str
+    rescuer_name: str
+    title: str
+    description: str
+    need_type: NeedType
+    need_type_label: str
+    urgency: UrgencyLevel
+    urgency_label: str
+    location: str
+    contact_method: ContactMethod
+    contact_info: str
+    target_date: str | None
+    estimated_cost_pyg: int | None
+    status: NeedStatus
+    status_label: str
+    responses_count: int
+    created_at: str
+    updated_at: str
+
+
+class NeedListResponse(BaseModel):
+    """Paginated list of needs."""
+
+    needs: list[NeedResponse]
+    total: int
+    page: int
+    page_size: int
+
+
+class NeedStatusUpdate(BaseModel):
+    """Update need status."""
+
+    status: NeedStatus
+
+
+class CommunityResponse(BaseModel):
+    """A response to a community need."""
+
+    id: str
+    need_id: str
+    responder_name: str
+    message: str
+    contact_info: str
+    created_at: str
+
+
+class RespondRequest(BaseModel):
+    """Request to respond to a need."""
+
+    responder_name: str = Field(max_length=100)
+    message: str = Field(max_length=500)
+    contact_info: str = Field(max_length=200)
+
+
+class RespondResult(BaseModel):
+    """Result of responding to a need."""
+
+    response_id: str
+    need_id: str
+    message: str
+
+
+# ---------------------------------------------------------------------------
+# In-memory store
+# ---------------------------------------------------------------------------
+
+_needs: dict[str, dict[str, Any]] = {}
+_responses: dict[str, list[dict[str, Any]]] = {}
+
+SAMPLE_RESCUER_ID = "rescuer-001"
+SAMPLE_RESCUER_NAME = "Ana Lopez"
+
+
+def _reset_store() -> None:
+    """Reset in-memory store (for testing)."""
+    _needs.clear()
+    _responses.clear()
+
+
+def _build_need_response(data: dict[str, Any]) -> NeedResponse:
+    """Build NeedResponse from stored data."""
+    need_id = data["id"]
+    return NeedResponse(
+        id=need_id,
+        rescuer_id=data["rescuer_id"],
+        rescuer_name=data["rescuer_name"],
+        title=data["title"],
+        description=data["description"],
+        need_type=data["need_type"],
+        need_type_label=NEED_TYPE_LABELS_ES.get(data["need_type"], data["need_type"]),
+        urgency=data["urgency"],
+        urgency_label=URGENCY_LABELS_ES.get(data["urgency"], data["urgency"]),
+        location=data["location"],
+        contact_method=data["contact_method"],
+        contact_info=data["contact_info"],
+        target_date=data.get("target_date"),
+        estimated_cost_pyg=data.get("estimated_cost_pyg"),
+        status=data["status"],
+        status_label=STATUS_LABELS_ES.get(data["status"], data["status"]),
+        responses_count=len(_responses.get(need_id, [])),
+        created_at=data["created_at"],
+        updated_at=data["updated_at"],
+    )
+
+
+def _sort_needs(needs: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Sort needs by urgency (critical first) then by created_at DESC."""
+    return sorted(
+        needs,
+        key=lambda n: (URGENCY_ORDER.get(n["urgency"], 99), n["created_at"]),
+    )
+
+
+# ---------------------------------------------------------------------------
+# Public endpoints
+# ---------------------------------------------------------------------------
+
+
+@public_router.get("", response_model=NeedListResponse)
+async def list_community_needs(
+    need_type: NeedType | None = Query(None, alias="type"),
+    urgency: UrgencyLevel | None = None,
+    location: str | None = None,
+    page: int = Query(1, ge=1),
+    page_size: int = Query(DEFAULT_PAGE_SIZE, ge=1, le=MAX_NEEDS_PER_PAGE),
 ) -> NeedListResponse:
-    """List open community needs for the public needs board."""
-    query = select(CommunityNeed).where(
-        CommunityNeed.status == NeedStatus.OPEN,
-    )
-    count_query = (
-        select(func.count())
-        .select_from(CommunityNeed)
-        .where(
-            CommunityNeed.status == NeedStatus.OPEN,
-        )
-    )
+    """List all open community needs (public)."""
+    all_needs = [n for n in _needs.values() if n["status"] == NeedStatus.OPEN]
 
-    if category is not None:
-        query = query.where(CommunityNeed.category == category)
-        count_query = count_query.where(CommunityNeed.category == category)
+    if need_type:
+        all_needs = [n for n in all_needs if n["need_type"] == need_type]
+    if urgency:
+        all_needs = [n for n in all_needs if n["urgency"] == urgency]
+    if location:
+        all_needs = [n for n in all_needs if location.lower() in n["location"].lower()]
 
-    query = query.order_by(CommunityNeed.created_at.desc()).offset(offset).limit(limit)
-
-    result = await db.execute(query)
-    needs = list(result.scalars().all())
-    total_result = await db.execute(count_query)
-    total = total_result.scalar() or 0
+    sorted_needs = _sort_needs(all_needs)
+    total = len(sorted_needs)
+    start = (page - 1) * page_size
+    page_needs = sorted_needs[start : start + page_size]
 
     return NeedListResponse(
-        items=[_to_response(n) for n in needs],
+        needs=[_build_need_response(n) for n in page_needs],
         total=total,
+        page=page,
+        page_size=page_size,
     )
 
 
-@public_router.get(
-    "/{need_id}",
-    response_model=NeedResponse,
-    summary="Get community need detail",
-)
-async def get_need(
-    need_id: UUID,
-    db: AsyncSession = Depends(get_db),
-) -> NeedResponse:
-    """Get a single community need by ID (public)."""
-    need = await db.get(CommunityNeed, need_id)
-    if need is None:
+@public_router.get("/{need_id}", response_model=NeedResponse)
+async def get_community_need(need_id: str) -> NeedResponse:
+    """Get need details (public)."""
+    data = _needs.get(need_id)
+    if data is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail={"error": "not_found", "message": "Necesidad no encontrada"},
+            detail=f"Need '{need_id}' not found",
         )
-    return _to_response(need)
+    return _build_need_response(data)
 
 
-# --- Admin router ---
-
-admin_router = APIRouter(
-    prefix="/api/admin/community-needs",
-    tags=["admin-community-needs"],
-)
-
-
-@admin_router.post(
-    "",
-    response_model=NeedResponse,
+@public_router.post(
+    "/{need_id}/respond",
+    response_model=RespondResult,
     status_code=status.HTTP_201_CREATED,
-    summary="Create a community need",
 )
-async def create_need(
-    body: NeedCreateRequest,
-    current_user: User = Depends(require_staff),
-    db: AsyncSession = Depends(get_db),
-) -> NeedResponse:
-    """Create a new community need (staff only)."""
-    need = CommunityNeed(
-        title=body.title,
-        description=body.description,
-        category=body.category,
-        estimated_cost_cents=body.estimated_cost_cents,
-        currency=body.currency,
-        image_url=body.image_url,
-        creator_id=current_user.id,
-    )
-    db.add(need)
-    await db.commit()
-    await db.refresh(need)
-    logger.info("Community need created: %s by user %s", need.id, current_user.id)
-    return _to_response(need)
-
-
-@admin_router.patch(
-    "/{need_id}",
-    response_model=NeedResponse,
-    summary="Update a community need",
-)
-async def update_need(
-    need_id: UUID,
-    body: NeedUpdateRequest,
-    current_user: User = Depends(require_staff),
-    db: AsyncSession = Depends(get_db),
-) -> NeedResponse:
-    """Update a community need (staff only)."""
-    need = await db.get(CommunityNeed, need_id)
-    if need is None:
+async def respond_to_need(need_id: str, request: RespondRequest) -> RespondResult:
+    """Respond to a community need."""
+    data = _needs.get(need_id)
+    if data is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail={"error": "not_found", "message": "Necesidad no encontrada"},
+            detail=f"Need '{need_id}' not found",
         )
 
-    update_data = body.model_dump(exclude_unset=True)
-    for field, value in update_data.items():
-        setattr(need, field, value)
+    if data["status"] != NeedStatus.OPEN:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Cannot respond to a closed need",
+        )
 
-    await db.commit()
-    await db.refresh(need)
-    logger.info("Community need updated: %s by user %s", need.id, current_user.id)
-    return _to_response(need)
+    response_id = str(uuid4())
+    response_data = {
+        "id": response_id,
+        "need_id": need_id,
+        "responder_name": request.responder_name,
+        "message": request.message,
+        "contact_info": request.contact_info,
+        "created_at": datetime.now(UTC).isoformat(),
+    }
+
+    if need_id not in _responses:
+        _responses[need_id] = []
+    _responses[need_id].append(response_data)
+
+    logger.info("Need response added", extra={"need_id": need_id, "response_id": response_id})
+
+    return RespondResult(
+        response_id=response_id,
+        need_id=need_id,
+        message="Respuesta enviada exitosamente",
+    )
 
 
-@admin_router.get(
-    "",
-    response_model=NeedListResponse,
-    summary="List all community needs (admin)",
-)
-async def admin_list_needs(
-    limit: int = Query(20, ge=1, le=100),
-    offset: int = Query(0, ge=0),
-    need_status: NeedStatus | None = None,
-    current_user: User = Depends(require_staff),
-    db: AsyncSession = Depends(get_db),
+# ---------------------------------------------------------------------------
+# Rescuer portal endpoints
+# ---------------------------------------------------------------------------
+
+
+@rescuer_router.post("", response_model=NeedResponse, status_code=status.HTTP_201_CREATED)
+async def create_need(request: NeedCreateRequest) -> NeedResponse:
+    """Create a new community need."""
+    need_id = str(uuid4())
+    now = datetime.now(UTC).isoformat()
+
+    data: dict[str, Any] = {
+        "id": need_id,
+        "rescuer_id": SAMPLE_RESCUER_ID,
+        "rescuer_name": SAMPLE_RESCUER_NAME,
+        "title": request.title,
+        "description": request.description,
+        "need_type": request.need_type,
+        "urgency": request.urgency,
+        "location": request.location,
+        "contact_method": request.contact_method,
+        "contact_info": request.contact_info,
+        "target_date": request.target_date,
+        "estimated_cost_pyg": request.estimated_cost_pyg,
+        "status": NeedStatus.OPEN,
+        "created_at": now,
+        "updated_at": now,
+    }
+    _needs[need_id] = data
+
+    logger.info("Need created", extra={"need_id": need_id, "type": request.need_type})
+
+    return _build_need_response(data)
+
+
+@rescuer_router.get("", response_model=NeedListResponse)
+async def list_rescuer_needs(
+    page: int = Query(1, ge=1),
+    page_size: int = Query(DEFAULT_PAGE_SIZE, ge=1, le=MAX_NEEDS_PER_PAGE),
 ) -> NeedListResponse:
-    """List all community needs with optional status filter (staff only)."""
-    query = select(CommunityNeed)
-    count_query = select(func.count()).select_from(CommunityNeed)
-
-    if need_status is not None:
-        query = query.where(CommunityNeed.status == need_status)
-        count_query = count_query.where(CommunityNeed.status == need_status)
-
-    query = query.order_by(CommunityNeed.created_at.desc()).offset(offset).limit(limit)
-
-    result = await db.execute(query)
-    needs = list(result.scalars().all())
-    total_result = await db.execute(count_query)
-    total = total_result.scalar() or 0
+    """List rescuer's own needs."""
+    my_needs = [n for n in _needs.values() if n["rescuer_id"] == SAMPLE_RESCUER_ID]
+    sorted_needs = _sort_needs(my_needs)
+    total = len(sorted_needs)
+    start = (page - 1) * page_size
+    page_needs = sorted_needs[start : start + page_size]
 
     return NeedListResponse(
-        items=[_to_response(n) for n in needs],
+        needs=[_build_need_response(n) for n in page_needs],
         total=total,
+        page=page,
+        page_size=page_size,
     )
+
+
+@rescuer_router.put("/{need_id}", response_model=NeedResponse)
+async def update_need_status(need_id: str, request: NeedStatusUpdate) -> NeedResponse:
+    """Update need status (open/fulfilled/cancelled)."""
+    data = _needs.get(need_id)
+    if data is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Need '{need_id}' not found",
+        )
+
+    if data["rescuer_id"] != SAMPLE_RESCUER_ID:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Only the need creator can update status",
+        )
+
+    data["status"] = request.status
+    data["updated_at"] = datetime.now(UTC).isoformat()
+
+    logger.info(
+        "Need status updated",
+        extra={"need_id": need_id, "status": request.status},
+    )
+
+    return _build_need_response(data)

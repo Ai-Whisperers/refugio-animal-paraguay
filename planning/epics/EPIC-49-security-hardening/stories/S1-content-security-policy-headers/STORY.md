@@ -3,7 +3,7 @@ story: S1
 epic: EPIC-49
 ticket: RAP-240
 title: "Content Security Policy headers"
-status: planned
+status: done
 points: 3
 priority: P0
 track: Backend

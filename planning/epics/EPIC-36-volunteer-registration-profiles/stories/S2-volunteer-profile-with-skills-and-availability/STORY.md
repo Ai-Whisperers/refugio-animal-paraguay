@@ -1,9 +1,9 @@
 ---
 story: S2
 epic: EPIC-36
-ticket: RAP-176
+ticket: RAP-641
 title: "Volunteer profile with skills and availability"
-status: planned
+status: done
 points: 5
 priority: P0
 track: Fullstack

@@ -3,7 +3,7 @@ story: S4
 epic: EPIC-90
 ticket: RAP-615
 title: "Survey results analytics dashboard"
-status: ready
+status: done
 points: 5
 priority: P0
 track: Fullstack

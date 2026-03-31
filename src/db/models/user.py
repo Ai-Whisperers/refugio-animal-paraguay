@@ -77,3 +77,8 @@ class User(Base):
         server_default=sa.func.now(),
         onupdate=sa.func.now(),
     )
+    # Two-factor authentication (TOTP via RFC 6238)
+    totp_secret: Mapped[str | None] = mapped_column(sa.String(64), nullable=True)
+    totp_enabled: Mapped[bool] = mapped_column(
+        sa.Boolean, nullable=False, server_default=sa.false()
+    )

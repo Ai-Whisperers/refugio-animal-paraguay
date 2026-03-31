@@ -3,7 +3,7 @@ story: S1
 epic: EPIC-37
 ticket: RAP-180
 title: "Shift model with time slots and capacity"
-status: planned
+status: done
 points: 5
 priority: P0
 track: Backend

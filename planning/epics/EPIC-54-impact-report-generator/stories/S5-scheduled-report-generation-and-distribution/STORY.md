@@ -3,7 +3,7 @@ story: S5
 epic: EPIC-54
 ticket: RAP-269
 title: "Scheduled report generation and distribution"
-status: planned
+status: done
 points: 3
 priority: P2
 track: Backend

@@ -19,6 +19,7 @@ class DonationTargetType(enum.StrEnum):
     CLINIC = "clinic"
     CAMPAIGN = "campaign"
     NEED = "need"
+    EMERGENCY = "emergency"
 
 
 class CurrencyCode(enum.StrEnum):
@@ -73,6 +74,13 @@ class Donor(Base):
         index=True,
     )
     country: Mapped[str | None] = mapped_column(sa.String(2), nullable=True)
+    # E.164 phone number for WhatsApp receipt delivery (RAP-203)
+    phone: Mapped[str | None] = mapped_column(
+        sa.String(50),
+        nullable=True,
+        index=True,
+        comment="E.164 phone number for WhatsApp receipt delivery (e.g. +595981234567)",
+    )
     # Preferred currency for display and default donation creation
     currency_preference: Mapped[str] = mapped_column(
         sa.String(3),
@@ -90,6 +98,15 @@ class Donor(Base):
     gdpr_consent_at: Mapped[datetime | None] = mapped_column(
         sa.TIMESTAMP(timezone=True),
         nullable=True,
+    )
+    # Encrypted donor tax identification number (BSN, TIN, etc.)
+    # Encrypted at rest using Fernet symmetric encryption; key stored in env.
+    # GDPR: constitutes sensitive personal data — access limited to staff with explicit need.
+    tax_id_encrypted: Mapped[str | None] = mapped_column(sa.Text, nullable=True)
+    tax_id_type: Mapped[str | None] = mapped_column(
+        sa.String(10),
+        nullable=True,
+        comment="Tax ID type identifier: BSN, TIN, CPF, etc.",
     )
     created_at: Mapped[datetime] = mapped_column(
         sa.TIMESTAMP(timezone=True),

@@ -3,7 +3,7 @@ story: S5
 epic: EPIC-40
 ticket: RAP-199
 title: "Impact metrics (hours contributed, animals helped)"
-status: planned
+status: done
 points: 3
 priority: P2
 track: Backend

@@ -3,7 +3,7 @@ story: S2
 epic: EPIC-90
 ticket: RAP-613
 title: "Admin survey creation form"
-status: ready
+status: done
 points: 6
 priority: P0
 track: Fullstack

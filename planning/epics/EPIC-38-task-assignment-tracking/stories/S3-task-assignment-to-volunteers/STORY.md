@@ -3,7 +3,7 @@ story: S3
 epic: EPIC-38
 ticket: RAP-187
 title: "Task assignment to volunteers"
-status: planned
+status: done
 points: 3
 priority: P1
 track: Frontend

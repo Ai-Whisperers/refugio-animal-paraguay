@@ -3,7 +3,7 @@ story: S2
 epic: EPIC-56
 ticket: RAP-276
 title: "Document upload for adopters"
-status: planned
+status: done
 points: 3
 priority: P1
 track: Fullstack

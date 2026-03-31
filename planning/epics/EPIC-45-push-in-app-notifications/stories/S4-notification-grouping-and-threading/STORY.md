@@ -3,7 +3,7 @@ story: S4
 epic: EPIC-45
 ticket: RAP-223
 title: "Notification grouping and threading"
-status: planned
+status: done
 points: 3
 priority: P2
 track: Frontend

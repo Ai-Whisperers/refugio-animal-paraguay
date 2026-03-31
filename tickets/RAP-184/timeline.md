@@ -1,0 +1,5 @@
+# RAP-184 Timeline
+
+| Timestamp | Event | Duration |
+|-----------|-------|---------|
+| 2026-03-28 21:45 | Session start | — |

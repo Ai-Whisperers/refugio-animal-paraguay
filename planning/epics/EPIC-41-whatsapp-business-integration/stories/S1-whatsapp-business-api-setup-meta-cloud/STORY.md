@@ -3,7 +3,7 @@ story: S1
 epic: EPIC-41
 ticket: RAP-200
 title: "WhatsApp Business API setup (Meta Cloud)"
-status: planned
+status: done
 points: 5
 priority: P0
 track: Backend

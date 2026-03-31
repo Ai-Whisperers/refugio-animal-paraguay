@@ -3,7 +3,7 @@ story: S4
 epic: EPIC-80
 ticket: RAP-536
 title: "Rescuer campaign creation"
-status: ready
+status: done
 points: 5
 priority: P1
 track: Fullstack

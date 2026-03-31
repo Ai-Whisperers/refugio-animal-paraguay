@@ -3,7 +3,7 @@ story: S5
 epic: EPIC-91
 ticket: RAP-622
 title: "Real-time trip tracking with photos"
-status: ready
+status: done
 points: 4
 priority: P0
 track: Fullstack

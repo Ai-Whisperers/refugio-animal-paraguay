@@ -2,16 +2,27 @@
 
 from .active_session import ActiveSession
 from .adopter import Adopter
+from .adoption_outcome import AdoptionOutcome, AdoptionOutcomeType
 from .adoption_request import AdoptionRequest, AdoptionRequestStatus
 from .animal import Animal, AnimalGender, AnimalPhoto, AnimalSize, AnimalSpecies, AnimalStatus
 from .audit_log import AuditAction, AuditLog
+from .blog_post import BlogPost
 from .campaign import Campaign, CampaignDonation, CampaignStatus
+from .email_campaign import EmailCampaign, EmailCampaignStatus
+from .email_campaign_event import CampaignVariant, EmailCampaignEvent, EventType
+from .email_list import EmailList, EmailListMember, EmailListStatus, EmailListType, MemberStatus
+from .email_template import EmailTemplate, TemplateStatus
 from .castration_drive import CastrationDrive
 from .castration_photo import CastrationPhoto
 from .community_need import CommunityNeed, NeedCategory, NeedStatus
 from .contact_submission import ContactFormType, ContactSubmission
 from .donation import CurrencyCode, Donation, DonationStatus, Donor, PaymentMethod
+from .foster_check_in import CheckInStatus, CheckInType, FosterCheckIn
+from .foster_placement import FosterPlacement
+from .foster_profile import AnimalTypePreference, FosterProfile, FosterStatus, HomeType
 from .fund_allocation import FundAllocation, FundCategory
+from .volunteer_hours import HoursCategory, VolunteerHoursLog
+from .home_visit import HomeVisit, HomeVisitStatus
 from .in_kind_donation import InKindDonation, ItemType
 from .medical import (
     Diagnosis,
@@ -40,6 +51,7 @@ from .sponsorship import (
     SponsorshipTierLevel,
 )
 from .subscription import Subscription, SubscriptionInterval, SubscriptionStatus
+from .success_story import SuccessStory
 from .surgery import (
     AnesthesiaType,
     PostOpCheck,
@@ -49,11 +61,13 @@ from .surgery import (
     SurgeryStatus,
     SurgeryType,
 )
+from .trial_period import TrialCheckIn, TrialPeriod, TrialStatus
 from .user import User, UserRole
 from .user_consent import ConsentMethod, ConsentStatus, ConsentType, UserConsent
 from .vaccination import Vaccination, VaccinationSchedule, VaccinationStatus, VaccineType
 from .verification_token import TokenType, VerificationToken
 from .vet_referral import ReferralStatus, ReferralUrgency, VetReferral
+from .whatsapp_template import WhatsAppTemplate, WhatsAppTemplateCategory, WhatsAppTemplateStatus
 
 __all__ = [
     "BRONZE_AMOUNT_CENTS",
@@ -70,16 +84,25 @@ __all__ = [
     "AnimalSize",
     "AnimalSpecies",
     "AnimalStatus",
+    "AnimalTypePreference",
     "AuditAction",
     "AuditLog",
+    "BlogPost",
     "Campaign",
+    "EmailCampaign",
+    "EmailCampaignStatus",
     "CampaignDonation",
     "CampaignStatus",
+    "EmailList",
+    "EmailListMember",
+    "EmailListStatus",
+    "EmailListType",
+    "MemberStatus",
+    "EmailTemplate",
+    "TemplateStatus",
     "CastrationDrive",
     "CastrationPhoto",
     "CommunityNeed",
-    "NeedCategory",
-    "NeedStatus",
     "ConsentMethod",
     "ConsentStatus",
     "ConsentType",
@@ -92,14 +115,27 @@ __all__ = [
     "Donation",
     "DonationStatus",
     "Donor",
+    "CheckInStatus",
+    "CheckInType",
+    "FosterCheckIn",
+    "FosterPlacement",
+    "FosterProfile",
+    "FosterStatus",
     "FundAllocation",
     "FundCategory",
+    "HomeType",
+    "HoursCategory",
+    "VolunteerHoursLog",
+    "HomeVisit",
+    "HomeVisitStatus",
     "InKindDonation",
     "ItemType",
     "MedicalDocument",
     "Medication",
     "MedicationFrequency",
     "MedicationStatus",
+    "NeedCategory",
+    "NeedStatus",
     "Notification",
     "NotificationChannel",
     "NotificationPreference",
@@ -117,6 +153,7 @@ __all__ = [
     "Subscription",
     "SubscriptionInterval",
     "SubscriptionStatus",
+    "SuccessStory",
     "Surgery",
     "SurgeryOutcome",
     "SurgeryStatus",
@@ -124,6 +161,9 @@ __all__ = [
     "TokenType",
     "Treatment",
     "TreatmentStatus",
+    "TrialCheckIn",
+    "TrialPeriod",
+    "TrialStatus",
     "User",
     "UserConsent",
     "UserRole",
@@ -136,4 +176,7 @@ __all__ = [
     "VetVisit",
     "VisitStatus",
     "VisitType",
+    "WhatsAppTemplate",
+    "WhatsAppTemplateCategory",
+    "WhatsAppTemplateStatus",
 ]

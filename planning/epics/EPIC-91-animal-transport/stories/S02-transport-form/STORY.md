@@ -3,7 +3,7 @@ story: S2
 epic: EPIC-91
 ticket: RAP-619
 title: "Transport request creation form"
-status: ready
+status: done
 points: 5
 priority: P0
 track: Fullstack

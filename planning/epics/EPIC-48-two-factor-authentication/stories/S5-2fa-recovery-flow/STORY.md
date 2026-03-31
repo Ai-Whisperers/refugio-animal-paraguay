@@ -3,7 +3,7 @@ story: S5
 epic: EPIC-48
 ticket: RAP-239
 title: "2FA recovery flow"
-status: planned
+status: done
 points: 3
 priority: P2
 track: Fullstack

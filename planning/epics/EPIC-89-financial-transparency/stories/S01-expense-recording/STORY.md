@@ -3,7 +3,7 @@ story: S1
 epic: EPIC-89
 ticket: RAP-604
 title: "Expense recording system"
-status: ready
+status: done
 points: 6
 priority: P0
 track: Fullstack

@@ -545,6 +545,64 @@ async def get_donation_receipt(
     )
 
 
+@router.get("/{donation_id}/tax-receipt-eu")
+async def get_donation_tax_receipt_eu(
+    donation_id: UUID,
+    db: AsyncSession = Depends(get_db),
+    _: User = Depends(require_staff),
+) -> StreamingResponse:
+    """Generate and return an EU-format (Dutch ANBI compliant) tax receipt PDF. Staff only."""
+    from src.services.tax_receipt_eu_service import (
+        EUReceiptData,
+        TaxReceiptEUGenerator,
+    )
+
+    donation = await db.get(Donation, donation_id)
+    if donation is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Donation not found",
+        )
+
+    donor_name: str | None = None
+    donor_email: str | None = None
+    donor_country: str | None = None
+    if donation.donor_id is not None:
+        donor = await db.get(Donor, donation.donor_id)
+        if donor is not None:
+            donor_name = donor.full_name
+            donor_email = donor.email
+            donor_country = donor.country
+
+    receipt_data = EUReceiptData(
+        donation_id=donation.id,
+        amount_cents=donation.amount_cents,
+        currency=donation.currency,
+        payment_method=donation.payment_method,
+        status=donation.status,
+        receipt_number=donation.receipt_number,
+        fund_category=donation.fund_category,
+        is_recurring=donation.is_recurring,
+        recurring_interval=donation.recurring_interval,
+        notes=donation.notes,
+        donation_date=donation.created_at,
+        donor_name=donor_name,
+        donor_email=donor_email,
+        donor_country=donor_country,
+        donor_tax_id=None,
+    )
+
+    generator = TaxReceiptEUGenerator()
+    pdf_bytes = generator.generate_bytes(receipt_data)
+
+    filename = f"tax-receipt-eu-{str(donation_id)[:8]}.pdf"
+    return StreamingResponse(
+        iter([pdf_bytes]),
+        media_type="application/pdf",
+        headers={"Content-Disposition": f'attachment; filename="{filename}"'},
+    )
+
+
 @router.get("/{donation_id}", response_model=DonationResponse)
 async def get_donation(
     donation_id: UUID,

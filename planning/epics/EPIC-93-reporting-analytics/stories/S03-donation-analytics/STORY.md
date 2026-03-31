@@ -3,7 +3,7 @@ story: S3
 epic: EPIC-93
 ticket: RAP-634
 title: "Donation analytics and trends"
-status: ready
+status: done
 points: 5
 priority: P0
 track: Fullstack

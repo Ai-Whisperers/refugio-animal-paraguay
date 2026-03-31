@@ -3,7 +3,7 @@ story: S1
 epic: EPIC-54
 ticket: RAP-265
 title: "Impact report data aggregation service"
-status: planned
+status: done
 points: 5
 priority: P0
 track: Backend

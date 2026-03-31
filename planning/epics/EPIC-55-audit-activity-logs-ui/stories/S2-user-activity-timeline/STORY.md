@@ -3,7 +3,7 @@ story: S2
 epic: EPIC-55
 ticket: RAP-271
 title: "User activity timeline"
-status: planned
+status: done
 points: 3
 priority: P1
 track: Frontend

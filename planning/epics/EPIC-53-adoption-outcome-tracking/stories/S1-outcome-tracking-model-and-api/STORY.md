@@ -3,7 +3,7 @@ story: S1
 epic: EPIC-53
 ticket: RAP-260
 title: "Outcome tracking model and API"
-status: planned
+status: done
 points: 5
 priority: P0
 track: Backend

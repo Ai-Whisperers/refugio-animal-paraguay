@@ -3,7 +3,7 @@ story: S5
 epic: EPIC-93
 ticket: RAP-636
 title: "Veterinary care analytics"
-status: ready
+status: done
 points: 4
 priority: P0
 track: Fullstack

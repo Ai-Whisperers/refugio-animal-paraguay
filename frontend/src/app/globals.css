@@ -126,3 +126,22 @@ body {
 .animate-pulse-once {
   animation: pulse-once 2s ease-in-out 1;
 }
+
+/* Touch-friendly admin overrides for mobile */
+@layer utilities {
+  /* Ensure smooth momentum scrolling on touch devices */
+  .touch-scroll {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+
+  /* Disable text selection on interactive elements for touch */
+  .touch-action-manipulation {
+    touch-action: manipulation;
+  }
+
+  /* Safe area insets for notched devices */
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+}

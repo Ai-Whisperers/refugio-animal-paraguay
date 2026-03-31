@@ -34,6 +34,9 @@ export const FOOTER = {
   donate: "Donar",
   volunteer: "Ser Voluntario",
   foster: "Acogida",
+  legal: "Legal",
+  privacyPolicy: "Politica de Privacidad",
+  termsOfService: "Terminos de Uso",
   copyright: (year: number) =>
     `© ${year} Refugio Animal Paraguay. Todos los derechos reservados.`,
 } as const;
@@ -732,4 +735,171 @@ export const PRE_QUALIFY_RESULT = {
   tryAgain: "Modificar respuestas",
   backToAnimal: (name: string) => `Volver a ${name}`,
   backToAnimals: "Ver todos los animales",
+} as const;
+
+// --- Privacy Policy Page ---
+export const PRIVACY = {
+  title: "Politica de Privacidad",
+  titleEn: "Privacy Policy",
+  metaDescription:
+    "Como Refugio Animal Paraguay recopila, usa y protege tus datos personales.",
+  metaDescriptionEn:
+    "How Refugio Animal Paraguay collects, uses, and protects your personal data.",
+  lastUpdated: "Ultima actualizacion",
+  lastUpdatedEn: "Last updated",
+  lastUpdatedDate: "29 de marzo de 2026",
+  // Language toggle
+  langEs: "Espanol",
+  langEn: "English",
+  // Hero
+  heroTitle: "Politica de Privacidad",
+  heroTitleEn: "Privacy Policy",
+  heroSubtitle: "Tu privacidad es importante para nosotros.",
+  heroSubtitleEn: "Your privacy matters to us.",
+  // Sections — Spanish
+  section1Title: "Que datos recopilamos",
+  section1Body:
+    "Recopilamos los datos que vos nos proporcionas directamente: nombre, direccion de correo electronico, numero de telefono, y la informacion necesaria para procesar donaciones o solicitudes de adopcion. Tambien podemos recopilar datos tecnicas como la direccion IP y el tipo de navegador para mejorar nuestro servicio.",
+  section2Title: "Como usamos tus datos",
+  section2Body:
+    "Usamos tus datos para: procesar donaciones y emitir recibos; gestionar solicitudes de adopcion; enviarte actualizaciones sobre animales que apadrinaste; cumplir con obligaciones legales; y mejorar nuestros servicios. No vendemos ni compartimos tus datos con terceros para fines comerciales.",
+  section3Title: "Base legal (RGPD)",
+  section3Body:
+    "Si eres donante o usuario ubicado en la Union Europea, el procesamiento de tus datos se basa en: tu consentimiento explicito (cuando lo solicites); la ejecucion de un contrato (por ej. procesamiento de donaciones); y el cumplimiento de obligaciones legales.",
+  section4Title: "Retencion de datos",
+  section4Body:
+    "Conservamos tus datos personales solo mientras sea necesario para los fines descritos o lo exija la ley. Los datos de donaciones se conservan por 7 anos por motivos contables y fiscales. Podes solicitar la eliminacion de tus datos en cualquier momento.",
+  section5Title: "Tus derechos",
+  section5Body:
+    "Tenes derecho a: acceder a los datos que tenemos sobre vos; corregir datos inexactos; solicitar la eliminacion de tus datos; oponerte al procesamiento; y recibir tus datos en formato portatil. Para ejercer estos derechos, contactanos en privacidad@refugioanimal.com.py.",
+  section6Title: "Cookies",
+  section6Body:
+    "Usamos cookies tecnicas esenciales para el funcionamiento del sitio, y cookies opcionales de analisis (con tu consentimiento). Podes gestionar tus preferencias de cookies en cualquier momento a traves de la configuracion de cookies.",
+  section7Title: "Contacto",
+  section7Body:
+    "Para consultas sobre privacidad: privacidad@refugioanimal.com.py | Refugio Animal Paraguay, Asuncion, Paraguay.",
+  // Sections — English
+  section1TitleEn: "What data we collect",
+  section1BodyEn:
+    "We collect data you provide directly: name, email address, phone number, and information needed to process donations or adoption requests. We may also collect technical data such as IP address and browser type to improve our service.",
+  section2TitleEn: "How we use your data",
+  section2BodyEn:
+    "We use your data to: process donations and issue receipts; manage adoption applications; send you updates about animals you sponsor; comply with legal obligations; and improve our services. We do not sell or share your data with third parties for commercial purposes.",
+  section3TitleEn: "Legal basis (GDPR)",
+  section3BodyEn:
+    "If you are a donor or user located in the European Union, the processing of your data is based on: your explicit consent (where requested); the performance of a contract (e.g. donation processing); and compliance with legal obligations.",
+  section4TitleEn: "Data retention",
+  section4BodyEn:
+    "We retain your personal data only as long as necessary for the purposes described or as required by law. Donation data is retained for 7 years for accounting and tax purposes. You may request deletion of your data at any time.",
+  section5TitleEn: "Your rights",
+  section5BodyEn:
+    "You have the right to: access the data we hold about you; correct inaccurate data; request deletion of your data; object to processing; and receive your data in a portable format. To exercise these rights, contact us at privacy@refugioanimal.com.py.",
+  section6TitleEn: "Cookies",
+  section6BodyEn:
+    "We use essential technical cookies for site functionality, and optional analytics cookies (with your consent). You can manage your cookie preferences at any time through the cookie settings.",
+  section7TitleEn: "Contact",
+  section7BodyEn:
+    "For privacy inquiries: privacy@refugioanimal.com.py | Refugio Animal Paraguay, Asuncion, Paraguay.",
+} as const;
+
+// --- Terms of Service Page ---
+export const TERMS = {
+  title: "Terminos de Uso",
+  titleEn: "Terms of Service",
+  metaDescription:
+    "Terminos y condiciones de uso del sitio web de Refugio Animal Paraguay.",
+  metaDescriptionEn:
+    "Terms and conditions for using the Refugio Animal Paraguay website.",
+  lastUpdated: "Ultima actualizacion",
+  lastUpdatedEn: "Last updated",
+  lastUpdatedDate: "29 de marzo de 2026",
+  // Language toggle
+  langEs: "Espanol",
+  langEn: "English",
+  // Hero
+  heroTitle: "Terminos de Uso",
+  heroTitleEn: "Terms of Service",
+  heroSubtitle: "Por favor lee estos terminos antes de usar nuestro sitio.",
+  heroSubtitleEn: "Please read these terms before using our site.",
+  // Sections — Spanish
+  section1Title: "Aceptacion de los terminos",
+  section1Body:
+    "Al acceder y usar este sitio web, aceptas estos Terminos de Uso. Si no estas de acuerdo, por favor no uses el sitio.",
+  section2Title: "Uso del sitio",
+  section2Body:
+    "Este sitio es operado por Refugio Animal Paraguay con el proposito de facilitar adopciones, donaciones y la gestion del refugio. No podes usar el sitio para actividades ilegales, danar los sistemas, o proporcionar informacion falsa.",
+  section3Title: "Donaciones",
+  section3Body:
+    "Las donaciones procesadas a traves de este sitio son voluntarias y no reembolsables salvo error de procesamiento. Emitimos recibos para todas las donaciones. El uso de los fondos se reporta publicamente.",
+  section4Title: "Adopciones",
+  section4Body:
+    "La informacion proporcionada en solicitudes de adopcion debe ser veraz. Nos reservamos el derecho de rechazar solicitudes que no cumplan nuestros criterios de bienestar animal.",
+  section5Title: "Propiedad intelectual",
+  section5Body:
+    "El contenido de este sitio (textos, imagenes, logos) pertenece a Refugio Animal Paraguay o se usa con permiso. No podes reproducirlo sin autorizacion.",
+  section6Title: "Limitacion de responsabilidad",
+  section6Body:
+    "Refugio Animal Paraguay no sera responsable por danos indirectos o incidentales derivados del uso del sitio. El sitio se provee tal cual, sin garantias de disponibilidad continua.",
+  section7Title: "Cambios a los terminos",
+  section7Body:
+    "Podemos actualizar estos terminos. Los cambios son efectivos al publicarse en esta pagina. El uso continuo del sitio implica aceptacion.",
+  section8Title: "Contacto",
+  section8Body:
+    "Para consultas sobre estos terminos: info@refugioanimal.com.py | Refugio Animal Paraguay, Asuncion, Paraguay.",
+  // Sections — English
+  section1TitleEn: "Acceptance of terms",
+  section1BodyEn:
+    "By accessing and using this website, you agree to these Terms of Service. If you disagree, please do not use the site.",
+  section2TitleEn: "Use of the site",
+  section2BodyEn:
+    "This site is operated by Refugio Animal Paraguay to facilitate adoptions, donations, and shelter management. You may not use the site for illegal activities, damage systems, or provide false information.",
+  section3TitleEn: "Donations",
+  section3BodyEn:
+    "Donations processed through this site are voluntary and non-refundable except in cases of processing error. We issue receipts for all donations. Use of funds is publicly reported.",
+  section4TitleEn: "Adoptions",
+  section4BodyEn:
+    "Information provided in adoption applications must be truthful. We reserve the right to reject applications that do not meet our animal welfare criteria.",
+  section5TitleEn: "Intellectual property",
+  section5BodyEn:
+    "Content on this site (text, images, logos) belongs to Refugio Animal Paraguay or is used with permission. You may not reproduce it without authorization.",
+  section6TitleEn: "Limitation of liability",
+  section6BodyEn:
+    "Refugio Animal Paraguay will not be liable for indirect or incidental damages arising from use of the site. The site is provided as-is, without guarantees of continuous availability.",
+  section7TitleEn: "Changes to terms",
+  section7BodyEn:
+    "We may update these terms. Changes are effective when published on this page. Continued use of the site implies acceptance.",
+  section8TitleEn: "Contact",
+  section8BodyEn:
+    "For inquiries about these terms: info@refugioanimal.com.py | Refugio Animal Paraguay, Asuncion, Paraguay.",
+} as const;
+
+// --- Cookie Consent Banner ---
+export const COOKIE_CONSENT = {
+  // Banner
+  bannerTitle: "Usamos cookies",
+  bannerText:
+    "Usamos cookies esenciales para el funcionamiento del sitio y cookies opcionales de analisis para mejorar la experiencia. Podes aceptar todas, rechazar las opcionales, o personalizar tu eleccion.",
+  acceptAll: "Aceptar todo",
+  rejectOptional: "Solo esenciales",
+  customize: "Personalizar",
+  // Preferences modal
+  preferencesTitle: "Preferencias de cookies",
+  preferencesSubtitle: "Elige que tipos de cookies aceptas.",
+  essentialTitle: "Esenciales",
+  essentialDesc:
+    "Necesarias para el funcionamiento del sitio (autenticacion, seguridad, formularios). No se pueden desactivar.",
+  analyticsTitle: "Analisis",
+  analyticsDesc:
+    "Nos ayudan a entender como se usa el sitio para mejorarlo. No rastrean informacion personal.",
+  marketingTitle: "Marketing",
+  marketingDesc:
+    "Se usan para mostrar contenido relevante. Actualmente no utilizamos cookies de marketing.",
+  savePreferences: "Guardar preferencias",
+  cancel: "Cancelar",
+  // Footer link
+  cookieSettings: "Configuracion de cookies",
+  // Accessibility
+  closeModal: "Cerrar",
+  alwaysActive: "Siempre activo",
+  privacyLink: "Ver politica de privacidad",
 } as const;

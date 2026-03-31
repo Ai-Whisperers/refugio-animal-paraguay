@@ -3,7 +3,7 @@ story: S1
 epic: EPIC-52
 ticket: RAP-255
 title: "Donation summary by period/currency/type"
-status: planned
+status: done
 points: 5
 priority: P0
 track: Backend

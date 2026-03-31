@@ -3,7 +3,7 @@ story: S2
 epic: EPIC-41
 ticket: RAP-201
 title: "Message template registration and approval"
-status: planned
+status: done
 points: 3
 priority: P0
 track: Backend

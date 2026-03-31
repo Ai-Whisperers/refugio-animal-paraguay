@@ -3,7 +3,7 @@ story: S3
 epic: EPIC-85
 ticket: RAP-575
 title: "Public impact page"
-status: ready
+status: done
 points: 5
 priority: P1
 track: Fullstack

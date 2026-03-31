@@ -3,7 +3,7 @@ story: S4
 epic: EPIC-53
 ticket: RAP-263
 title: "Adoption success rate dashboard"
-status: planned
+status: done
 points: 5
 priority: P1
 track: Frontend

@@ -27,6 +27,41 @@ MAX_SPONSORED_ANIMALS = 10
 # -- Data structures returned by the service ----------------------------------
 
 
+class ApplicationDetail:
+    """Full adoption application info for the adopter-focused status page."""
+
+    __slots__ = (
+        "animal_id",
+        "animal_name",
+        "animal_species",
+        "decided_at",
+        "id",
+        "notes",
+        "status",
+        "submitted_at",
+    )
+
+    def __init__(
+        self,
+        id: UUID,
+        animal_id: UUID,
+        animal_name: str,
+        animal_species: str,
+        submitted_at: datetime,
+        decided_at: datetime | None,
+        status: str,
+        notes: str | None,
+    ) -> None:
+        self.id = id
+        self.animal_id = animal_id
+        self.animal_name = animal_name
+        self.animal_species = animal_species
+        self.submitted_at = submitted_at
+        self.decided_at = decided_at
+        self.status = status
+        self.notes = notes
+
+
 class ApplicationSummary:
     """Lightweight adoption application info for the dashboard."""
 
@@ -221,7 +256,63 @@ async def _get_sponsored_animals(db: AsyncSession, user_email: str) -> list[Spon
     ]
 
 
+# -- Query helpers (adopter-specific) -----------------------------------------
+
+
+async def _get_application_details(db: AsyncSession, user_email: str) -> list[ApplicationDetail]:
+    """Fetch all adoption applications with full detail for the adopter status page.
+
+    Returns all applications (no limit) sorted by most recent first.
+    Matches the user to their Adopter profile by email.
+    """
+    stmt = (
+        select(
+            AdoptionRequest.id,
+            Animal.id.label("animal_id"),
+            Animal.name,
+            Animal.species,
+            AdoptionRequest.submitted_at,
+            AdoptionRequest.decided_at,
+            AdoptionRequest.status,
+            AdoptionRequest.notes,
+        )
+        .join(Adopter, AdoptionRequest.adopter_id == Adopter.id)
+        .join(Animal, AdoptionRequest.animal_id == Animal.id)
+        .where(Adopter.email == user_email, Adopter.deleted_at.is_(None))
+        .order_by(AdoptionRequest.submitted_at.desc())
+    )
+    result = await db.execute(stmt)
+    return [
+        ApplicationDetail(
+            id=row.id,
+            animal_id=row.animal_id,
+            animal_name=row.name,
+            animal_species=row.species,
+            submitted_at=row.submitted_at,
+            decided_at=row.decided_at,
+            status=row.status,
+            notes=row.notes,
+        )
+        for row in result.all()
+    ]
+
+
 # -- Public API ---------------------------------------------------------------
+
+
+async def get_adopter_applications(db: AsyncSession, user: User) -> list[ApplicationDetail]:
+    """Return all adoption applications with full detail for the authenticated user.
+
+    Matches the user to their Adopter record by email. Returns all applications
+    (no pagination limit) since adopters rarely have more than a handful.
+    """
+    applications = await _get_application_details(db, user.email)
+    logger.info(
+        "Adopter applications loaded for user_id=%s: %d applications",
+        user.id,
+        len(applications),
+    )
+    return applications
 
 
 async def get_dashboard_data(db: AsyncSession, user: User) -> DashboardData:

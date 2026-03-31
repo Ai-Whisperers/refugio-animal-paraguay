@@ -3,7 +3,7 @@ story: S3
 epic: EPIC-39
 ticket: RAP-192
 title: "Foster check-in schedule and reminders"
-status: planned
+status: done
 points: 5
 priority: P1
 track: Fullstack

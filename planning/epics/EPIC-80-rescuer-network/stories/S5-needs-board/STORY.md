@@ -3,7 +3,7 @@ story: S5
 epic: EPIC-80
 ticket: RAP-537
 title: "Needs board"
-status: ready
+status: done
 points: 5
 priority: P1
 track: Fullstack

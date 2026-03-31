@@ -3,6 +3,9 @@
 Generates Spanish-language adoption contracts using fpdf2 and stores
 them on the local filesystem. The generated PDF path is recorded on
 the adoption_request row for later retrieval.
+
+Uses the centralized :class:`~src.services.pdf_service.BasePDFGenerator` and
+:class:`~src.services.pdf_service.ShelterPDF` for consistent shelter branding.
 """
 
 import logging
@@ -12,7 +15,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from uuid import UUID
 
-from fpdf import FPDF
+from src.services.pdf_service import BasePDFGenerator, ShelterPDF
 
 logger = logging.getLogger(__name__)
 
@@ -61,8 +64,15 @@ class ContractData:
     approved_at: datetime | None
 
 
-class ContractPDFGenerator:
-    """Generates adoption contract PDFs using fpdf2."""
+class ContractPDFGenerator(BasePDFGenerator):
+    """Generates adoption contract PDFs using the centralized ShelterPDF base.
+
+    Example::
+
+        generator = ContractPDFGenerator()
+        pdf_bytes = generator.generate_bytes(contract_data)
+        pdf_path  = generator.generate(contract_data)
+    """
 
     def __init__(self, storage_dir: Path | None = None) -> None:
         self._storage_dir = storage_dir or CONTRACT_STORAGE_DIR
@@ -87,23 +97,12 @@ class ContractPDFGenerator:
         )
         return output_path
 
-    def _build_pdf(self, data: ContractData) -> FPDF:
+    def _build_pdf(self, data: ContractData) -> ShelterPDF:  # type: ignore[override]
         """Build the PDF document in memory."""
-        pdf = FPDF()
-        pdf.set_auto_page_break(auto=True, margin=25)
+        pdf = ShelterPDF(title="CONTRATO DE ADOPCION RESPONSABLE")
         pdf.add_page()
 
-        # --- Title ---
-        pdf.set_font("Helvetica", "B", 18)
-        pdf.cell(
-            0, 12, "CONTRATO DE ADOPCION RESPONSABLE", align="C", new_x="LMARGIN", new_y="NEXT"
-        )
-
-        pdf.set_font("Helvetica", "", 11)
-        pdf.set_text_color(100, 100, 100)
-        pdf.cell(0, 8, "Refugio Animal Paraguay", align="C", new_x="LMARGIN", new_y="NEXT")
-        pdf.set_text_color(0, 0, 0)
-        pdf.ln(8)
+        pdf.ln(4)
 
         # --- Adopter Section ---
         self._section_title(pdf, "Datos del Adoptante")
@@ -180,20 +179,11 @@ class ContractPDFGenerator:
         return pdf
 
     @staticmethod
-    def _section_title(pdf: FPDF, title: str) -> None:
+    def _section_title(pdf: ShelterPDF, title: str) -> None:
         """Render a section title with underline."""
-        pdf.set_font("Helvetica", "B", 12)
-        pdf.cell(0, 8, title, new_x="LMARGIN", new_y="NEXT")
-        pdf.set_draw_color(200, 200, 200)
-        pdf.line(pdf.l_margin, pdf.get_y(), pdf.w - pdf.r_margin, pdf.get_y())
-        pdf.ln(4)
-        pdf.set_font("Helvetica", "", 10)
+        pdf.section_title(title)
 
     @staticmethod
-    def _info_row(pdf: FPDF, label: str, value: str) -> None:
+    def _info_row(pdf: ShelterPDF, label: str, value: str) -> None:
         """Render a label: value row."""
-        pdf.set_font("Helvetica", "", 10)
-        pdf.set_text_color(100, 100, 100)
-        pdf.cell(55, 6, label)
-        pdf.set_text_color(0, 0, 0)
-        pdf.cell(0, 6, value, new_x="LMARGIN", new_y="NEXT")
+        pdf.info_row(label, value)

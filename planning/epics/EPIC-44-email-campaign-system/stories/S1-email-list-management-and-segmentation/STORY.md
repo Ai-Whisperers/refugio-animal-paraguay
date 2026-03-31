@@ -3,7 +3,7 @@ story: S1
 epic: EPIC-44
 ticket: RAP-215
 title: "Email list management and segmentation"
-status: planned
+status: done
 points: 5
 priority: P1
 track: Backend

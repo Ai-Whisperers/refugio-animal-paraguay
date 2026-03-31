@@ -3,7 +3,7 @@ story: S5
 epic: EPIC-52
 ticket: RAP-259
 title: "Financial dashboard with charts"
-status: planned
+status: done
 points: 5
 priority: P1
 track: Frontend

@@ -1,7 +1,7 @@
 # Development Queue — Refugio Animal Paraguay
 
-**Last updated**: 2026-03-28
-**Active version**: V6 Sprint 3 EPIC-33 COMPLETE | New epics EPIC-76 to EPIC-93 queued
+**Last updated**: 2026-03-29
+**Active version**: V10 Sprint 7 COMPLETE — EPIC-51–55 ALL DONE (25/25 stories). Sprint 8 (Public Experience) is next. RAP-269 status anomaly: story marked done but no merged PR found (flagged 2026-03-29).
 **Full roadmap**: [ROADMAP.md](ROADMAP.md) — 16 sprints, 68 epics, ~395 stories
 **Tech stack**: Python 3.12, FastAPI, SQLAlchemy 2.x, PostgreSQL 16, Next.js 14
 
@@ -272,6 +272,7 @@ Week 3-4:
 | RAP-618 to RAP-624 | V15 | Sprint 15: EPIC-91 Transport Logistics |
 | RAP-625 to RAP-631 | V15 | Sprint 15: EPIC-92 Education Hub |
 | RAP-632 to RAP-639 | V16 | Sprint 16: EPIC-93 Analytics Platform |
+| RAP-640 to RAP-649 | V7 | Sprint 4: EPIC-36 Volunteer Registration (overflow IDs) |
 
 ---
 
@@ -358,6 +359,114 @@ Week 3-4:
 
 ---
 
+## V9 Sprint 6 — GDPR, Security & Compliance (EPIC-46 + EPIC-47 + EPIC-48 + EPIC-49 + EPIC-50 — ALL COMPLETE)
+
+### EPIC-46: GDPR Right to Erasure (19 pts) — COMPLETE
+
+| # | Story | Ticket | Pts | Status | Track |
+|---|-------|--------|-----|--------|-------|
+| 1 | GDPR anonymization for all PII entities | RAP-225 | 4 | DONE (PR #350) | Backend |
+| 2 | GDPR third-party deletion cascade | RAP-226 | 4 | DONE (PR #351) | Backend |
+| 3 | User self-service deletion request (frontend) | RAP-227 | 4 | DONE (PR #352) | Frontend |
+| 4 | GDPR erasure audit trail | RAP-228 | 4 | DONE (PR #353) | Backend |
+| 5 | Data retention policy automation | RAP-229 | 3 | DONE (PR #354) | Backend |
+
+### EPIC-47: Privacy & Cookie Compliance (16 pts) — COMPLETE
+
+| # | Story | Ticket | Pts | Status | Track |
+|---|-------|--------|-----|--------|-------|
+| 1 | Privacy policy page (Spanish + English) | RAP-230 | 3 | DONE (PR #355) | Frontend |
+| 2 | Cookie consent banner with preferences | RAP-231 | 5 | DONE (PR #356) | Frontend |
+| 3 | Terms of service page | RAP-232 | 3 | DONE (PR #357) | Frontend |
+| 4 | Data processing agreement template | RAP-233 | 3 | DONE (PR #358) | Backend |
+| 5 | Sub-processor registry (Stripe, SMTP, etc.) | RAP-234 | 2 | DONE (PR #359) | Backend |
+
+### EPIC-48: Two-Factor Authentication (19 pts) — COMPLETE
+
+| # | Story | Ticket | Pts | Status | Track |
+|---|-------|--------|-----|--------|-------|
+| 1 | TOTP secret generation and verification | RAP-235 | 5 | DONE (PR #360) | Backend |
+| 2 | 2FA setup flow with QR code | RAP-236 | 5 | DONE (PR #361) | Frontend |
+| 3 | Backup codes generation and usage | RAP-237 | 3 | DONE (PR #362) | Backend |
+| 4 | 2FA enforcement for admin role | RAP-238 | 3 | DONE (PR #363) | Backend |
+| 5 | 2FA recovery flow | RAP-239 | 3 | DONE (PR #364) | Fullstack |
+
+### EPIC-49: Security Hardening (16 pts) — PARTIAL (1 story conflicting)
+
+| # | Story | Ticket | Pts | Status | Track |
+|---|-------|--------|-----|--------|-------|
+| 1 | Content Security Policy headers middleware | RAP-240 | 3 | DONE (PR #365) | Backend |
+| 2 | Automated weekly dependency vulnerability scanning | RAP-241 | 3 | DONE (PR #366) | DevOps |
+| 3 | JWT key rotation with zero-downtime fallback | RAP-242 | 4 | DONE (PR #367) | Backend |
+| 4 | SQL injection and XSS audit script with CI integration | RAP-243 | 3 | DONE (PR #368) | Backend |
+| 5 | Security headers audit (HSTS, X-Frame-Options, etc.) | RAP-244 | 3 | DONE (PR #369) | Backend |
+
+### EPIC-50: Paraguayan Legal Compliance (17 pts)
+
+| # | Story | Ticket | Pts | Status | Track |
+|---|-------|--------|-----|--------|-------|
+| 1 | Animal registration number tracking (SENACSA) | RAP-245 | 3 | DONE (PR #370) | Backend |
+| 2 | Legal adoption contract template (Paraguay law) | RAP-246 | 5 | DONE (PR #371) | Backend |
+| 3 | Required record retention implementation | RAP-247 | 3 | DONE (PR #372) | Backend |
+| 4 | Government reporting export formats | RAP-248 | 3 | DONE (PR #373) | Backend |
+| 5 | Multi-language legal documents | RAP-249 | 3 | DONE (PR #374) | Backend |
+
+---
+
+## V10 Sprint 7 — Analytics & Reporting (EPIC-51 COMPLETE + EPIC-52 partial)
+
+### EPIC-51: Operational Dashboard (21 pts) — COMPLETE
+
+| # | Story | Ticket | Pts | Status | Track |
+|---|-------|--------|-----|--------|-------|
+| 1 | Dashboard API with aggregated metrics | RAP-250 | 5 | DONE (PR #375) | Backend |
+| 2 | KPI cards — occupancy, intake, outcomes | RAP-251 | 5 | DONE (PR #376) | Frontend |
+| 3 | Trend charts — daily/weekly/monthly | RAP-252 | 5 | DONE (PR #377) | Frontend |
+| 4 | Capacity alerts and thresholds | RAP-253 | 3 | DONE (PR #378) | Backend |
+| 5 | Exportable dashboard data | RAP-254 | 3 | DONE (PR #379) | Backend |
+
+### EPIC-52: Financial Reporting (23 pts) — COMPLETE
+
+| # | Story | Ticket | Pts | Status | Track |
+|---|-------|--------|-----|--------|-------|
+| 1 | Donation summary by period/currency/type | RAP-255 | 5 | DONE (PR #380) | Backend |
+| 2 | Fund allocation vs budget report | RAP-256 | 5 | DONE (PR #381) | Frontend |
+| 3 | EU tax compliance export (annual) | RAP-257 | 5 | DONE (PR #382) | Backend |
+| 4 | Donor retention and churn analysis | RAP-258 | 3 | DONE (PR #383) | Backend |
+| 5 | Financial dashboard with charts | RAP-259 | 5 | DONE (PR #384) | Frontend |
+
+### EPIC-53: Adoption Outcome Tracking (21 pts) — COMPLETE
+
+| # | Story | Ticket | Pts | Status | Track |
+|---|-------|--------|-----|--------|-------|
+| 1 | Adoption outcome model and service | RAP-260 | 5 | DONE (PR #385) | Backend |
+| 2 | Follow-up schedule visibility and maintenance | RAP-261 | 5 | DONE (PR #386) | Backend |
+| 3 | Return and surrender tracking analytics | RAP-262 | 3 | DONE (PR #387) | Backend |
+| 4 | Adoption success rate dashboard | RAP-263 | 5 | DONE (PR #388) | Frontend |
+| 5 | Adopter satisfaction survey integration | RAP-264 | 3 | DONE (PR #389) | Fullstack |
+
+### EPIC-54: Impact Report Generator (21 pts) — ALL DONE
+
+| # | Story | Ticket | Pts | Status | Track |
+|---|-------|--------|-----|--------|-------|
+| 1 | Impact report data aggregation service | RAP-265 | 5 | DONE (PR #390) | Backend |
+| 2 | Impact report PDF template | RAP-266 | 5 | DONE (PR #391) | Backend |
+| 3 | Donor-specific impact summaries | RAP-267 | 3 | DONE (PR #392) | Backend |
+| 4 | Annual impact report with visualizations | RAP-268 | 5 | DONE (PR #393) | Fullstack |
+| 5 | Scheduled report generation and distribution | RAP-269 | 3 | DONE (story file done; no merged PR found — anomaly flagged) | Backend |
+
+### EPIC-55: Audit & Activity Logs UI (17 pts) — COMPLETE
+
+| # | Story | Ticket | Pts | Status | Track |
+|---|-------|--------|-----|--------|-------|
+| 1 | Audit log viewer with filters | RAP-270 | 5 | DONE (PR #394) | Frontend |
+| 2 | User activity timeline | RAP-271 | 3 | DONE (PR #395) | Frontend |
+| 3 | Export audit logs (CSV, JSON) | RAP-272 | 3 | DONE (PR #396) | Frontend |
+| 4 | Alert on suspicious activity | RAP-273 | 3 | DONE (PR #397) | Backend |
+| 5 | Data change history viewer | RAP-274 | 3 | DONE (PR #398) | Frontend |
+
+---
+
 ## Sprint 12 — Campaigns & Donations (143 pts, 4 epics)
 
 **Goal**: Castration campaigns, flexible donations, photo management, real-time dashboards.
@@ -380,13 +489,13 @@ Week 3-4:
 | # | Story | Ticket | Pts | Status | Track | Depends On |
 |---|-------|--------|-----|--------|-------|------------|
 | 1 | Donation target type system | RAP-543 | 5 | DONE (PR #171) | Backend | — |
-| 2 | Animal sponsorship page | RAP-544 | 5 | IN_REVIEW (PR #233) | Fullstack | RAP-543 |
-| 3 | Rescuer support page | RAP-545 | 5 | IN_REVIEW (PR #234) | Fullstack | RAP-543, RAP-533 (EPIC-80) |
-| 4 | Clinic fund page | RAP-546 | 5 | IN_REVIEW (PR #235) | Fullstack | RAP-543, RAP-507 (EPIC-77) |
-| 5 | Need-specific donation | RAP-547 | 3 | IN_REVIEW (PR #232) | Fullstack | RAP-543 |
+| 2 | Animal sponsorship page | RAP-544 | 5 | DONE (PR #233) | Fullstack | RAP-543 |
+| 3 | Rescuer support page | RAP-545 | 5 | DONE (PR #234) | Fullstack | RAP-543, RAP-533 (EPIC-80) |
+| 4 | Clinic fund page | RAP-546 | 5 | DONE (PR #235) | Fullstack | RAP-543, RAP-507 (EPIC-77) |
+| 5 | Need-specific donation | RAP-547 | 3 | DONE (PR #232) | Fullstack | RAP-543 |
 | 6 | Donation allocation tracking API | RAP-548 | 5 | DONE (PR #172) | Backend | RAP-543 |
 | 7 | Impact notification system | RAP-549 | 5 | DONE (PR #176) | Backend | RAP-548 |
-| 8 | Fund management dashboard | RAP-550 | 5 | IN_REVIEW (PR #236) | Fullstack | RAP-548 |
+| 8 | Fund management dashboard | RAP-550 | 5 | DONE (PR #236) | Fullstack | RAP-548 |
 
 ### EPIC-83: Photo Upload & Media Management (35 pts)
 
@@ -406,9 +515,9 @@ Week 3-4:
 |---|-------|--------|-----|--------|-------|
 | 1 | Public statistics API | RAP-573 | 3 | DONE (PR #177) | Backend |
 | 2 | Homepage live statistics | RAP-574 | 3 | DONE (PR #218) | Frontend |
-| 3 | Public impact page | RAP-575 | 5 | IN_REVIEW (PR #227) | Fullstack |
+| 3 | Public impact page | RAP-575 | 5 | DONE (PR #227) | Fullstack |
 | 4 | Castration counter widget | RAP-576 | 3 | DONE (PR #219) | Fullstack |
-| 5 | Admin real-time activity feed | RAP-577 | 5 | IN_REVIEW (PR #229) | Fullstack |
+| 5 | Admin real-time activity feed | RAP-577 | 5 | DONE (PR #229) | Fullstack |
 | 6 | Real-time donation notifications | RAP-578 | 5 | DONE (PR #183) | Backend |
 | 7 | Campaign real-time progress | RAP-579 | 3 | DONE (PR #225) | Frontend |
 
@@ -423,14 +532,14 @@ Week 3-4:
 | # | Story | Ticket | Pts | Status | Track | Depends On |
 |---|-------|--------|-----|--------|-------|------------|
 | 1 | Rescuer self-registration and profile model | RAP-533 | 5 | DONE (PR #184) | Backend | RAP-500 (EPIC-76) |
-| 2 | Rescuer profile page | RAP-534 | 8 | READY | Fullstack | RAP-533 |
-| 3 | Rescuer animal listing management | RAP-535 | 8 | READY | Fullstack | RAP-533 |
-| 4 | Rescuer campaign creation | RAP-536 | 5 | READY | Fullstack | RAP-534 |
-| 5 | Needs board | RAP-537 | 5 | READY | Fullstack | RAP-533 |
-| 6 | Community feed | RAP-538 | 5 | READY | Fullstack | RAP-534 |
-| 7 | Donor choice interface | RAP-539 | 5 | READY | Fullstack | RAP-543 (EPIC-81) |
+| 2 | Rescuer profile page | RAP-534 | Rescuer profile page | 8 | EPIC-80 | DONE (PR #292) |
+| 3 | Rescuer animal listing management | RAP-535 | Rescuer animal listing management | 8 | EPIC-80 | DONE (PR #293) |
+| 4 | Rescuer campaign creation | RAP-536 | 5 | DONE (PR #299) | Fullstack | RAP-534 | Rescuer profile page | 8 | EPIC-80 | DONE (PR #292) |
+| 5 | Needs board | RAP-537 | 5 | DONE (PR #289) | Fullstack | RAP-533 |
+| 6 | Community feed | RAP-538 | 5 | DONE (PR #300) | Fullstack | RAP-534 | Rescuer profile page | 8 | EPIC-80 | DONE (PR #292) |
+| 7 | Donor choice interface | RAP-539 | Donor choice interface | 5 | EPIC-80 | DONE (PR #290) |
 | 8 | Rescuer verification system | RAP-540 | 3 | DONE (PR #185) | Backend | RAP-533 |
-| 9 | Admin moderation tools | RAP-541 | 5 | READY | Fullstack | RAP-533 |
+| 9 | Admin moderation tools | RAP-541 | Admin moderation tools | 5 | EPIC-80 | DONE (PR #291) |
 | 10 | Integration with vet voucher system | RAP-542 | 3 | DONE (PR #186) | Backend | RAP-510 (EPIC-77) |
 
 ### EPIC-82: Content Management System (40 pts)
@@ -438,22 +547,22 @@ Week 3-4:
 | # | Story | Ticket | Pts | Status | Track |
 |---|-------|--------|-----|--------|-------|
 | 1 | CMS content model and API | RAP-551 | 5 | DONE (PR #187) | Backend |
-| 2 | Homepage dynamic content | RAP-552 | 5 | IN_REVIEW (PR #241) | Fullstack |
-| 3 | Admin content editor | RAP-553 | 8 | READY | Frontend |
-| 4 | Success stories CRUD | RAP-554 | 5 | READY | Fullstack |
-| 5 | News/blog posts | RAP-555 | 5 | READY | Fullstack |
-| 6 | Featured animals on homepage | RAP-556 | 3 | IN_REVIEW (PR #237) | Fullstack |
-| 7 | Featured campaigns on homepage | RAP-557 | 3 | IN_REVIEW (PR #238) | Fullstack |
+| 2 | Homepage dynamic content | RAP-552 | 5 | DONE (PR #241) | Fullstack |
+| 3 | Admin content editor | RAP-553 | 8 | DONE (PR #249) | Frontend |
+| 4 | Success stories CRUD | RAP-554 | 5 | DONE (PR #246) | Fullstack |
+| 5 | News/blog posts | RAP-555 | 5 | DONE (PR #247) | Fullstack |
+| 6 | Featured animals on homepage | RAP-556 | 3 | DONE (PR #237) | Fullstack |
+| 7 | Featured campaigns on homepage | RAP-557 | 3 | DONE (PR #238) | Fullstack |
 | 8 | Multilingual content support | RAP-558 | 5 | DONE (PR #188) | Backend |
 
 ### EPIC-84: Social Sharing & WhatsApp Deep Integration (30 pts)
 
 | # | Story | Ticket | Pts | Status | Track |
 |---|-------|--------|-----|--------|-------|
-| 1 | Open Graph meta tags for all public pages | RAP-566 | 5 | IN_REVIEW (PR #240) | Frontend |
-| 2 | WhatsApp share buttons on animal cards | RAP-567 | 3 | IN_REVIEW (PR #226) | Frontend |
-| 3 | WhatsApp share for campaigns | RAP-568 | 3 | IN_REVIEW (PR #228) | Frontend |
-| 4 | Social media share buttons (Facebook, Instagram, Twitter) | RAP-569 | 3 | IN_REVIEW (PR #239) | Frontend |
+| 1 | Open Graph meta tags for all public pages | RAP-566 | 5 | DONE (PR #240) | Frontend |
+| 2 | WhatsApp share buttons on animal cards | RAP-567 | 3 | DONE (PR #226) | Frontend |
+| 3 | WhatsApp share for campaigns | RAP-568 | 3 | DONE (PR #228) | Frontend |
+| 4 | Social media share buttons (Facebook, Instagram, Twitter) | RAP-569 | 3 | DONE (PR #239) | Frontend |
 | 5 | Share tracking analytics | RAP-570 | 5 | DONE (PR #189) | Backend |
 | 6 | Referral tracking | RAP-571 | 5 | DONE (on develop) | Backend |
 | 7 | Auto-generated social media cards | RAP-572 | 3 | DONE | Backend |
@@ -469,12 +578,12 @@ Week 3-4:
 | # | Story | Ticket | Pts | Status | Track |
 |---|-------|--------|-----|--------|-------|
 | 1 | Emergency case model and creation API | RAP-580 | 5 | DONE | Backend |
-| 2 | Emergency case creation form | RAP-581 | 5 | READY | Fullstack |
-| 3 | Emergency featured on homepage | RAP-582 | 5 | READY | Frontend |
+| 2 | Emergency case creation form | RAP-581 | 5 | DONE (PR #243) | Fullstack |
+| 3 | Emergency featured on homepage | RAP-582 | 5 | DONE (PR #244) | Frontend |
 | 4 | Push notifications to donors | RAP-583 | 3 | DONE | Backend |
-| 5 | Simplified 1-click donation for emergencies | RAP-584 | 5 | READY | Fullstack |
+| 5 | Simplified 1-click donation for emergencies | RAP-584 | 5 | DONE (PR #245) | Fullstack |
 | 6 | Auto-close when funded | RAP-585 | 3 | DONE | Backend |
-| 7 | Post-emergency update | RAP-586 | 3 | READY | Fullstack |
+| 7 | Post-emergency update | RAP-586 | 3 | DONE (PR #242) | Fullstack |
 | 8 | Emergency analytics | RAP-587 | 3 | DONE | Backend |
 
 ### EPIC-87: Advanced Adoption Workflow (40 pts)
@@ -483,9 +592,9 @@ Week 3-4:
 |---|-------|--------|-----|--------|-------|
 | 1 | Configurable adoption pipeline stages | RAP-588 | 5 | DONE | Backend |
 | 2 | Pipeline status tracking API | RAP-589 | 5 | DONE | Backend |
-| 3 | Adoption pipeline board UI | RAP-590 | 8 | READY | Frontend |
-| 4 | Home visit scheduling | RAP-591 | 5 | READY | Fullstack |
-| 5 | Trial period management | RAP-592 | 5 | READY | Fullstack |
+| 3 | Adoption pipeline board UI | RAP-590 | 8 | DONE (PR #251) | Frontend |
+| 4 | Home visit scheduling | RAP-591 | 5 | DONE (PR #250) | Fullstack |
+| 5 | Trial period management | RAP-592 | 5 | DONE (PR #248) | Fullstack |
 | 6 | Post-adoption follow-up automation | RAP-593 | 5 | DONE | Backend |
 | 7 | Return/exchange management | RAP-594 | 3 | DONE | Backend |
 | 8 | Adoption success scoring | RAP-595 | 5 | DONE | Backend |
@@ -494,27 +603,27 @@ Week 3-4:
 
 | # | Story | Ticket | Pts | Status | Track |
 |---|-------|--------|-----|--------|-------|
-| 1 | PWA manifest and service worker setup | RAP-596 | 5 | READY | Frontend |
-| 2 | Responsive design audit and fixes | RAP-597 | 6 | READY | Frontend |
-| 3 | Camera integration for forms | RAP-598 | 7 | READY | Fullstack |
-| 4 | Offline donation forms with IndexedDB | RAP-599 | 6 | READY | Fullstack |
-| 5 | Web push notifications | RAP-600 | 6 | READY | Fullstack |
-| 6 | Touch-friendly admin interface | RAP-601 | 4 | READY | Frontend |
-| 7 | App-like bottom navigation bar | RAP-602 | 4 | READY | Frontend |
-| 8 | Performance optimization and bundling | RAP-603 | 3 | READY | Fullstack |
+| 1 | PWA manifest and service worker setup | RAP-596 | 5 | DONE (PR #255) | Frontend |
+| 2 | Responsive design audit and fixes | RAP-597 | 6 | DONE (PR #256) | Frontend |
+| 3 | Camera integration for forms | RAP-598 | 7 | DONE (PR #259) | Fullstack |
+| 4 | Offline donation forms with IndexedDB | RAP-599 | 6 | DONE (PR #258) | Fullstack |
+| 5 | Web push notifications | RAP-600 | 6 | DONE (PR #257) | Fullstack |
+| 6 | Touch-friendly admin interface | RAP-601 | 4 | DONE (PR #254) | Frontend |
+| 7 | App-like bottom navigation bar | RAP-602 | 4 | DONE (PR #253) | Frontend |
+| 8 | Performance optimization and bundling | RAP-603 | 3 | DONE (PR #252) | Fullstack |
 
 ### EPIC-89: Financial Transparency & Impact Reporting (38 pts)
 
 | # | Story | Ticket | Pts | Status | Track |
 |---|-------|--------|-----|--------|-------|
-| 1 | Expense recording system | RAP-604 | 6 | READY | Fullstack |
-| 2 | Expense management UI with receipts | RAP-605 | 5 | READY | Frontend |
-| 3 | Financial transparency dashboard | RAP-606 | 7 | READY | Fullstack |
-| 4 | Campaign-specific financial reports | RAP-607 | 5 | READY | Fullstack |
-| 5 | Donor impact summaries | RAP-608 | 6 | READY | Fullstack |
+| 1 | Expense recording system | RAP-604 | 6 | DONE (PR #262) | Fullstack |
+| 2 | Expense management UI with receipts | RAP-605 | 5 | DONE (PR #263) | Frontend |
+| 3 | Financial transparency dashboard | RAP-606 | 7 | DONE (PR #264) | Fullstack |
+| 4 | Campaign-specific financial reports | RAP-607 | 5 | DONE (PR #265) | Fullstack |
+| 5 | Donor impact summaries | RAP-608 | 6 | DONE (PR #266) | Fullstack |
 | 6 | Automated monthly impact emails | RAP-609 | 4 | DONE (PR #206) | Backend |
-| 7 | Annual financial report generation | RAP-610 | 3 | READY | Backend |
-| 8 | Expense approval workflow | RAP-611 | 2 | READY | Fullstack |
+| 7 | Annual financial report generation | RAP-610 | 3 | DONE (PR #261) | Backend |
+| 8 | Expense approval workflow | RAP-611 | 2 | DONE (PR #260) | Fullstack |
 
 ---
 
@@ -527,35 +636,35 @@ Week 3-4:
 | # | Story | Ticket | Pts | Status | Track |
 |---|-------|--------|-----|--------|-------|
 | 1 | Survey model with question types | RAP-612 | 5 | DONE | Backend |
-| 2 | Admin survey creation form | RAP-613 | 6 | READY | Fullstack |
-| 3 | Public survey response collection | RAP-614 | 4 | READY | Fullstack |
-| 4 | Survey results analytics dashboard | RAP-615 | 5 | READY | Fullstack |
-| 5 | Community feature request board | RAP-616 | 3 | READY | Frontend |
-| 6 | Survey distribution via WhatsApp/email | RAP-617 | 3 | PR #205 | Backend |
+| 2 | Admin survey creation form | RAP-613 | 6 | DONE (PR #270) | Fullstack |
+| 3 | Public survey response collection | RAP-614 | 4 | DONE (PR #268) | Fullstack |
+| 4 | Survey results analytics dashboard | RAP-615 | 5 | DONE (PR #269) | Fullstack |
+| 5 | Community feature request board | RAP-616 | 3 | DONE (PR #267) | Frontend |
+| 6 | Survey distribution via WhatsApp/email | RAP-617 | 3 | DONE (PR #205) | Backend |
 
 ### EPIC-91: Animal Transport & Logistics Network (29 pts)
 
 | # | Story | Ticket | Pts | Status | Track |
 |---|-------|--------|-----|--------|-------|
 | 1 | Transport request model and API | RAP-618 | 4 | DONE | Backend |
-| 2 | Transport request creation form | RAP-619 | 5 | READY | Fullstack |
-| 3 | Volunteer driver registration | RAP-620 | 5 | READY | Fullstack |
-| 4 | Intelligent request matching and notification | RAP-621 | 6 | READY | Fullstack |
-| 5 | Real-time trip tracking with photos | RAP-622 | 4 | READY | Fullstack |
-| 6 | Integration with vet appointments | RAP-623 | 3 | PR #204 | Backend |
-| 7 | Driver reimbursement tracking | RAP-624 | 2 | PR #203 | Backend |
+| 2 | Transport request creation form | RAP-619 | 5 | DONE (PR #282) | Fullstack |
+| 3 | Volunteer driver registration | RAP-620 | 5 | DONE (PR #283) | Fullstack |
+| 4 | Intelligent request matching and notification | RAP-621 | 6 | DONE (PR #286) | Fullstack |
+| 5 | Real-time trip tracking with photos | RAP-622 | 4 | DONE (PR #277) | Fullstack |
+| 6 | Integration with vet appointments | RAP-623 | 3 | DONE (PR #204) | Backend |
+| 7 | Driver reimbursement tracking | RAP-624 | 2 | DONE (PR #203) | Backend |
 
 ### EPIC-92: Education & Responsible Pet Ownership Hub (31 pts)
 
 | # | Story | Ticket | Pts | Status | Track |
 |---|-------|--------|-----|--------|-------|
-| 1 | Educational article model and API | RAP-625 | 4 | PR #202 | Backend |
-| 2 | Education hub public page | RAP-626 | 5 | READY | Frontend |
-| 3 | Article detail page with related articles | RAP-627 | 5 | READY | Frontend |
-| 4 | Required pre-adoption reading enforcement | RAP-628 | 4 | READY | Fullstack |
-| 5 | Sterilization awareness campaign page | RAP-629 | 4 | READY | Frontend |
-| 6 | Video embed support | RAP-630 | 3 | READY | Frontend |
-| 7 | Admin article editor with rich text | RAP-631 | 6 | READY | Fullstack |
+| 1 | Educational article model and API | RAP-625 | 4 | DONE (PR #202) | Backend |
+| 2 | Education hub public page | RAP-626 | 5 | DONE (PR #273) | Frontend |
+| 3 | Article detail page with related articles | RAP-627 | 5 | DONE (PR #274) | Frontend |
+| 4 | Required pre-adoption reading enforcement | RAP-628 | 4 | DONE (PR #275) | Fullstack |
+| 5 | Sterilization awareness campaign page | RAP-629 | 4 | DONE (PR #272) | Frontend |
+| 6 | Video embed support | RAP-630 | 3 | DONE (PR #271) | Frontend |
+| 7 | Admin article editor with rich text | RAP-631 | 6 | DONE (PR #276) | Fullstack |
 
 ---
 
@@ -567,14 +676,14 @@ Week 3-4:
 
 | # | Story | Ticket | Pts | Status | Track |
 |---|-------|--------|-----|--------|-------|
-| 1 | Executive KPI dashboard | RAP-632 | 7 | READY | Fullstack |
-| 2 | Animal intake/outcome analytics | RAP-633 | 6 | READY | Fullstack |
-| 3 | Donation analytics and trends | RAP-634 | 5 | READY | Fullstack |
-| 4 | Donor analytics and retention | RAP-635 | 5 | READY | Fullstack |
-| 5 | Veterinary care analytics | RAP-636 | 4 | READY | Fullstack |
-| 6 | Community engagement analytics | RAP-637 | 5 | READY | Fullstack |
-| 7 | Exportable reports (PDF/CSV) | RAP-638 | 4 | READY | Fullstack |
-| 8 | Predictive analytics and forecasting | RAP-639 | 5 | READY | Backend |
+| 1 | Executive KPI dashboard | RAP-632 | 7 | DONE (PR #288) | Fullstack |
+| 2 | Animal intake/outcome analytics | RAP-633 | 6 | DONE (PR #287) | Fullstack |
+| 3 | Donation analytics and trends | RAP-634 | 5 | DONE (PR #280) | Fullstack |
+| 4 | Donor analytics and retention | RAP-635 | 5 | DONE (PR #281) | Fullstack |
+| 5 | Veterinary care analytics | RAP-636 | 4 | DONE (PR #278) | Fullstack |
+| 6 | Community engagement analytics | RAP-637 | 5 | DONE (PR #284) | Fullstack |
+| 7 | Exportable reports (PDF/CSV) | RAP-638 | 4 | DONE (PR #279) | Fullstack |
+| 8 | Predictive analytics and forecasting | RAP-639 | 5 | DONE (PR #285) | Backend |
 
 ---
 
@@ -590,9 +699,9 @@ Full details in [ROADMAP.md](ROADMAP.md). Each sprint has epic and story docs in
 | 1 | V4 | Staff Operations Launch (S1 done, S2+ pending) | 105 | EPIC 21-25 |
 | 2 | V5 | Veterinary & Medical Records | 105 | EPIC 26-30 |
 | 3 | V6 | EU Payment Integration | 112 | EPIC 31-35 |
-| 4 | V7 | Volunteer & Foster Programs | 99 | EPIC 36-40 |
-| 5 | V8 | Notifications & Communications | 102 | EPIC 41-45 |
-| 6 | V9 | GDPR, Security & Compliance | 87 | EPIC 46-50 |
+| 4 | V7 | Volunteer & Foster Programs | 99 | EPIC 36-40 | COMPLETE (2026-03-29). EPIC-36 through EPIC-40 all 5 stories each DONE. RAP-196 (S2) and RAP-197 (S3) conflicts resolved and merged via rebase. |
+| 5 | V8 | Notifications & Communications | 102 | EPIC 41-45 | In progress. EPIC-41 ALL DONE (RAP-200–204). EPIC-42 ALL DONE (RAP-205–209). EPIC-43 ALL DONE (RAP-210–214; PR #335–339, 2026-03-29). EPIC-44 ALL DONE (RAP-215–219; PR #340–344, 2026-03-29). EPIC-45 ALL DONE (RAP-220–224; PR #345–349, 2026-03-29). EPIC-46 ALL DONE (RAP-225–229; PR #350–354, 2026-03-29). |
+| 6 | V9 | GDPR, Security & Compliance | 87 | EPIC 46-50 | COMPLETE (2026-03-29). EPIC-46 ALL DONE (RAP-225–229; PR #350–354). EPIC-47 ALL DONE (RAP-230–234; PR #355–359). EPIC-48 ALL DONE (RAP-235–239; PR #360–364). EPIC-49 ALL DONE (RAP-240–244; PR #365–369). EPIC-50 ALL DONE (RAP-245–249; PR #370–374; RAP-245/246/249 required rebase). |
 | 7 | V10 | Analytics & Reporting | 101 | EPIC 51-55 |
 | 8 | V11 | Public Experience & Content | 101 | EPIC 56-60 |
 | 9 | V12 | Infrastructure & DevOps | 104 | EPIC 61-65 |
