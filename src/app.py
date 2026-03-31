@@ -24,10 +24,11 @@ from src.api.admin_fund_dashboard import router as admin_fund_dashboard_router
 from src.api.admin_government_reports import router as admin_government_reports_router
 from src.api.admin_moderation import router as admin_moderation_router
 from src.api.admin_security import router as admin_security_router
-from src.api.admin_suspicious_activity import router as admin_suspicious_activity_router
 from src.api.admin_sse import router as admin_sse_router
+from src.api.admin_suspicious_activity import router as admin_suspicious_activity_router
 from src.api.admin_voucher_finance import router as admin_voucher_finance_router
 from src.api.adopters import router as adopters_router
+from src.api.adoption_outcomes import router as adoption_outcomes_router
 from src.api.adoption_requests import router as adoption_requests_router
 from src.api.adoption_requirements import (
     admin_router as adoption_req_admin_router,
@@ -35,7 +36,6 @@ from src.api.adoption_requirements import (
 from src.api.adoption_requirements import (
     public_router as adoption_req_public_router,
 )
-from src.api.adoption_outcomes import router as adoption_outcomes_router
 from src.api.adoption_success import router as adoption_success_router
 from src.api.anbi_compliance import router as anbi_compliance_router
 from src.api.animal_intake_outcome import router as animal_intake_outcome_router
@@ -95,10 +95,11 @@ from src.api.expense_crud import router as expense_crud_router
 from src.api.feature_requests import router as feature_requests_router
 from src.api.financial_reporting import router as financial_reporting_router
 from src.api.financial_stats import router as financial_stats_router
-from src.api.follow_up_schedule import adoption_schedule_router as follow_up_adoption_schedule_router
+from src.api.follow_up_schedule import (
+    adoption_schedule_router as follow_up_adoption_schedule_router,
+)
 from src.api.follow_up_schedule import router as follow_up_schedule_router
 from src.api.follow_ups import router as follow_ups_router
-from src.api.return_tracking import router as return_tracking_router
 from src.api.followup_automation import admin_router as followup_auto_admin_router
 from src.api.followup_automation import public_router as followup_auto_public_router
 from src.api.foster import public_router as foster_public_router
@@ -128,6 +129,7 @@ from src.api.password_reset import router as password_reset_router
 from src.api.phone_verification import router as phone_verification_router
 from src.api.pipeline_tracking import router as pipeline_tracking_router
 from src.api.portal import router as portal_router
+from src.api.portal_visits import router as portal_visits_router
 from src.api.pre_adoption_reading import router as pre_adoption_reading_router
 from src.api.pre_qualification import router as pre_qualification_router
 from src.api.pre_qualification_analytics import router as pre_qual_analytics_router
@@ -169,6 +171,7 @@ from src.api.rescuer_profiles import router as rescuer_profiles_router
 from src.api.rescuer_verification import router as rescuer_verification_router
 from src.api.rescuer_voucher_integration import router as rescuer_voucher_integration_router
 from src.api.rescuer_vouchers import router as rescuer_vouchers_router
+from src.api.return_tracking import router as return_tracking_router
 from src.api.sepa import router as sepa_router
 from src.api.sessions import router as sessions_router
 from src.api.share_tracking import admin_router as share_admin_router
@@ -364,6 +367,7 @@ def create_app() -> FastAPI:
     application.include_router(sessions_router)
     application.include_router(animals_router)
     application.include_router(adopters_router)
+    application.include_router(portal_visits_router)
     application.include_router(adoption_requests_router)
     application.include_router(donors_router)
     application.include_router(donations_router)
