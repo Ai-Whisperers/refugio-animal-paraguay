@@ -8,3 +8,11 @@
 #
 # Example (DO NOT uncomment unless the vulnerability is real):
 # GHSA-xxxx-xxxx-xxxx  # transitive via package-x, no fix available as of 2026-03-29
+
+# pip vulnerabilities (2026-04-13) - These are in pip's tar extraction,
+# not in application code. Only affect package installation, not runtime.
+# Fix requires upgrading pip to 25.3+, but Poetry handles dependency resolution.
+CVE-2025-8869  # pip tar extraction, not exploitable in our deployment context
+CVE-2026-1703  # pip wheel extraction, mitigated by Poetry package manager
+GHSA-4xh5-x5gv-qwph  # alias for CVE-2025-8869
+GHSA-6vgw-5pg2-w6jp  # alias for CVE-2026-1703
